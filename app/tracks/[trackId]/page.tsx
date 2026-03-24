@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { TrackCategory } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { ArrowRight, CheckCircle2, Clock3, Layers3, Lock, Sparkles, Trophy } from "lucide-react";
+import { getLocale } from "next-intl/server";
 
 import { SkillRadarChart } from "@/components/skill-radar/skill-radar";
 import { LevelBadge } from "@/components/level/level-badge";
@@ -11,6 +12,7 @@ import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
 import { resolveLearningUser } from "@/lib/learning-user";
 import { getNextLevelTarget, getLevelByXp } from "@/lib/progress/xp";
 import { prisma } from "@/lib/prisma";
+import { applyTrackContentOverrides, normalizeLearningLocale } from "@/lib/tracks/content-overrides";
 import {
   LearningPathState,
   buildTrackProgression,
@@ -98,10 +100,13 @@ function formatMinutes(minutes: number) {
 }
 
 export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
-  const [track, session] = await Promise.all([
+  const [runtimeTrack, session, localeValue] = await Promise.all([
     resolveRuntimeCourseBySlug(params.trackId, { includeCourseEntities: true }),
     getServerSession(authOptions),
+    getLocale(),
   ]);
+
+  const track = runtimeTrack ? applyTrackContentOverrides(runtimeTrack, normalizeLearningLocale(localeValue)) : null;
 
   if (!track) {
     notFound();
@@ -160,8 +165,16 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
   const level = getLevelByXp(progression.earnedXp);
   const levelProgress = getNextLevelTarget(progression.earnedXp);
   const accent = categoryAccent(trackCategory);
-  const whatYouLearn = trackWhatYouLearn(trackCategory);
-  const skillsToShow = progression.unlockedSkills.length > 0 ? progression.unlockedSkills : whatYouLearn;
+  const localizedLearnings = progression.modules.flatMap((moduleItem) =>
+    moduleItem.whatYouWillLearn.length > 0 ? moduleItem.whatYouWillLearn : moduleItem.outcomes,
+  );
+  const whatYouLearn = Array.from(new Set(localizedLearnings)).slice(0, 6);
+  const fallbackLearnings = trackWhatYouLearn(trackCategory);
+  const whatYouLearnToShow = whatYouLearn.length > 0 ? whatYouLearn : fallbackLearnings;
+  const fallbackSkills = progression.modules.flatMap((moduleItem) => moduleItem.skills);
+  const skillsToShow = progression.unlockedSkills.length > 0
+    ? progression.unlockedSkills
+    : Array.from(new Set(fallbackSkills)).slice(0, 8);
   const firstActiveModule =
     progression.modules.find((moduleItem) => moduleItem.state !== "locked") ?? progression.modules[0];
   const strongestSkill = [...radarData].sort((a, b) => b.value - a.value)[0]?.skill ?? "Core skill";
@@ -212,9 +225,9 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
 
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <section className="surface-elevated space-y-4 p-5">
-          <h2 className="section-title">What you will learn</h2>
+            <h2 className="section-title">What you will learn</h2>
           <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
-            {whatYouLearn.map((item) => (
+            {whatYouLearnToShow.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>

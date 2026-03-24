@@ -11,6 +11,7 @@ import {
   Rocket,
   Sparkles,
   Target,
+  Zap,
 } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
@@ -23,7 +24,36 @@ import { SectionReveal } from "@/components/landing/section-reveal";
 import { resolveRuntimeCatalog } from "@/lib/learning/runtime-content";
 import { mapRuntimeCatalogToMissions } from "@/lib/missions/runtime-missions";
 
-const valueChips = ["Practical learning", "AI guidance", "Career readiness", "Real missions"];
+const valueProps = [
+  {
+    icon: Target,
+    title: "Role-focused tracks",
+    description: "QA, BA, DA, and PM paths built around real job requirements.",
+    color: "text-sky-400",
+    bg: "bg-sky-500/10 border-sky-500/20",
+  },
+  {
+    icon: Rocket,
+    title: "Real-world missions",
+    description: "Practice on scenarios that mirror actual product-team work.",
+    color: "text-violet-400",
+    bg: "bg-violet-500/10 border-violet-500/20",
+  },
+  {
+    icon: Bot,
+    title: "AI mentor guidance",
+    description: "Personalised path, review feedback, and interview prep.",
+    color: "text-emerald-400",
+    bg: "bg-emerald-500/10 border-emerald-500/20",
+  },
+  {
+    icon: LineChart,
+    title: "Career readiness score",
+    description: "Track your progress toward job-ready with clear metrics.",
+    color: "text-amber-400",
+    bg: "bg-amber-500/10 border-amber-500/20",
+  },
+];
 
 const howItWorks = [
   {
@@ -55,6 +85,8 @@ const fallbackTracks = [
     category: "BA",
     title: "Business Analyst",
     accent: "border-orange-400/30 bg-orange-500/10",
+    iconColor: "text-orange-300",
+    dot: "bg-orange-400",
     duration: "10 weeks",
     modules: 18,
     missions: 14,
@@ -67,6 +99,8 @@ const fallbackTracks = [
     category: "DA",
     title: "Data Analyst",
     accent: "border-violet-400/30 bg-violet-500/10",
+    iconColor: "text-violet-300",
+    dot: "bg-violet-400",
     duration: "12 weeks",
     modules: 20,
     missions: 16,
@@ -79,6 +113,8 @@ const fallbackTracks = [
     category: "QA",
     title: "QA Engineer",
     accent: "border-emerald-400/30 bg-emerald-500/10",
+    iconColor: "text-emerald-300",
+    dot: "bg-emerald-400",
     duration: "10 weeks",
     modules: 17,
     missions: 15,
@@ -91,6 +127,8 @@ const fallbackTracks = [
     category: "PRODUCT",
     title: "Product Manager",
     accent: "border-sky-400/30 bg-sky-500/10",
+    iconColor: "text-sky-300",
+    dot: "bg-sky-400",
     duration: "8 weeks",
     modules: 14,
     missions: 12,
@@ -105,18 +143,27 @@ const fallbackMissions = [
     scenario: "Release candidate returns inconsistent status codes under edge conditions.",
     xp: 140,
     status: "In progress",
+    category: "QA",
+    accent: "border-emerald-400/25 bg-emerald-500/8",
+    dot: "bg-emerald-400",
   },
   {
     title: "Stakeholder Request to User Story",
     scenario: "Convert a vague request into clear acceptance criteria and testable scope.",
     xp: 120,
     status: "Available",
+    category: "BA",
+    accent: "border-orange-400/25 bg-orange-500/8",
+    dot: "bg-orange-400",
   },
   {
     title: "Retention Dataset Deep Dive",
     scenario: "Analyze churn signals and propose 3 high-impact product actions.",
     xp: 180,
     status: "Locked",
+    category: "DA",
+    accent: "border-violet-400/25 bg-violet-500/8",
+    dot: "bg-violet-400",
   },
 ];
 
@@ -136,11 +183,53 @@ const outcomes = [
   "Prepare for interviews with AI mentor feedback",
 ];
 
+const pricingPlans = [
+  {
+    name: "Starter",
+    price: "Free",
+    description: "Best for local demo and personal exploration.",
+    features: ["1 career track", "Core modules", "Basic quizzes", "Progress tracking"],
+    cta: "Get started",
+    highlight: false,
+  },
+  {
+    name: "Pro Learner",
+    price: "$29",
+    period: "/ mo",
+    description: "Full access to tracks, missions, and AI guidance.",
+    features: ["All career tracks", "Real-world missions", "AI mentor feedback", "Interview prep", "Portfolio builder", "Priority support"],
+    cta: "Start Pro",
+    highlight: true,
+  },
+  {
+    name: "Team Academy",
+    price: "Custom",
+    description: "Builder workflows and analytics for cohorts.",
+    features: ["Unlimited members", "Admin studio", "Analytics dashboard", "Custom tracks", "Cohort progress", "Dedicated support"],
+    cta: "Contact us",
+    highlight: false,
+  },
+];
+
 function accentByCategory(category: string) {
   if (category === "QA") return "border-emerald-400/30 bg-emerald-500/10";
   if (category === "BA") return "border-orange-400/30 bg-orange-500/10";
   if (category === "DA") return "border-violet-400/30 bg-violet-500/10";
   return "border-sky-400/30 bg-sky-500/10";
+}
+
+function dotByCategory(category: string) {
+  if (category === "QA") return "bg-emerald-400";
+  if (category === "BA") return "bg-orange-400";
+  if (category === "DA") return "bg-violet-400";
+  return "bg-sky-400";
+}
+
+function iconColorByCategory(category: string) {
+  if (category === "QA") return "text-emerald-300";
+  if (category === "BA") return "text-orange-300";
+  if (category === "DA") return "text-violet-300";
+  return "text-sky-300";
 }
 
 function skillHintsByCategory(category: string) {
@@ -156,6 +245,21 @@ function normalizeMissionStatus(status: string) {
   return "Available";
 }
 
+function missionAccentByCategory(category: string) {
+  if (category === "QA") return "border-emerald-400/25 bg-emerald-500/8";
+  if (category === "BA") return "border-orange-400/25 bg-orange-500/8";
+  if (category === "DA") return "border-violet-400/25 bg-violet-500/8";
+  return "border-sky-400/25 bg-sky-500/8";
+}
+
+function missionStatusColor(status: string) {
+  if (status === "In progress" || status === "in_progress")
+    return "border-sky-400/30 bg-sky-500/10 text-sky-300";
+  if (status === "locked")
+    return "border-slate-700/60 bg-slate-800/50 text-slate-500";
+  return "border-emerald-400/30 bg-emerald-500/10 text-emerald-300";
+}
+
 export default async function HomePage() {
   const catalog = await resolveRuntimeCatalog({ includeCourseEntities: true });
 
@@ -168,6 +272,8 @@ export default async function HomePage() {
       category: course.category,
       title: course.title,
       accent: accentByCategory(course.category),
+      iconColor: iconColorByCategory(course.category),
+      dot: dotByCategory(course.category),
       duration: `${Math.max(4, Math.round(course.estimatedDuration / 300))} weeks`,
       modules: course.modules.length,
       missions: course.modules.reduce((sum, moduleItem) => sum + moduleItem.missions.length, 0) || course.modules.length,
@@ -182,6 +288,9 @@ export default async function HomePage() {
     scenario: mission.scenario,
     xp: mission.xpReward,
     status: normalizeMissionStatus(mission.status),
+    category: "QA",
+    accent: missionAccentByCategory("QA"),
+    dot: "bg-sky-400",
   }));
 
   const missions = dynamicMissionCards.length > 0 ? dynamicMissionCards : fallbackMissions;
@@ -193,29 +302,35 @@ export default async function HomePage() {
       <div className="mx-auto w-full max-w-[112rem] px-3 pb-14 sm:px-5 lg:px-7">
         <LandingHeader />
 
-        <main className="space-y-16 pb-16 pt-8 sm:space-y-20 sm:pt-10">
+        <main className="space-y-20 pb-16 pt-8 sm:space-y-24 sm:pt-12">
+
+          {/* ── Hero ─────────────────────────────────────── */}
           <SectionReveal>
-            <section className="grid items-center gap-8 lg:grid-cols-[1.03fr_0.97fr] lg:gap-10">
-              <div className="space-y-6">
-                <p className="inline-flex items-center gap-2 rounded-full border border-sky-400/35 bg-sky-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-200">
+            <section className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+              <div className="space-y-7">
+                <div className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/8 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-sky-300">
                   <Sparkles className="h-3.5 w-3.5" />
                   Build real-world skills
-                </p>
-                <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-slate-100 sm:text-5xl lg:text-6xl">
-                  Launch your tech career with modules, missions, and AI mentoring
+                </div>
+                <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-slate-100 sm:text-5xl lg:text-[3.5rem] lg:leading-[1.12]">
+                  Launch your tech career with{" "}
+                  <span className="bg-gradient-to-br from-sky-300 via-sky-200 to-violet-300 bg-clip-text text-transparent">
+                    modules, missions,
+                  </span>{" "}
+                  and AI mentoring
                 </h1>
-                <p className="max-w-2xl text-base text-slate-300 sm:text-lg">
-                  SkillPath Academy combines practical learning, progression systems, and career guidance in one premium local workspace.
+                <p className="max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg">
+                  SkillPath Academy combines practical learning, progression systems, and career guidance in one premium workspace.
                 </p>
-                <div className="flex flex-wrap gap-2.5">
-                  <Link href="/login" className={cn(buttonVariants({ size: "lg" }), "h-11 px-6")}>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Link href="/login" className={cn(buttonVariants({ size: "lg" }), "gap-2")}>
                     Start learning
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <ArrowRight className="h-4 w-4" />
                   </Link>
-                  <a href="#tracks" className={cn(buttonVariants({ variant: "outline" }), "h-11 border-slate-700 px-6")}>
+                  <a href="#tracks" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
                     Explore tracks
                   </a>
-                  <Link href="/login" className={cn(buttonVariants({ variant: "ghost" }), "h-11 px-4")}>
+                  <Link href="/login" className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "text-slate-400")}>
                     Try demo
                   </Link>
                 </div>
@@ -224,76 +339,109 @@ export default async function HomePage() {
             </section>
           </SectionReveal>
 
+          {/* ── Value props ──────────────────────────────── */}
           <SectionReveal>
-            <section className="surface-elevated p-4 sm:p-5">
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                {valueChips.map((chip) => (
-                  <span key={chip} className="inline-flex items-center justify-center rounded-xl border border-slate-700/80 bg-slate-900/65 px-3 py-2 text-sm text-slate-200">
-                    {chip}
-                  </span>
-                ))}
-              </div>
-            </section>
-          </SectionReveal>
-
-          <SectionReveal>
-            <section className="space-y-5">
-              <div className="space-y-2">
-                <p className="kicker">How it works</p>
-                <h2 className="section-title">How SkillPath works</h2>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                {howItWorks.map((item) => (
-                  <article key={item.title} className="surface-subtle surface-panel-hover p-5">
-                    <item.icon className="h-5 w-5 text-sky-300" />
-                    <h3 className="mt-3 text-lg font-semibold text-slate-100">{item.title}</h3>
-                    <p className="mt-2 text-sm text-slate-400">{item.description}</p>
+            <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {valueProps.map((prop) => {
+                const Icon = prop.icon;
+                return (
+                  <article
+                    key={prop.title}
+                    className={cn(
+                      "surface-panel surface-panel-hover flex flex-col gap-3 p-5",
+                    )}
+                  >
+                    <div className={cn("inline-flex h-9 w-9 items-center justify-center rounded-xl border", prop.bg)}>
+                      <Icon className={cn("h-4 w-4", prop.color)} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-100">{prop.title}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-slate-400">{prop.description}</p>
+                    </div>
                   </article>
-                ))}
+                );
+              })}
+            </section>
+          </SectionReveal>
+
+          {/* ── How it works ─────────────────────────────── */}
+          <SectionReveal>
+            <section className="space-y-8">
+              <div className="section-header">
+                <p className="kicker">How it works</p>
+                <h2 className="section-title">Four steps to career readiness</h2>
+              </div>
+              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+                {howItWorks.map((item, index) => {
+                  const Icon = item.icon;
+                  return (
+                    <article key={item.title} className="surface-subtle surface-panel-hover relative p-5">
+                      <div className="mb-4 flex items-center gap-3">
+                        <span className="step-number">{index + 1}</span>
+                        <div className="h-px flex-1 bg-slate-800" />
+                        <Icon className="h-4 w-4 text-sky-400" />
+                      </div>
+                      <h3 className="text-base font-semibold text-slate-100">{item.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-slate-400">{item.description}</p>
+                    </article>
+                  );
+                })}
               </div>
             </section>
           </SectionReveal>
 
+          {/* ── Tracks ───────────────────────────────────── */}
           <SectionReveal>
-            <section id="tracks" className="space-y-5">
-              <div className="flex items-end justify-between gap-3">
-                <div className="space-y-2">
+            <section id="tracks" className="space-y-8">
+              <div className="flex items-end justify-between gap-4">
+                <div className="section-header">
                   <p className="kicker">Career tracks</p>
                   <h2 className="section-title">Choose your role-focused path</h2>
                 </div>
-                <Link href="/tracks" className={cn(buttonVariants({ variant: "outline" }), "hidden h-9 border-slate-700 px-4 sm:inline-flex")}>
-                  Open tracks
+                <Link href="/tracks" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "hidden shrink-0 sm:inline-flex")}>
+                  All tracks
                 </Link>
               </div>
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
                 {tracks.map((track) => (
-                  <article key={track.title} className={cn("surface-panel-hover space-y-4 rounded-2xl border p-4", track.accent)}>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-100">{track.title}</h3>
-                      <p className="mt-1 line-clamp-2 text-sm text-slate-400">{track.description}</p>
+                  <article
+                    key={track.title}
+                    className={cn("surface-panel-hover flex flex-col gap-4 rounded-2xl border p-5", track.accent)}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className={cn("h-2 w-2 rounded-full shrink-0", track.dot)} />
+                          <span className={cn("text-xs font-semibold uppercase tracking-[0.14em]", track.iconColor)}>
+                            {track.category}
+                          </span>
+                        </div>
+                        <h3 className="mt-1.5 text-base font-semibold text-slate-100">{track.title}</h3>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                      <div className="rounded-lg border border-slate-800 bg-slate-900/65 p-2">
-                        <p className="text-slate-500">Duration</p>
-                        <p className="mt-1 text-slate-100">{track.duration}</p>
+                    <p className="line-clamp-2 text-sm leading-relaxed text-slate-400">{track.description}</p>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="stat-card">
+                        <p className="stat-card-label">Duration</p>
+                        <p className="stat-card-value mt-1 text-sm">{track.duration}</p>
                       </div>
-                      <div className="rounded-lg border border-slate-800 bg-slate-900/65 p-2">
-                        <p className="text-slate-500">Modules</p>
-                        <p className="mt-1 text-slate-100">{track.modules}</p>
+                      <div className="stat-card">
+                        <p className="stat-card-label">Modules</p>
+                        <p className="stat-card-value mt-1 text-sm">{track.modules}</p>
                       </div>
-                      <div className="rounded-lg border border-slate-800 bg-slate-900/65 p-2">
-                        <p className="text-slate-500">Missions</p>
-                        <p className="mt-1 text-slate-100">{track.missions}</p>
+                      <div className="stat-card">
+                        <p className="stat-card-label">Missions</p>
+                        <p className="stat-card-value mt-1 text-sm">{track.missions}</p>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {track.skills.map((skill) => (
-                        <span key={skill} className="rounded-full border border-slate-700 bg-slate-900/70 px-2 py-0.5 text-[11px] text-slate-300">
+                        <span key={skill} className="rounded-lg border border-slate-700/80 bg-slate-900/60 px-2 py-0.5 text-xs text-slate-300">
                           {skill}
                         </span>
                       ))}
                     </div>
-                    <Link href={track.href} className={cn(buttonVariants({ variant: "outline" }), "h-9 w-full border-slate-700")}>
+                    <Link href={track.href} className={cn(buttonVariants({ variant: "outline", size: "sm" }), "mt-auto w-full")}>
                       Explore track
                     </Link>
                   </article>
@@ -302,26 +450,27 @@ export default async function HomePage() {
             </section>
           </SectionReveal>
 
+          {/* ── Product preview ──────────────────────────── */}
           <SectionReveal>
-            <section className="surface-elevated space-y-5 p-5 sm:p-6">
-              <div className="space-y-2">
+            <section className="surface-elevated space-y-6 p-5 sm:p-7">
+              <div className="section-header">
                 <p className="kicker">Product preview</p>
                 <h2 className="section-title">A premium learning command center</h2>
               </div>
-              <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-                <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+              <div className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
+                <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
                   <div className="grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
-                      <p className="text-xs text-slate-500">Total XP</p>
-                      <p className="mt-1 text-xl font-semibold text-slate-100">1,840</p>
+                    <div className="stat-card">
+                      <p className="stat-card-label">Total XP</p>
+                      <p className="stat-card-value mt-1 text-xl">1,840</p>
                     </div>
-                    <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
-                      <p className="text-xs text-slate-500">Active track</p>
-                      <p className="mt-1 text-xl font-semibold text-slate-100">QA Engineer</p>
+                    <div className="stat-card">
+                      <p className="stat-card-label">Active track</p>
+                      <p className="stat-card-value mt-1 text-base">QA Engineer</p>
                     </div>
-                    <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3">
-                      <p className="text-xs text-slate-500">Quiz accuracy</p>
-                      <p className="mt-1 text-xl font-semibold text-slate-100">82%</p>
+                    <div className="stat-card">
+                      <p className="stat-card-label">Quiz accuracy</p>
+                      <p className="stat-card-value mt-1 text-xl">82%</p>
                     </div>
                   </div>
                   <div className="mt-3 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
@@ -330,98 +479,129 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <div className="grid gap-3">
-                  <article className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
-                    <p className="text-sm font-semibold text-slate-100">Track cards</p>
-                    <p className="mt-1 text-xs text-slate-400">Progress, next module, and ETA in one glance.</p>
-                  </article>
-                  <article className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
-                    <p className="text-sm font-semibold text-slate-100">Mission cards</p>
-                    <p className="mt-1 text-xs text-slate-400">Scenario, XP reward, and status-driven actions.</p>
-                  </article>
-                  <article className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
-                    <p className="text-sm font-semibold text-slate-100">Progress widgets</p>
-                    <p className="mt-1 text-xs text-slate-400">Level growth, streak, and readiness insights.</p>
-                  </article>
+                  {["Track cards", "Mission cards", "Progress widgets"].map((label, i) => (
+                    <article key={label} className="stat-card flex items-start gap-3 p-4">
+                      <div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-sky-400/70" />
+                      <div>
+                        <p className="text-sm font-semibold text-slate-100">{label}</p>
+                        <p className="mt-0.5 text-xs text-slate-400">
+                          {i === 0 && "Progress, next module, and ETA in one glance."}
+                          {i === 1 && "Scenario, XP reward, and status-driven actions."}
+                          {i === 2 && "Level growth, streak, and readiness insights."}
+                        </p>
+                      </div>
+                    </article>
+                  ))}
                 </div>
               </div>
             </section>
           </SectionReveal>
 
+          {/* ── Skill radar demo ─────────────────────────── */}
           <SectionReveal>
             <LandingSkillRadarDemo />
           </SectionReveal>
 
+          {/* ── Career roadmap ───────────────────────────── */}
           <SectionReveal>
-            <section id="career" className="space-y-5">
-              <div className="space-y-2">
+            <section id="career" className="space-y-8">
+              <div className="section-header">
                 <p className="kicker">Career path visual map</p>
                 <h2 className="section-title">From beginner to job-ready</h2>
               </div>
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {roadmapStages.map((stage, index) => (
-                  <article key={stage.title} className="surface-subtle surface-panel-hover relative p-4">
-                    <span className="absolute -left-2 top-5 hidden h-2 w-2 rounded-full bg-sky-400 xl:block" />
-                    <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Stage {index + 1}</p>
-                    <h3 className="mt-1 text-lg font-semibold text-slate-100">{stage.title}</h3>
-                    <p className="mt-1 text-sm text-slate-400">{stage.description}</p>
-                    <p className="mt-2 inline-flex rounded-full border border-slate-700 bg-slate-900/70 px-2 py-0.5 text-[11px] text-slate-300">
-                      Unlock: {stage.unlock}
-                    </p>
+                  <article key={stage.title} className="surface-subtle surface-panel-hover p-5">
+                    <div className="flex items-center gap-2.5">
+                      <span className="step-number">{index + 1}</span>
+                      <h3 className="text-base font-semibold text-slate-100">{stage.title}</h3>
+                    </div>
+                    <p className="mt-3 text-sm leading-relaxed text-slate-400">{stage.description}</p>
+                    <div className="mt-3 flex items-center gap-1.5">
+                      <Zap className="h-3 w-3 shrink-0 text-amber-400" />
+                      <span className="text-xs text-slate-400">
+                        Unlock: <span className="text-slate-300">{stage.unlock}</span>
+                      </span>
+                    </div>
                   </article>
                 ))}
               </div>
             </section>
           </SectionReveal>
 
+          {/* ── AI mentor ────────────────────────────────── */}
           <SectionReveal>
-            <section className="surface-elevated grid gap-5 p-5 sm:p-6 lg:grid-cols-[0.95fr_1.05fr]">
-              <div className="space-y-3">
-                <p className="kicker">AI mentor onboarding</p>
-                <h2 className="section-title">Personalized guidance from day one</h2>
-                <p className="text-sm text-slate-400">
+            <section className="surface-elevated grid gap-6 p-5 sm:p-7 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10">
+              <div className="flex flex-col justify-center space-y-4">
+                <div className="section-header">
+                  <p className="kicker">AI mentor onboarding</p>
+                  <h2 className="section-title">Personalised guidance from day one</h2>
+                </div>
+                <p className="text-sm leading-relaxed text-slate-400">
                   Tell SkillPath your target role and weekly time. AI mentor builds a practical path and adapts it as you progress.
                 </p>
-                <Link href="/login" className={cn(buttonVariants({ size: "sm" }), "h-9 px-4")}>
+                <Link href="/login" className={cn(buttonVariants({ variant: "accent", size: "sm" }), "w-fit gap-2")}>
+                  <Bot className="h-3.5 w-3.5" />
                   Ask AI mentor
                 </Link>
               </div>
-              <div className="space-y-2 rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
-                <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3 text-sm text-slate-200">
-                  I want to become a QA engineer.
+              <div className="space-y-2.5 rounded-2xl border border-slate-800/80 bg-slate-950/60 p-4">
+                <div className="flex justify-end">
+                  <div className="max-w-[80%] rounded-2xl rounded-tr-sm border border-slate-700/60 bg-slate-800/60 px-3.5 py-2.5 text-sm text-slate-200">
+                    I want to become a QA engineer.
+                  </div>
                 </div>
-                <div className="rounded-xl border border-violet-400/25 bg-violet-500/10 p-3 text-sm text-violet-100">
-                  Great goal. How many hours can you study each week?
+                <div className="flex justify-start">
+                  <div className="max-w-[80%] rounded-2xl rounded-tl-sm border border-violet-400/20 bg-violet-500/10 px-3.5 py-2.5 text-sm text-violet-100">
+                    Great goal. How many hours can you study each week?
+                  </div>
                 </div>
-                <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-3 text-sm text-slate-200">
-                  Around 7 hours.
+                <div className="flex justify-end">
+                  <div className="max-w-[80%] rounded-2xl rounded-tr-sm border border-slate-700/60 bg-slate-800/60 px-3.5 py-2.5 text-sm text-slate-200">
+                    Around 7 hours.
+                  </div>
                 </div>
-                <div className="rounded-xl border border-sky-400/25 bg-sky-500/10 p-3 text-sm text-sky-100">
-                  Recommended path: QA Foundations → API Testing → Bug Tracker Simulation → Mock Interview.
+                <div className="flex justify-start">
+                  <div className="max-w-[80%] rounded-2xl rounded-tl-sm border border-sky-400/20 bg-sky-500/10 px-3.5 py-2.5 text-sm leading-relaxed text-sky-100">
+                    Recommended path: QA Foundations → API Testing → Bug Tracker Simulation → Mock Interview.
+                  </div>
                 </div>
               </div>
             </section>
           </SectionReveal>
 
+          {/* ── Missions ─────────────────────────────────── */}
           <SectionReveal>
-            <section id="missions" className="space-y-5">
-              <div className="space-y-2">
+            <section id="missions" className="space-y-8">
+              <div className="section-header">
                 <p className="kicker">Real-world missions</p>
                 <h2 className="section-title">Practice with scenarios that mirror real teams</h2>
               </div>
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid gap-5 md:grid-cols-3">
                 {missions.map((mission) => (
-                  <article key={mission.title} className="surface-subtle surface-panel-hover space-y-3 p-4">
-                    <h3 className="text-base font-semibold text-slate-100">{mission.title}</h3>
-                    <p className="line-clamp-2 text-sm text-slate-400">{mission.scenario}</p>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="rounded-full border border-violet-400/30 bg-violet-500/10 px-2 py-0.5 text-violet-200">
+                  <article
+                    key={mission.title}
+                    className={cn("surface-panel-hover flex flex-col gap-4 rounded-2xl border p-5", mission.accent)}
+                  >
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", mission.dot)} />
+                        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                          {mission.category}
+                        </span>
+                      </div>
+                      <h3 className="text-base font-semibold text-slate-100">{mission.title}</h3>
+                      <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-slate-400">{mission.scenario}</p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="rounded-lg border border-violet-400/30 bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-300">
                         +{mission.xp} XP
                       </span>
-                      <span className="rounded-full border border-slate-700 bg-slate-900/70 px-2 py-0.5 text-slate-300">
+                      <span className={cn("rounded-lg border px-2.5 py-1 text-xs font-semibold", missionStatusColor(mission.status))}>
                         {mission.status}
                       </span>
                     </div>
-                    <Link href="/missions" className={cn(buttonVariants({ variant: "outline" }), "h-9 w-full border-slate-700")}>
+                    <Link href="/missions" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "mt-auto w-full")}>
                       Open mission
                     </Link>
                   </article>
@@ -430,97 +610,162 @@ export default async function HomePage() {
             </section>
           </SectionReveal>
 
+          {/* ── Outcomes ─────────────────────────────────── */}
           <SectionReveal>
-            <section id="about" className="surface-elevated space-y-5 p-5 sm:p-6">
-              <div className="space-y-2">
-                <p className="kicker">Outcomes</p>
-                <h2 className="section-title">What you will be able to do</h2>
+            <section id="about" className="surface-elevated p-5 sm:p-7">
+              <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
+                <div className="section-header">
+                  <p className="kicker">Outcomes</p>
+                  <h2 className="section-title">What you will be able to do</h2>
+                  <p className="text-sm leading-relaxed text-slate-400">
+                    Built around the skills that actually matter in QA, BA, and DA roles.
+                  </p>
+                </div>
+                <ul className="grid gap-3 sm:grid-cols-2">
+                  {outcomes.map((outcome) => (
+                    <li
+                      key={outcome}
+                      className="flex items-start gap-3 rounded-xl border border-slate-800/70 bg-slate-900/40 px-4 py-3"
+                    >
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                      <span className="text-sm text-slate-200">{outcome}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <div className="grid gap-3 md:grid-cols-2">
-                {outcomes.map((outcome) => (
-                  <article key={outcome} className="rounded-xl border border-slate-800 bg-slate-950/70 p-4">
-                    <p className="inline-flex items-start gap-2 text-sm text-slate-200">
-                      <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />
-                      {outcome}
-                    </p>
+            </section>
+          </SectionReveal>
+
+          {/* ── Pricing ──────────────────────────────────── */}
+          <SectionReveal>
+            <section id="pricing" className="space-y-8">
+              <div className="section-header">
+                <p className="kicker">Pricing</p>
+                <h2 className="section-title">Simple plans for every stage</h2>
+              </div>
+              <div className="grid gap-5 md:grid-cols-3">
+                {pricingPlans.map((plan) => (
+                  <article
+                    key={plan.name}
+                    className={cn(
+                      "relative flex flex-col gap-5 rounded-2xl border p-6",
+                      plan.highlight
+                        ? "border-sky-400/35 bg-gradient-to-b from-sky-500/10 to-slate-900/70 shadow-[0_0_0_1px_rgba(56,189,248,0.12),0_16px_40px_rgba(2,6,23,0.42)]"
+                        : "surface-subtle",
+                    )}
+                  >
+                    {plan.highlight ? (
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-sky-400/40 bg-sky-500/20 px-3 py-0.5 text-xs font-semibold text-sky-300">
+                          <Sparkles className="h-3 w-3" />
+                          Most popular
+                        </span>
+                      </div>
+                    ) : null}
+                    <div>
+                      <p className="text-sm font-semibold text-slate-200">{plan.name}</p>
+                      <div className="mt-2 flex items-baseline gap-1">
+                        <span className="text-3xl font-bold tracking-tight text-slate-100">{plan.price}</span>
+                        {plan.period ? (
+                          <span className="text-sm text-slate-400">{plan.period}</span>
+                        ) : null}
+                      </div>
+                      <p className="mt-1.5 text-xs text-slate-400">{plan.description}</p>
+                    </div>
+                    <ul className="flex-1 space-y-2">
+                      {plan.features.map((feature) => (
+                        <li key={feature} className="flex items-center gap-2 text-sm text-slate-300">
+                          <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      href="/login"
+                      className={cn(
+                        plan.highlight
+                          ? buttonVariants({ size: "sm" })
+                          : buttonVariants({ variant: "outline", size: "sm" }),
+                        "w-full",
+                      )}
+                    >
+                      {plan.cta}
+                    </Link>
                   </article>
                 ))}
               </div>
             </section>
           </SectionReveal>
 
+          {/* ── Final CTA ────────────────────────────────── */}
           <SectionReveal>
-            <section id="pricing" className="space-y-5">
-              <div className="space-y-2">
-                <p className="kicker">Pricing</p>
-                <h2 className="section-title">Simple plans for local and team learning</h2>
+            <section className="relative overflow-hidden rounded-[28px] border border-sky-400/15 bg-gradient-to-br from-slate-900/90 via-indigo-950/60 to-slate-950/90 p-8 text-center shadow-[0_0_0_1px_rgba(56,189,248,0.08),0_24px_60px_rgba(2,6,23,0.5)] sm:p-12">
+              <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+                <div className="absolute -left-24 top-[-40px] h-[320px] w-[320px] rounded-full bg-sky-500/12 blur-3xl" />
+                <div className="absolute -right-24 bottom-[-40px] h-[320px] w-[320px] rounded-full bg-violet-500/12 blur-3xl" />
               </div>
-              <div className="grid gap-4 md:grid-cols-3">
-                <article className="surface-subtle p-4">
-                  <p className="text-sm font-semibold text-slate-100">Starter</p>
-                  <p className="mt-1 text-xs text-slate-400">Best for local demo and personal practice.</p>
-                  <p className="mt-3 text-2xl font-semibold text-slate-100">Local</p>
-                </article>
-                <article className="surface-subtle p-4">
-                  <p className="text-sm font-semibold text-slate-100">Pro learner</p>
-                  <p className="mt-1 text-xs text-slate-400">Track progression, missions, and AI guidance.</p>
-                  <p className="mt-3 text-2xl font-semibold text-slate-100">$29</p>
-                </article>
-                <article className="surface-subtle p-4">
-                  <p className="text-sm font-semibold text-slate-100">Team Academy</p>
-                  <p className="mt-1 text-xs text-slate-400">Builder workflows and analytics for cohorts.</p>
-                  <p className="mt-3 text-2xl font-semibold text-slate-100">Custom</p>
-                </article>
-              </div>
-            </section>
-          </SectionReveal>
-
-          <SectionReveal>
-            <section className="surface-elevated text-center p-7 sm:p-10">
-              <h2 className="mx-auto max-w-2xl text-3xl font-semibold tracking-tight text-slate-100 sm:text-4xl">
-                Build your skills. Grow your career.
-              </h2>
-              <p className="mx-auto mt-3 max-w-xl text-sm text-slate-400 sm:text-base">
-                Start your learning journey today with role-based tracks, missions, and AI-powered feedback.
-              </p>
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
-                <Link href="/login" className={cn(buttonVariants({ size: "lg" }), "h-11 px-6")}>
-                  Start learning
-                </Link>
-                <Link href="/login" className={cn(buttonVariants({ variant: "outline" }), "h-11 border-slate-700 px-6")}>
-                  Try demo
-                </Link>
+              <div className="relative space-y-4">
+                <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-slate-100 sm:text-4xl">
+                  Build your skills.{" "}
+                  <span className="bg-gradient-to-r from-sky-300 to-violet-300 bg-clip-text text-transparent">
+                    Grow your career.
+                  </span>
+                </h2>
+                <p className="mx-auto max-w-lg text-base leading-relaxed text-slate-400">
+                  Start your learning journey today with role-based tracks, missions, and AI-powered feedback.
+                </p>
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                  <Link href="/login" className={cn(buttonVariants({ size: "lg" }), "gap-2 shadow-[0_10px_30px_rgba(56,189,248,0.3)]")}>
+                    Start learning
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
+                    Try demo
+                  </Link>
+                </div>
               </div>
             </section>
           </SectionReveal>
         </main>
 
-        <footer className="border-t border-slate-800/80 py-8">
-          <div className="grid gap-6 text-sm text-slate-400 sm:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <p className="font-semibold text-slate-200">SkillPath Academy</p>
-              <p className="mt-2 text-xs text-slate-500">Premium local-first EdTech workspace.</p>
+        {/* ── Footer ─────────────────────────────────────── */}
+        <footer className="border-t border-slate-800/70 py-10">
+          <div className="grid gap-8 text-sm text-slate-400 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-sky-400/30 bg-sky-500/15 text-sky-200">
+                  <Sparkles className="h-3.5 w-3.5" />
+                </span>
+                <p className="font-semibold text-slate-200">SkillPath Academy</p>
+              </div>
+              <p className="text-xs text-slate-500 leading-relaxed">Premium local-first EdTech workspace for QA, BA, and DA careers.</p>
             </div>
-            <div className="space-y-1">
-              <p className="font-semibold text-slate-200">Product</p>
-              <Link href="/tracks" className="block hover:text-slate-200">Tracks</Link>
-              <Link href="/missions" className="block hover:text-slate-200">Missions</Link>
-              <Link href="/career" className="block hover:text-slate-200">Career</Link>
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Product</p>
+              <Link href="/tracks" className="block transition-colors hover:text-slate-200">Tracks</Link>
+              <Link href="/missions" className="block transition-colors hover:text-slate-200">Missions</Link>
+              <Link href="/career" className="block transition-colors hover:text-slate-200">Career</Link>
             </div>
-            <div className="space-y-1">
-              <p className="font-semibold text-slate-200">AI & Learning</p>
-              <Link href="/dashboard" className="block hover:text-slate-200">Dashboard</Link>
-              <Link href="/interview" className="block hover:text-slate-200">AI interview</Link>
-              <Link href="/planner" className="block hover:text-slate-200">Planner</Link>
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">AI & Learning</p>
+              <Link href="/dashboard" className="block transition-colors hover:text-slate-200">Dashboard</Link>
+              <Link href="/interview" className="block transition-colors hover:text-slate-200">AI interview</Link>
+              <Link href="/planner" className="block transition-colors hover:text-slate-200">Planner</Link>
             </div>
-            <div className="space-y-1">
-              <p className="font-semibold text-slate-200">Company</p>
-              <a href="#about" className="block hover:text-slate-200">About</a>
-              <a href="#pricing" className="block hover:text-slate-200">Pricing</a>
-              <Link href="/login" className="block hover:text-slate-200">Contact</Link>
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Company</p>
+              <a href="#about" className="block transition-colors hover:text-slate-200">About</a>
+              <a href="#pricing" className="block transition-colors hover:text-slate-200">Pricing</a>
+              <Link href="/login" className="block transition-colors hover:text-slate-200">Contact</Link>
             </div>
           </div>
-          <p className="mt-6 text-xs text-slate-500">© {new Date().getFullYear()} SkillPath Academy. Local edition.</p>
+          <div className="mt-8 flex items-center justify-between border-t border-slate-800/60 pt-6 text-xs text-slate-600">
+            <p>© {new Date().getFullYear()} SkillPath Academy. Local edition.</p>
+            <div className="flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span>All systems operational</span>
+            </div>
+          </div>
         </footer>
       </div>
     </div>

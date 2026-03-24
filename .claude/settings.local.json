@@ -10,7 +10,14 @@
       "Bash(npx vitest:*)",
       "Bash(grep -E \"\\\\.tsx$\")",
       "Bash(npm run:*)",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "Bash(ls -la \"C:\\\\Users\\\\1234\\\\Documents\\\\GitHub\\\\skill_path_io\\\\components\\\\landing\"\" 2>/dev/null || echo \"Directory not found \")",
+      "Bash(node -e \"const p = require\\(''./node_modules/next-intl/package.json''\\); console.log\\(p.version\\)\")",
+      "Bash(xargs wc:*)",
+      "Bash(xargs grep:*)",
+      "Bash(wc -l /c/Users/1234/Documents/GitHub/skill_path_io/app/api/*/*.ts)",
+      "Bash(xargs head:*)",
+      "Bash(grep -r \"loading.tsx\\\\|error.tsx\\\\|not-found.tsx\" /c/Users/1234/Documents/GitHub/skill_path_io/app --include=*.tsx)"
     ]
   }
 }

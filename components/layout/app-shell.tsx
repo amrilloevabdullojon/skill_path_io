@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Bell,
   BarChart3,
@@ -29,6 +30,7 @@ import {
 
 import { Dropdown } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/input";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { SiteFooter } from "@/components/site-footer";
 import { cn } from "@/lib/utils";
@@ -45,7 +47,7 @@ type AppShellProps = {
 
 type NavItem = {
   id: string;
-  label: string;
+  labelKey: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   adminOnly?: boolean;
@@ -53,84 +55,84 @@ type NavItem = {
 
 type NavGroup = {
   id: string;
-  title: string;
+  titleKey: string;
   items: NavItem[];
 };
 
 const sidebarGroups: NavGroup[] = [
   {
     id: "learning",
-    title: "Learning",
+    titleKey: "groups",
     items: [
-      { id: "overview", label: "Overview", href: "/dashboard?tab=overview", icon: LayoutDashboard },
-      { id: "tracks", label: "Tracks", href: "/tracks", icon: Target },
-      { id: "missions", label: "Missions", href: "/missions", icon: Rocket },
-      { id: "quests", label: "Weekly quests", href: "/dashboard?tab=overview#quests", icon: Home },
-      { id: "planner", label: "Planner", href: "/planner", icon: Home },
+      { id: "overview", labelKey: "overview", href: "/dashboard?tab=overview", icon: LayoutDashboard },
+      { id: "tracks", labelKey: "tracks", href: "/tracks", icon: Target },
+      { id: "missions", labelKey: "missions", href: "/missions", icon: Rocket },
+      { id: "quests", labelKey: "weeklyQuests", href: "/dashboard?tab=overview#quests", icon: Home },
+      { id: "planner", labelKey: "planner", href: "/planner", icon: Home },
     ],
   },
   {
     id: "skills",
-    title: "Skills",
+    titleKey: "skills",
     items: [
-      { id: "skill-radar", label: "Skill radar", href: "/dashboard?tab=skills#skills", icon: ChartLine },
-      { id: "skill-tree", label: "Skill tree", href: "/dashboard?tab=skills#tree", icon: ChartLine },
-      { id: "xp-level", label: "XP & level", href: "/dashboard?tab=skills#xp", icon: ChartLine },
-      { id: "heatmap", label: "Heatmap", href: "/dashboard?tab=skills#heatmap", icon: ChartLine },
+      { id: "skill-radar", labelKey: "skillRadar", href: "/dashboard?tab=skills#skills", icon: ChartLine },
+      { id: "skill-tree", labelKey: "skillTree", href: "/dashboard?tab=skills#tree", icon: ChartLine },
+      { id: "xp-level", labelKey: "xpLevel", href: "/dashboard?tab=skills#xp", icon: ChartLine },
+      { id: "heatmap", labelKey: "heatmap", href: "/dashboard?tab=skills#heatmap", icon: ChartLine },
     ],
   },
   {
     id: "career",
-    title: "Career",
+    titleKey: "career",
     items: [
-      { id: "career", label: "Career", href: "/career", icon: BriefcaseBusiness },
-      { id: "jobs", label: "Jobs", href: "/jobs", icon: BriefcaseBusiness },
-      { id: "marketplace", label: "Marketplace", href: "/marketplace", icon: BriefcaseBusiness },
-      { id: "portfolio", label: "Portfolio", href: "/portfolio", icon: FolderKanban },
-      { id: "interview", label: "Interview", href: "/interview", icon: BriefcaseBusiness },
-      { id: "review", label: "Review", href: "/review", icon: BriefcaseBusiness },
-      { id: "public-profile", label: "Public profile", href: "/profile/me", icon: UserCircle2 },
+      { id: "career", labelKey: "career", href: "/career", icon: BriefcaseBusiness },
+      { id: "jobs", labelKey: "jobs", href: "/jobs", icon: BriefcaseBusiness },
+      { id: "marketplace", labelKey: "marketplace", href: "/marketplace", icon: BriefcaseBusiness },
+      { id: "portfolio", labelKey: "portfolio", href: "/portfolio", icon: FolderKanban },
+      { id: "interview", labelKey: "interview", href: "/interview", icon: BriefcaseBusiness },
+      { id: "review", labelKey: "review", href: "/review", icon: BriefcaseBusiness },
+      { id: "public-profile", labelKey: "publicProfile", href: "/profile/me", icon: UserCircle2 },
     ],
   },
   {
     id: "community",
-    title: "Community",
+    titleKey: "community",
     items: [
-      { id: "leaderboard", label: "Leaderboard", href: "/leaderboard", icon: Users },
-      { id: "activity", label: "Activity", href: "/dashboard?tab=overview#activity", icon: Users },
+      { id: "leaderboard", labelKey: "leaderboard", href: "/leaderboard", icon: Users },
+      { id: "activity", labelKey: "activity", href: "/dashboard?tab=overview#activity", icon: Users },
     ],
   },
   {
     id: "ai-tools",
-    title: "AI Tools",
+    titleKey: "aiTools",
     items: [
-      { id: "adaptive", label: "Adaptive path", href: "/dashboard?tab=skills#adaptive", icon: Command },
-      { id: "ai-reco", label: "AI recommendations", href: "/dashboard?tab=skills#ai", icon: Command },
-      { id: "next-actions", label: "Next actions", href: "/dashboard?tab=overview#actions", icon: Command },
+      { id: "adaptive", labelKey: "adaptivePath", href: "/dashboard?tab=skills#adaptive", icon: Command },
+      { id: "ai-reco", labelKey: "aiRecommendations", href: "/dashboard?tab=skills#ai", icon: Command },
+      { id: "next-actions", labelKey: "nextActions", href: "/dashboard?tab=overview#actions", icon: Command },
     ],
   },
   {
     id: "saas",
-    title: "SaaS",
+    titleKey: "saas",
     items: [
-      { id: "billing", label: "Billing", href: "/billing", icon: CreditCard },
-      { id: "advanced-analytics", label: "Advanced analytics", href: "/analytics/advanced", icon: BarChart3 },
-      { id: "teams", label: "Teams", href: "/teams", icon: Building2 },
+      { id: "billing", labelKey: "billing", href: "/billing", icon: CreditCard },
+      { id: "advanced-analytics", labelKey: "advancedAnalytics", href: "/analytics/advanced", icon: BarChart3 },
+      { id: "teams", labelKey: "teams", href: "/teams", icon: Building2 },
     ],
   },
   {
     id: "admin",
-    title: "Admin",
-    items: [{ id: "admin-link", label: "Admin", href: "/admin", icon: Shield, adminOnly: true }],
+    titleKey: "admin",
+    items: [{ id: "admin-link", labelKey: "admin", href: "/admin", icon: Shield, adminOnly: true }],
   },
 ];
 
 const mobileBottomItems: NavItem[] = [
-  { id: "home", label: "Home", href: "/dashboard", icon: Home },
-  { id: "tracks", label: "Tracks", href: "/tracks", icon: Target },
-  { id: "missions", label: "Missions", href: "/missions", icon: Rocket },
-  { id: "jobs", label: "Jobs", href: "/marketplace", icon: BriefcaseBusiness },
-  { id: "profile", label: "Profile", href: "/login", icon: Users },
+  { id: "home", labelKey: "home", href: "/dashboard", icon: Home },
+  { id: "tracks", labelKey: "tracks", href: "/tracks", icon: Target },
+  { id: "missions", labelKey: "missions", href: "/missions", icon: Rocket },
+  { id: "jobs", labelKey: "jobs", href: "/marketplace", icon: BriefcaseBusiness },
+  { id: "profile", labelKey: "profile", href: "/login", icon: Users },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -141,6 +143,8 @@ function isActive(pathname: string, href: string) {
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const { data: session, status } = useSession();
+  const t = useTranslations("nav");
+  const tCommon = useTranslations("common");
   const [notificationCount, setNotificationCount] = useState(0);
   const isAdmin = session?.user?.role === "ADMIN";
   const isAuthenticated = status === "authenticated";
@@ -250,11 +254,14 @@ export function AppShell({ children }: AppShellProps) {
                       )}
                     >
                       {!isSidebarCollapsed ? (
-                        <p className="px-2 text-[10px] uppercase tracking-[0.16em] text-slate-500">{group.title}</p>
+                        <p className="px-2 text-[10px] uppercase tracking-[0.16em] text-slate-500">
+                          {t(group.titleKey as Parameters<typeof t>[0])}
+                        </p>
                       ) : null}
                       {group.items.map((item) => {
                         const Icon = item.icon;
                         const active = isActive(pathname, item.href);
+                        const label = t(item.labelKey as Parameters<typeof t>[0]);
                         return (
                           <Link
                             key={item.id}
@@ -266,11 +273,11 @@ export function AppShell({ children }: AppShellProps) {
                               isSidebarCollapsed && "mx-auto h-10 w-10 justify-center rounded-2xl border border-transparent px-0",
                               isSidebarCollapsed && active && "border-sky-400/35 bg-sky-500/15 text-sky-100 shadow-[0_0_0_1px_rgba(56,189,248,0.25),0_10px_20px_rgba(2,6,23,0.42)]",
                             )}
-                            aria-label={isSidebarCollapsed ? item.label : undefined}
-                            title={isSidebarCollapsed ? item.label : undefined}
+                            aria-label={isSidebarCollapsed ? label : undefined}
+                            title={isSidebarCollapsed ? label : undefined}
                           >
                             <Icon className="h-4 w-4 shrink-0" />
-                            {isSidebarCollapsed ? null : <span className="truncate">{item.label}</span>}
+                            {isSidebarCollapsed ? null : <span className="truncate">{label}</span>}
                           </Link>
                         );
                       })}
@@ -280,8 +287,8 @@ export function AppShell({ children }: AppShellProps) {
 
                 {!isSidebarCollapsed ? (
                   <div className="mt-3 shrink-0 rounded-xl border border-slate-800 bg-slate-900/75 p-3 text-xs text-slate-400">
-                    <p className="font-semibold text-slate-200">Quick tip</p>
-                    <p className="mt-1">Press Cmd/Ctrl + K to search lessons, missions, jobs, and admin entities.</p>
+                    <p className="font-semibold text-slate-200">{t("quickTip")}</p>
+                    <p className="mt-1">{t("quickTipText")}</p>
                   </div>
                 ) : null}
               </div>
@@ -306,7 +313,7 @@ export function AppShell({ children }: AppShellProps) {
                   type="button"
                   onClick={toggleSidebar}
                   className="btn-secondary h-10 w-10 p-0 lg:hidden"
-                  aria-label="Open navigation"
+                  aria-label={t("openNavigation")}
                 >
                   {isSidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
                 </button>
@@ -317,7 +324,7 @@ export function AppShell({ children }: AppShellProps) {
                     value=""
                     placeholder="Search modules, missions, jobs... (Cmd/Ctrl + K)"
                     className="cursor-pointer pr-10"
-                    aria-label="Open command palette"
+                    aria-label={t("openCommandPalette")}
                   />
                   <Command className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
                 </div>
@@ -325,14 +332,15 @@ export function AppShell({ children }: AppShellProps) {
 
               <div className="flex items-center gap-2">
                 <ThemeToggle />
-                <Link href="/tracks" className="btn-secondary hidden sm:inline-flex">Quick actions</Link>
+                <LanguageSwitcher className="hidden sm:flex" />
+                <Link href="/tracks" className="btn-secondary hidden sm:inline-flex">{t("quickActions")}</Link>
                 <button type="button" onClick={openCommandPalette} className="btn-secondary hidden md:inline-flex">
                   Cmd + K
                 </button>
                 <Link
                   href="/dashboard?tab=overview#notifications"
                   className="btn-secondary relative h-10 w-10 p-0"
-                  aria-label="Notifications"
+                  aria-label={t("notifications")}
                 >
                   <Bell className="h-4 w-4" />
                   {notificationCount > 0 ? (
@@ -354,8 +362,8 @@ export function AppShell({ children }: AppShellProps) {
                   }
                   items={[
                     { id: "profile", label: session?.user?.email ?? "Not signed in", href: "/login" },
-                    { id: "dashboard", label: "Open dashboard", href: "/dashboard" },
-                    ...(isAdmin ? [{ id: "admin", label: "Open admin", href: "/admin" }] : []),
+                    { id: "dashboard", label: tCommon("openDashboard"), href: "/dashboard" },
+                    ...(isAdmin ? [{ id: "admin", label: t("admin"), href: "/admin" }] : []),
                     ...(isAuthenticated
                       ? [
                           {
@@ -392,6 +400,7 @@ export function AppShell({ children }: AppShellProps) {
         <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
           {mobileBottomItems.map((item) => {
             const Icon = item.icon;
+            const label = t(item.labelKey as Parameters<typeof t>[0]);
             return (
               <Link
                 key={item.id}
@@ -399,7 +408,7 @@ export function AppShell({ children }: AppShellProps) {
                 className={cn("mobile-bottom-link", isActive(pathname, item.href) && "mobile-bottom-link-active")}
               >
                 <Icon className="h-4 w-4" />
-                <span>{item.label}</span>
+                <span>{label}</span>
               </Link>
             );
           })}

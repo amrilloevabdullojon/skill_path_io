@@ -54,6 +54,7 @@ export type ModuleProgressionCard = {
   outcomes: string[];
   objectives: string[];
   skills: string[];
+  whatYouWillLearn: string[];
   finalChallenge: string;
   realWorldExample: string;
   quickChecks: string[];
@@ -299,6 +300,7 @@ export function buildTrackProgression(params: {
       outcomes: parsedContent.outcomes,
       objectives: parsedContent.objectives,
       skills: parsedContent.skills,
+      whatYouWillLearn: parsedContent.whatYouWillLearn,
       finalChallenge: parsedContent.finalChallenge,
       realWorldExample: parsedContent.realWorldExample,
       quickChecks: parsedContent.quickChecks,

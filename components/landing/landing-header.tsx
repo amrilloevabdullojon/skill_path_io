@@ -3,19 +3,24 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Menu, Sparkles, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { buttonVariants } from "@/components/ui/button";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { label: "Tracks", href: "#tracks" },
-  { label: "Missions", href: "#missions" },
-  { label: "Career", href: "#career" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "About", href: "#about" },
+type NavItem = { labelKey: string; href: string };
+
+const navItems: NavItem[] = [
+  { labelKey: "tracks", href: "#tracks" },
+  { labelKey: "missions", href: "#missions" },
+  { labelKey: "career", href: "#career" },
+  { labelKey: "pricing", href: "#pricing" },
+  { labelKey: "about", href: "#about" },
 ];
 
 export function LandingHeader() {
+  const t = useTranslations("landing.header");
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -48,18 +53,19 @@ export function LandingHeader() {
 
         <nav className="hidden items-center gap-1 lg:flex">
           {navItems.map((item) => (
-            <a key={item.label} href={item.href} className="nav-link text-sm">
-              {item.label}
+            <a key={item.labelKey} href={item.href} className="nav-link text-sm">
+              {t(item.labelKey as Parameters<typeof t>[0])}
             </a>
           ))}
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <LanguageSwitcher />
           <Link href="/login" className={cn(buttonVariants({ variant: "ghost" }), "h-9 px-3")}>
-            Login
+            {t("login")}
           </Link>
           <Link href="/login" className={cn(buttonVariants({ size: "sm" }), "h-9 px-4")}>
-            Start learning
+            {t("startLearning")}
           </Link>
         </div>
 
@@ -78,26 +84,28 @@ export function LandingHeader() {
           <nav className="space-y-1">
             {navItems.map((item) => (
               <a
-                key={item.label}
+                key={item.labelKey}
                 href={item.href}
                 className="nav-link block"
                 onClick={() => setMobileOpen(false)}
               >
-                {item.label}
+                {t(item.labelKey as Parameters<typeof t>[0])}
               </a>
             ))}
           </nav>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <Link href="/login" className={cn(buttonVariants({ variant: "outline" }), "h-9 w-full")}>
-              Login
-            </Link>
-            <Link href="/login" className={cn(buttonVariants({ size: "sm" }), "h-9 w-full")}>
-              Start learning
-            </Link>
+          <div className="mt-3 flex flex-col gap-2">
+            <LanguageSwitcher className="w-full justify-center" />
+            <div className="grid grid-cols-2 gap-2">
+              <Link href="/login" className={cn(buttonVariants({ variant: "outline" }), "h-9 w-full")}>
+                {t("login")}
+              </Link>
+              <Link href="/login" className={cn(buttonVariants({ size: "sm" }), "h-9 w-full")}>
+                {t("startLearning")}
+              </Link>
+            </div>
           </div>
         </div>
       ) : null}
     </header>
   );
 }
-

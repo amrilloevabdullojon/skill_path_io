@@ -1,6 +1,7 @@
+import { getTranslations } from "next-intl/server";
+
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
-import { PermissionRoleType } from "@prisma/client";
 
 const ACTION_COLORS: Record<string, string> = {
   CREATE: "border-emerald-400/30 bg-emerald-500/10 text-emerald-300",
@@ -19,6 +20,8 @@ function actionColor(action: string) {
 export default async function AuditLogPage() {
   await requireAdminPermission("analytics.read");
 
+  const t = await getTranslations("admin.auditLog");
+
   let logs: Awaited<ReturnType<typeof prisma.adminActivityLog.findMany>> = [];
   let total = 0;
   let error: string | null = null;
@@ -32,16 +35,16 @@ export default async function AuditLogPage() {
       prisma.adminActivityLog.count(),
     ]);
   } catch {
-    error = "Could not load audit logs. The database may be unavailable.";
+    error = t("error");
   }
 
   return (
     <section className="page-shell">
       <header className="surface-elevated space-y-2 p-5 sm:p-7">
-        <p className="kicker">Security & Compliance</p>
-        <h1 className="section-title text-2xl">Audit Log</h1>
+        <p className="kicker">{t("kicker")}</p>
+        <h1 className="section-title text-2xl">{t("title")}</h1>
         <p className="body-text text-sm">
-          All admin actions are recorded here. Showing the latest {Math.min(100, total)} of {total} events.
+          {t("description", { count: Math.min(100, total), total })}
         </p>
       </header>
 
@@ -51,7 +54,7 @@ export default async function AuditLogPage() {
         </div>
       ) : logs.length === 0 ? (
         <div className="surface-elevated p-8 text-center">
-          <p className="text-sm text-muted-foreground">No audit events recorded yet.</p>
+          <p className="text-sm text-muted-foreground">{t("empty")}</p>
         </div>
       ) : (
         <>
@@ -60,12 +63,12 @@ export default async function AuditLogPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-800 bg-slate-900/60">
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">Time</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">Actor</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400 hidden lg:table-cell">Role</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">Action</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">Entity</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400 hidden xl:table-cell">Note</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.time")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.actor")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-400 hidden lg:table-cell">{t("columns.role")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.action")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.entity")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-400 hidden xl:table-cell">{t("columns.note")}</th>
                 </tr>
               </thead>
               <tbody>

@@ -1,0 +1,431 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "tryAgain": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "and": "and",
+    "viewAll": "View all",
+    "seeMore": "See more",
+    "learnMore": "Learn more",
+    "getStarted": "Get started",
+    "openDashboard": "Open dashboard",
+    "active": "Active",
+    "inactive": "Inactive",
+    "noDataYet": "No data yet",
+    "comingSoon": "Coming soon"
+  },
+  "meta": {
+    "title": "SkillPath Academy",
+    "description": "Learning platform for QA engineers, business analysts, and data analysts.",
+    "titleTemplate": "{page} — SkillPath Academy"
+  },
+  "nav": {
+    "overview": "Overview",
+    "tracks": "Tracks",
+    "missions": "Missions",
+    "weeklyQuests": "Weekly quests",
+    "planner": "Planner",
+    "skillRadar": "Skill radar",
+    "skillTree": "Skill tree",
+    "xpLevel": "XP & level",
+    "heatmap": "Heatmap",
+    "career": "Career",
+    "jobs": "Jobs",
+    "marketplace": "Marketplace",
+    "portfolio": "Portfolio",
+    "interview": "Interview",
+    "review": "Review",
+    "publicProfile": "Public profile",
+    "leaderboard": "Leaderboard",
+    "activity": "Activity",
+    "adaptivePath": "Adaptive path",
+    "aiRecommendations": "AI recommendations",
+    "nextActions": "Next actions",
+    "billing": "Billing",
+    "advancedAnalytics": "Advanced analytics",
+    "teams": "Teams",
+    "admin": "Admin",
+    "groups": "Learning",
+    "skills": "Skills",
+    "aiTools": "AI Tools",
+    "saas": "SaaS",
+    "community": "Community",
+    "quickTip": "Quick tip",
+    "quickTipText": "Press Cmd/Ctrl + K to search lessons, missions, jobs, and admin entities.",
+    "quickActions": "Quick actions",
+    "openCommandPalette": "Open command palette",
+    "notifications": "Notifications",
+    "openNavigation": "Open navigation",
+    "home": "Home",
+    "profile": "Profile"
+  },
+  "landing": {
+    "header": {
+      "tracks": "Tracks",
+      "missions": "Missions",
+      "career": "Career",
+      "pricing": "Pricing",
+      "about": "About",
+      "login": "Login",
+      "startLearning": "Start learning"
+    },
+    "hero": {
+      "badge": "Build real-world skills",
+      "title": "Launch your tech career with {highlight} and AI mentoring",
+      "titleHighlight": "modules, missions,",
+      "description": "SkillPath Academy combines practical learning, progression systems, and career guidance in one premium workspace.",
+      "ctaStart": "Start learning",
+      "ctaExplore": "Explore tracks",
+      "ctaDemo": "Try demo"
+    },
+    "valueProps": {
+      "tracks": {
+        "title": "Role-focused tracks",
+        "description": "QA, BA, DA, and PM paths built around real job requirements."
+      },
+      "missions": {
+        "title": "Real-world missions",
+        "description": "Practice on scenarios that mirror actual product-team work."
+      },
+      "aiMentor": {
+        "title": "AI mentor guidance",
+        "description": "Personalised path, review feedback, and interview prep."
+      },
+      "career": {
+        "title": "Career readiness score",
+        "description": "Track your progress toward job-ready with clear metrics."
+      }
+    },
+    "howItWorks": {
+      "kicker": "How it works",
+      "title": "Four steps to career readiness",
+      "steps": [
+        {
+          "title": "Choose a career track",
+          "description": "Pick QA, BA, DA, or PM and get a clear roadmap with milestones."
+        },
+        {
+          "title": "Complete interactive modules",
+          "description": "Learn through lessons, quizzes, mini challenges, and smart progress feedback."
+        },
+        {
+          "title": "Solve real-world missions",
+          "description": "Practice in realistic scenarios that feel like actual product-team work."
+        },
+        {
+          "title": "Prepare for interviews",
+          "description": "Get readiness insights, AI review, and role-focused mock interview support."
+        }
+      ]
+    },
+    "tracks": {
+      "kicker": "Career tracks",
+      "title": "Choose your role-focused path",
+      "allTracks": "All tracks",
+      "duration": "Duration",
+      "modules": "Modules",
+      "missions": "Missions",
+      "exploreTrack": "Explore track"
+    },
+    "productPreview": {
+      "kicker": "Product preview",
+      "title": "A premium learning command center",
+      "totalXp": "Total XP",
+      "activeTrack": "Active track",
+      "quizAccuracy": "Quiz accuracy",
+      "widgets": {
+        "dashboard": {
+          "title": "Dashboard widgets",
+          "description": "Heatmap, radar, recommendations, and weekly quest cards."
+        },
+        "trackCards": {
+          "title": "Track cards",
+          "description": "Progress, next module, and ETA in one glance."
+        },
+        "missionCards": {
+          "title": "Mission cards",
+          "description": "Scenario, XP reward, and status-driven actions."
+        },
+        "progressWidgets": {
+          "title": "Progress widgets",
+          "description": "Level growth, streak, and readiness insights."
+        }
+      }
+    },
+    "roadmap": {
+      "kicker": "Career path visual map",
+      "title": "From beginner to job-ready",
+      "unlock": "Unlock",
+      "stages": [
+        {
+          "title": "Beginner",
+          "description": "Set target role and baseline skills.",
+          "unlock": "Personal onboarding profile"
+        },
+        {
+          "title": "Foundations",
+          "description": "Build core concepts across track modules.",
+          "unlock": "First core badge"
+        },
+        {
+          "title": "Practice",
+          "description": "Complete quizzes and guided exercises.",
+          "unlock": "Track confidence score"
+        },
+        {
+          "title": "Missions",
+          "description": "Solve realistic role-based scenarios.",
+          "unlock": "Real-work portfolio items"
+        },
+        {
+          "title": "Interview Ready",
+          "description": "Run mock interviews and remediation.",
+          "unlock": "Interview readiness report"
+        },
+        {
+          "title": "Job Ready",
+          "description": "Close remaining skill gaps and apply.",
+          "unlock": "Career action plan"
+        }
+      ]
+    },
+    "aiMentor": {
+      "kicker": "AI mentor onboarding",
+      "title": "Personalised guidance from day one",
+      "description": "Tell SkillPath your target role and weekly time. AI mentor builds a practical path and adapts it as you progress.",
+      "cta": "Ask AI mentor",
+      "chat": [
+        { "role": "user", "text": "I want to become a QA engineer." },
+        { "role": "ai", "text": "Great goal. How many hours can you study each week?" },
+        { "role": "user", "text": "Around 7 hours." },
+        { "role": "ai", "text": "Recommended path: QA Foundations → API Testing → Bug Tracker Simulation → Mock Interview." }
+      ]
+    },
+    "missions": {
+      "kicker": "Real-world missions",
+      "title": "Practice with scenarios that mirror real teams",
+      "openMission": "Open mission"
+    },
+    "outcomes": {
+      "kicker": "Outcomes",
+      "title": "What you will be able to do",
+      "subtitle": "Built around the skills that actually matter in QA, BA, and DA roles.",
+      "list": [
+        "Write strong bug reports and acceptance criteria",
+        "Build SQL analyses and explain product metrics",
+        "Handle role-based scenarios before your first job",
+        "Prepare for interviews with AI mentor feedback"
+      ]
+    },
+    "pricing": {
+      "kicker": "Pricing",
+      "title": "Simple plans for every stage",
+      "popular": "Most popular",
+      "plans": [
+        {
+          "name": "Starter",
+          "price": "Free",
+          "description": "Best for local demo and personal exploration.",
+          "features": ["1 career track", "Core modules", "Basic quizzes", "Progress tracking"],
+          "cta": "Get started"
+        },
+        {
+          "name": "Pro Learner",
+          "price": "$29",
+          "period": "/ mo",
+          "description": "Full access to tracks, missions, and AI guidance.",
+          "features": ["All career tracks", "Real-world missions", "AI mentor feedback", "Interview prep", "Portfolio builder", "Priority support"],
+          "cta": "Start Pro",
+          "highlight": true
+        },
+        {
+          "name": "Team Academy",
+          "price": "Custom",
+          "description": "Builder workflows and analytics for cohorts.",
+          "features": ["Unlimited members", "Admin studio", "Analytics dashboard", "Custom tracks", "Cohort progress", "Dedicated support"],
+          "cta": "Contact us"
+        }
+      ]
+    },
+    "cta": {
+      "title": "Build your skills. Grow your career.",
+      "titleHighlight": "Grow your career.",
+      "description": "Start your learning journey today with role-based tracks, missions, and AI-powered feedback.",
+      "start": "Start learning",
+      "demo": "Try demo"
+    },
+    "footer": {
+      "tagline": "Premium local-first EdTech workspace for QA, BA, and DA careers.",
+      "product": "Product",
+      "aiLearning": "AI & Learning",
+      "company": "Company",
+      "links": {
+        "tracks": "Tracks",
+        "missions": "Missions",
+        "career": "Career",
+        "dashboard": "Dashboard",
+        "aiInterview": "AI interview",
+        "planner": "Planner",
+        "about": "About",
+        "pricing": "Pricing",
+        "contact": "Contact"
+      },
+      "copyright": "SkillPath Academy. Local edition.",
+      "status": "All systems operational"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "you@example.com",
+    "passwordPlaceholder": "Enter your password",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "guest": {
+      "badge": "SkillPath Academy",
+      "title": "Learn faster. Practice smarter. Get job ready.",
+      "description": "Local demo access for role-based learning flows with premium UI, AI guidance, and mission-based progression.",
+      "trackProgression": {
+        "title": "Track progression",
+        "description": "Modules, quizzes, unlock logic, and XP-based growth."
+      },
+      "realMissions": {
+        "title": "Real missions",
+        "description": "Apply skills in practical scenarios for QA, BA, and DA roles."
+      },
+      "aiMentor": {
+        "title": "AI mentor",
+        "description": "Get guidance, feedback, and personalized next actions."
+      },
+      "studentAccess": "Student access",
+      "adminAccess": "Admin access"
+    },
+    "member": {
+      "welcomeBack": "Welcome back",
+      "title": "Continue your learning command center",
+      "description": "{name}, your {role} workspace is ready.",
+      "totalXp": "Total XP",
+      "trackProgress": "Track progress",
+      "currentTrack": "Current track",
+      "continueLearning": "Continue learning",
+      "openRoadmap": "Open roadmap",
+      "askAiMentor": "Ask AI mentor",
+      "nextMission": "Next mission",
+      "chooseMission": "Choose a new mission",
+      "aiSupport": "AI support",
+      "aiSupportDescription": "Use mentor chat for module guidance and recovery plan suggestions."
+    }
+  },
+  "dashboard": {
+    "hero": {
+      "kicker": "Personal command center",
+      "title": "Welcome back, {name}",
+      "description": "Progressing through {track}. Keep this sprint focused.",
+      "stats": {
+        "totalXp": "Total XP",
+        "streak": "Streak",
+        "streakUnit": "days",
+        "skillLevel": "Skill level",
+        "eta": "Track ETA"
+      },
+      "progress": {
+        "modulesCompleted": "{done}/{total} modules completed"
+      },
+      "cta": {
+        "continueLearning": "Continue learning",
+        "openRoadmap": "Open roadmap",
+        "askAiMentor": "Ask AI mentor"
+      },
+      "badges": {
+        "admin": "Admin",
+        "student": "Student",
+        "demo": "Demo"
+      }
+    },
+    "progressSnapshot": {
+      "title": "Progress snapshot",
+      "totalCompletion": "Total completion",
+      "modulesDone": "Modules done",
+      "learningStreak": "Learning streak",
+      "estCompletion": "Est. completion"
+    },
+    "empty": {
+      "title": "Dashboard data is empty",
+      "description": "No user data found yet. Sign in and complete onboarding, or import initial content.",
+      "action": "Open tracks"
+    }
+  },
+  "admin": {
+    "auditLog": {
+      "kicker": "Security & Compliance",
+      "title": "Audit Log",
+      "description": "All admin actions are recorded here. Showing the latest {count} of {total} events.",
+      "columns": {
+        "time": "Time",
+        "actor": "Actor",
+        "role": "Role",
+        "action": "Action",
+        "entity": "Entity",
+        "note": "Note"
+      },
+      "empty": "No audit events recorded yet.",
+      "error": "Could not load audit logs. The database may be unavailable."
+    },
+    "permissions": {
+      "kicker": "Access Control",
+      "title": "Permission Roles",
+      "description": "Manage admin role assignments. Each role grants specific permissions within the Academy Studio.",
+      "columns": {
+        "email": "Email",
+        "role": "Role",
+        "permissions": "Permissions",
+        "status": "Status",
+        "created": "Created"
+      },
+      "empty": "No permission roles configured yet.",
+      "error": "Could not load permission roles. The database may be unavailable.",
+      "morePermissions": "+{count} more",
+      "active": "Active",
+      "inactive": "Inactive",
+      "reference": {
+        "title": "Role Permissions Reference"
+      },
+      "roles": {
+        "SUPER_ADMIN": "Super Admin",
+        "CONTENT_ADMIN": "Content Admin",
+        "COURSE_EDITOR": "Course Editor",
+        "REVIEWER": "Reviewer",
+        "ANALYTICS_MANAGER": "Analytics Manager"
+      }
+    }
+  },
+  "emptyState": {
+    "noItems": "No items found",
+    "noItemsDescription": "There's nothing here yet.",
+    "noResults": "No results",
+    "noResultsDescription": "Try adjusting your search or filters."
+  },
+  "language": {
+    "switchTo": "Switch language",
+    "en": "English",
+    "ru": "Русский",
+    "current": "Current language"
+  }
+}

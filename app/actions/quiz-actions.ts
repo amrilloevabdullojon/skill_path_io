@@ -2,11 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 import { ProgressStatus, QuestionType } from "@prisma/client";
 
 import { authOptions } from "@/lib/auth";
+import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
 import { resolveLearningUser } from "@/lib/learning-user";
 import { prisma } from "@/lib/prisma";
+import { applyTrackContentOverrides, normalizeLearningLocale } from "@/lib/tracks/content-overrides";
 
 type QuizAttemptPayload = {
   trackSlug: string;
@@ -120,37 +123,43 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
     };
   }
 
-  const quiz = await prisma.quiz.findFirst({
-    where: {
-      id: payload.quizId,
-      moduleId: payload.moduleId,
-      module: {
-        track: {
-          slug: payload.trackSlug,
+  const cookieStore = await cookies();
+  const locale = normalizeLearningLocale(cookieStore.get("skillpath-locale")?.value);
+
+  const [quiz, runtimeTrack] = await Promise.all([
+    prisma.quiz.findFirst({
+      where: {
+        id: payload.quizId,
+        moduleId: payload.moduleId,
+        module: {
+          track: {
+            slug: payload.trackSlug,
+          },
         },
       },
-    },
-    include: {
-      module: {
-        select: {
-          id: true,
-          trackId: true,
+      include: {
+        module: {
+          select: {
+            id: true,
+            trackId: true,
+          },
+        },
+        questions: {
+          orderBy: {
+            id: "asc",
+          },
+          select: {
+            id: true,
+            text: true,
+            type: true,
+            options: true,
+            correctAnswer: true,
+          },
         },
       },
-      questions: {
-        orderBy: {
-          id: "asc",
-        },
-        select: {
-          id: true,
-          text: true,
-          type: true,
-          options: true,
-          correctAnswer: true,
-        },
-      },
-    },
-  });
+    }),
+    resolveRuntimeCourseBySlug(payload.trackSlug, { includeCourseEntities: true }),
+  ]);
 
   if (!quiz) {
     return {
@@ -184,18 +193,31 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
   }
 
   let correctAnswers = 0;
+  const overriddenTrack = runtimeTrack
+    ? applyTrackContentOverrides(runtimeTrack, locale)
+    : null;
+  const overriddenQuiz = overriddenTrack?.modules.find((moduleItem) => moduleItem.id === payload.moduleId)?.quiz;
+  const questionsForScoring = overriddenQuiz?.id === payload.quizId
+    ? overriddenQuiz.questions
+    : quiz.questions.map((question) => ({
+        id: question.id,
+        text: question.text,
+        type: question.type,
+        options: parseQuestionOptions(question.options),
+        correctAnswer: normalizeAnswerList(question.correctAnswer),
+      }));
+
   const wrongAnswers: QuizAttemptResult["wrongAnswers"] = [];
-  for (const question of quiz.questions) {
+  for (const question of questionsForScoring) {
     const selectedAnswers = normalizeAnswerList(payload.answers[question.id] ?? []);
     const expectedAnswers = normalizeAnswerList(question.correctAnswer);
     const isQuestionCorrect = answersMatch(selectedAnswers, expectedAnswers);
-    const parsedOptions = parseQuestionOptions(question.options);
 
-    if (question.type === QuestionType.SINGLE && selectedAnswers.length > 1) {
+    if ((question.type === QuestionType.SINGLE || question.type === "SINGLE") && selectedAnswers.length > 1) {
       wrongAnswers.push({
         questionId: question.id,
         question: question.text,
-        options: parsedOptions,
+        options: question.options,
         userAnswers: selectedAnswers,
         correctAnswers: expectedAnswers,
       });
@@ -208,7 +230,7 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
       wrongAnswers.push({
         questionId: question.id,
         question: question.text,
-        options: parsedOptions,
+        options: question.options,
         userAnswers: selectedAnswers,
         correctAnswers: expectedAnswers,
       });

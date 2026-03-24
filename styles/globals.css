@@ -244,7 +244,11 @@ textarea {
   }
 
   .hero-title {
-    @apply text-4xl font-semibold tracking-tight text-slate-100 sm:text-5xl;
+    @apply text-4xl font-bold tracking-tight text-slate-100 sm:text-5xl lg:text-6xl;
+  }
+
+  .hero-title-gradient {
+    @apply bg-gradient-to-br from-slate-100 via-sky-100 to-violet-200 bg-clip-text text-transparent;
   }
 
   .page-title {
@@ -264,7 +268,30 @@ textarea {
   }
 
   .data-label {
-    @apply text-[11px] uppercase tracking-[0.18em] text-slate-500;
+    @apply text-xs uppercase tracking-[0.14em] text-slate-500;
+  }
+
+  /* Stat card — small metric box used across dashboard and landing */
+  .stat-card {
+    @apply rounded-xl border border-slate-800/80 bg-slate-900/60 p-3;
+  }
+
+  .stat-card-value {
+    @apply text-lg font-semibold tracking-tight text-slate-100;
+  }
+
+  .stat-card-label {
+    @apply text-xs text-slate-500;
+  }
+
+  /* Section header — consistent kicker + title pairing */
+  .section-header {
+    @apply space-y-1.5;
+  }
+
+  /* Numbered step pill */
+  .step-number {
+    @apply inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-xs font-bold text-slate-300;
   }
 
   .surface-panel {
@@ -318,7 +345,7 @@ textarea {
   }
 
   .kicker {
-    @apply text-[11px] uppercase tracking-[0.2em] text-slate-500;
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-slate-400;
   }
 
   .section-title {

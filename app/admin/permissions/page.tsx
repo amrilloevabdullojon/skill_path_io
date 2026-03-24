@@ -1,14 +1,8 @@
-import { requireAdminPermission } from "@/lib/admin-auth";
-import { prisma } from "@/lib/prisma";
+import { getTranslations } from "next-intl/server";
 import { PermissionRoleType } from "@prisma/client";
 
-const ROLE_LABELS: Record<PermissionRoleType, string> = {
-  SUPER_ADMIN: "Super Admin",
-  CONTENT_ADMIN: "Content Admin",
-  COURSE_EDITOR: "Course Editor",
-  REVIEWER: "Reviewer",
-  ANALYTICS_MANAGER: "Analytics Manager",
-};
+import { requireAdminPermission } from "@/lib/admin-auth";
+import { prisma } from "@/lib/prisma";
 
 const ROLE_COLORS: Record<PermissionRoleType, string> = {
   SUPER_ADMIN: "border-red-400/35 bg-red-500/15 text-red-200",
@@ -21,6 +15,8 @@ const ROLE_COLORS: Record<PermissionRoleType, string> = {
 export default async function PermissionsPage() {
   await requireAdminPermission("users.manage");
 
+  const t = await getTranslations("admin.permissions");
+
   let roles: Awaited<ReturnType<typeof prisma.permissionRole.findMany>> = [];
   let error: string | null = null;
 
@@ -29,17 +25,23 @@ export default async function PermissionsPage() {
       orderBy: [{ role: "asc" }, { createdAt: "asc" }],
     });
   } catch {
-    error = "Could not load permission roles. The database may be unavailable.";
+    error = t("error");
   }
+
+  const ROLE_LABELS: Record<PermissionRoleType, string> = {
+    SUPER_ADMIN: t("roles.SUPER_ADMIN"),
+    CONTENT_ADMIN: t("roles.CONTENT_ADMIN"),
+    COURSE_EDITOR: t("roles.COURSE_EDITOR"),
+    REVIEWER: t("roles.REVIEWER"),
+    ANALYTICS_MANAGER: t("roles.ANALYTICS_MANAGER"),
+  };
 
   return (
     <section className="page-shell">
       <header className="surface-elevated space-y-2 p-5 sm:p-7">
-        <p className="kicker">Access Control</p>
-        <h1 className="section-title text-2xl">Permission Roles</h1>
-        <p className="body-text text-sm">
-          Manage admin role assignments. Each role grants specific permissions within the Academy Studio.
-        </p>
+        <p className="kicker">{t("kicker")}</p>
+        <h1 className="section-title text-2xl">{t("title")}</h1>
+        <p className="body-text text-sm">{t("description")}</p>
       </header>
 
       {error ? (
@@ -48,7 +50,7 @@ export default async function PermissionsPage() {
         </div>
       ) : roles.length === 0 ? (
         <div className="surface-elevated p-8 text-center">
-          <p className="text-sm text-muted-foreground">No permission roles configured yet.</p>
+          <p className="text-sm text-muted-foreground">{t("empty")}</p>
         </div>
       ) : (
         <>
@@ -57,11 +59,11 @@ export default async function PermissionsPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-800 bg-slate-900/60">
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">Email</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">Role</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400 hidden lg:table-cell">Permissions</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">Status</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400 hidden sm:table-cell">Created</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.email")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.role")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-400 hidden lg:table-cell">{t("columns.permissions")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.status")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-400 hidden sm:table-cell">{t("columns.created")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -96,7 +98,7 @@ export default async function PermissionsPage() {
                           ))}
                           {permissions.length > 4 && (
                             <span className="rounded border border-slate-700 bg-slate-800/60 px-1.5 py-0.5 text-xs text-slate-500">
-                              +{permissions.length - 4} more
+                              {t("morePermissions", { count: permissions.length - 4 })}
                             </span>
                           )}
                         </div>
@@ -105,7 +107,7 @@ export default async function PermissionsPage() {
                         <span
                           className={`inline-flex rounded-lg border px-2 py-0.5 text-xs font-semibold ${role.isActive ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300" : "border-slate-600/40 bg-slate-700/30 text-slate-400"}`}
                         >
-                          {role.isActive ? "Active" : "Inactive"}
+                          {role.isActive ? t("active") : t("inactive")}
                         </span>
                       </td>
                       <td className="hidden px-4 py-3 text-xs text-slate-500 sm:table-cell">
@@ -133,7 +135,7 @@ export default async function PermissionsPage() {
                     <span
                       className={`inline-flex rounded-lg border px-2 py-0.5 text-xs font-semibold ${role.isActive ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300" : "border-slate-600/40 bg-slate-700/30 text-slate-400"}`}
                     >
-                      {role.isActive ? "Active" : "Inactive"}
+                      {role.isActive ? t("active") : t("inactive")}
                     </span>
                   </div>
                   <p className="font-mono text-xs text-slate-200">{role.email}</p>
@@ -149,7 +151,7 @@ export default async function PermissionsPage() {
                       ))}
                       {permissions.length > 6 && (
                         <span className="rounded border border-slate-700 bg-slate-800/60 px-1.5 py-0.5 text-xs text-slate-500">
-                          +{permissions.length - 6}
+                          {t("morePermissions", { count: permissions.length - 6 })}
                         </span>
                       )}
                     </div>
@@ -163,12 +165,12 @@ export default async function PermissionsPage() {
       )}
 
       <div className="surface-elevated space-y-4 p-5">
-        <h2 className="section-title">Role Permissions Reference</h2>
+        <h2 className="section-title">{t("reference.title")}</h2>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {Object.entries(ROLE_LABELS).map(([roleKey, roleLabel]) => (
+          {(Object.keys(ROLE_LABELS) as PermissionRoleType[]).map((roleKey) => (
             <article key={roleKey} className="surface-subtle space-y-2 p-3">
-              <span className={`inline-flex rounded-lg border px-2 py-0.5 text-xs font-semibold ${ROLE_COLORS[roleKey as PermissionRoleType]}`}>
-                {roleLabel}
+              <span className={`inline-flex rounded-lg border px-2 py-0.5 text-xs font-semibold ${ROLE_COLORS[roleKey]}`}>
+                {ROLE_LABELS[roleKey]}
               </span>
               <ul className="space-y-0.5 text-xs text-slate-400">
                 {roleKey === "SUPER_ADMIN" && (

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { LessonType, ProgressStatus } from "@prisma/client";
+import { LessonType, ProgressStatus, TrackCategory } from "@prisma/client";
 import { ChevronLeft, ChevronRight, CircleCheckBig, Clock3, Flag, Layers3, Lock, Sparkles, Trophy } from "lucide-react";
 import { notFound } from "next/navigation";
+import { getLocale } from "next-intl/server";
 
 import { MentorChatWidget } from "@/components/mentor/mentor-chat-widget";
 import { AIExerciseReview } from "@/components/simulation/ai-exercise-review";
@@ -10,10 +11,12 @@ import { LessonBlockRenderer } from "@/components/tracks/lesson-block-renderer";
 import { MarkModuleCompleteButton } from "@/components/tracks/mark-module-complete-button";
 import { QuickSaveBookmarkButton } from "@/components/tracks/quick-save-bookmark-button";
 import { authOptions } from "@/lib/auth";
+import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
 import { resolveLearningUser } from "@/lib/learning-user";
 import { buildDefaultAdaptiveSignal } from "@/lib/personalization/adaptive-defaults";
 import { prisma } from "@/lib/prisma";
 import { getAdaptivePath } from "@/lib/recommendations/adaptive-path";
+import { applyTrackContentOverrides, normalizeLearningLocale } from "@/lib/tracks/content-overrides";
 import { buildLessonBlocks, buildLessonRecommendations } from "@/lib/tracks/lesson-blocks";
 import {
   LearningPathState,
@@ -112,14 +115,21 @@ function timelineLessonState(state: LearningPathState, lessonIndex: number, tota
   return "available";
 }
 
-function lessonTypeLabel(type: LessonType) {
-  if (type === LessonType.VIDEO) {
+function lessonTypeLabel(type: string) {
+  if (type === LessonType.VIDEO || type === "VIDEO") {
     return "Video lesson";
   }
-  if (type === LessonType.TASK) {
+  if (type === LessonType.TASK || type === "TASK") {
     return "Practice lesson";
   }
   return "Text lesson";
+}
+
+function toTrackCategory(value: string) {
+  if (value === TrackCategory.QA || value === TrackCategory.BA || value === TrackCategory.DA) {
+    return value;
+  }
+  return TrackCategory.QA;
 }
 
 function timelineKindLabel(kind: TimelineNode["kind"]) {
@@ -137,38 +147,21 @@ function formatMinutes(minutes: number) {
 }
 
 export default async function ModulePage({ params }: ModulePageProps) {
-  const [track, session] = await Promise.all([
-    prisma.track.findUnique({
-      where: { slug: params.trackId },
-      include: {
-        modules: {
-          orderBy: { order: "asc" },
-          include: {
-            lessons: {
-              orderBy: { order: "asc" },
-            },
-            quiz: {
-              select: {
-                id: true,
-                title: true,
-                passingScore: true,
-              },
-            },
-            _count: {
-              select: {
-                lessons: true,
-              },
-            },
-          },
-        },
-      },
-    }),
+  const [runtimeTrack, session, localeValue] = await Promise.all([
+    resolveRuntimeCourseBySlug(params.trackId, { includeCourseEntities: true }),
     getServerSession(authOptions),
+    getLocale(),
   ]);
+
+  const track = runtimeTrack
+    ? applyTrackContentOverrides(runtimeTrack, normalizeLearningLocale(localeValue))
+    : null;
 
   if (!track) {
     notFound();
   }
+
+  const trackCategory = toTrackCategory(track.category);
 
   const currentModuleIndex = track.modules.findIndex((moduleItem) => moduleItem.id === params.moduleId);
   const currentModule = track.modules[currentModuleIndex];
@@ -193,15 +186,15 @@ export default async function ModulePage({ params }: ModulePageProps) {
 
   const progressByModuleId = new Map(progressRecords.map((progress) => [progress.moduleId, progress]));
   const progression = buildTrackProgression({
-    category: track.category,
+    category: trackCategory,
     modules: track.modules.map((moduleItem) => ({
       id: moduleItem.id,
       order: moduleItem.order,
       title: moduleItem.title,
       description: moduleItem.description,
-      duration: moduleItem.duration,
+      duration: moduleItem.estimatedDuration,
       content: moduleItem.content,
-      lessonsCount: moduleItem._count.lessons,
+      lessonsCount: moduleItem.lessons.length,
       quizCount: moduleItem.quiz ? 1 : 0,
     })),
     userProgress: progressRecords.map((progress) => ({
@@ -225,20 +218,23 @@ export default async function ModulePage({ params }: ModulePageProps) {
   const primaryLesson = currentModule.lessons[0] ?? null;
   const nextLesson = currentModule.lessons[1] ?? null;
   const taskLesson =
-    currentModule.lessons.find((lesson) => lesson.type === LessonType.TASK) ??
+    currentModule.lessons.find((lesson) => lesson.lessonType === LessonType.TASK || lesson.lessonType === "TASK") ??
     currentModule.lessons[currentModule.lessons.length - 1] ??
     null;
 
-  const parsedContent = parseModuleContent(currentModule.content, track.category, currentModule.title, currentModule.order);
+  const parsedContent = parseModuleContent(currentModule.content, trackCategory, currentModule.title, currentModule.order);
   const resources = parsedContent.resources.length > 0 ? parsedContent.resources : ["Read module notes", "Complete practical task", "Review quiz result"];
 
   const lessonBlocks = buildLessonBlocks({
-    category: track.category,
+    category: trackCategory,
+    locale: normalizeLearningLocale(localeValue),
     moduleTitle: currentModule.title,
     moduleDescription: currentModule.description,
     moduleOverview: parsedContent.overview,
     outcomes: parsedContent.outcomes,
     resources,
+    realWorldExample: parsedContent.realWorldExample,
+    quickChecks: parsedContent.quickChecks,
     lessons: currentModule.lessons.map((lesson) => ({
       id: lesson.id,
       title: lesson.title,
@@ -278,7 +274,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
       id: `lesson-${lesson.id}`,
       kind: "lesson" as const,
       title: `${lesson.order}. ${lesson.title}`,
-      description: lessonTypeLabel(lesson.type),
+      description: lessonTypeLabel(lesson.lessonType),
       state: timelineLessonState(currentState, index, currentModule.lessons.length),
     })),
     {
@@ -437,7 +433,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
               </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-slate-800 px-2.5 py-1 text-slate-300">
                 <Clock3 className="h-3.5 w-3.5" />
-                {formatMinutes(currentModule.duration)}
+                {formatMinutes(currentModule.estimatedDuration)}
               </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-slate-800 px-2.5 py-1 text-slate-300">
                 <Flag className="h-3.5 w-3.5" />
@@ -455,7 +451,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
               <QuickSaveBookmarkButton
                 title={`Module: ${currentModule.title}`}
                 href={`/tracks/${track.slug}/modules/${currentModule.id}`}
-                tag={track.category}
+                tag={trackCategory}
                 type="module"
               />
               <Link href="/notes" className="btn-secondary px-3 py-2 text-xs">
@@ -484,7 +480,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
                   <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Simulation XP: +{currentModuleCard.simulationXpReward}</p>
                   <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Difficulty: {currentModuleCard.difficulty}</p>
                 </div>
-                <p className="text-xs text-slate-400">{trackCareerOutcome(track.category)}</p>
+                <p className="text-xs text-slate-400">{trackCareerOutcome(trackCategory)}</p>
               </article>
             </div>
 

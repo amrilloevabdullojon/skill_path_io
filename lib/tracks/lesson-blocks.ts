@@ -93,8 +93,16 @@ function commonMistakes(category: TrackCategory) {
   ];
 }
 
-function quickCheck(category: TrackCategory): LessonQuickCheck {
+function quickCheck(category: TrackCategory, locale: "en" | "ru"): LessonQuickCheck {
   if (category === TrackCategory.QA) {
+    if (locale === "ru") {
+      return {
+        question: "Что обычно означает HTTP 200 в API-тестировании?",
+        options: ["Запрос завершился ошибкой", "Запрос успешно обработан", "Пользователь не авторизован", "Сервер не отвечает"],
+        correctIndex: 1,
+        explanation: "HTTP 200 обычно означает, что сервер успешно обработал запрос.",
+      };
+    }
     return {
       question: "What does HTTP 200 usually mean in API testing?",
       options: ["Request failed", "Request succeeded", "User is unauthorized", "Server timeout"],
@@ -103,11 +111,27 @@ function quickCheck(category: TrackCategory): LessonQuickCheck {
     };
   }
   if (category === TrackCategory.BA) {
+    if (locale === "ru") {
+      return {
+        question: "Что обязательно должно быть в хорошем user story?",
+        options: ["Только UI-дизайн", "Роль, цель и ценность", "Схема базы данных", "Скрипт деплоя"],
+        correctIndex: 1,
+        explanation: "Качественный user story начинается с роли, намерения и бизнес-ценности.",
+      };
+    }
     return {
       question: "What must a good user story include?",
       options: ["Only UI design", "A role, goal, and value", "Database schema", "Deployment script"],
       correctIndex: 1,
       explanation: "User story quality starts with role + intent + business value.",
+    };
+  }
+  if (locale === "ru") {
+    return {
+      question: "Для чего в первую очередь нужен SQL JOIN?",
+      options: ["Создавать пользователей", "Объединять данные из таблиц", "Деплоить backend", "Форматировать CSS"],
+      correctIndex: 1,
+      explanation: "JOIN связывает строки из двух и более таблиц по связанным колонкам.",
     };
   }
   return {
@@ -120,139 +144,179 @@ function quickCheck(category: TrackCategory): LessonQuickCheck {
 
 export function buildLessonBlocks(params: {
   category: TrackCategory;
+  locale?: "en" | "ru";
   moduleTitle: string;
   moduleDescription: string;
   moduleOverview: string;
   outcomes: string[];
   resources: string[];
+  realWorldExample?: string;
+  quickChecks?: string[];
   lessons: LessonLike[];
 }): LessonBlock[] {
   const {
     category,
+    locale = "en",
     moduleTitle,
     moduleDescription,
     moduleOverview,
     outcomes,
     resources,
+    realWorldExample,
+    quickChecks,
     lessons,
   } = params;
-  const primaryLesson = lessons[0];
   const listItems = outcomes.length > 0 ? outcomes : ["Understand core ideas", "Apply in practice", "Prepare for quiz"];
   const resourceItems = resources.length > 0 ? resources : ["Read notes", "Try mini challenge", "Review quiz mistakes"];
-  const qc = quickCheck(category);
+  const qc = quickCheck(category, locale);
+  const localized = {
+    learningFocus: locale === "ru" ? "Фокус обучения" : "Learning focus",
+    whatYouWillLearn: locale === "ru" ? "Что вы изучите" : "What you will learn",
+    conceptMap: locale === "ru" ? "Карта понятий" : "Concept map",
+    importantConcept: locale === "ru" ? "Важная идея" : "Important concept",
+    lessonSummary: locale === "ru" ? "Итог урока" : "Lesson summary",
+    selfCheck: locale === "ru" ? "Вопросы для самопроверки" : "Self-check questions",
+    realWorldExample: locale === "ru" ? "Пример из практики" : "Real world example",
+    commonMistakes: locale === "ru" ? "Типичные ошибки" : "Common Mistakes",
+    quickCheck: locale === "ru" ? "Быстрая проверка" : "Quick Check",
+    miniChallenge: locale === "ru" ? "Мини-практика" : "Mini Challenge",
+    summary: locale === "ru" ? "Итоги модуля" : "Module summary",
+    codePattern: locale === "ru" ? "Пример структуры" : "Structure example",
+  };
+  const lessonBlocks = [...lessons]
+    .sort((a, b) => a.order - b.order)
+    .flatMap((lesson, index): LessonBlock[] => ([
+      {
+        id: makeId("lesson-heading", index + 20),
+        type: "heading",
+        title: `${lesson.order}. ${lesson.title}`,
+        content: moduleDescription,
+      },
+      {
+        id: makeId("lesson-markdown", index + 40),
+        type: "markdown",
+        title: locale === "ru" ? "Содержание урока" : "Lesson content",
+        content: lesson.body,
+      },
+    ]));
 
   const blocks: LessonBlock[] = [
     {
       id: makeId("heading", 0),
       type: "heading",
-      title: primaryLesson?.title ?? moduleTitle,
+      title: moduleTitle,
       content: moduleDescription,
     },
     {
       id: makeId("key-idea", 1),
       type: "key_idea",
-      title: "Key Idea",
+      title: localized.importantConcept,
       content: moduleOverview || moduleDescription,
     },
     {
-      id: makeId("paragraph", 2),
-      type: "paragraph",
-      content: primaryLesson?.body || "Core lesson explanation will be shown here.",
-    },
-    {
-      id: makeId("markdown", 3),
+      id: makeId("markdown", 2),
       type: "markdown",
-      content: "### Learning focus\n- Understand\n- Practice\n- Validate outcome",
+      title: localized.learningFocus,
+      content: locale === "ru"
+        ? "### Подход\n- Понять идею\n- Разобрать сценарии\n- Подтвердить результат практикой"
+        : "### Approach\n- Understand the concept\n- Break down the scenarios\n- Confirm the result through practice",
     },
     {
-      id: makeId("list", 4),
+      id: makeId("list", 3),
       type: "list",
-      title: "What you will learn",
+      title: localized.whatYouWillLearn,
       items: listItems,
     },
     {
-      id: makeId("table", 5),
+      id: makeId("table", 4),
       type: "table",
-      title: "Concept map",
+      title: localized.conceptMap,
       table: {
-        headers: ["Concept", "Why it matters", "How to practice"],
+        headers: locale === "ru"
+          ? ["Концепт", "Зачем это нужно", "Как практиковать"]
+          : ["Concept", "Why it matters", "How to practice"],
         rows: [
-          ["Theory", "Build a foundation", "Read concise notes"],
-          ["Practice", "Turn theory into skill", "Do tasks and checkpoints"],
-          ["Review", "Avoid repeating mistakes", "Analyze feedback and quiz errors"],
+          locale === "ru"
+            ? ["Теория", "Создает фундамент", "Разберите ключевые уроки"]
+            : ["Theory", "Builds the foundation", "Review the key lessons"],
+          locale === "ru"
+            ? ["Практика", "Превращает знание в навык", "Выполните задания и проверки"]
+            : ["Practice", "Turns knowledge into skill", "Complete tasks and checkpoints"],
+          locale === "ru"
+            ? ["Рефлексия", "Не дает повторять ошибки", "Сверьте выводы и квиз"]
+            : ["Reflection", "Prevents repeated mistakes", "Compare findings with quiz feedback"],
         ],
       },
     },
     {
-      id: makeId("callout", 6),
+      id: makeId("callout", 5),
       type: "callout",
-      title: "Important Concept",
-      content: "Focus on reproducible workflow: hypothesis -> action -> validation.",
+      title: localized.importantConcept,
+      content: locale === "ru"
+        ? "Стройте воспроизводимый workflow: гипотеза -> действие -> проверка результата."
+        : "Build a reproducible workflow: hypothesis -> action -> validation.",
     },
     {
-      id: makeId("code", 7),
+      id: makeId("code", 6),
       type: "code_block",
-      title: "Code pattern",
+      title: localized.codePattern,
       code: {
         language: "ts",
         value: "const progress = completed / total;\nif (progress >= 1) unlockNextModule();",
       },
     },
+    ...lessonBlocks,
     {
-      id: makeId("quote", 8),
-      type: "quote",
-      content: "Strong learners iterate quickly: learn, apply, reflect, improve.",
-    },
-    {
-      id: makeId("real-world", 9),
+      id: makeId("real-world", 80),
       type: "real_world_example",
-      title: "Real world example",
-      content: trackExample(category),
+      title: localized.realWorldExample,
+      content: realWorldExample || trackExample(category),
     },
     {
-      id: makeId("mistakes", 10),
+      id: makeId("mistakes", 81),
       type: "common_mistakes",
-      title: "Common Mistakes",
+      title: localized.commonMistakes,
       items: commonMistakes(category),
     },
     {
-      id: makeId("image", 11),
-      type: "image",
-      media: {
-        url: "https://placehold.co/960x420/0f172a/94a3b8?text=SkillPath+Academy+Flow",
-        alt: "Learning flow illustration",
-      },
+      id: makeId("self-check", 82),
+      type: "list",
+      title: localized.selfCheck,
+      items: quickChecks && quickChecks.length > 0
+        ? quickChecks
+        : locale === "ru"
+          ? ["Сформулируйте 2 ключевых вывода после модуля", "Назовите 1 риск, который вы проверите первым", "Опишите, что еще требует уточнения"]
+          : ["Write 2 key takeaways from the module", "Name 1 risk you would test first", "Describe what still needs clarification"],
     },
     {
-      id: makeId("video", 12),
-      type: "video",
-      media: {
-        url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-      },
-    },
-    {
-      id: makeId("divider", 13),
+      id: makeId("divider", 83),
       type: "divider",
     },
     {
-      id: makeId("quick-check", 14),
+      id: makeId("quick-check", 84),
       type: "quick_check",
-      title: "Quick Check",
+      title: localized.quickCheck,
       quickCheck: qc,
     },
     {
-      id: makeId("mini-challenge", 15),
+      id: makeId("mini-challenge", 85),
       type: "mini_challenge",
-      title: "Mini Challenge",
-      challengePrompt: `Apply today's idea from "${moduleTitle}" to a realistic task. Write a short action plan.`,
-      challengeHint: "Use 3-5 bullet points: context, action, expected result.",
+      title: localized.miniChallenge,
+      challengePrompt: locale === "ru"
+        ? `Примените идею из модуля "${moduleTitle}" к реальной задаче и опишите короткий план действий.`
+        : `Apply the idea from "${moduleTitle}" to a realistic task and write a short action plan.`,
+      challengeHint: locale === "ru"
+        ? "Используйте 3-5 пунктов: контекст, действие, ожидаемый результат."
+        : "Use 3-5 bullet points: context, action, expected result.",
     },
     {
-      id: makeId("summary", 16),
+      id: makeId("summary", 86),
       type: "summary",
-      title: "Summary",
+      title: localized.summary,
       items: resourceItems,
-      content: "You now have a structured path: concept, practice, validation, and next-step recommendation.",
+      content: locale === "ru"
+        ? "У вас есть структурированный путь: понять концепт, пройти уроки, выполнить практику и закрепить материал проверкой."
+        : "You now have a structured path: understand the concept, work through the lessons, practice, and validate the result.",
     },
   ];
 
