@@ -1,0 +1,775 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  STUDENT
+  ADMIN
+}
+
+enum TrackCategory {
+  QA
+  BA
+  DA
+}
+
+enum LessonType {
+  TEXT
+  VIDEO
+  TASK
+}
+
+enum QuestionType {
+  SINGLE
+  MULTI
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model User {
+  id                 String                   @id @default(cuid())
+  name               String
+  email              String                   @unique
+  role               UserRole                 @default(STUDENT)
+  createdAt          DateTime                 @default(now())
+  progresses         UserProgress[]
+  certificates       Certificate[]
+  userProfile        UserProfile?
+  onboardingProfile  OnboardingProfile?
+  careerGoals        CareerGoal[]
+  missionSubmissions MissionSubmission[]
+  learningPlans      LearningPlan[]
+  notes              UserNote[]
+  bookmarks          UserBookmark[]
+  portfolio          Portfolio?
+  discussionThreads  DiscussionThread[]
+  discussionComments DiscussionComment[]
+  skillGapSnapshots  SkillGapSnapshot[]
+  readinessSnapshots ReadinessScoreSnapshot[]
+}
+
+model Track {
+  id           String        @id @default(cuid())
+  slug         String        @unique
+  title        String
+  description  String
+  icon         String
+  color        String
+  category     TrackCategory
+  modules      Module[]
+  certificates Certificate[]
+}
+
+model Module {
+  id             String         @id @default(cuid())
+  trackId        String
+  order          Int
+  title          String
+  description    String
+  duration       Int
+  content        Json
+  track          Track          @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  lessons        Lesson[]
+  quiz           Quiz?
+  userProgresses UserProgress[]
+
+  @@unique([trackId, order])
+}
+
+model Lesson {
+  id       String     @id @default(cuid())
+  moduleId String
+  order    Int
+  title    String
+  body     String
+  type     LessonType
+  module   Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([moduleId, order])
+}
+
+model Quiz {
+  id           String     @id @default(cuid())
+  moduleId     String     @unique
+  title        String
+  passingScore Int
+  module       Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  questions    Question[]
+}
+
+model Question {
+  id            String       @id @default(cuid())
+  quizId        String
+  text          String
+  type          QuestionType
+  options       Json
+  correctAnswer Json
+  quiz          Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model UserProgress {
+  id          String         @id @default(cuid())
+  userId      String
+  moduleId    String
+  status      ProgressStatus @default(NOT_STARTED)
+  score       Int?
+  completedAt DateTime?
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module      Module         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+}
+
+model Certificate {
+  id             String   @id @default(cuid())
+  userId         String
+  trackId        String
+  issuedAt       DateTime @default(now())
+  certificateUrl String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track          Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, trackId])
+}
+
+enum StudioContentStatus {
+  DRAFT
+  IN_REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum StudioVisibility {
+  PUBLIC
+  PRIVATE
+  HIDDEN
+}
+
+enum StudioCourseLevel {
+  BEGINNER
+  JUNIOR
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum StudioCourseLanguage {
+  RU
+  EN
+}
+
+enum StudioLessonBlockType {
+  heading
+  subheading
+  paragraph
+  markdown
+  bullet_list
+  numbered_list
+  checklist
+  quote
+  callout
+  key_points
+  common_mistakes
+  important_note
+  real_world_example
+  table
+  divider
+  code_block
+  image
+  video_embed
+  file_attachment
+  faq_accordion
+  task_block
+  summary_block
+}
+
+enum StudioQuestionType {
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  SHORT_ANSWER
+  MATCH_PAIRS
+  REORDER_STEPS
+  CASE_BASED
+}
+
+enum StudioAssignmentType {
+  TEXT_TASK
+  BUG_REPORT_TASK
+  SQL_TASK
+  BA_TASK
+  CASE_ANALYSIS
+  UPLOAD_TASK
+  REFLECTIVE_TASK
+  AI_REVIEW_TASK
+}
+
+enum StudioSimulationType {
+  BUG_TRACKER
+  ANALYST_WORKFLOW
+  SQL_CHALLENGE
+  MOCK_INTERVIEW
+  SCENARIO_EXERCISE
+}
+
+enum PermissionRoleType {
+  SUPER_ADMIN
+  CONTENT_ADMIN
+  COURSE_EDITOR
+  REVIEWER
+  ANALYTICS_MANAGER
+}
+
+model Course {
+  id                 String                    @id @default(cuid())
+  slug               String                    @unique
+  title              String
+  shortTitle         String
+  description        String                    @db.Text
+  shortDescription   String
+  category           String
+  level              StudioCourseLevel         @default(BEGINNER)
+  language           StudioCourseLanguage      @default(RU)
+  coverImage         String                    @default("")
+  icon               String                    @default("")
+  themeColor         String                    @default("#38bdf8")
+  estimatedDuration  Int                       @default(0)
+  tags               Json                      @default("[]")
+  outcomes           Json                      @default("[]")
+  requirements       Json                      @default("[]")
+  targetAudience     String                    @default("")
+  status             StudioContentStatus       @default(DRAFT)
+  featured           Boolean                   @default(false)
+  certificateEnabled Boolean                   @default(true)
+  visibility         StudioVisibility          @default(PUBLIC)
+  difficulty         String                    @default("MEDIUM")
+  seoTitle           String                    @default("")
+  seoDescription     String                    @default("")
+  createdBy          String                    @default("admin@skillpath.local")
+  updatedBy          String                    @default("admin@skillpath.local")
+  version            Int                       @default(1)
+  publishedAt        DateTime?
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+  modules            CourseModule[]
+  templates          CourseTemplate[]
+  versions           CourseVersion[]
+  analyticsSnapshots CourseAnalyticsSnapshot[]
+  certificateConfig  CertificateConfig?
+}
+
+model CourseModule {
+  id                String              @id @default(cuid())
+  courseId          String
+  title             String
+  description       String              @default("")
+  order             Int
+  estimatedDuration Int                 @default(0)
+  status            StudioContentStatus @default(DRAFT)
+  unlockRule        Json                @default("{}")
+  prerequisiteIds   Json                @default("[]")
+  xpReward          Int                 @default(0)
+  visibility        StudioVisibility    @default(PUBLIC)
+  icon              String              @default("")
+  themeColor        String              @default("#38bdf8")
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  course            Course              @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons           CourseLesson[]
+  quizzes           CourseQuiz[]
+  assignments       Assignment[]
+  simulations       Simulation[]
+  caseStudies       CaseStudy[]
+
+  @@unique([courseId, order])
+}
+
+model CourseLesson {
+  id                String              @id @default(cuid())
+  moduleId          String
+  title             String
+  description       String              @default("")
+  order             Int
+  estimatedDuration Int                 @default(0)
+  status            StudioContentStatus @default(DRAFT)
+  xpReward          Int                 @default(0)
+  visibility        StudioVisibility    @default(PUBLIC)
+  tags              Json                @default("[]")
+  draftDirty        Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  module            CourseModule        @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  blocks            LessonBlock[]
+
+  @@unique([moduleId, order])
+}
+
+model LessonBlock {
+  id        String                @id @default(cuid())
+  lessonId  String
+  type      StudioLessonBlockType
+  content   String                @db.Text
+  config    Json                  @default("{}")
+  order     Int
+  collapsed Boolean               @default(false)
+  lesson    CourseLesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([lessonId, order])
+}
+
+model CourseQuiz {
+  id               String              @id @default(cuid())
+  moduleId         String
+  title            String
+  description      String              @default("")
+  passingScore     Int                 @default(70)
+  timeLimit        Int?
+  maxAttempts      Int                 @default(3)
+  shuffleQuestions Boolean             @default(true)
+  shuffleOptions   Boolean             @default(true)
+  explanationMode  String              @default("ON_SUBMIT")
+  aiReviewEnabled  Boolean             @default(true)
+  status           StudioContentStatus @default(DRAFT)
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  module           CourseModule        @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  questions        CourseQuestion[]
+}
+
+model CourseQuestion {
+  id                   String             @id @default(cuid())
+  quizId               String
+  questionText         String             @db.Text
+  questionType         StudioQuestionType
+  options              Json               @default("[]")
+  correctAnswer        Json               @default("[]")
+  explanation          String             @default("")
+  hint                 String             @default("")
+  difficulty           String             @default("MEDIUM")
+  tags                 Json               @default("[]")
+  points               Int                @default(10)
+  aiExplanationEnabled Boolean            @default(true)
+  quiz                 CourseQuiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model Assignment {
+  id                 String               @id @default(cuid())
+  moduleId           String
+  assignmentType     StudioAssignmentType
+  title              String
+  instructions       String               @db.Text
+  expectedOutput     String               @default("")
+  evaluationCriteria Json                 @default("[]")
+  hints              Json                 @default("[]")
+  attachments        Json                 @default("[]")
+  maxScore           Int                  @default(100)
+  estimatedTime      Int                  @default(0)
+  aiReviewEnabled    Boolean              @default(true)
+  status             StudioContentStatus  @default(DRAFT)
+  tags               Json                 @default("[]")
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  module             CourseModule         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+}
+
+model Simulation {
+  id                  String               @id @default(cuid())
+  moduleId            String
+  title               String
+  description         String               @default("")
+  simulationType      StudioSimulationType
+  scenario            String               @db.Text
+  steps               Json                 @default("[]")
+  expectedResult      String               @default("")
+  aiEvaluationEnabled Boolean              @default(true)
+  difficulty          String               @default("MEDIUM")
+  estimatedTime       Int                  @default(0)
+  xpReward            Int                  @default(0)
+  status              StudioContentStatus  @default(DRAFT)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  module              CourseModule         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+}
+
+model CaseStudy {
+  id               String              @id @default(cuid())
+  moduleId         String
+  title            String
+  summary          String              @default("")
+  problemStatement String              @db.Text
+  materials        Json                @default("[]")
+  questions        Json                @default("[]")
+  expectedApproach String              @default("")
+  outcome          String              @default("")
+  tags             Json                @default("[]")
+  difficulty       String              @default("MEDIUM")
+  status           StudioContentStatus @default(DRAFT)
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  module           CourseModule        @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+}
+
+model CourseTemplate {
+  id             String   @id @default(cuid())
+  title          String
+  description    String
+  category       String
+  sourceCourseId String?
+  createdAt      DateTime @default(now())
+  blueprint      Json     @default("{}")
+  tags           Json     @default("[]")
+  sourceCourse   Course?  @relation(fields: [sourceCourseId], references: [id], onDelete: SetNull)
+}
+
+model CourseVersion {
+  id            String   @id @default(cuid())
+  courseId      String
+  version       Int
+  updatedBy     String
+  updatedAt     DateTime @default(now())
+  changelogNote String
+  snapshot      Json     @default("{}")
+  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, version])
+}
+
+model MediaAsset {
+  id         String   @id @default(cuid())
+  name       String
+  type       String
+  sizeKb     Int
+  url        String
+  uploadedAt DateTime @default(now())
+  uploadedBy String?
+  tags       Json     @default("[]")
+}
+
+model CertificateConfig {
+  id                  String   @id @default(cuid())
+  courseId            String   @unique
+  enabled             Boolean  @default(true)
+  certificateTitle    String
+  certificateTemplate String   @default("modern-dark")
+  signatoryName       String   @default("SkillPath Academy")
+  signatoryRole       String   @default("Head of Learning")
+  logoUrl             String   @default("")
+  certificateText     String   @default("Awarded for successful completion.")
+  issuanceConditions  Json     @default("[]")
+  updatedAt           DateTime @updatedAt
+  course              Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+}
+
+model AdminActivityLog {
+  id         String             @id @default(cuid())
+  actorEmail String
+  actorRole  PermissionRoleType
+  action     String
+  entityType String
+  entityId   String
+  note       String             @default("")
+  timestamp  DateTime           @default(now())
+}
+
+model CourseAnalyticsSnapshot {
+  id                     String   @id @default(cuid())
+  courseId               String
+  enrolledUsers          Int      @default(0)
+  completionRate         Float    @default(0)
+  averageQuizScore       Float    @default(0)
+  averageAssignmentScore Float    @default(0)
+  averageTimeSpentMin    Int      @default(0)
+  mostDifficultModule    String   @default("")
+  topFailedQuizQuestions Json     @default("[]")
+  dropOffPoints          Json     @default("[]")
+  mostSkippedLesson      String   @default("")
+  progressByModule       Json     @default("[]")
+  capturedAt             DateTime @default(now())
+  course                 Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+}
+
+model PermissionRole {
+  id          String             @id @default(cuid())
+  email       String             @unique
+  role        PermissionRoleType @default(COURSE_EDITOR)
+  permissions Json               @default("[]")
+  isActive    Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model UserProfile {
+  id                  String         @id @default(cuid())
+  userId              String         @unique
+  profession          TrackCategory?
+  currentLevel        String         @default("BEGINNER")
+  weeklyHours         Int            @default(5)
+  targetTimelineWeeks Int            @default(12)
+  preferredSkills     Json           @default("[]")
+  goals               Json           @default("[]")
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model OnboardingProfile {
+  id                 String        @id @default(cuid())
+  userId             String        @unique
+  selectedProfession TrackCategory
+  currentLevel       String
+  goal               String
+  hoursPerWeek       Int           @default(5)
+  targetMonths       Int           @default(3)
+  interestedSkills   Json          @default("[]")
+  roadmap            Json          @default("[]")
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CareerGoal {
+  id             String    @id @default(cuid())
+  userId         String
+  role           String
+  targetDate     DateTime?
+  priority       String    @default("MEDIUM")
+  progress       Int       @default(0)
+  requiredSkills Json      @default("[]")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model JobRole {
+  id             String         @id @default(cuid())
+  slug           String         @unique
+  title          String
+  track          TrackCategory?
+  level          String
+  requiredSkills Json           @default("[]")
+  description    String         @default("")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  postings       JobPosting[]
+}
+
+model JobPosting {
+  id               String              @id @default(cuid())
+  roleId           String?
+  title            String
+  level            String
+  company          String              @default("SkillPath Partners")
+  location         String              @default("Remote")
+  requiredSkills   Json                @default("[]")
+  responsibilities Json                @default("[]")
+  status           StudioContentStatus @default(PUBLISHED)
+  source           String              @default("mock")
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  role             JobRole?            @relation(fields: [roleId], references: [id], onDelete: SetNull)
+}
+
+model LearningMission {
+  id                  String              @id @default(cuid())
+  slug                String              @unique
+  title               String
+  scenario            String              @db.Text
+  roleContext         String
+  objective           String              @db.Text
+  steps               Json                @default("[]")
+  expectedResult      String              @default("")
+  difficulty          String              @default("MEDIUM")
+  xpReward            Int                 @default(0)
+  aiEvaluationEnabled Boolean             @default(true)
+  category            TrackCategory?
+  status              StudioContentStatus @default(DRAFT)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  submissions         MissionSubmission[]
+}
+
+model MissionSubmission {
+  id          String          @id @default(cuid())
+  missionId   String
+  userId      String
+  answer      String          @db.Text
+  score       Int?
+  feedback    Json            @default("[]")
+  status      String          @default("SUBMITTED")
+  submittedAt DateTime        @default(now())
+  reviewedAt  DateTime?
+  mission     LearningMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, missionId])
+}
+
+model WeeklyQuest {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  goal        Int      @default(1)
+  rewardXp    Int      @default(0)
+  isActive    Boolean  @default(true)
+  cadence     String   @default("WEEKLY")
+  conditions  Json     @default("[]")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model LearningPlan {
+  id           String    @id @default(cuid())
+  userId       String
+  goal         String
+  weeklyHours  Int       @default(5)
+  workload     String    @default("BALANCED")
+  forecastDate DateTime?
+  tasks        Json      @default("[]")
+  status       String    @default("ACTIVE")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model KnowledgeNode {
+  id             String           @id @default(cuid())
+  slug           String           @unique
+  title          String
+  category       String
+  dependencies   Json             @default("[]")
+  difficulty     String           @default("FOUNDATION")
+  track          TrackCategory?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  outgoingEdges  KnowledgeEdge[]  @relation("EdgeFrom")
+  incomingEdges  KnowledgeEdge[]  @relation("EdgeTo")
+}
+
+model KnowledgeEdge {
+  id         String        @id @default(cuid())
+  fromNodeId String
+  toNodeId   String
+  edgeType   String        @default("REQUIRES")
+  weight     Int           @default(1)
+  createdAt  DateTime      @default(now())
+  fromNode   KnowledgeNode @relation("EdgeFrom", fields: [fromNodeId], references: [id], onDelete: Cascade)
+  toNode     KnowledgeNode @relation("EdgeTo", fields: [toNodeId], references: [id], onDelete: Cascade)
+
+  @@unique([fromNodeId, toNodeId])
+  @@index([fromNodeId])
+  @@index([toNodeId])
+}
+
+model Portfolio {
+  id          String           @id @default(cuid())
+  userId      String           @unique
+  headline    String           @default("")
+  summary     String           @default("") @db.Text
+  isPublic    Boolean          @default(false)
+  publicSlug  String?          @unique
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects    PortfolioProject[]
+}
+
+model PortfolioProject {
+  id           String    @id @default(cuid())
+  portfolioId  String
+  title        String
+  description  String    @default("") @db.Text
+  skillsUsed   Json      @default("[]")
+  source       String    @default("manual")
+  sourceRef    String    @default("")
+  resultSummary String   @default("")
+  isPublic     Boolean   @default(true)
+  order        Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  portfolio    Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@index([portfolioId])
+}
+
+model UserNote {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String   @db.Text
+  moduleRef String   @default("")
+  lessonRef String   @default("")
+  tags      Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserBookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  href      String
+  type      String
+  tag       String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+}
+
+model DiscussionThread {
+  id        String              @id @default(cuid())
+  userId    String
+  title     String
+  moduleRef String              @default("")
+  track     TrackCategory?
+  body      String              @db.Text
+  tags      Json                @default("[]")
+  isLocked  Boolean             @default(false)
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments  DiscussionComment[]
+}
+
+model DiscussionComment {
+  id        String           @id @default(cuid())
+  threadId  String
+  userId    String
+  content   String           @db.Text
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  thread    DiscussionThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SkillGapSnapshot {
+  id              String         @id @default(cuid())
+  userId          String
+  track           TrackCategory?
+  missingSkills   Json           @default("[]")
+  strongestSkills Json           @default("[]")
+  capturedAt      DateTime       @default(now())
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ReadinessScoreSnapshot {
+  id         String   @id @default(cuid())
+  userId     String
+  targetRole String
+  score      Int
+  level      String
+  breakdown  Json     @default("{}")
+  capturedAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find C:Users1234DocumentsGitHubskill_path_io -type f -name *mock*)",
+      "Bash(find /c/Users/1234/Documents/GitHub/skill_path_io -type f -name *.test.ts -o -name *.test.tsx)",
+      "Bash(find /c/Users/1234/Documents/GitHub/skill_path_io/components -name *admin* -type d)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx vitest:*)",
+      "Bash(grep -E \"\\\\.tsx$\")",
+      "Bash(npm run:*)",
+      "Bash(npx next:*)"
+    ]
+  }
+}

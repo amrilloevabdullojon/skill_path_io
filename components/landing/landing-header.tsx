@@ -1,0 +1,103 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Menu, Sparkles, X } from "lucide-react";
+
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+const navItems = [
+  { label: "Tracks", href: "#tracks" },
+  { label: "Missions", href: "#missions" },
+  { label: "Career", href: "#career" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "About", href: "#about" },
+];
+
+export function LandingHeader() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    function onScroll() {
+      setIsScrolled(window.scrollY > 12);
+    }
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <header className="sticky top-3 z-50">
+      <div
+        className={cn(
+          "mx-auto flex w-full max-w-[112rem] items-center justify-between rounded-2xl border px-3 py-2.5 transition-all sm:px-4",
+          isScrolled
+            ? "border-slate-700/90 bg-slate-950/88 shadow-[0_10px_30px_rgba(2,6,23,0.45)] backdrop-blur-lg"
+            : "border-slate-700/50 bg-slate-950/45 backdrop-blur-sm",
+        )}
+      >
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-100">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-sky-400/30 bg-sky-500/15 text-sky-200">
+            <Sparkles className="h-3.5 w-3.5" />
+          </span>
+          SkillPath Academy
+        </Link>
+
+        <nav className="hidden items-center gap-1 lg:flex">
+          {navItems.map((item) => (
+            <a key={item.label} href={item.href} className="nav-link text-sm">
+              {item.label}
+            </a>
+          ))}
+        </nav>
+
+        <div className="hidden items-center gap-2 lg:flex">
+          <Link href="/login" className={cn(buttonVariants({ variant: "ghost" }), "h-9 px-3")}>
+            Login
+          </Link>
+          <Link href="/login" className={cn(buttonVariants({ size: "sm" }), "h-9 px-4")}>
+            Start learning
+          </Link>
+        </div>
+
+        <button
+          type="button"
+          aria-label="Toggle menu"
+          onClick={() => setMobileOpen((prev) => !prev)}
+          className="btn-secondary h-9 w-9 p-0 lg:hidden"
+        >
+          {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        </button>
+      </div>
+
+      {mobileOpen ? (
+        <div className="mx-auto mt-2 w-full max-w-[112rem] rounded-2xl border border-slate-700/90 bg-slate-950/92 p-3 backdrop-blur-lg lg:hidden">
+          <nav className="space-y-1">
+            {navItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="nav-link block"
+                onClick={() => setMobileOpen(false)}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <Link href="/login" className={cn(buttonVariants({ variant: "outline" }), "h-9 w-full")}>
+              Login
+            </Link>
+            <Link href="/login" className={cn(buttonVariants({ size: "sm" }), "h-9 w-full")}>
+              Start learning
+            </Link>
+          </div>
+        </div>
+      ) : null}
+    </header>
+  );
+}
+

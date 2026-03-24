@@ -1,0 +1,334 @@
+"use client";
+
+import { useMemo, useState, type ReactNode } from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeHighlight from "rehype-highlight";
+import { AlertTriangle, CheckCircle2, Lightbulb, PlayCircle, Quote, Sparkles } from "lucide-react";
+
+import { AskAiHintButton } from "@/components/tracks/ask-ai-hint-button";
+import { LessonBlock } from "@/lib/tracks/lesson-blocks";
+
+type LessonBlockRendererProps = {
+  blocks: LessonBlock[];
+};
+
+type QuickCheckState = {
+  selectedIndex: number | null;
+  submitted: boolean;
+};
+
+function BlockCard({
+  title,
+  children,
+  className,
+}: {
+  title?: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={`surface-subtle space-y-3 p-4 sm:p-5 ${className ?? ""}`}>
+      {title ? <h3 className="text-lg font-semibold text-slate-100">{title}</h3> : null}
+      {children}
+    </section>
+  );
+}
+
+export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
+  const [quickCheckState, setQuickCheckState] = useState<Record<string, QuickCheckState>>({});
+  const [challengeDrafts, setChallengeDrafts] = useState<Record<string, string>>({});
+  const [challengeSubmitted, setChallengeSubmitted] = useState<Record<string, boolean>>({});
+
+  const orderedBlocks = useMemo(() => blocks, [blocks]);
+
+  return (
+    <div className="space-y-4">
+      {orderedBlocks.map((block) => {
+        if (block.type === "heading") {
+          return (
+            <BlockCard key={block.id} className="border-sky-400/20 bg-sky-500/5">
+              <p className="kicker">Lesson heading</p>
+              <h2 className="text-2xl font-semibold text-slate-100">{block.title || block.content}</h2>
+              {block.content ? <p className="text-sm text-slate-300">{block.content}</p> : null}
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "paragraph") {
+          return (
+            <BlockCard key={block.id}>
+              <p className="body-text">{block.content}</p>
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "markdown") {
+          return (
+            <BlockCard key={block.id} title={block.title}>
+              <article className="markdown-content">
+                <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{block.content || ""}</ReactMarkdown>
+              </article>
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "list") {
+          return (
+            <BlockCard key={block.id} title={block.title}>
+              <ul className="list-disc space-y-1 pl-5 text-sm text-slate-300">
+                {(block.items || []).map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "table") {
+          return (
+            <BlockCard key={block.id} title={block.title}>
+              <div className="table-shell">
+                <table className="table-base">
+                  <thead className="table-head">
+                    <tr>
+                      {(block.table?.headers || []).map((header) => (
+                        <th key={header}>{header}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(block.table?.rows || []).map((row, rowIndex) => (
+                      <tr key={`${block.id}-${rowIndex}`} className="table-row">
+                        {row.map((cell, cellIndex) => (
+                          <td key={`${block.id}-${rowIndex}-${cellIndex}`}>{cell}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "callout" || block.type === "important_concept") {
+          return (
+            <BlockCard key={block.id} title={block.title} className="border-amber-400/25 bg-amber-500/8">
+              <p className="inline-flex items-center gap-2 text-sm font-medium text-amber-200">
+                <Lightbulb className="h-4 w-4" />
+                Important concept
+              </p>
+              <p className="text-sm text-amber-100/90">{block.content}</p>
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "code_block") {
+          return (
+            <BlockCard key={block.id} title={block.title}>
+              <pre className="overflow-x-auto rounded-xl border border-slate-700/90 bg-slate-950 p-4 text-sm text-slate-200">
+                <code>{block.code?.value || ""}</code>
+              </pre>
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "image") {
+          return (
+            <BlockCard key={block.id}>
+              {block.media?.url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={block.media.url}
+                  alt={block.media.alt || "Lesson visual"}
+                  className="w-full rounded-xl border border-slate-700/80"
+                />
+              ) : null}
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "video") {
+          return (
+            <BlockCard key={block.id} title={block.title || "Video explanation"}>
+              <div className="aspect-video overflow-hidden rounded-xl border border-slate-700/80">
+                <iframe
+                  src={block.media?.url}
+                  className="h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title="Lesson video"
+                />
+              </div>
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "quote") {
+          return (
+            <BlockCard key={block.id}>
+              <blockquote className="inline-flex items-start gap-2 rounded-xl border border-slate-700 bg-slate-900/70 px-3 py-2 text-sm text-slate-200">
+                <Quote className="mt-0.5 h-4 w-4 text-sky-300" />
+                <span>{block.content}</span>
+              </blockquote>
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "divider") {
+          return <hr key={block.id} className="border-slate-800" />;
+        }
+
+        if (block.type === "key_idea") {
+          return (
+            <BlockCard key={block.id} title={block.title} className="border-sky-400/25 bg-sky-500/8">
+              <p className="text-sm text-sky-100">{block.content}</p>
+              <AskAiHintButton question={`Explain this key idea in simple words: ${block.content || ""}`} />
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "common_mistakes") {
+          return (
+            <BlockCard key={block.id} title={block.title} className="border-rose-400/25 bg-rose-500/8">
+              <ul className="list-disc space-y-1 pl-5 text-sm text-rose-100/90">
+                {(block.items || []).map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "real_world_example") {
+          return (
+            <BlockCard key={block.id} title={block.title} className="border-violet-400/25 bg-violet-500/8">
+              <p className="text-sm text-violet-100/90">{block.content}</p>
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "quick_check") {
+          const state = quickCheckState[block.id] ?? { selectedIndex: null, submitted: false };
+          const qc = block.quickCheck;
+          if (!qc) {
+            return null;
+          }
+          const isCorrect = state.submitted && state.selectedIndex === qc.correctIndex;
+          return (
+            <BlockCard key={block.id} title={block.title || "Quick Check"} className="border-emerald-400/25 bg-emerald-500/8">
+              <p className="text-sm font-medium text-emerald-100">{qc.question}</p>
+              <div className="space-y-2">
+                {qc.options.map((option, index) => (
+                  <label key={option} className="flex items-start gap-2 rounded-xl border border-slate-700 bg-slate-900/70 p-2 text-sm text-slate-200">
+                    <input
+                      type="radio"
+                      name={block.id}
+                      checked={state.selectedIndex === index}
+                      onChange={() =>
+                        setQuickCheckState((prev) => ({
+                          ...prev,
+                          [block.id]: { ...state, selectedIndex: index },
+                        }))
+                      }
+                      className="mt-1 h-4 w-4 accent-emerald-400"
+                    />
+                    <span>{option}</span>
+                  </label>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  setQuickCheckState((prev) => ({
+                    ...prev,
+                    [block.id]: { ...state, submitted: true },
+                  }))
+                }
+                disabled={state.selectedIndex === null}
+                className="btn-secondary"
+              >
+                Check answer
+              </button>
+              {state.submitted ? (
+                <div className={`rounded-xl border px-3 py-2 text-sm ${isCorrect ? "border-emerald-400/35 bg-emerald-500/10 text-emerald-200" : "border-amber-400/35 bg-amber-500/10 text-amber-100"}`}>
+                  <p className="inline-flex items-center gap-2">
+                    {isCorrect ? <CheckCircle2 className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
+                    {isCorrect ? "Correct!" : "Not quite yet"}
+                  </p>
+                  <p className="mt-1 text-xs">{qc.explanation}</p>
+                </div>
+              ) : null}
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "mini_challenge") {
+          const draft = challengeDrafts[block.id] ?? "";
+          const submitted = challengeSubmitted[block.id] ?? false;
+          return (
+            <BlockCard key={block.id} title={block.title || "Mini Challenge"} className="border-cyan-400/25 bg-cyan-500/8">
+              <p className="text-sm text-cyan-100">{block.challengePrompt}</p>
+              <textarea
+                value={draft}
+                onChange={(event) =>
+                  setChallengeDrafts((prev) => ({
+                    ...prev,
+                    [block.id]: event.target.value,
+                  }))
+                }
+                className="textarea-base min-h-[110px]"
+                placeholder="Write your short answer..."
+              />
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setChallengeSubmitted((prev) => ({
+                      ...prev,
+                      [block.id]: true,
+                    }))
+                  }
+                  className="btn-secondary"
+                  disabled={draft.trim().length < 12}
+                >
+                  Submit challenge
+                </button>
+                <AskAiHintButton question={`Give me a hint for this challenge: ${block.challengePrompt || ""}`} />
+              </div>
+              {submitted ? (
+                <p className="inline-flex items-center gap-2 rounded-xl border border-emerald-400/35 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+                  <Sparkles className="h-4 w-4" />
+                  Great start. Next step: validate your answer with module quiz or simulation.
+                </p>
+              ) : block.challengeHint ? (
+                <p className="text-xs text-cyan-100/80">Hint: {block.challengeHint}</p>
+              ) : null}
+            </BlockCard>
+          );
+        }
+
+        if (block.type === "summary") {
+          return (
+            <BlockCard key={block.id} title={block.title} className="border-slate-600/60 bg-slate-900/70">
+              {block.content ? <p className="text-sm text-slate-200">{block.content}</p> : null}
+              {(block.items || []).length > 0 ? (
+                <ul className="list-disc space-y-1 pl-5 text-sm text-slate-300">
+                  {(block.items || []).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              ) : null}
+              <p className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-300">
+                <PlayCircle className="h-4 w-4 text-sky-300" />
+                Recommended next step: complete quiz and continue timeline.
+              </p>
+            </BlockCard>
+          );
+        }
+
+        return null;
+      })}
+    </div>
+  );
+}
