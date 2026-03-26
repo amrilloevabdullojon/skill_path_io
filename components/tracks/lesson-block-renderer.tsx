@@ -28,7 +28,7 @@ function BlockCard({
 }) {
   return (
     <section className={`surface-subtle space-y-3 p-4 sm:p-5 ${className ?? ""}`}>
-      {title ? <h3 className="text-lg font-semibold text-slate-100">{title}</h3> : null}
+      {title ? <h3 className="section-heading">{title}</h3> : null}
       {children}
     </section>
   );
@@ -48,8 +48,8 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
           return (
             <BlockCard key={block.id} className="border-sky-400/20 bg-sky-500/5">
               <p className="kicker">Lesson heading</p>
-              <h2 className="text-2xl font-semibold text-slate-100">{block.title || block.content}</h2>
-              {block.content ? <p className="text-sm text-slate-300">{block.content}</p> : null}
+              <h2 className="text-2xl font-semibold text-foreground">{block.title || block.content}</h2>
+              {block.content ? <p className="text-sm text-muted-foreground">{block.content}</p> : null}
             </BlockCard>
           );
         }
@@ -75,7 +75,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "list") {
           return (
             <BlockCard key={block.id} title={block.title}>
-              <ul className="list-disc space-y-1 pl-5 text-sm text-slate-300">
+              <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
                 {(block.items || []).map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -126,7 +126,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "code_block") {
           return (
             <BlockCard key={block.id} title={block.title}>
-              <pre className="overflow-x-auto rounded-xl border border-slate-700/90 bg-slate-950 p-4 text-sm text-slate-200">
+              <pre className="overflow-x-auto rounded-xl border border-border/90 bg-background p-4 text-sm text-muted-foreground">
                 <code>{block.code?.value || ""}</code>
               </pre>
             </BlockCard>
@@ -141,7 +141,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                 <img
                   src={block.media.url}
                   alt={block.media.alt || "Lesson visual"}
-                  className="w-full rounded-xl border border-slate-700/80"
+                  className="w-full rounded-xl border border-border/80"
                 />
               ) : null}
             </BlockCard>
@@ -151,7 +151,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "video") {
           return (
             <BlockCard key={block.id} title={block.title || "Video explanation"}>
-              <div className="aspect-video overflow-hidden rounded-xl border border-slate-700/80">
+              <div className="aspect-video overflow-hidden rounded-xl border border-border/80">
                 <iframe
                   src={block.media?.url}
                   className="h-full w-full"
@@ -167,7 +167,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "quote") {
           return (
             <BlockCard key={block.id}>
-              <blockquote className="inline-flex items-start gap-2 rounded-xl border border-slate-700 bg-slate-900/70 px-3 py-2 text-sm text-slate-200">
+              <blockquote className="data-pill inline-flex items-start gap-2 rounded-xl px-3 py-2 text-sm">
                 <Quote className="mt-0.5 h-4 w-4 text-sky-300" />
                 <span>{block.content}</span>
               </blockquote>
@@ -176,7 +176,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         }
 
         if (block.type === "divider") {
-          return <hr key={block.id} className="border-slate-800" />;
+          return <hr key={block.id} className="border-border" />;
         }
 
         if (block.type === "key_idea") {
@@ -220,7 +220,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
               <p className="text-sm font-medium text-emerald-100">{qc.question}</p>
               <div className="space-y-2">
                 {qc.options.map((option, index) => (
-                  <label key={option} className="flex items-start gap-2 rounded-xl border border-slate-700 bg-slate-900/70 p-2 text-sm text-slate-200">
+                  <label key={option} className="quiz-option-default flex items-start gap-2 rounded-xl p-2 text-sm text-foreground">
                     <input
                       type="radio"
                       name={block.id}
@@ -310,16 +310,16 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
 
         if (block.type === "summary") {
           return (
-            <BlockCard key={block.id} title={block.title} className="border-slate-600/60 bg-slate-900/70">
-              {block.content ? <p className="text-sm text-slate-200">{block.content}</p> : null}
+            <BlockCard key={block.id} title={block.title} className="border-border/60 bg-card/70">
+              {block.content ? <p className="text-sm text-foreground">{block.content}</p> : null}
               {(block.items || []).length > 0 ? (
-                <ul className="list-disc space-y-1 pl-5 text-sm text-slate-300">
+                <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
                   {(block.items || []).map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
               ) : null}
-              <p className="inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-slate-300">
+              <p className="data-pill inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs">
                 <PlayCircle className="h-4 w-4 text-sky-300" />
                 Recommended next step: complete quiz and continue timeline.
               </p>

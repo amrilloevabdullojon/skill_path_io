@@ -21,26 +21,26 @@ export function DashboardSkillRadarSection({ radar }: DashboardSkillRadarProps) 
         </div>
 
         <aside className="grid min-w-0 gap-3 sm:grid-cols-3 2xl:grid-cols-1">
-          <div className="min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-            <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-slate-500">
+          <div className="content-card min-w-0 p-3">
+            <p className="data-label inline-flex items-center gap-2">
               <TrendingUp className="h-3.5 w-3.5 text-emerald-300" />
               Strongest
             </p>
-            <p className="mt-2 break-words text-sm font-semibold text-slate-100">{radar.strongestSkill}</p>
+            <p className="mt-2 break-words text-sm font-semibold text-foreground">{radar.strongestSkill}</p>
           </div>
-          <div className="min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-            <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-slate-500">
+          <div className="content-card min-w-0 p-3">
+            <p className="data-label inline-flex items-center gap-2">
               <TrendingDown className="h-3.5 w-3.5 text-orange-300" />
               Weakest
             </p>
-            <p className="mt-2 break-words text-sm font-semibold text-slate-100">{radar.weakestSkill}</p>
+            <p className="mt-2 break-words text-sm font-semibold text-foreground">{radar.weakestSkill}</p>
           </div>
-          <div className="min-w-0 rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-            <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-slate-500">
+          <div className="content-card min-w-0 p-3">
+            <p className="data-label inline-flex items-center gap-2">
               <ShieldCheck className="h-3.5 w-3.5 text-sky-300" />
               Next focus
             </p>
-            <p className="mt-2 break-words text-sm font-semibold text-slate-100">{radar.nextFocus}</p>
+            <p className="mt-2 break-words text-sm font-semibold text-foreground">{radar.nextFocus}</p>
           </div>
         </aside>
       </div>

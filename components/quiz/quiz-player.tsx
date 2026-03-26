@@ -94,7 +94,7 @@ export function QuizPlayer({
   if (totalQuestions === 0) {
     return (
       <div className="state-panel">
-        <p className="text-sm text-slate-400">No questions found for this quiz.</p>
+        <p className="text-sm text-muted-foreground">No questions found for this quiz.</p>
       </div>
     );
   }
@@ -103,10 +103,10 @@ export function QuizPlayer({
     return (
       <AnimatePresence mode="wait">
         <motion.section key="result-screen" className="space-y-6" {...containerMotion}>
-          <div className="surface-subtle rounded-2xl p-4 text-slate-100 sm:p-6">
+          <div className="surface-subtle rounded-2xl p-4 text-foreground sm:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Quiz result</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Quiz result</p>
                 <h2 className="mt-2 break-words text-2xl font-semibold">{quizTitle}</h2>
               </div>
               <div
@@ -121,22 +121,22 @@ export function QuizPlayer({
 
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
               <div className="surface-subtle rounded-xl p-4">
-                <p className="text-xs text-slate-400">Score</p>
+                <p className="text-xs text-muted-foreground">Score</p>
                 <p className="text-2xl font-semibold">{result.score}%</p>
               </div>
               <div className="surface-subtle rounded-xl p-4">
-                <p className="text-xs text-slate-400">Correct answers</p>
+                <p className="text-xs text-muted-foreground">Correct answers</p>
                 <p className="text-2xl font-semibold">
                   {result.correctAnswers}/{result.totalQuestions}
                 </p>
               </div>
               <div className="surface-subtle rounded-xl p-4">
-                <p className="text-xs text-slate-400">Passing score</p>
+                <p className="text-xs text-muted-foreground">Passing score</p>
                 <p className="text-2xl font-semibold">{result.passingScore}%</p>
               </div>
             </div>
 
-            <div className="mt-5 space-y-2 text-sm text-slate-300">
+            <div className="mt-5 space-y-2 text-sm text-muted-foreground">
               {result.passed ? (
                 <p>Your module progress has been updated.</p>
               ) : (
@@ -182,15 +182,15 @@ export function QuizPlayer({
       <div className="surface-subtle rounded-2xl p-4 sm:p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Quiz</p>
-            <h2 className="mt-1 break-words text-xl font-semibold text-slate-100">{quizTitle}</h2>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Quiz</p>
+            <h2 className="mt-1 break-words text-xl font-semibold text-foreground">{quizTitle}</h2>
           </div>
-          <div className="text-sm text-slate-300">
+          <div className="text-sm text-muted-foreground">
             Question {currentIndex + 1} of {totalQuestions}
           </div>
         </div>
 
-        <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-800">
+        <div className="progress-track mt-4 h-2">
           <motion.div
             className="h-full rounded-full bg-sky-400"
             initial={false}
@@ -203,11 +203,11 @@ export function QuizPlayer({
       <AnimatePresence mode="wait">
         <motion.article
           key={currentQuestion.id}
-          className="space-y-5 rounded-2xl border border-slate-800 bg-slate-950/78 p-4 text-slate-100 sm:p-6"
+          className="content-card space-y-5 rounded-2xl p-4 text-foreground sm:p-6"
           {...containerMotion}
         >
           <header className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
               {currentQuestion.type === "SINGLE" ? "Single choice" : "Multiple choice"}
             </p>
             <h3 className="break-words text-lg font-semibold leading-snug sm:text-xl">{currentQuestion.text}</h3>
@@ -226,7 +226,7 @@ export function QuizPlayer({
                 className={`flex w-full cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${
                   checked
                     ? "border-sky-400/70 bg-sky-400/10"
-                    : "border-slate-800 bg-slate-900/70 hover:border-slate-700"
+                    : "quiz-option-default"
                 }`}
               >
                   <input
@@ -238,7 +238,7 @@ export function QuizPlayer({
                     }
                     className="mt-1 h-4 w-4 accent-sky-400"
                   />
-                  <span className="break-words text-sm leading-6 text-slate-200">{option.text}</span>
+                  <span className="break-words text-sm leading-6 text-foreground">{option.text}</span>
                 </motion.label>
               );
             })}

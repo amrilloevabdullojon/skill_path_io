@@ -25,26 +25,26 @@ export function StudentAnalyticsDashboard({ snapshot }: { snapshot: StudentAnaly
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <article className="surface-elevated p-4">
-          <p className="text-xs text-slate-500">Learning time</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-100">{snapshot.totalLearningMinutes} min</p>
+          <p className="text-xs text-muted-foreground">Learning time</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{snapshot.totalLearningMinutes} min</p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="text-xs text-slate-500">Completed lessons</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-100">{snapshot.completedLessons}</p>
+          <p className="text-xs text-muted-foreground">Completed lessons</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{snapshot.completedLessons}</p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="text-xs text-slate-500">Quiz accuracy</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-100">{snapshot.averageQuizAccuracy}%</p>
+          <p className="text-xs text-muted-foreground">Quiz accuracy</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{snapshot.averageQuizAccuracy}%</p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="text-xs text-slate-500">Mission completion</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-100">{snapshot.missionCompletionRate}%</p>
+          <p className="text-xs text-muted-foreground">Mission completion</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{snapshot.missionCompletionRate}%</p>
         </article>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
         <article className="surface-elevated p-4">
-          <p className="mb-3 text-sm font-semibold text-slate-100">Weekly progress trend</p>
+          <p className="mb-3 text-sm font-semibold text-foreground">Weekly progress trend</p>
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220}>
               <AreaChart data={snapshot.weeklyProgress}>
@@ -65,7 +65,7 @@ export function StudentAnalyticsDashboard({ snapshot }: { snapshot: StudentAnaly
         </article>
 
         <article className="surface-elevated p-4">
-          <p className="mb-3 text-sm font-semibold text-slate-100">Daily progress vs accuracy</p>
+          <p className="mb-3 text-sm font-semibold text-foreground">Daily progress vs accuracy</p>
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220}>
               <LineChart data={snapshot.trend}>
@@ -102,7 +102,7 @@ export function StudentAnalyticsDashboard({ snapshot }: { snapshot: StudentAnaly
               </span>
             ))}
           </div>
-          <p className="mt-3 text-xs text-slate-400">Simulation performance: {snapshot.simulationPerformance}%</p>
+          <p className="mt-3 text-xs text-muted-foreground">Simulation performance: {snapshot.simulationPerformance}%</p>
         </article>
       </div>
     </section>

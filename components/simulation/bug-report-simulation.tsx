@@ -56,8 +56,8 @@ export function BugReportSimulation() {
     <section className="surface-elevated space-y-5 p-5 sm:p-6">
       <header className="space-y-2">
         <p className="kicker">QA Simulation</p>
-        <h1 className="text-2xl font-semibold text-slate-100">Bug Tracker Simulation</h1>
-        <p className="text-sm text-slate-400">
+        <h1 className="text-2xl font-semibold text-foreground">Bug Tracker Simulation</h1>
+        <p className="text-sm text-muted-foreground">
           Create a Jira-style bug report and receive AI quality review.
         </p>
       </header>
@@ -109,7 +109,7 @@ export function BugReportSimulation() {
 
       {review && (
         <article className="surface-subtle space-y-3 p-4">
-          <p className="text-sm font-semibold text-slate-100">Quality score: {review.qualityScore}/100</p>
+          <p className="text-sm font-semibold text-foreground">Quality score: {review.qualityScore}/100</p>
           <div className="grid gap-3 md:grid-cols-3">
             <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-100">
               <p className="font-semibold uppercase tracking-wide text-emerald-200">Strengths</p>

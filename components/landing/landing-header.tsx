@@ -40,11 +40,11 @@ export function LandingHeader() {
         className={cn(
           "mx-auto flex w-full max-w-[112rem] items-center justify-between rounded-2xl border px-3 py-2.5 transition-all sm:px-4",
           isScrolled
-            ? "border-slate-700/90 bg-slate-950/88 shadow-[0_10px_30px_rgba(2,6,23,0.45)] backdrop-blur-lg"
-            : "border-slate-700/50 bg-slate-950/45 backdrop-blur-sm",
+            ? "border-border/90 bg-background/88 shadow-[0_10px_30px_rgba(2,6,23,0.45)] backdrop-blur-lg"
+            : "border-border/50 bg-background/45 backdrop-blur-sm",
         )}
       >
-        <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-slate-100">
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
           <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-sky-400/30 bg-sky-500/15 text-sky-200">
             <Sparkles className="h-3.5 w-3.5" />
           </span>
@@ -80,7 +80,7 @@ export function LandingHeader() {
       </div>
 
       {mobileOpen ? (
-        <div className="mx-auto mt-2 w-full max-w-[112rem] rounded-2xl border border-slate-700/90 bg-slate-950/92 p-3 backdrop-blur-lg lg:hidden">
+        <div className="mx-auto mt-2 w-full max-w-[112rem] rounded-2xl border border-border/90 bg-background/92 p-3 backdrop-blur-lg lg:hidden">
           <nav className="space-y-1">
             {navItems.map((item) => (
               <a

@@ -9,23 +9,36 @@ import { useTranslations } from "next-intl";
 import {
   Bell,
   BarChart3,
+  BookMarked,
+  Bot,
+  Brain,
   Building2,
   BriefcaseBusiness,
+  CalendarDays,
   ChartLine,
   ChevronLeft,
   ChevronRight,
   Command,
   CreditCard,
+  FlameKindling,
   FolderKanban,
+  GitBranch,
   Home,
   LayoutDashboard,
+  MapPin,
   Menu,
+  Newspaper,
   Rocket,
   Shield,
+  Sparkles,
+  Store,
   Target,
+  Trophy,
   UserCircle2,
   Users,
+  Wand2,
   X,
+  Zap,
 } from "lucide-react";
 
 import { Dropdown } from "@/components/ui/dropdown";
@@ -67,8 +80,8 @@ const sidebarGroups: NavGroup[] = [
       { id: "overview", labelKey: "overview", href: "/dashboard?tab=overview", icon: LayoutDashboard },
       { id: "tracks", labelKey: "tracks", href: "/tracks", icon: Target },
       { id: "missions", labelKey: "missions", href: "/missions", icon: Rocket },
-      { id: "quests", labelKey: "weeklyQuests", href: "/dashboard?tab=overview#quests", icon: Home },
-      { id: "planner", labelKey: "planner", href: "/planner", icon: Home },
+      { id: "quests", labelKey: "weeklyQuests", href: "/dashboard?tab=overview#quests", icon: FlameKindling },
+      { id: "planner", labelKey: "planner", href: "/planner", icon: CalendarDays },
     ],
   },
   {
@@ -76,21 +89,21 @@ const sidebarGroups: NavGroup[] = [
     titleKey: "skills",
     items: [
       { id: "skill-radar", labelKey: "skillRadar", href: "/dashboard?tab=skills#skills", icon: ChartLine },
-      { id: "skill-tree", labelKey: "skillTree", href: "/dashboard?tab=skills#tree", icon: ChartLine },
-      { id: "xp-level", labelKey: "xpLevel", href: "/dashboard?tab=skills#xp", icon: ChartLine },
-      { id: "heatmap", labelKey: "heatmap", href: "/dashboard?tab=skills#heatmap", icon: ChartLine },
+      { id: "skill-tree", labelKey: "skillTree", href: "/dashboard?tab=skills#tree", icon: GitBranch },
+      { id: "xp-level", labelKey: "xpLevel", href: "/dashboard?tab=skills#xp", icon: Zap },
+      { id: "heatmap", labelKey: "heatmap", href: "/dashboard?tab=skills#heatmap", icon: Brain },
     ],
   },
   {
     id: "career",
     titleKey: "career",
     items: [
-      { id: "career", labelKey: "career", href: "/career", icon: BriefcaseBusiness },
+      { id: "career", labelKey: "career", href: "/career", icon: MapPin },
       { id: "jobs", labelKey: "jobs", href: "/jobs", icon: BriefcaseBusiness },
-      { id: "marketplace", labelKey: "marketplace", href: "/marketplace", icon: BriefcaseBusiness },
+      { id: "marketplace", labelKey: "marketplace", href: "/marketplace", icon: Store },
       { id: "portfolio", labelKey: "portfolio", href: "/portfolio", icon: FolderKanban },
-      { id: "interview", labelKey: "interview", href: "/interview", icon: BriefcaseBusiness },
-      { id: "review", labelKey: "review", href: "/review", icon: BriefcaseBusiness },
+      { id: "interview", labelKey: "interview", href: "/interview", icon: Newspaper },
+      { id: "review", labelKey: "review", href: "/review", icon: BookMarked },
       { id: "public-profile", labelKey: "publicProfile", href: "/profile/me", icon: UserCircle2 },
     ],
   },
@@ -98,7 +111,7 @@ const sidebarGroups: NavGroup[] = [
     id: "community",
     titleKey: "community",
     items: [
-      { id: "leaderboard", labelKey: "leaderboard", href: "/leaderboard", icon: Users },
+      { id: "leaderboard", labelKey: "leaderboard", href: "/leaderboard", icon: Trophy },
       { id: "activity", labelKey: "activity", href: "/dashboard?tab=overview#activity", icon: Users },
     ],
   },
@@ -106,9 +119,9 @@ const sidebarGroups: NavGroup[] = [
     id: "ai-tools",
     titleKey: "aiTools",
     items: [
-      { id: "adaptive", labelKey: "adaptivePath", href: "/dashboard?tab=skills#adaptive", icon: Command },
-      { id: "ai-reco", labelKey: "aiRecommendations", href: "/dashboard?tab=skills#ai", icon: Command },
-      { id: "next-actions", labelKey: "nextActions", href: "/dashboard?tab=overview#actions", icon: Command },
+      { id: "adaptive", labelKey: "adaptivePath", href: "/dashboard?tab=skills#adaptive", icon: Wand2 },
+      { id: "ai-reco", labelKey: "aiRecommendations", href: "/dashboard?tab=skills#ai", icon: Sparkles },
+      { id: "next-actions", labelKey: "nextActions", href: "/dashboard?tab=overview#actions", icon: Bot },
     ],
   },
   {
@@ -132,7 +145,7 @@ const mobileBottomItems: NavItem[] = [
   { id: "tracks", labelKey: "tracks", href: "/tracks", icon: Target },
   { id: "missions", labelKey: "missions", href: "/missions", icon: Rocket },
   { id: "jobs", labelKey: "jobs", href: "/marketplace", icon: BriefcaseBusiness },
-  { id: "profile", labelKey: "profile", href: "/login", icon: Users },
+  { id: "profile", labelKey: "profile", href: "/profile/me", icon: UserCircle2 },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -221,11 +234,11 @@ export function AppShell({ children }: AppShellProps) {
               <div className="flex h-full min-h-0 flex-col">
                 <div
                   className={cn(
-                    "mb-2 flex shrink-0 items-center gap-2 border-b border-slate-800/80 px-1 pb-3",
+                    "sidebar-header-divider",
                     isSidebarCollapsed ? "justify-center" : "justify-between",
                   )}
                 >
-                  <Link href="/" className="truncate bg-gradient-to-r from-slate-100 via-sky-100 to-violet-200 bg-clip-text text-sm font-semibold text-transparent">
+                  <Link href="/" className="site-header-logo-text truncate text-sm font-semibold">
                     {isSidebarCollapsed ? "SP" : "SkillPath Academy"}
                   </Link>
                   <button
@@ -244,17 +257,17 @@ export function AppShell({ children }: AppShellProps) {
                   </button>
                 </div>
 
-                <nav className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 overscroll-contain [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/70 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5">
+                <nav className="sidebar-scroll">
                   {visibleSidebarGroups.map((group) => (
                     <div
                       key={group.id}
                       className={cn(
                         "space-y-1",
-                        isSidebarCollapsed ? "mt-3 border-t border-slate-800/80 pt-3 first:mt-0 first:border-t-0 first:pt-0" : "",
+                        isSidebarCollapsed ? "sidebar-group-divider" : "",
                       )}
                     >
                       {!isSidebarCollapsed ? (
-                        <p className="px-2 text-[10px] uppercase tracking-[0.16em] text-slate-500">
+                        <p className="sidebar-group-label">
                           {t(group.titleKey as Parameters<typeof t>[0])}
                         </p>
                       ) : null}
@@ -286,8 +299,8 @@ export function AppShell({ children }: AppShellProps) {
                 </nav>
 
                 {!isSidebarCollapsed ? (
-                  <div className="mt-3 shrink-0 rounded-xl border border-slate-800 bg-slate-900/75 p-3 text-xs text-slate-400">
-                    <p className="font-semibold text-slate-200">{t("quickTip")}</p>
+                  <div className="sidebar-quick-tip">
+                    <p className="sidebar-quick-tip-title">{t("quickTip")}</p>
                     <p className="mt-1">{t("quickTipText")}</p>
                   </div>
                 ) : null}
@@ -299,7 +312,7 @@ export function AppShell({ children }: AppShellProps) {
                 type="button"
                 onClick={closeSidebar}
                 aria-label="Close sidebar overlay"
-                className="fixed inset-0 z-30 bg-slate-950/45 lg:hidden"
+                className="sidebar-overlay"
               />
             ) : null}
           </>
@@ -326,7 +339,7 @@ export function AppShell({ children }: AppShellProps) {
                     className="cursor-pointer pr-10"
                     aria-label={t("openCommandPalette")}
                   />
-                  <Command className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                  <Command className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 </div>
               </div>
 
@@ -355,8 +368,8 @@ export function AppShell({ children }: AppShellProps) {
                 <Dropdown
                   align="right"
                   trigger={
-                    <span className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/85 px-3 text-sm text-slate-200">
-                      <Users className="h-4 w-4 text-slate-400" />
+                    <span className="topbar-user-trigger">
+                      <Users className="topbar-user-icon" />
                       <span className="hidden sm:inline">{session?.user?.role ?? "Guest"}</span>
                     </span>
                   }
@@ -383,7 +396,7 @@ export function AppShell({ children }: AppShellProps) {
           ) : null}
 
           {isFocusLearningMode ? (
-            <div className="surface-glass mb-4 flex items-center justify-between gap-2 p-2 text-xs text-slate-300">
+            <div className="focus-mode-banner">
               <p>Focus learning mode enabled</p>
               <Link href="/dashboard" className="btn-secondary h-8 px-3 py-1 text-xs">
                 Exit focus mode

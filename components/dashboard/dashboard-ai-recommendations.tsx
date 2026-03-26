@@ -33,16 +33,16 @@ export function DashboardAiRecommendationsSection({ recommendations }: Dashboard
     >
       <div className="grid gap-3">
         {recommendations.map((item) => (
-          <article key={item.id} className="surface-panel-hover rounded-xl border border-slate-800 bg-slate-950/75 p-4">
+          <article key={item.id} className="content-card surface-panel-hover p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   {recommendationIcon(item.tag)}
-                  <p className="text-sm font-semibold text-slate-100">{item.title}</p>
+                  <p className="text-sm font-semibold text-foreground">{item.title}</p>
                 </div>
-                <p className="text-xs text-slate-400">{item.description}</p>
+                <p className="text-xs text-muted-foreground">{item.description}</p>
               </div>
-              <span className="rounded-full border border-slate-700 bg-slate-900/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-300">
+              <span className="chip-neutral px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
                 {item.tag}
               </span>
             </div>

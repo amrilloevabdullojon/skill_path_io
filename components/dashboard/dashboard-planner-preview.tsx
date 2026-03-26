@@ -24,38 +24,38 @@ export function DashboardPlannerPreviewSection({
 
   return (
     <DashboardSection id="planner" title="Planner Preview" description="Weekly pace and realistic completion forecast.">
-      <article className="surface-panel-hover rounded-xl border border-slate-800 bg-slate-950/70 p-4">
-        <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">Current plan</p>
-        <p className="mt-1 line-clamp-2 text-sm font-semibold leading-6 text-slate-100">{goal}</p>
+      <article className="content-card surface-panel-hover p-4">
+        <p className="module-order-label">Current plan</p>
+        <p className="mt-1 line-clamp-2 text-sm font-semibold leading-6 text-foreground">{goal}</p>
 
         <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
-          <div className="rounded-lg border border-slate-800/80 bg-slate-900/50 px-2.5 py-2">
-            <p className="inline-flex items-center gap-1 text-slate-500">
+          <div className="track-info-box px-2.5 py-2">
+            <p className="track-info-label inline-flex items-center gap-1">
               <Timer className="h-3.5 w-3.5" />
               Workload
             </p>
-            <p className="mt-1 text-slate-200">{workload}</p>
+            <p className="track-info-value mt-1">{workload}</p>
           </div>
-          <div className="rounded-lg border border-slate-800/80 bg-slate-900/50 px-2.5 py-2">
-            <p className="inline-flex items-center gap-1 text-slate-500">
+          <div className="track-info-box px-2.5 py-2">
+            <p className="track-info-label inline-flex items-center gap-1">
               <CalendarClock className="h-3.5 w-3.5" />
               Forecast date
             </p>
-            <p className="mt-1 text-slate-200">{new Date(forecastDate).toLocaleDateString()}</p>
+            <p className="track-info-value mt-1">{new Date(forecastDate).toLocaleDateString()}</p>
           </div>
-          <div className="rounded-lg border border-slate-800/80 bg-slate-900/50 px-2.5 py-2">
-            <p className="inline-flex items-center gap-1 text-slate-500">
+          <div className="track-info-box px-2.5 py-2">
+            <p className="track-info-label inline-flex items-center gap-1">
               <Activity className="h-3.5 w-3.5" />
               Weekly pace
             </p>
-            <p className="mt-1 text-slate-200">{weeklyPace}</p>
+            <p className="track-info-value mt-1">{weeklyPace}</p>
           </div>
-          <div className="rounded-lg border border-slate-800/80 bg-slate-900/50 px-2.5 py-2">
-            <p className="inline-flex items-center gap-1 text-slate-500">
+          <div className="track-info-box px-2.5 py-2">
+            <p className="track-info-label inline-flex items-center gap-1">
               <Gauge className="h-3.5 w-3.5" />
               Confidence
             </p>
-            <p className="mt-1 text-slate-200">{confidence}</p>
+            <p className="track-info-value mt-1">{confidence}</p>
           </div>
         </div>
 
@@ -65,7 +65,7 @@ export function DashboardPlannerPreviewSection({
           </span>
           <Link
             href="/planner"
-            className="inline-flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-900/70 px-2.5 py-1 text-xs font-medium text-sky-300 transition-colors hover:border-slate-600 hover:text-sky-200"
+            className="data-pill inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-sky-300 transition-colors hover:text-sky-200"
           >
             Open planner
             <ArrowUpRight className="h-3.5 w-3.5" />

@@ -74,14 +74,14 @@ export function SmartOnboardingFlow({ initialProfile }: { initialProfile: Onboar
       <article className="surface-elevated space-y-5 p-5 sm:p-6">
         <header className="space-y-2">
           <p className="kicker">Smart Onboarding</p>
-          <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Build your personal learning plan</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">Build your personal learning plan</h1>
+          <p className="text-sm text-muted-foreground">
             Tell us your goal and weekly capacity. SkillPath will adapt roadmap, missions, and recommendations.
           </p>
         </header>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <label className="space-y-2 text-sm text-slate-300">
+          <label className="space-y-2 text-sm text-muted-foreground">
             Target profession
             <select
               value={profile.profession}
@@ -101,7 +101,7 @@ export function SmartOnboardingFlow({ initialProfile }: { initialProfile: Onboar
             </select>
           </label>
 
-          <label className="space-y-2 text-sm text-slate-300">
+          <label className="space-y-2 text-sm text-muted-foreground">
             Current level
             <select
               value={profile.currentLevel}
@@ -121,7 +121,7 @@ export function SmartOnboardingFlow({ initialProfile }: { initialProfile: Onboar
             </select>
           </label>
 
-          <label className="space-y-2 text-sm text-slate-300 md:col-span-2">
+          <label className="space-y-2 text-sm text-muted-foreground md:col-span-2">
             Main goal
             <input
               value={profile.goal}
@@ -131,7 +131,7 @@ export function SmartOnboardingFlow({ initialProfile }: { initialProfile: Onboar
             />
           </label>
 
-          <label className="space-y-2 text-sm text-slate-300">
+          <label className="space-y-2 text-sm text-muted-foreground">
             Hours per week
             <input
               type="number"
@@ -148,7 +148,7 @@ export function SmartOnboardingFlow({ initialProfile }: { initialProfile: Onboar
             />
           </label>
 
-          <label className="space-y-2 text-sm text-slate-300">
+          <label className="space-y-2 text-sm text-muted-foreground">
             Target timeline (months)
             <input
               type="number"
@@ -167,7 +167,7 @@ export function SmartOnboardingFlow({ initialProfile }: { initialProfile: Onboar
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm text-slate-300">Skills of interest</p>
+          <p className="text-sm text-muted-foreground">Skills of interest</p>
           <div className="flex flex-wrap gap-2">
             {interestOptions.map((option) => {
               const active = profile.interests.includes(option);
@@ -179,7 +179,7 @@ export function SmartOnboardingFlow({ initialProfile }: { initialProfile: Onboar
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                     active
                       ? "border-sky-400/40 bg-sky-500/15 text-sky-200"
-                      : "border-slate-700 bg-slate-900/80 text-slate-300 hover:border-slate-600"
+                      : "border-border bg-card/80 text-muted-foreground hover:border-border/70"
                   }`}
                 >
                   {option}
@@ -200,7 +200,7 @@ export function SmartOnboardingFlow({ initialProfile }: { initialProfile: Onboar
       <aside className="surface-elevated space-y-4 p-5 sm:p-6">
         <p className="kicker">Personal Start Plan</p>
         <div className="surface-subtle space-y-2 p-4">
-          <p className="text-sm font-semibold text-slate-100">Recommended starter track</p>
+          <p className="text-sm font-semibold text-foreground">Recommended starter track</p>
           <p className="inline-flex items-center gap-2 text-sm text-sky-200">
             <Sparkles className="h-4 w-4" />
             {starterTrack}
@@ -208,11 +208,11 @@ export function SmartOnboardingFlow({ initialProfile }: { initialProfile: Onboar
         </div>
 
         <div className="surface-subtle space-y-3 p-4">
-          <p className="text-sm font-semibold text-slate-100">Roadmap preview</p>
-          <ol className="space-y-2 text-sm text-slate-300">
+          <p className="text-sm font-semibold text-foreground">Roadmap preview</p>
+          <ol className="space-y-2 text-sm text-muted-foreground">
             {roadmap.map((item, index) => (
               <li key={item} className="flex items-start gap-2">
-                <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-[11px] text-slate-300">
+                <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full border border-border bg-card text-[11px] text-muted-foreground">
                   {index + 1}
                 </span>
                 <span>{item}</span>
@@ -226,7 +226,7 @@ export function SmartOnboardingFlow({ initialProfile }: { initialProfile: Onboar
             <Target className="h-4 w-4" />
             Goal horizon: {profile.targetMonths} months
           </p>
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-xs text-muted-foreground">
             Weekly load target: {profile.hoursPerWeek}h/week. Adaptive engine will adjust pace using your quiz, mission, and simulation performance.
           </p>
         </div>

@@ -175,7 +175,7 @@ export function AppCommandPalette({ isAdmin }: AppCommandPaletteProps) {
     <Modal open={isCommandPaletteOpen} onClose={closeCommandPalette} title="Command palette">
       <div className="space-y-3">
         <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <Search className="select-chevron pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
           <Input
             autoFocus
             value={query}
@@ -186,7 +186,7 @@ export function AppCommandPalette({ isAdmin }: AppCommandPaletteProps) {
           />
         </div>
 
-        <p className="text-xs text-slate-500">Shortcut: Cmd/Ctrl + K</p>
+        <p className="text-xs text-muted-foreground">Shortcut: Cmd/Ctrl + K</p>
 
         {items.length === 0 ? (
           <EmptyState
@@ -200,17 +200,17 @@ export function AppCommandPalette({ isAdmin }: AppCommandPaletteProps) {
                 <Link
                   href={item.href}
                   onClick={closeCommandPalette}
-                  className={`surface-subtle block p-3 transition-colors hover:bg-slate-800/80 ${
-                    pathname === item.href ? "border-slate-600" : ""
+                  className={`surface-subtle block p-3 transition-colors hover:bg-card/80 ${
+                    pathname === item.href ? "border-border" : ""
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-medium text-slate-100">{item.title}</p>
-                    <span className="rounded-full border border-slate-700 bg-slate-900/80 px-2 py-0.5 text-[10px] uppercase tracking-wide text-slate-400">
+                    <p className="text-sm font-medium text-foreground">{item.title}</p>
+                    <span className="chip-neutral px-2 py-0.5 text-[10px] uppercase tracking-wide">
                       {item.type}
                     </span>
                   </div>
-                  {item.subtitle ? <p className="mt-1 text-xs text-slate-500">{item.subtitle}</p> : null}
+                  {item.subtitle ? <p className="mt-1 text-xs text-muted-foreground">{item.subtitle}</p> : null}
                 </Link>
               </li>
             ))}

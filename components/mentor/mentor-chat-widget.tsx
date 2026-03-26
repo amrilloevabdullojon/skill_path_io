@@ -185,18 +185,18 @@ export function MentorChatWidget({
             animate={{ opacity: 1, x: 0, y: 0 }}
             exit={{ opacity: 0, x: 24, y: 12 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed inset-x-3 bottom-20 z-[80] flex h-[min(78vh,620px)] w-auto flex-col overflow-hidden rounded-2xl border border-slate-700/85 bg-slate-950/96 shadow-2xl shadow-slate-950/70 sm:inset-x-auto sm:bottom-24 sm:right-6 sm:w-[min(92vw,420px)]"
+            className="chat-panel fixed inset-x-3 bottom-20 z-[80] flex h-[min(78vh,620px)] w-auto flex-col overflow-hidden rounded-2xl shadow-2xl shadow-black/70 sm:inset-x-auto sm:bottom-24 sm:right-6 sm:w-[min(92vw,420px)]"
           >
-            <header className="flex items-start justify-between gap-3 border-b border-slate-800 p-3 sm:p-4">
+            <header className="flex items-start justify-between gap-3 border-b border-border p-3 sm:p-4">
               <div className="min-w-0">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">AI Mentor</p>
-                <p className="truncate text-sm font-semibold text-slate-100">{trackTitle}</p>
-                <p className="truncate text-xs text-slate-400">{moduleTitle}</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">AI Mentor</p>
+                <p className="truncate text-sm font-semibold text-foreground">{trackTitle}</p>
+                <p className="truncate text-xs text-muted-foreground">{moduleTitle}</p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="rounded-md border border-slate-700 p-1.5 text-slate-300 hover:bg-slate-900"
+                className="rounded-md border border-border p-1.5 text-muted-foreground hover:bg-card"
                 aria-label="Close mentor panel"
               >
                 <X className="h-4 w-4" />
@@ -210,10 +210,10 @@ export function MentorChatWidget({
                   <div
                     key={message.id}
                     className={`max-w-[94%] rounded-xl px-3 py-2 text-sm leading-6 sm:max-w-[90%] ${
-                      isAssistant ? "bg-slate-800 text-slate-100" : "ml-auto bg-sky-500/20 text-sky-100"
+                      isAssistant ? "chat-bubble-assistant" : "ml-auto bg-sky-500/20 text-sky-100"
                     }`}
                   >
-                    <div className="mb-1 inline-flex items-center gap-1 text-[11px] uppercase tracking-wide text-slate-400">
+                    <div className="mb-1 inline-flex items-center gap-1 text-[11px] uppercase tracking-wide text-muted-foreground">
                       {isAssistant ? (
                         <>
                           <Bot className="h-3.5 w-3.5" />
@@ -229,7 +229,7 @@ export function MentorChatWidget({
               })}
 
               {isLoading && (
-                <div className="inline-flex items-center gap-2 rounded-xl bg-slate-800 px-3 py-2 text-sm text-slate-200">
+                <div className="inline-flex items-center gap-2 rounded-xl bg-card px-3 py-2 text-sm text-foreground">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Mentor is typing...
                 </div>
@@ -243,20 +243,20 @@ export function MentorChatWidget({
               </p>
             )}
 
-            <div className="border-t border-slate-800 p-3 sm:p-4">
+            <div className="border-t border-border p-3 sm:p-4">
               <form onSubmit={handleSubmit} className="space-y-2.5 sm:space-y-3">
                 <textarea
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   placeholder="Example: how should I approach this task?"
                   rows={3}
-                  className="w-full resize-none rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none ring-0 placeholder:text-slate-500 focus:border-sky-500"
+                  className="w-full resize-none rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none ring-0 placeholder:text-muted-foreground focus:border-sky-500"
                 />
                 <div className="flex flex-col-reverse items-stretch gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <button
                     type="button"
                   onClick={clearHistory}
-                    className="inline-flex items-center justify-center gap-2 rounded-md border border-slate-700 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-slate-900 sm:justify-start"
+                    className="inline-flex items-center justify-center gap-2 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-card sm:justify-start"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Clear

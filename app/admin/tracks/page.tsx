@@ -60,10 +60,10 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
   });
 
   return (
-    <section className="surface-elevated space-y-4 p-5 text-slate-100">
+    <section className="surface-elevated space-y-4 p-5 text-foreground">
       <header className="space-y-2">
         <h2 className="text-xl font-semibold">Tracks</h2>
-        <p className="text-sm text-slate-400">Search tracks, filter by category, and edit metadata.</p>
+        <p className="text-sm text-muted-foreground">Search tracks, filter by category, and edit metadata.</p>
       </header>
 
       <form className="surface-subtle grid gap-3 p-4 md:grid-cols-[1fr_180px_auto]">
@@ -109,7 +109,7 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
           <tbody>
             {tracks.map((track) => (
               <tr key={track.id} className="table-row">
-                <td className="px-3 py-3 text-slate-300">{track.slug}</td>
+                <td className="px-3 py-3 text-muted-foreground">{track.slug}</td>
                 <td className="px-3 py-3">
                   <input
                     form={`track-edit-${track.id}`}
@@ -146,8 +146,8 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
                     className="input-base h-9 w-28 px-2 py-1.5"
                   />
                 </td>
-                <td className="px-3 py-3 text-slate-300">{track._count.modules}</td>
-                <td className="px-3 py-3 text-slate-300">{track._count.certificates}</td>
+                <td className="px-3 py-3 text-muted-foreground">{track._count.modules}</td>
+                <td className="px-3 py-3 text-muted-foreground">{track._count.certificates}</td>
                 <td className="px-3 py-3">
                   <form id={`track-edit-${track.id}`} action={updateTrackAction}>
                     <input type="hidden" name="trackId" value={track.id} />
@@ -163,7 +163,7 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
             ))}
             {tracks.length === 0 && (
               <tr>
-                <td className="px-3 py-6 text-center text-slate-400" colSpan={8}>
+                <td className="px-3 py-6 text-center text-muted-foreground" colSpan={8}>
                   No tracks found.
                 </td>
               </tr>

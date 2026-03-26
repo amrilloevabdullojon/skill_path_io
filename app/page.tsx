@@ -256,7 +256,7 @@ function missionStatusColor(status: string) {
   if (status === "In progress" || status === "in_progress")
     return "border-sky-400/30 bg-sky-500/10 text-sky-300";
   if (status === "locked")
-    return "border-slate-700/60 bg-slate-800/50 text-slate-500";
+    return "border-border/60 bg-card/50 text-muted-foreground";
   return "border-emerald-400/30 bg-emerald-500/10 text-emerald-300";
 }
 
@@ -312,14 +312,14 @@ export default async function HomePage() {
                   <Sparkles className="h-3.5 w-3.5" />
                   Build real-world skills
                 </div>
-                <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-slate-100 sm:text-5xl lg:text-[3.5rem] lg:leading-[1.12]">
+                <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem] lg:leading-[1.12]">
                   Launch your tech career with{" "}
                   <span className="bg-gradient-to-br from-sky-300 via-sky-200 to-violet-300 bg-clip-text text-transparent">
                     modules, missions,
                   </span>{" "}
                   and AI mentoring
                 </h1>
-                <p className="max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg">
+                <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
                   SkillPath Academy combines practical learning, progression systems, and career guidance in one premium workspace.
                 </p>
                 <div className="flex flex-wrap items-center gap-3">
@@ -330,7 +330,7 @@ export default async function HomePage() {
                   <a href="#tracks" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
                     Explore tracks
                   </a>
-                  <Link href="/login" className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "text-slate-400")}>
+                  <Link href="/login" className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "text-muted-foreground")}>
                     Try demo
                   </Link>
                 </div>
@@ -355,8 +355,8 @@ export default async function HomePage() {
                       <Icon className={cn("h-4 w-4", prop.color)} />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-100">{prop.title}</p>
-                      <p className="mt-1 text-sm leading-relaxed text-slate-400">{prop.description}</p>
+                      <p className="text-sm font-semibold text-foreground">{prop.title}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{prop.description}</p>
                     </div>
                   </article>
                 );
@@ -378,11 +378,11 @@ export default async function HomePage() {
                     <article key={item.title} className="surface-subtle surface-panel-hover relative p-5">
                       <div className="mb-4 flex items-center gap-3">
                         <span className="step-number">{index + 1}</span>
-                        <div className="h-px flex-1 bg-slate-800" />
+                        <div className="h-px flex-1 bg-border" />
                         <Icon className="h-4 w-4 text-sky-400" />
                       </div>
-                      <h3 className="text-base font-semibold text-slate-100">{item.title}</h3>
-                      <p className="mt-2 text-sm leading-relaxed text-slate-400">{item.description}</p>
+                      <h3 className="text-base font-semibold text-foreground">{item.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
                     </article>
                   );
                 })}
@@ -416,10 +416,10 @@ export default async function HomePage() {
                             {track.category}
                           </span>
                         </div>
-                        <h3 className="mt-1.5 text-base font-semibold text-slate-100">{track.title}</h3>
+                        <h3 className="mt-1.5 text-base font-semibold text-foreground">{track.title}</h3>
                       </div>
                     </div>
-                    <p className="line-clamp-2 text-sm leading-relaxed text-slate-400">{track.description}</p>
+                    <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">{track.description}</p>
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div className="stat-card">
                         <p className="stat-card-label">Duration</p>
@@ -436,7 +436,7 @@ export default async function HomePage() {
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {track.skills.map((skill) => (
-                        <span key={skill} className="rounded-lg border border-slate-700/80 bg-slate-900/60 px-2 py-0.5 text-xs text-slate-300">
+                        <span key={skill} className="skill-tag px-2 py-0.5 text-xs">
                           {skill}
                         </span>
                       ))}
@@ -458,7 +458,7 @@ export default async function HomePage() {
                 <h2 className="section-title">A premium learning command center</h2>
               </div>
               <div className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-                <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-5">
+                <div className="content-card rounded-2xl p-5">
                   <div className="grid gap-3 sm:grid-cols-3">
                     <div className="stat-card">
                       <p className="stat-card-label">Total XP</p>
@@ -473,9 +473,9 @@ export default async function HomePage() {
                       <p className="stat-card-value mt-1 text-xl">82%</p>
                     </div>
                   </div>
-                  <div className="mt-3 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-                    <p className="text-sm font-semibold text-slate-100">Dashboard widgets</p>
-                    <p className="mt-1 text-xs text-slate-400">Heatmap, radar, recommendations, and weekly quest cards.</p>
+                  <div className="mini-stat-box mt-3 p-4">
+                    <p className="text-sm font-semibold text-foreground">Dashboard widgets</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Heatmap, radar, recommendations, and weekly quest cards.</p>
                   </div>
                 </div>
                 <div className="grid gap-3">
@@ -483,8 +483,8 @@ export default async function HomePage() {
                     <article key={label} className="stat-card flex items-start gap-3 p-4">
                       <div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-sky-400/70" />
                       <div>
-                        <p className="text-sm font-semibold text-slate-100">{label}</p>
-                        <p className="mt-0.5 text-xs text-slate-400">
+                        <p className="text-sm font-semibold text-foreground">{label}</p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
                           {i === 0 && "Progress, next module, and ETA in one glance."}
                           {i === 1 && "Scenario, XP reward, and status-driven actions."}
                           {i === 2 && "Level growth, streak, and readiness insights."}
@@ -514,13 +514,13 @@ export default async function HomePage() {
                   <article key={stage.title} className="surface-subtle surface-panel-hover p-5">
                     <div className="flex items-center gap-2.5">
                       <span className="step-number">{index + 1}</span>
-                      <h3 className="text-base font-semibold text-slate-100">{stage.title}</h3>
+                      <h3 className="text-base font-semibold text-foreground">{stage.title}</h3>
                     </div>
-                    <p className="mt-3 text-sm leading-relaxed text-slate-400">{stage.description}</p>
+                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{stage.description}</p>
                     <div className="mt-3 flex items-center gap-1.5">
                       <Zap className="h-3 w-3 shrink-0 text-amber-400" />
-                      <span className="text-xs text-slate-400">
-                        Unlock: <span className="text-slate-300">{stage.unlock}</span>
+                      <span className="text-xs text-muted-foreground">
+                        Unlock: <span className="text-foreground">{stage.unlock}</span>
                       </span>
                     </div>
                   </article>
@@ -537,7 +537,7 @@ export default async function HomePage() {
                   <p className="kicker">AI mentor onboarding</p>
                   <h2 className="section-title">Personalised guidance from day one</h2>
                 </div>
-                <p className="text-sm leading-relaxed text-slate-400">
+                <p className="text-sm leading-relaxed text-muted-foreground">
                   Tell SkillPath your target role and weekly time. AI mentor builds a practical path and adapts it as you progress.
                 </p>
                 <Link href="/login" className={cn(buttonVariants({ variant: "accent", size: "sm" }), "w-fit gap-2")}>
@@ -545,9 +545,9 @@ export default async function HomePage() {
                   Ask AI mentor
                 </Link>
               </div>
-              <div className="space-y-2.5 rounded-2xl border border-slate-800/80 bg-slate-950/60 p-4">
+              <div className="content-card space-y-2.5 rounded-2xl p-4">
                 <div className="flex justify-end">
-                  <div className="max-w-[80%] rounded-2xl rounded-tr-sm border border-slate-700/60 bg-slate-800/60 px-3.5 py-2.5 text-sm text-slate-200">
+                  <div className="max-w-[80%] rounded-2xl rounded-tr-sm border border-border/60 bg-card px-3.5 py-2.5 text-sm text-foreground">
                     I want to become a QA engineer.
                   </div>
                 </div>
@@ -557,7 +557,7 @@ export default async function HomePage() {
                   </div>
                 </div>
                 <div className="flex justify-end">
-                  <div className="max-w-[80%] rounded-2xl rounded-tr-sm border border-slate-700/60 bg-slate-800/60 px-3.5 py-2.5 text-sm text-slate-200">
+                  <div className="max-w-[80%] rounded-2xl rounded-tr-sm border border-border/60 bg-card px-3.5 py-2.5 text-sm text-foreground">
                     Around 7 hours.
                   </div>
                 </div>
@@ -586,12 +586,12 @@ export default async function HomePage() {
                     <div>
                       <div className="flex items-center gap-2 mb-2">
                         <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", mission.dot)} />
-                        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
                           {mission.category}
                         </span>
                       </div>
-                      <h3 className="text-base font-semibold text-slate-100">{mission.title}</h3>
-                      <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-slate-400">{mission.scenario}</p>
+                      <h3 className="text-base font-semibold text-foreground">{mission.title}</h3>
+                      <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{mission.scenario}</p>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="rounded-lg border border-violet-400/30 bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-300">
@@ -617,7 +617,7 @@ export default async function HomePage() {
                 <div className="section-header">
                   <p className="kicker">Outcomes</p>
                   <h2 className="section-title">What you will be able to do</h2>
-                  <p className="text-sm leading-relaxed text-slate-400">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
                     Built around the skills that actually matter in QA, BA, and DA roles.
                   </p>
                 </div>
@@ -625,10 +625,10 @@ export default async function HomePage() {
                   {outcomes.map((outcome) => (
                     <li
                       key={outcome}
-                      className="flex items-start gap-3 rounded-xl border border-slate-800/70 bg-slate-900/40 px-4 py-3"
+                      className="content-card flex items-start gap-3 px-4 py-3"
                     >
                       <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
-                      <span className="text-sm text-slate-200">{outcome}</span>
+                      <span className="text-sm text-foreground">{outcome}</span>
                     </li>
                   ))}
                 </ul>
@@ -663,18 +663,18 @@ export default async function HomePage() {
                       </div>
                     ) : null}
                     <div>
-                      <p className="text-sm font-semibold text-slate-200">{plan.name}</p>
+                      <p className="text-sm font-semibold text-foreground">{plan.name}</p>
                       <div className="mt-2 flex items-baseline gap-1">
-                        <span className="text-3xl font-bold tracking-tight text-slate-100">{plan.price}</span>
+                        <span className="text-3xl font-bold tracking-tight text-foreground">{plan.price}</span>
                         {plan.period ? (
-                          <span className="text-sm text-slate-400">{plan.period}</span>
+                          <span className="text-sm text-muted-foreground">{plan.period}</span>
                         ) : null}
                       </div>
-                      <p className="mt-1.5 text-xs text-slate-400">{plan.description}</p>
+                      <p className="mt-1.5 text-xs text-muted-foreground">{plan.description}</p>
                     </div>
                     <ul className="flex-1 space-y-2">
                       {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-center gap-2 text-sm text-slate-300">
+                        <li key={feature} className="flex items-center gap-2 text-sm text-muted-foreground">
                           <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
                           {feature}
                         </li>
@@ -705,13 +705,13 @@ export default async function HomePage() {
                 <div className="absolute -right-24 bottom-[-40px] h-[320px] w-[320px] rounded-full bg-violet-500/12 blur-3xl" />
               </div>
               <div className="relative space-y-4">
-                <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-slate-100 sm:text-4xl">
+                <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                   Build your skills.{" "}
                   <span className="bg-gradient-to-r from-sky-300 to-violet-300 bg-clip-text text-transparent">
                     Grow your career.
                   </span>
                 </h2>
-                <p className="mx-auto max-w-lg text-base leading-relaxed text-slate-400">
+                <p className="mx-auto max-w-lg text-base leading-relaxed text-muted-foreground">
                   Start your learning journey today with role-based tracks, missions, and AI-powered feedback.
                 </p>
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
@@ -729,37 +729,37 @@ export default async function HomePage() {
         </main>
 
         {/* ── Footer ─────────────────────────────────────── */}
-        <footer className="border-t border-slate-800/70 py-10">
-          <div className="grid gap-8 text-sm text-slate-400 sm:grid-cols-2 lg:grid-cols-4">
+        <footer className="border-t border-border/70 py-10">
+          <div className="grid gap-8 text-sm text-muted-foreground sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-sky-400/30 bg-sky-500/15 text-sky-200">
                   <Sparkles className="h-3.5 w-3.5" />
                 </span>
-                <p className="font-semibold text-slate-200">SkillPath Academy</p>
+                <p className="font-semibold text-foreground">SkillPath Academy</p>
               </div>
-              <p className="text-xs text-slate-500 leading-relaxed">Premium local-first EdTech workspace for QA, BA, and DA careers.</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">Premium local-first EdTech workspace for QA, BA, and DA careers.</p>
             </div>
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Product</p>
-              <Link href="/tracks" className="block transition-colors hover:text-slate-200">Tracks</Link>
-              <Link href="/missions" className="block transition-colors hover:text-slate-200">Missions</Link>
-              <Link href="/career" className="block transition-colors hover:text-slate-200">Career</Link>
+              <p className="module-order-label font-semibold">Product</p>
+              <Link href="/tracks" className="block transition-colors hover:text-foreground">Tracks</Link>
+              <Link href="/missions" className="block transition-colors hover:text-foreground">Missions</Link>
+              <Link href="/career" className="block transition-colors hover:text-foreground">Career</Link>
             </div>
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">AI & Learning</p>
-              <Link href="/dashboard" className="block transition-colors hover:text-slate-200">Dashboard</Link>
-              <Link href="/interview" className="block transition-colors hover:text-slate-200">AI interview</Link>
-              <Link href="/planner" className="block transition-colors hover:text-slate-200">Planner</Link>
+              <p className="module-order-label font-semibold">AI & Learning</p>
+              <Link href="/dashboard" className="block transition-colors hover:text-foreground">Dashboard</Link>
+              <Link href="/interview" className="block transition-colors hover:text-foreground">AI interview</Link>
+              <Link href="/planner" className="block transition-colors hover:text-foreground">Planner</Link>
             </div>
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Company</p>
-              <a href="#about" className="block transition-colors hover:text-slate-200">About</a>
-              <a href="#pricing" className="block transition-colors hover:text-slate-200">Pricing</a>
-              <Link href="/login" className="block transition-colors hover:text-slate-200">Contact</Link>
+              <p className="module-order-label font-semibold">Company</p>
+              <a href="#about" className="block transition-colors hover:text-foreground">About</a>
+              <a href="#pricing" className="block transition-colors hover:text-foreground">Pricing</a>
+              <Link href="/login" className="block transition-colors hover:text-foreground">Contact</Link>
             </div>
           </div>
-          <div className="mt-8 flex items-center justify-between border-t border-slate-800/60 pt-6 text-xs text-slate-600">
+          <div className="mt-8 flex items-center justify-between border-t border-border/60 pt-6 text-xs text-muted-foreground">
             <p>© {new Date().getFullYear()} SkillPath Academy. Local edition.</p>
             <div className="flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />

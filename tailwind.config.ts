@@ -60,7 +60,7 @@ const config: Config = {
         ring: "hsl(var(--ring))",
       },
       fontFamily: {
-        sans: ["Manrope", "Sora", "Inter", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
+        sans: ["var(--font-manrope)", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius-lg)",
@@ -74,6 +74,11 @@ const config: Config = {
         soft: "0 14px 42px rgba(2, 6, 23, 0.36)",
         card: "0 10px 30px rgba(2, 6, 23, 0.28)",
         glow: "0 0 0 1px rgba(148, 163, 184, 0.08), 0 12px 28px rgba(2, 6, 23, 0.44)",
+      },
+      transitionDuration: {
+        fast: "180ms",
+        normal: "260ms",
+        slow: "400ms",
       },
       transitionTimingFunction: {
         smooth: "cubic-bezier(0.22, 1, 0.36, 1)",

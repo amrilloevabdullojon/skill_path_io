@@ -17,12 +17,12 @@ export function DashboardLearningHeatmapSection({ heatmap, streak }: DashboardLe
       description="GitHub-style activity map for the last 12 weeks."
     >
       <div className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
-          <span className="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+          <span className="xp-pill inline-flex items-center gap-1 px-3 py-1">
             <Flame className="h-3.5 w-3.5 text-orange-300" />
             Current streak: {streak} days
           </span>
-          <span className="rounded-full border border-slate-700 bg-slate-900/80 px-3 py-1 text-slate-500">
+          <span className="xp-pill px-3 py-1">
             Data mode: {heatmap.mode === "real" ? "real activity" : "mock fallback"}
           </span>
         </div>

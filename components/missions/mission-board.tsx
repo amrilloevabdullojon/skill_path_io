@@ -81,15 +81,15 @@ export function MissionBoard({ missions, isPlanLimited = false, upgradeMessage =
               className={`w-full rounded-xl border p-3 text-left transition ${
                 activeId === mission.id
                   ? "border-sky-400/40 bg-sky-500/12"
-                  : "border-slate-800 bg-slate-900/70 hover:border-slate-700"
+                  : "border-border bg-card/70 hover:border-border/70"
               }`}
             >
-              <p className="text-sm font-semibold text-slate-100">{mission.title}</p>
-              <p className="mt-1 text-xs text-slate-400">{mission.roleContext}</p>
+              <p className="text-sm font-semibold text-foreground">{mission.title}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{mission.roleContext}</p>
               <div className="mt-2 flex flex-wrap gap-2 text-[10px] uppercase tracking-wide">
-                <span className="rounded-full border border-slate-700 px-2 py-0.5 text-slate-300">{mission.difficulty}</span>
+                <span className="chip-neutral px-2 py-0.5">{mission.difficulty}</span>
                 <span className="rounded-full border border-emerald-400/35 bg-emerald-500/10 px-2 py-0.5 text-emerald-200">+{mission.xpReward} XP</span>
-                <span className="rounded-full border border-slate-700 px-2 py-0.5 text-slate-300">{mission.status}</span>
+                <span className="chip-neutral px-2 py-0.5">{mission.status}</span>
               </div>
             </button>
           ))}
@@ -98,8 +98,8 @@ export function MissionBoard({ missions, isPlanLimited = false, upgradeMessage =
         {activeMission ? (
           <article className="surface-elevated space-y-4 p-5">
             <div className="space-y-1">
-              <p className="text-lg font-semibold text-slate-100">{activeMission.title}</p>
-              <p className="text-sm text-slate-300">{activeMission.scenario}</p>
+              <p className="text-lg font-semibold text-foreground">{activeMission.title}</p>
+              <p className="text-sm text-muted-foreground">{activeMission.scenario}</p>
             </div>
 
             <div className="surface-subtle space-y-2 p-3">
@@ -107,8 +107,8 @@ export function MissionBoard({ missions, isPlanLimited = false, upgradeMessage =
                 <Crosshair className="h-4 w-4" />
                 Mission objective
               </p>
-              <p className="text-sm text-slate-200">{activeMission.objective}</p>
-              <ol className="list-decimal space-y-1 pl-5 text-sm text-slate-300">
+              <p className="text-sm text-foreground">{activeMission.objective}</p>
+              <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
                 {activeMission.steps.map((step) => (
                   <li key={step}>{step}</li>
                 ))}
@@ -125,7 +125,7 @@ export function MissionBoard({ missions, isPlanLimited = false, upgradeMessage =
               </div>
             </div>
 
-            <label className="space-y-2 text-sm text-slate-300">
+            <label className="space-y-2 text-sm text-muted-foreground">
               Mission submission
               <textarea
                 value={submission}

@@ -25,7 +25,7 @@ export function Tooltip({
     >
       {children}
       {open ? (
-        <span className="surface-glass pointer-events-none absolute -top-9 left-1/2 z-30 -translate-x-1/2 whitespace-nowrap px-2 py-1 text-[11px] text-slate-100">
+        <span className="surface-glass pointer-events-none absolute -top-9 left-1/2 z-30 -translate-x-1/2 whitespace-nowrap px-2 py-1 text-[11px] text-foreground">
           {content}
         </span>
       ) : null}

@@ -43,10 +43,10 @@ export function StudioDashboard({ realStats }: StudioDashboardProps) {
 
   return (
     <section className="page-shell">
-      <header className="surface-elevated space-y-2 p-5 text-slate-100">
+      <header className="surface-elevated space-y-2 p-5 text-foreground">
         <p className="kicker">Academy Studio</p>
         <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-muted-foreground">
           Build, publish, and analyze course content with a visual LMS constructor.
         </p>
       </header>
@@ -60,7 +60,7 @@ export function StudioDashboard({ realStats }: StudioDashboardProps) {
 
       <div className="grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
         <section className="surface-elevated space-y-3 p-5">
-          <h2 className="text-lg font-semibold text-slate-100">Quick actions</h2>
+          <h2 className="text-lg font-semibold text-foreground">Quick actions</h2>
           <div className="grid gap-2 sm:grid-cols-2">
             <Link href="/admin/courses/new" className="btn-primary gap-2">
               <Plus className="h-4 w-4" />
@@ -82,29 +82,29 @@ export function StudioDashboard({ realStats }: StudioDashboardProps) {
         </section>
 
         <section className="surface-elevated space-y-3 p-5">
-          <h2 className="text-lg font-semibold text-slate-100">Legacy platform stats</h2>
-          <div className="space-y-2 text-sm text-slate-300">
-            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><Users className="h-4 w-4 text-slate-500" />Users</span><span>{realStats.users}</span></p>
-            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><BookOpen className="h-4 w-4 text-slate-500" />Tracks</span><span>{realStats.tracks}</span></p>
-            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><Layers3 className="h-4 w-4 text-slate-500" />Modules</span><span>{realStats.modules}</span></p>
-            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><FileStack className="h-4 w-4 text-slate-500" />Lessons</span><span>{realStats.lessons}</span></p>
-            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><Sparkles className="h-4 w-4 text-slate-500" />Quizzes</span><span>{realStats.quizzes}</span></p>
-            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><Medal className="h-4 w-4 text-slate-500" />Certificates</span><span>{realStats.certificates}</span></p>
+          <h2 className="text-lg font-semibold text-foreground">Legacy platform stats</h2>
+          <div className="space-y-2 text-sm text-muted-foreground">
+            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><Users className="h-4 w-4 text-muted-foreground" />Users</span><span>{realStats.users}</span></p>
+            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><BookOpen className="h-4 w-4 text-muted-foreground" />Tracks</span><span>{realStats.tracks}</span></p>
+            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><Layers3 className="h-4 w-4 text-muted-foreground" />Modules</span><span>{realStats.modules}</span></p>
+            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><FileStack className="h-4 w-4 text-muted-foreground" />Lessons</span><span>{realStats.lessons}</span></p>
+            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><Sparkles className="h-4 w-4 text-muted-foreground" />Quizzes</span><span>{realStats.quizzes}</span></p>
+            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><Medal className="h-4 w-4 text-muted-foreground" />Certificates</span><span>{realStats.certificates}</span></p>
           </div>
         </section>
       </div>
 
       <section className="surface-elevated space-y-3 p-5">
-        <h2 className="text-lg font-semibold text-slate-100">Recent edits</h2>
+        <h2 className="text-lg font-semibold text-foreground">Recent edits</h2>
         {recentEdits.length === 0 ? (
-          <p className="text-sm text-slate-400">No builder activity yet.</p>
+          <p className="text-sm text-muted-foreground">No builder activity yet.</p>
         ) : (
           <div className="space-y-2">
             {recentEdits.map((item) => (
               <article key={item.id} className="surface-subtle p-3">
-                <p className="text-sm font-semibold text-slate-100">{item.courseTitle}</p>
-                <p className="text-xs text-slate-400">{item.note}</p>
-                <p className="text-xs text-slate-500">{new Date(item.date).toLocaleString()}</p>
+                <p className="text-sm font-semibold text-foreground">{item.courseTitle}</p>
+                <p className="text-xs text-muted-foreground">{item.note}</p>
+                <p className="text-xs text-muted-foreground">{new Date(item.date).toLocaleString()}</p>
               </article>
             ))}
           </div>

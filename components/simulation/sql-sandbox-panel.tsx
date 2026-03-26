@@ -9,7 +9,7 @@ import { SQL_SANDBOX_TABLES, executeLocalSql } from "@/features/simulations/sql-
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => (
-    <div className="h-[260px] rounded-xl border border-slate-800 bg-slate-900/70 p-4 text-sm text-slate-500">
+    <div className="content-card h-[260px] p-4 text-sm text-muted-foreground">
       Loading editor...
     </div>
   ),
@@ -43,8 +43,8 @@ export function SqlSandboxPanel() {
     <section className="surface-elevated space-y-5 p-5 sm:p-6">
       <header className="space-y-2">
         <p className="kicker">SQL Sandbox</p>
-        <h1 className="text-2xl font-semibold text-slate-100">Interactive SQL editor</h1>
-        <p className="text-sm text-slate-400">
+        <h1 className="text-2xl font-semibold text-foreground">Interactive SQL editor</h1>
+        <p className="text-sm text-muted-foreground">
           Local parser supports basic `SELECT ... FROM ... WHERE ... LIMIT ...` for practice.
         </p>
       </header>
@@ -83,16 +83,16 @@ export function SqlSandboxPanel() {
           <RotateCcw className="h-4 w-4" />
           Reset
         </button>
-        <p className="text-xs text-slate-500">{resultMessage}</p>
+        <p className="text-xs text-muted-foreground">{resultMessage}</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
         <section className="surface-subtle p-4">
-          <h2 className="text-sm font-semibold text-slate-100">Sample tables</h2>
-          <div className="mt-2 space-y-2 text-xs text-slate-400">
+          <h2 className="text-sm font-semibold text-foreground">Sample tables</h2>
+          <div className="mt-2 space-y-2 text-xs text-muted-foreground">
             {sampleTables.map((table) => (
-              <div key={table.name} className="rounded-lg border border-slate-800 bg-slate-950/70 p-2">
-                <p className="font-medium text-slate-200">{table.name}</p>
+              <div key={table.name} className="content-card p-2">
+                <p className="font-medium text-foreground">{table.name}</p>
                 <p>{table.columns.join(", ")}</p>
               </div>
             ))}
@@ -100,10 +100,10 @@ export function SqlSandboxPanel() {
         </section>
 
         <section className="surface-subtle p-4">
-          <h2 className="text-sm font-semibold text-slate-100">Result table</h2>
-          <div className="mt-2 overflow-x-auto rounded-xl border border-slate-800">
+          <h2 className="text-sm font-semibold text-foreground">Result table</h2>
+          <div className="mt-2 overflow-x-auto rounded-xl border border-border">
             <table className="min-w-full text-xs">
-              <thead className="bg-slate-900 text-slate-400">
+              <thead className="bg-card text-muted-foreground">
                 <tr>
                   {columns.map((column) => (
                     <th key={column} className="px-2 py-2 text-left font-medium">
@@ -111,15 +111,15 @@ export function SqlSandboxPanel() {
                     </th>
                   ))}
                   {columns.length === 0 && (
-                    <th className="px-2 py-2 text-left font-medium text-slate-500">No columns yet</th>
+                    <th className="px-2 py-2 text-left font-medium text-muted-foreground">No columns yet</th>
                   )}
                 </tr>
               </thead>
               <tbody>
                 {rows.map((row, rowIndex) => (
-                  <tr key={`${rowIndex}-${columns.join("-")}`} className="border-t border-slate-800">
+                  <tr key={`${rowIndex}-${columns.join("-")}`} className="border-t border-border">
                     {columns.map((column) => (
-                      <td key={`${rowIndex}-${column}`} className="px-2 py-2 text-slate-300">
+                      <td key={`${rowIndex}-${column}`} className="px-2 py-2 text-muted-foreground">
                         {String(row[column] ?? "null")}
                       </td>
                     ))}
@@ -127,7 +127,7 @@ export function SqlSandboxPanel() {
                 ))}
                 {rows.length === 0 && (
                   <tr>
-                    <td className="px-2 py-6 text-center text-slate-500" colSpan={Math.max(columns.length, 1)}>
+                    <td className="px-2 py-6 text-center text-muted-foreground" colSpan={Math.max(columns.length, 1)}>
                       Run a query to see rows.
                     </td>
                   </tr>

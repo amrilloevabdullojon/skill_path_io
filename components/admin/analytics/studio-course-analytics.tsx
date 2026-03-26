@@ -22,16 +22,16 @@ export function StudioCourseAnalytics() {
   }, [courses, query]);
 
   return (
-    <section className="surface-elevated space-y-4 p-5 text-slate-100">
+    <section className="surface-elevated space-y-4 p-5 text-foreground">
       <header className="space-y-2">
         <h2 className="text-xl font-semibold">Studio course analytics (mock-ready)</h2>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-muted-foreground">
           Analytics widgets for Academy Studio courses, ready to replace with Prisma snapshots.
         </p>
       </header>
 
       <label className="relative">
-        <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
+        <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
         <input
           className="input-base pl-9"
           value={query}
@@ -47,32 +47,32 @@ export function StudioCourseAnalytics() {
           {filtered.map((entity) => (
             <article key={entity.course.id} className="surface-subtle space-y-2 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="font-semibold text-slate-100">{entity.course.title}</p>
-                <p className="text-xs text-slate-500">{entity.course.category}</p>
+                <p className="font-semibold text-foreground">{entity.course.title}</p>
+                <p className="text-xs text-muted-foreground">{entity.course.category}</p>
               </div>
               <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
-                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                  <p className="text-xs text-slate-500">Enrolled</p>
+                <div className="content-card p-3">
+                  <p className="text-xs text-muted-foreground">Enrolled</p>
                   <p className="text-lg font-semibold">{entity.analytics.enrolledUsers}</p>
                 </div>
-                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                  <p className="text-xs text-slate-500">Completion rate</p>
+                <div className="content-card p-3">
+                  <p className="text-xs text-muted-foreground">Completion rate</p>
                   <p className="text-lg font-semibold">{entity.analytics.completionRate}%</p>
                 </div>
-                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                  <p className="text-xs text-slate-500">Avg quiz score</p>
+                <div className="content-card p-3">
+                  <p className="text-xs text-muted-foreground">Avg quiz score</p>
                   <p className="text-lg font-semibold">{entity.analytics.averageQuizScore}%</p>
                 </div>
-                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                  <p className="text-xs text-slate-500">Avg assignment</p>
+                <div className="content-card p-3">
+                  <p className="text-xs text-muted-foreground">Avg assignment</p>
                   <p className="text-lg font-semibold">{entity.analytics.averageAssignmentScore}%</p>
                 </div>
-                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                  <p className="text-xs text-slate-500">Most difficult module</p>
+                <div className="content-card p-3">
+                  <p className="text-xs text-muted-foreground">Most difficult module</p>
                   <p className="text-sm font-semibold">{entity.analytics.mostDifficultModule}</p>
                 </div>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 Drop-off points: {entity.analytics.dropOffPoints.join(" | ") || "N/A"}
               </p>
             </article>

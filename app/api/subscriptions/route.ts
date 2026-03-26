@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
+import { Errors, apiOk, withErrorHandler } from "@/lib/api/error-handler";
 import { getDashboardData } from "@/lib/dashboard/data";
 import { listSubscriptionPlans } from "@/lib/saas/subscriptions";
 
-export async function GET() {
+export const GET = withErrorHandler(async () => {
   const session = await getServerSession(authOptions);
   const [dashboard, plans] = await Promise.all([
     getDashboardData({
@@ -15,15 +15,7 @@ export async function GET() {
     listSubscriptionPlans(),
   ]);
 
-  if (!dashboard) {
-    return NextResponse.json({ error: "No dashboard data available." }, { status: 404 });
-  }
+  if (!dashboard) throw Errors.notFound("No dashboard data available.");
 
-  return NextResponse.json(
-    {
-      subscription: dashboard.subscription,
-      plans,
-    },
-    { status: 200 },
-  );
-}
+  return apiOk({ subscription: dashboard.subscription, plans });
+});

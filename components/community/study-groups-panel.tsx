@@ -80,8 +80,8 @@ export function StudyGroupsPanel() {
     <section className="surface-elevated space-y-5 p-5 sm:p-6">
       <header className="space-y-2">
         <p className="kicker">Community</p>
-        <h1 className="text-2xl font-semibold text-slate-100">Study groups and peer review</h1>
-        <p className="text-sm text-slate-400">
+        <h1 className="text-2xl font-semibold text-foreground">Study groups and peer review</h1>
+        <p className="text-sm text-muted-foreground">
           Create a group, join discussions, and review assignments from peers.
         </p>
       </header>
@@ -104,7 +104,7 @@ export function StudyGroupsPanel() {
         </button>
       </div>
 
-      <p className="text-xs text-slate-500">Joined groups: {joinedCount}</p>
+      <p className="text-xs text-muted-foreground">Joined groups: {joinedCount}</p>
 
       <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-3">
@@ -112,8 +112,8 @@ export function StudyGroupsPanel() {
             <article key={group.id} className="surface-subtle p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-semibold text-slate-100">{group.title}</p>
-                  <p className="text-xs text-slate-400">{group.topic}</p>
+                  <p className="font-semibold text-foreground">{group.title}</p>
+                  <p className="text-xs text-muted-foreground">{group.topic}</p>
                 </div>
                 <button
                   type="button"
@@ -121,14 +121,14 @@ export function StudyGroupsPanel() {
                   className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${
                     group.joined
                       ? "border-emerald-400/40 bg-emerald-500/15 text-emerald-200"
-                      : "border-slate-700 bg-slate-900/85 text-slate-300 hover:border-slate-600"
+                      : "border-border bg-card/85 text-muted-foreground hover:border-border/70"
                   }`}
                 >
                   {group.joined ? "Joined" : "Join"}
                 </button>
               </div>
-              <p className="mt-2 text-xs text-slate-500">{group.description}</p>
-              <p className="mt-2 inline-flex items-center gap-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs text-muted-foreground">{group.description}</p>
+              <p className="mt-2 inline-flex items-center gap-2 text-xs text-muted-foreground">
                 <Users className="h-4 w-4" />
                 {group.membersCount} members
               </p>
@@ -137,14 +137,14 @@ export function StudyGroupsPanel() {
         </div>
 
         <aside className="surface-subtle space-y-3 p-4">
-          <h2 className="text-sm font-semibold text-slate-100">Peer review queue</h2>
+          <h2 className="text-sm font-semibold text-foreground">Peer review queue</h2>
           {peerReviewQueueSeed.map((task) => (
-            <div key={task.id} className="rounded-lg border border-slate-800 bg-slate-950/70 p-3">
-              <p className="text-sm font-medium text-slate-100">{task.title}</p>
-              <p className="mt-1 text-xs text-slate-500">
+            <div key={task.id} className="content-card p-3">
+              <p className="text-sm font-medium text-foreground">{task.title}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
                 {task.track} | {task.type}
               </p>
-              <p className="mt-2 inline-flex items-center gap-2 text-xs text-slate-400">
+              <p className="mt-2 inline-flex items-center gap-2 text-xs text-muted-foreground">
                 <MessagesSquare className="h-4 w-4" />
                 {task.author} - {task.submittedAt}
               </p>

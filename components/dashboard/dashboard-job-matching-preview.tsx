@@ -15,12 +15,12 @@ export function DashboardJobMatchingPreviewSection({ jobs }: { jobs: JobPreview[
     <DashboardSection id="jobs" title="Job Matching Preview" description="Top roles aligned to your current skill profile.">
       <div className="space-y-2">
         {jobs.slice(0, 3).map((job) => (
-          <article key={job.id} className="surface-panel-hover rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+          <article key={job.id} className="content-card surface-panel-hover p-4">
             <div className="flex items-start justify-between gap-3">
-              <p className="text-sm font-semibold text-slate-100">{job.title}</p>
-              <span className="rounded-full border border-slate-700 bg-slate-900 px-2 py-0.5 text-[10px] text-slate-300">{job.matchPercent}%</span>
+              <p className="text-sm font-semibold text-foreground">{job.title}</p>
+              <span className="chip-neutral px-2 py-0.5 text-[10px]">{job.matchPercent}%</span>
             </div>
-            <p className="mt-2 text-xs text-slate-400">Missing: {job.missingRequirements.slice(0, 2).join(", ") || "None"}</p>
+            <p className="mt-2 text-xs text-muted-foreground">Missing: {job.missingRequirements.slice(0, 2).join(", ") || "None"}</p>
           </article>
         ))}
       </div>

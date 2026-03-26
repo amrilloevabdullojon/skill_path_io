@@ -16,23 +16,23 @@ export function DiscussionsHub({ threads }: { threads: DiscussionThread[] }) {
           <article key={thread.id} className="surface-elevated space-y-3 p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold text-slate-100">{thread.title}</p>
-                <p className="text-xs text-slate-500">{thread.moduleTitle} | {thread.author}</p>
+                <p className="text-sm font-semibold text-foreground">{thread.title}</p>
+                <p className="text-xs text-muted-foreground">{thread.moduleTitle} | {thread.author}</p>
               </div>
-              <span className="rounded-full border border-slate-700 bg-slate-900 px-2 py-0.5 text-[11px] text-slate-300">
+              <span className="chip-neutral px-2 py-0.5 text-[11px]">
                 {thread.lastActivity}
               </span>
             </div>
 
             <div className="flex flex-wrap gap-1.5">
               {thread.tags.map((tag) => (
-                <span key={tag} className="rounded-full border border-slate-700 bg-slate-900/80 px-2 py-0.5 text-[10px] text-slate-300">
+                <span key={tag} className="chip-neutral px-2 py-0.5 text-[10px]">
                   {tag}
                 </span>
               ))}
             </div>
 
-            <p className="inline-flex items-center gap-2 text-xs text-slate-400">
+            <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
               <MessageCircleMore className="h-3.5 w-3.5" />
               {thread.replies} replies
             </p>

@@ -201,7 +201,7 @@ export function SettingsPanel({ entity, selected, canWrite, canPublish }: Settin
       <section className="space-y-2">
         <p className="kicker">Publish workflow</p>
         <div className="flex items-center justify-between">
-          <span className="text-sm text-slate-300">Current status</span>
+          <span className="text-sm text-muted-foreground">Current status</span>
           <StudioStatusBadge status={currentStatus} />
         </div>
         <div className="grid grid-cols-2 gap-2">
@@ -229,11 +229,11 @@ export function SettingsPanel({ entity, selected, canWrite, canPublish }: Settin
           <input className="input-base h-9" type="number" min={0} value={entity.course.estimatedDuration} onChange={(event) => updateCourse(entity.course.id, { estimatedDuration: Number(event.target.value) || 0 })} disabled={!canWrite} placeholder="Estimated duration (min)" />
           <input className="input-base h-9" value={entity.course.seoTitle} onChange={(event) => updateCourse(entity.course.id, { seoTitle: event.target.value })} disabled={!canWrite} placeholder="SEO title" />
           <textarea className="textarea-base min-h-[76px]" value={entity.course.seoDescription} onChange={(event) => updateCourse(entity.course.id, { seoDescription: event.target.value })} disabled={!canWrite} placeholder="SEO description" />
-          <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-slate-300">
+          <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-muted-foreground">
             <input type="checkbox" checked={entity.course.featured} onChange={(event) => updateCourse(entity.course.id, { featured: event.target.checked })} disabled={!canWrite} className="h-4 w-4 accent-sky-400" />
             Featured course
           </label>
-          <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-slate-300">
+          <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-muted-foreground">
             <input type="checkbox" checked={entity.course.certificateConfig.enabled} onChange={(event) => updateCourse(entity.course.id, { certificateConfig: { ...entity.course.certificateConfig, enabled: event.target.checked } })} disabled={!canWrite} className="h-4 w-4 accent-sky-400" />
             Certificate enabled
           </label>
@@ -254,11 +254,11 @@ export function SettingsPanel({ entity, selected, canWrite, canPublish }: Settin
             disabled={!canWrite}
             placeholder="Prerequisite module ids"
           />
-          <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-slate-300">
+          <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-muted-foreground">
             <input type="checkbox" checked={moduleItem.unlockRule.unlockAfterQuizPass} onChange={(event) => updateModule(moduleItem.id, { unlockRule: { ...moduleItem.unlockRule, unlockAfterQuizPass: event.target.checked } })} disabled={!canWrite} className="h-4 w-4 accent-sky-400" />
             Unlock after quiz pass
           </label>
-          <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-slate-300">
+          <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-muted-foreground">
             <input type="checkbox" checked={moduleItem.unlockRule.unlockAfterAssignmentCompletion} onChange={(event) => updateModule(moduleItem.id, { unlockRule: { ...moduleItem.unlockRule, unlockAfterAssignmentCompletion: event.target.checked } })} disabled={!canWrite} className="h-4 w-4 accent-sky-400" />
             Unlock after assignment completion
           </label>
@@ -283,14 +283,14 @@ export function SettingsPanel({ entity, selected, canWrite, canPublish }: Settin
         </button>
         <div className="space-y-1">
           {entity.versions.slice(0, 4).map((version) => (
-            <div key={version.id} className="surface-subtle p-2.5 text-xs text-slate-300">
-              <p className="font-semibold text-slate-100">v{version.version}</p>
-              <p className="text-slate-400">{version.changelogNote}</p>
-              <p className="text-slate-500">{new Date(version.updatedAt).toLocaleString()}</p>
+            <div key={version.id} className="surface-subtle p-2.5 text-xs text-muted-foreground">
+              <p className="font-semibold text-foreground">v{version.version}</p>
+              <p className="text-muted-foreground">{version.changelogNote}</p>
+              <p className="text-muted-foreground">{new Date(version.updatedAt).toLocaleString()}</p>
             </div>
           ))}
         </div>
-        <p className="text-[11px] text-slate-500">
+        <p className="text-[11px] text-muted-foreground">
           Restore and diff flow is scaffolded via snapshots and can be wired to Prisma rollback endpoints later.
         </p>
       </section>
@@ -317,8 +317,8 @@ export function SettingsPanel({ entity, selected, canWrite, canPublish }: Settin
         </button>
         {aiResult ? (
           <div className="surface-subtle space-y-2 p-3">
-            <p className="text-xs text-slate-500">Source: {aiSource ?? "mock"}</p>
-            <pre className="max-h-56 overflow-y-auto whitespace-pre-wrap text-xs text-slate-200">{aiResult}</pre>
+            <p className="text-xs text-muted-foreground">Source: {aiSource ?? "mock"}</p>
+            <pre className="max-h-56 overflow-y-auto whitespace-pre-wrap text-xs text-muted-foreground">{aiResult}</pre>
             <button type="button" className="btn-secondary w-full" onClick={applyAiResult} disabled={!canWrite}>
               Apply to editor
             </button>

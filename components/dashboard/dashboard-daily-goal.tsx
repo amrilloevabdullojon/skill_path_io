@@ -25,7 +25,7 @@ export function DashboardDailyGoalSection({ goal }: DashboardDailyGoalProps) {
     >
       <article className="surface-subtle surface-panel-hover space-y-3 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="inline-flex items-center gap-2 text-sm font-semibold text-slate-100">
+          <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
             <Target className="h-4 w-4 text-sky-300" />
             {goal.targetLessons} lessons today
           </p>
@@ -33,7 +33,7 @@ export function DashboardDailyGoalSection({ goal }: DashboardDailyGoalProps) {
             className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
               isCompleted
                 ? "border-emerald-400/30 bg-emerald-500/15 text-emerald-200"
-                : "border-slate-700 bg-slate-900/80 text-slate-300"
+                : "xp-pill"
             }`}
           >
             {isCompleted ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}
@@ -47,10 +47,10 @@ export function DashboardDailyGoalSection({ goal }: DashboardDailyGoalProps) {
           label={`${goal.earnedXp}/${goal.targetXp} XP`}
         />
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-          <p className="text-slate-400">
+          <p className="text-muted-foreground">
             Reward: <span className="font-semibold text-emerald-200">+{goal.targetXp} XP</span>
           </p>
-          <p className="text-slate-500">{Math.max(0, goal.targetLessons - goal.completedLessons)} lessons remaining</p>
+          <p className="text-muted-foreground">{Math.max(0, goal.targetLessons - goal.completedLessons)} lessons remaining</p>
         </div>
       </article>
     </DashboardSection>

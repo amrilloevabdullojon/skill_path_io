@@ -179,41 +179,41 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
 
   return (
     <section className="page-shell">
-      <header className="surface-elevated space-y-2 p-5 text-slate-100">
+      <header className="surface-elevated space-y-2 p-5 text-foreground">
         <h2 className="text-xl font-semibold">Analytics</h2>
-        <p className="text-sm text-slate-400">Local metrics for users, content, progress, and certificates.</p>
+        <p className="text-sm text-muted-foreground">Local metrics for users, content, progress, and certificates.</p>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        <div className="surface-panel surface-panel-hover p-4 text-slate-100">
-          <p className="text-xs text-slate-400">Users</p>
+        <div className="surface-panel surface-panel-hover p-4 text-foreground">
+          <p className="text-xs text-muted-foreground">Users</p>
           <p className="text-2xl font-semibold">{users}</p>
         </div>
-        <div className="surface-panel surface-panel-hover p-4 text-slate-100">
-          <p className="text-xs text-slate-400">Tracks / Modules</p>
+        <div className="surface-panel surface-panel-hover p-4 text-foreground">
+          <p className="text-xs text-muted-foreground">Tracks / Modules</p>
           <p className="text-2xl font-semibold">
             {tracks} / {modules}
           </p>
         </div>
-        <div className="surface-panel surface-panel-hover p-4 text-slate-100">
-          <p className="text-xs text-slate-400">Quizzes / Questions</p>
+        <div className="surface-panel surface-panel-hover p-4 text-foreground">
+          <p className="text-xs text-muted-foreground">Quizzes / Questions</p>
           <p className="text-2xl font-semibold">
             {quizzes} / {questions}
           </p>
         </div>
-        <div className="surface-panel surface-panel-hover p-4 text-slate-100">
-          <p className="text-xs text-slate-400">Progress statuses</p>
-          <p className="text-sm text-slate-300">Completed: {completedProgress}</p>
-          <p className="text-sm text-slate-300">In progress: {inProgress}</p>
-          <p className="text-sm text-slate-300">Not started: {notStarted}</p>
+        <div className="surface-panel surface-panel-hover p-4 text-foreground">
+          <p className="text-xs text-muted-foreground">Progress statuses</p>
+          <p className="text-sm text-muted-foreground">Completed: {completedProgress}</p>
+          <p className="text-sm text-muted-foreground">In progress: {inProgress}</p>
+          <p className="text-sm text-muted-foreground">Not started: {notStarted}</p>
         </div>
-        <div className="surface-panel surface-panel-hover p-4 text-slate-100">
-          <p className="text-xs text-slate-400">Certificates</p>
+        <div className="surface-panel surface-panel-hover p-4 text-foreground">
+          <p className="text-xs text-muted-foreground">Certificates</p>
           <p className="text-2xl font-semibold">{certificates}</p>
         </div>
       </div>
 
-      <section className="surface-elevated space-y-4 p-5 text-slate-100">
+      <section className="surface-elevated space-y-4 p-5 text-foreground">
         <form className="grid gap-3 md:grid-cols-[1fr_180px_auto]">
           <input
             type="text"
@@ -270,7 +270,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
               })}
               {trackRows.length === 0 && (
                 <tr>
-                  <td className="px-3 py-6 text-center text-slate-400" colSpan={5}>
+                  <td className="px-3 py-6 text-center text-muted-foreground" colSpan={5}>
                     No tracks for current filters.
                   </td>
                 </tr>
@@ -280,7 +280,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
         </div>
       </section>
 
-      <section className="surface-elevated space-y-3 p-5 text-slate-100">
+      <section className="surface-elevated space-y-3 p-5 text-foreground">
         <h3 className="text-lg font-semibold">Latest certificates</h3>
         <div className="table-shell">
           <table className="table-base min-w-[700px]">
@@ -295,15 +295,15 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
             <tbody>
               {latestCertificates.map((certificate) => (
                 <tr key={certificate.id} className="table-row">
-                  <td className="px-3 py-3 text-slate-300">{certificate.issuedAt.toLocaleString()}</td>
+                  <td className="px-3 py-3 text-muted-foreground">{certificate.issuedAt.toLocaleString()}</td>
                   <td className="px-3 py-3">{certificate.user.name}</td>
-                  <td className="px-3 py-3 text-slate-300">{certificate.user.email}</td>
+                  <td className="px-3 py-3 text-muted-foreground">{certificate.user.email}</td>
                   <td className="px-3 py-3">{certificate.track.title}</td>
                 </tr>
               ))}
               {latestCertificates.length === 0 && (
                 <tr>
-                  <td className="px-3 py-6 text-center text-slate-400" colSpan={4}>
+                  <td className="px-3 py-6 text-center text-muted-foreground" colSpan={4}>
                     No certificates yet.
                   </td>
                 </tr>
@@ -315,28 +315,28 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
 
       <StudioCourseAnalytics />
 
-      <section className="surface-elevated space-y-4 p-5 text-slate-100">
+      <section className="surface-elevated space-y-4 p-5 text-foreground">
         <h3 className="text-lg font-semibold">SaaS admin analytics</h3>
         <div className="grid gap-4 md:grid-cols-3">
           <article className="surface-subtle p-4">
-            <p className="text-xs text-slate-500">Mission success rate</p>
+            <p className="text-xs text-muted-foreground">Mission success rate</p>
             <p className="mt-1 text-xl font-semibold">{missionSuccessRate}%</p>
-            <p className="text-xs text-slate-500">Average score: {missionAvg}%</p>
+            <p className="text-xs text-muted-foreground">Average score: {missionAvg}%</p>
           </article>
           <article className="surface-subtle p-4">
-            <p className="text-xs text-slate-500">Mission submissions</p>
+            <p className="text-xs text-muted-foreground">Mission submissions</p>
             <p className="mt-1 text-xl font-semibold">{missionSubmissionCount}</p>
-            <p className="text-xs text-slate-500">Successful: {missionSuccessCount}</p>
+            <p className="text-xs text-muted-foreground">Successful: {missionSuccessCount}</p>
           </article>
           <article className="surface-subtle p-4">
-            <p className="text-xs text-slate-500">User growth periods</p>
+            <p className="text-xs text-muted-foreground">User growth periods</p>
             <p className="mt-1 text-xl font-semibold">{growthRows.length}</p>
-            <p className="text-xs text-slate-500">Monthly aggregation</p>
+            <p className="text-xs text-muted-foreground">Monthly aggregation</p>
           </article>
         </div>
       </section>
 
-      <section className="surface-elevated space-y-4 p-5 text-slate-100">
+      <section className="surface-elevated space-y-4 p-5 text-foreground">
         <h3 className="text-lg font-semibold">User growth by month</h3>
         <div className="table-shell">
           <table className="table-base min-w-[520px]">
@@ -355,7 +355,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
               ))}
               {growthRows.length === 0 ? (
                 <tr>
-                  <td className="px-3 py-6 text-center text-slate-400" colSpan={2}>
+                  <td className="px-3 py-6 text-center text-muted-foreground" colSpan={2}>
                     No user growth data.
                   </td>
                 </tr>
@@ -365,7 +365,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
         </div>
       </section>
 
-      <section className="surface-elevated space-y-4 p-5 text-slate-100">
+      <section className="surface-elevated space-y-4 p-5 text-foreground">
         <h3 className="text-lg font-semibold">Track completion rates</h3>
         <div className="table-shell">
           <table className="table-base min-w-[720px]">
@@ -388,7 +388,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
               ))}
               {completionRows.length === 0 ? (
                 <tr>
-                  <td className="px-3 py-6 text-center text-slate-400" colSpan={4}>
+                  <td className="px-3 py-6 text-center text-muted-foreground" colSpan={4}>
                     No completion data.
                   </td>
                 </tr>
@@ -398,18 +398,18 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
         </div>
       </section>
 
-      <section className="surface-elevated space-y-4 p-5 text-slate-100">
+      <section className="surface-elevated space-y-4 p-5 text-foreground">
         <h3 className="text-lg font-semibold">Popular tracks</h3>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {popularTracks.map((track) => (
             <article key={track.id} className="surface-subtle p-4">
-              <p className="text-sm font-semibold text-slate-100">{track.title}</p>
-              <p className="mt-1 text-xs text-slate-400">Started attempts: {track.started}</p>
-              <p className="text-xs text-slate-400">Completion rate: {track.completionRate}%</p>
+              <p className="text-sm font-semibold text-foreground">{track.title}</p>
+              <p className="mt-1 text-xs text-muted-foreground">Started attempts: {track.started}</p>
+              <p className="text-xs text-muted-foreground">Completion rate: {track.completionRate}%</p>
             </article>
           ))}
           {popularTracks.length === 0 ? (
-            <p className="text-sm text-slate-400">No popular track data yet.</p>
+            <p className="text-sm text-muted-foreground">No popular track data yet.</p>
           ) : null}
         </div>
       </section>

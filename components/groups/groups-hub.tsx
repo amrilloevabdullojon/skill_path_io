@@ -22,7 +22,7 @@ export function GroupsHub({ groups }: { groups: StudyGroup[] }) {
         <p className="section-description">Join groups by topic, discuss modules, and run peer learning sessions.</p>
       </header>
 
-      <p className="text-xs text-slate-500">Joined groups: {joinedCount}</p>
+      <p className="text-xs text-muted-foreground">Joined groups: {joinedCount}</p>
 
       <div className="grid gap-4 xl:grid-cols-2">
         {groups.map((group) => {
@@ -31,8 +31,8 @@ export function GroupsHub({ groups }: { groups: StudyGroup[] }) {
             <article key={group.id} className="surface-elevated space-y-3 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold text-slate-100">{group.name}</p>
-                  <p className="text-xs text-slate-500">{group.topic}</p>
+                  <p className="text-sm font-semibold text-foreground">{group.name}</p>
+                  <p className="text-xs text-muted-foreground">{group.topic}</p>
                 </div>
                 <button
                   type="button"
@@ -40,14 +40,14 @@ export function GroupsHub({ groups }: { groups: StudyGroup[] }) {
                   className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${
                     joined
                       ? "border-emerald-400/35 bg-emerald-500/10 text-emerald-200"
-                      : "border-slate-700 bg-slate-900/80 text-slate-300"
+                      : "border-border bg-card text-muted-foreground"
                   }`}
                 >
                   {joined ? "Joined" : "Join"}
                 </button>
               </div>
-              <p className="text-sm text-slate-300">{group.description}</p>
-              <p className="inline-flex items-center gap-2 text-xs text-slate-400">
+              <p className="text-sm text-muted-foreground">{group.description}</p>
+              <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
                 <UsersRound className="h-3.5 w-3.5" />
                 {group.members + (joined ? 1 : 0)} members | {group.mode}
               </p>

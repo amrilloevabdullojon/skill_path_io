@@ -17,7 +17,20 @@
       "Bash(xargs grep:*)",
       "Bash(wc -l /c/Users/1234/Documents/GitHub/skill_path_io/app/api/*/*.ts)",
       "Bash(xargs head:*)",
-      "Bash(grep -r \"loading.tsx\\\\|error.tsx\\\\|not-found.tsx\" /c/Users/1234/Documents/GitHub/skill_path_io/app --include=*.tsx)"
+      "Bash(grep -r \"loading.tsx\\\\|error.tsx\\\\|not-found.tsx\" /c/Users/1234/Documents/GitHub/skill_path_io/app --include=*.tsx)",
+      "Bash(wc -l /Users/panda/Documents/GitHub/skill_path_io/app/api/*/*route.ts)",
+      "Bash(du -sh /Users/panda/Documents/GitHub/skill_path_io/*)",
+      "Bash(npm test:*)",
+      "Bash(/usr/local/bin/node ./node_modules/.bin/vitest run --reporter=verbose)",
+      "Read(//usr/bin/**)",
+      "Read(//Users/panda/.nvm/versions/**)",
+      "Bash(export PATH=\"$HOME/.local/share/mise/shims:$HOME/.asdf/shims:/opt/homebrew/bin:/usr/bin:$PATH\")",
+      "Bash(node ./node_modules/.bin/vitest run --reporter=verbose)",
+      "Bash(export PATH=/opt/homebrew/opt/node@22/bin:/opt/homebrew/opt/node@20/bin:/opt/homebrew/opt/node/bin:$PATH)",
+      "Read(//opt/homebrew/**)",
+      "Bash(ls /Users/panda/Documents/GitHub/skill_path_io/.env*)",
+      "Bash(find /Users/panda/Documents/GitHub/skill_path_io/components/admin -name *.tsx -type f)",
+      "Bash(find /Users/panda/Documents/GitHub/skill_path_io/components/analytics -name *.tsx -type f)"
     ]
   }
 }

@@ -77,38 +77,38 @@ export function AdvancedLearningAnalyticsDashboard({ analytics }: AdvancedLearni
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <article className="surface-elevated p-4">
-          <p className="text-xs text-slate-500">Mission success rate</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-100">{analytics.missionSuccessRate}%</p>
+          <p className="text-xs text-muted-foreground">Mission success rate</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{analytics.missionSuccessRate}%</p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="text-xs text-slate-500">Quiz accuracy</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-100">{analytics.quizAccuracy}%</p>
+          <p className="text-xs text-muted-foreground">Quiz accuracy</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{analytics.quizAccuracy}%</p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="text-xs text-slate-500">Consistency score</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-100">{analytics.weeklyConsistency.score}%</p>
+          <p className="text-xs text-muted-foreground">Consistency score</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{analytics.weeklyConsistency.score}%</p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="text-xs text-slate-500">Velocity (latest)</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-100">
+          <p className="text-xs text-muted-foreground">Velocity (latest)</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">
             {analytics.learningVelocity[analytics.learningVelocity.length - 1]?.value ?? 0}
           </p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="text-xs text-slate-500">Top skill</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-100">{topSkills[0]?.skill ?? "n/a"}</p>
+          <p className="text-xs text-muted-foreground">Top skill</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{topSkills[0]?.skill ?? "n/a"}</p>
         </article>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
         <article className="surface-elevated p-4">
-          <p className="mb-3 text-sm font-semibold text-slate-100">Learning velocity (line chart)</p>
+          <p className="mb-3 text-sm font-semibold text-foreground">Learning velocity (line chart)</p>
           <div className="h-72">
             <VelocityChart data={analytics.learningVelocity} />
           </div>
         </article>
         <article className="surface-elevated p-4">
-          <p className="mb-3 text-sm font-semibold text-slate-100">Skill radar evolution</p>
+          <p className="mb-3 text-sm font-semibold text-foreground">Skill radar evolution</p>
           <div className="h-72">
             <RadarEvolutionChart data={analytics.skillGrowth.current} />
           </div>
@@ -116,7 +116,7 @@ export function AdvancedLearningAnalyticsDashboard({ analytics }: AdvancedLearni
       </div>
 
       <article className="surface-elevated p-4">
-        <p className="mb-3 text-sm font-semibold text-slate-100">Weekly consistency heatmap</p>
+        <p className="mb-3 text-sm font-semibold text-foreground">Weekly consistency heatmap</p>
         <LearningHeatmap data={analytics.weeklyConsistency.heatmap} />
       </article>
     </section>

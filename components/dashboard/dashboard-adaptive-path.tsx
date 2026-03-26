@@ -21,17 +21,17 @@ export function DashboardAdaptivePathSection({ suggestions }: { suggestions: Ada
     >
       <div className="space-y-2">
         {suggestions.map((item) => (
-          <article key={item.id} className="surface-panel-hover rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+          <article key={item.id} className="content-card surface-panel-hover p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold text-slate-100">{item.title}</p>
-                <p className="text-xs text-slate-500">{item.reason}</p>
+                <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                <p className="text-xs text-muted-foreground">{item.reason}</p>
               </div>
               <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wide ${priorityColor(item.priority)}`}>
                 {item.priority}
               </span>
             </div>
-            <p className="mt-2 text-xs text-slate-300">{item.action}</p>
+            <p className="mt-2 text-xs text-muted-foreground">{item.action}</p>
             <Link href={item.href} className="mt-2 inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200">
               <Compass className="h-3.5 w-3.5" />
               Follow suggestion
@@ -41,7 +41,7 @@ export function DashboardAdaptivePathSection({ suggestions }: { suggestions: Ada
         ))}
       </div>
 
-      <p className="inline-flex items-center gap-2 text-xs text-slate-500">
+      <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
         <Flame className="h-3.5 w-3.5 text-amber-300" />
         Adaptive engine can switch to acceleration path when consistency improves.
       </p>

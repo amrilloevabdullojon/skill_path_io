@@ -26,25 +26,25 @@ export function DashboardSkillTreePreviewSection({ skillTree }: DashboardSkillTr
     >
       <div className="space-y-4">
         <div className="grid gap-2 sm:grid-cols-3">
-          <div className="rounded-xl border border-slate-800 bg-slate-950/75 p-3">
-            <p className="text-xs text-slate-500">Unlocked</p>
-            <p className="mt-1 text-lg font-semibold text-slate-100">{skillTree.unlockedCount}</p>
+          <div className="mini-stat-box p-3">
+            <p className="text-xs text-muted-foreground">Unlocked</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">{skillTree.unlockedCount}</p>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/75 p-3">
-            <p className="text-xs text-slate-500">Total nodes</p>
-            <p className="mt-1 text-lg font-semibold text-slate-100">{skillTree.totalCount}</p>
+          <div className="mini-stat-box p-3">
+            <p className="text-xs text-muted-foreground">Total nodes</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">{skillTree.totalCount}</p>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/75 p-3">
-            <p className="text-xs text-slate-500">Nearest unlock</p>
-            <p className="mt-1 truncate text-sm font-semibold text-slate-100">{skillTree.nextUnlock ?? "All unlocked"}</p>
+          <div className="mini-stat-box p-3">
+            <p className="text-xs text-muted-foreground">Nearest unlock</p>
+            <p className="mt-1 truncate text-sm font-semibold text-foreground">{skillTree.nextUnlock ?? "All unlocked"}</p>
           </div>
         </div>
 
         <div className="space-y-2">
           {skillTree.branches.map((branch) => (
-            <article key={branch.id} className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
+            <article key={branch.id} className="content-card p-3">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-slate-100">{branch.title}</p>
+                <p className="text-sm font-semibold text-foreground">{branch.title}</p>
                 <span
                   className={cn(
                     "inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
@@ -61,7 +61,7 @@ export function DashboardSkillTreePreviewSection({ skillTree }: DashboardSkillTr
                   </span>
                 ))}
                 {branch.locked.map((skill) => (
-                  <span key={`${branch.id}-locked-${skill}`} className="rounded-full border border-slate-700 bg-slate-900/75 px-2 py-0.5 text-[11px] text-slate-500">
+                  <span key={`${branch.id}-locked-${skill}`} className="skill-tag px-2 py-0.5 text-[11px]">
                     {skill}
                   </span>
                 ))}
@@ -72,7 +72,7 @@ export function DashboardSkillTreePreviewSection({ skillTree }: DashboardSkillTr
 
         <Link
           href="/career"
-          className="inline-flex rounded-xl border border-slate-700 bg-slate-900/85 px-3 py-2 text-sm font-semibold text-slate-100 transition-colors hover:border-slate-600 hover:bg-slate-800/85"
+          className="btn-secondary text-sm"
         >
           Open full skill tree
         </Link>

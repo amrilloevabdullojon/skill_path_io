@@ -13,9 +13,9 @@ export function GrowthLoopCards({ cards }: GrowthLoopCardsProps) {
       <div className="grid gap-3 md:grid-cols-2">
         {cards.map((card) => (
           <article key={card.id} className="surface-subtle space-y-2 p-4">
-            <p className="text-sm font-semibold text-slate-100">{card.title}</p>
-            <p className="text-xs text-slate-400">{card.description}</p>
-            <p className="text-[11px] text-slate-500">Channel: {card.channelHint}</p>
+            <p className="text-sm font-semibold text-foreground">{card.title}</p>
+            <p className="text-xs text-muted-foreground">{card.description}</p>
+            <p className="text-[11px] text-muted-foreground">Channel: {card.channelHint}</p>
             <Link href={card.shareUrl} className="btn-secondary inline-flex">
               Open share link
             </Link>

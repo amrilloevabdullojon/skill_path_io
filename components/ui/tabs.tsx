@@ -24,7 +24,7 @@ export function Tabs({
 
   return (
     <section className={cn("space-y-3", className)}>
-      <div className="flex flex-wrap gap-1 rounded-2xl border border-slate-800 bg-slate-900/70 p-1">
+      <div className="tab-list flex flex-wrap gap-1 p-1">
         {items.map((item) => (
           <button
             key={item.id}
@@ -32,7 +32,7 @@ export function Tabs({
             onClick={() => setActive(item.id)}
             className={cn(
               "focus-ring rounded-xl px-3 py-2 text-sm font-medium transition-all",
-              item.id === current?.id ? "bg-slate-800 text-slate-100" : "text-slate-400 hover:text-slate-200",
+              item.id === current?.id ? "tab-trigger-active" : "tab-trigger",
             )}
           >
             {item.label}

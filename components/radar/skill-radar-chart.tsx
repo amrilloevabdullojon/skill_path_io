@@ -37,7 +37,7 @@ function RadarAngleTick(props: { x?: number; y?: number; payload?: { value?: str
 
 export function SkillRadarChart({ data }: SkillRadarChartProps) {
   return (
-    <div className="h-[20rem] w-full min-w-0 rounded-2xl border border-slate-800 bg-slate-950/70 p-2 sm:h-[22rem] sm:p-3">
+    <div className="content-card h-[20rem] w-full min-w-0 rounded-2xl p-2 sm:h-[22rem] sm:p-3">
       <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={240}>
         <RadarChart data={data} margin={{ top: 24, right: 30, bottom: 20, left: 30 }}>
           <defs>

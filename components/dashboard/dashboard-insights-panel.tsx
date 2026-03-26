@@ -16,28 +16,28 @@ export function DashboardInsightsPanel({ achievements, weeklyProgress, rank, wee
   const velocity = Math.max(0, (lastWeek?.progress ?? 0) - (previousWeek?.progress ?? 0));
 
   return (
-    <div className="sticky top-24 max-h-[calc(100dvh-7rem)] min-w-0 space-y-4 overflow-y-auto pr-1 overscroll-contain [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/70 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5">
+    <div className="sticky top-24 max-h-[calc(100dvh-7rem)] min-w-0 space-y-4 overflow-y-auto pr-1 overscroll-contain [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5">
       <section className="surface-elevated surface-panel-hover space-y-3 p-4">
-        <p className="text-sm font-semibold text-slate-100">Learning insights</p>
+        <p className="text-sm font-semibold text-foreground">Learning insights</p>
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className="rounded-xl border border-slate-800 bg-slate-950/75 p-2.5">
-            <p className="text-slate-500">Your rank</p>
-            <p className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-slate-100">
+          <div className="mini-stat-box p-2.5">
+            <p className="text-muted-foreground">Your rank</p>
+            <p className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-foreground">
               <Trophy className="h-3.5 w-3.5 text-amber-300" />
               {rank ? `#${rank}` : "N/A"}
             </p>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/75 p-2.5">
-            <p className="text-slate-500">Weekly XP</p>
-            <p className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-slate-100">
+          <div className="mini-stat-box p-2.5">
+            <p className="text-muted-foreground">Weekly XP</p>
+            <p className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-foreground">
               <Flame className="h-3.5 w-3.5 text-orange-300" />
               {weeklyXp}
             </p>
           </div>
         </div>
-        <div className="rounded-xl border border-slate-800 bg-slate-950/75 p-2.5 text-xs">
-          <p className="text-slate-500">Learning velocity</p>
-          <p className="mt-1 text-slate-100">{velocity}% this week</p>
+        <div className="mini-stat-box p-2.5 text-xs">
+          <p className="text-muted-foreground">Learning velocity</p>
+          <p className="mt-1 text-foreground">{velocity}% this week</p>
         </div>
         <Link
           href="/leaderboard"
@@ -49,40 +49,40 @@ export function DashboardInsightsPanel({ achievements, weeklyProgress, rank, wee
       </section>
 
       <section className="surface-elevated surface-panel-hover space-y-3 p-4">
-        <p className="inline-flex items-center gap-2 text-sm font-semibold text-slate-100">
+        <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
           <Award className="h-4 w-4 text-emerald-300" />
           Achievements
         </p>
         <div className="space-y-2">
           {achievements.map((item) => (
-            <article key={item.id} className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-              <p className="text-xs text-slate-500">{item.label}</p>
-              <p className="mt-1 text-lg font-semibold text-slate-100">{item.value}</p>
-              <p className="text-[11px] text-slate-500">{item.hint}</p>
+            <article key={item.id} className="content-card p-3">
+              <p className="text-xs text-muted-foreground">{item.label}</p>
+              <p className="mt-1 text-lg font-semibold text-foreground">{item.value}</p>
+              <p className="text-[11px] text-muted-foreground">{item.hint}</p>
             </article>
           ))}
         </div>
       </section>
 
       <section className="surface-elevated surface-panel-hover space-y-3 p-4">
-        <p className="text-sm font-semibold text-slate-100">Skill progress</p>
+        <p className="text-sm font-semibold text-foreground">Skill progress</p>
         <div className="space-y-2">
           {skillRadar.data.map((item) => (
             <div key={item.skill} className="space-y-1">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-300">{item.skill}</span>
-                <span className="text-slate-500">{item.value}%</span>
+                <span className="text-muted-foreground">{item.skill}</span>
+                <span className="text-muted-foreground">{item.value}%</span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">
+              <div className="progress-track h-1.5">
                 <div className="h-full rounded-full bg-sky-400/90 transition-all duration-500" style={{ width: `${item.value}%` }} />
               </div>
             </div>
           ))}
         </div>
-        <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3 text-xs">
-          <p className="text-slate-500">Strongest: <span className="text-slate-200">{skillRadar.strongestSkill}</span></p>
-          <p className="text-slate-500">Weakest: <span className="text-slate-200">{skillRadar.weakestSkill}</span></p>
-          <p className="text-slate-500">Next focus: <span className="text-slate-200">{skillRadar.nextFocus}</span></p>
+        <div className="content-card p-3 text-xs">
+          <p className="text-muted-foreground">Strongest: <span className="text-foreground">{skillRadar.strongestSkill}</span></p>
+          <p className="text-muted-foreground">Weakest: <span className="text-foreground">{skillRadar.weakestSkill}</span></p>
+          <p className="text-muted-foreground">Next focus: <span className="text-foreground">{skillRadar.nextFocus}</span></p>
         </div>
       </section>
     </div>

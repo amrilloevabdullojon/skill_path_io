@@ -36,7 +36,7 @@ export function NewCourseForm() {
     <section className="surface-elevated space-y-4 p-5 sm:p-6">
       <header>
         <p className="kicker">New course</p>
-        <h1 className="text-2xl font-semibold text-slate-100">Create course in Academy Studio</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Create course in Academy Studio</h1>
       </header>
 
       <form onSubmit={handleSubmit} className="space-y-3">

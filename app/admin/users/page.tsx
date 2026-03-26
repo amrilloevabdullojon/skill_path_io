@@ -56,10 +56,10 @@ export default async function UsersAdminPage({ searchParams }: UsersAdminPagePro
   });
 
   return (
-    <section className="surface-elevated space-y-4 p-5 text-slate-100">
+    <section className="surface-elevated space-y-4 p-5 text-foreground">
       <header className="space-y-2">
         <h2 className="text-xl font-semibold">Users</h2>
-        <p className="text-sm text-slate-400">Search, filter, and edit user roles locally.</p>
+        <p className="text-sm text-muted-foreground">Search, filter, and edit user roles locally.</p>
       </header>
 
       <form className="surface-subtle grid gap-3 p-4 md:grid-cols-[1fr_180px_auto]">
@@ -111,7 +111,7 @@ export default async function UsersAdminPage({ searchParams }: UsersAdminPagePro
                     className="input-base h-9 px-2 py-1.5"
                   />
                 </td>
-                <td className="px-3 py-3 text-slate-300">{user.email}</td>
+                <td className="px-3 py-3 text-muted-foreground">{user.email}</td>
                 <td className="px-3 py-3">
                   <select
                     form={`user-edit-${user.id}`}
@@ -123,9 +123,9 @@ export default async function UsersAdminPage({ searchParams }: UsersAdminPagePro
                     <option value={UserRole.STUDENT}>STUDENT</option>
                   </select>
                 </td>
-                <td className="px-3 py-3 text-slate-300">{user._count.progresses}</td>
-                <td className="px-3 py-3 text-slate-300">{user._count.certificates}</td>
-                <td className="px-3 py-3 text-slate-300">{user.createdAt.toLocaleDateString()}</td>
+                <td className="px-3 py-3 text-muted-foreground">{user._count.progresses}</td>
+                <td className="px-3 py-3 text-muted-foreground">{user._count.certificates}</td>
+                <td className="px-3 py-3 text-muted-foreground">{user.createdAt.toLocaleDateString()}</td>
                 <td className="px-3 py-3">
                   <form id={`user-edit-${user.id}`} action={updateUserAction} className="inline-flex">
                     <input type="hidden" name="userId" value={user.id} />
@@ -141,7 +141,7 @@ export default async function UsersAdminPage({ searchParams }: UsersAdminPagePro
             ))}
             {users.length === 0 && (
               <tr>
-                <td className="px-3 py-6 text-center text-slate-400" colSpan={7}>
+                <td className="px-3 py-6 text-center text-muted-foreground" colSpan={7}>
                   No users found.
                 </td>
               </tr>

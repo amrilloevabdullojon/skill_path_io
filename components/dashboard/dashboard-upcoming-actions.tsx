@@ -15,7 +15,7 @@ function priorityClass(priority: DashboardUpcomingAction["priority"]) {
   if (priority === "Medium") {
     return "border-amber-400/35 bg-amber-500/15 text-amber-200";
   }
-  return "border-slate-600 bg-slate-800/70 text-slate-200";
+  return "border-border bg-card/70 text-muted-foreground";
 }
 
 function difficultyClass(difficulty: DashboardUpcomingAction["difficulty"]) {
@@ -39,11 +39,11 @@ export function DashboardUpcomingActionsSection({ actions }: DashboardUpcomingAc
         {actions.map((action) => (
           <article
             key={action.id}
-            className="surface-panel-hover space-y-3 rounded-xl border border-slate-800 bg-slate-950/70 p-4"
+            className="content-card surface-panel-hover space-y-3 p-4"
           >
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="text-sm font-semibold text-slate-100">{action.title}</p>
+                <p className="text-sm font-semibold text-foreground">{action.title}</p>
                 <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${priorityClass(action.priority)}`}>
                   {action.priority}
                 </span>
@@ -51,12 +51,12 @@ export function DashboardUpcomingActionsSection({ actions }: DashboardUpcomingAc
                   Difficulty: {action.difficulty}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">{action.description}</p>
+              <p className="text-xs text-muted-foreground">{action.description}</p>
             </div>
-            <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
-              <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Time: {action.eta}</p>
-              <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">+{action.xpReward} XP</p>
-              <p className="col-span-2 rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <p className="data-pill px-2 py-1.5">Time: {action.eta}</p>
+              <p className="data-pill px-2 py-1.5">+{action.xpReward} XP</p>
+              <p className="data-pill col-span-2 px-2 py-1.5">
                 Skill impact: {action.skillImpact}
               </p>
             </div>

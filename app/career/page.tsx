@@ -38,7 +38,7 @@ export default async function CareerPage() {
   if (!dashboard) {
     return (
       <section className="surface-elevated p-6">
-        <p className="text-sm text-slate-400">No dashboard data found yet. Open your dashboard after onboarding.</p>
+        <p className="text-sm text-muted-foreground">No dashboard data found yet. Open your dashboard after onboarding.</p>
       </section>
     );
   }
@@ -97,7 +97,7 @@ export default async function CareerPage() {
       <section className="surface-elevated flex flex-wrap items-center justify-between gap-3 p-5">
         <div>
           <p className="kicker">Portfolio</p>
-          <p className="text-sm text-slate-300">Turn completed missions into portfolio artifacts for job interviews.</p>
+          <p className="text-sm text-muted-foreground">Turn completed missions into portfolio artifacts for job interviews.</p>
         </div>
         <Link href="/portfolio" className="btn-secondary">
           Open portfolio

@@ -116,12 +116,12 @@ export function BookmarksBoard({ initialBookmarks }: { initialBookmarks: UserBoo
         {bookmarks.map((bookmark) => (
           <article key={bookmark.id} className="surface-elevated space-y-3 p-4">
             <div className="flex items-start justify-between gap-2">
-              <p className="text-sm font-semibold text-slate-100">{bookmark.title}</p>
-              <button type="button" onClick={() => removeBookmark(bookmark.id)} className="text-xs text-slate-500 hover:text-slate-300">
+              <p className="text-sm font-semibold text-foreground">{bookmark.title}</p>
+              <button type="button" onClick={() => removeBookmark(bookmark.id)} className="text-xs text-muted-foreground hover:text-foreground">
                 Remove
               </button>
             </div>
-            <p className="text-xs text-slate-500">{bookmark.type} | {bookmark.tag}</p>
+            <p className="text-xs text-muted-foreground">{bookmark.type} | {bookmark.tag}</p>
             <Link href={bookmark.href} className="inline-flex items-center gap-2 text-sm text-sky-300 hover:text-sky-200">
               <Bookmark className="h-4 w-4" />
               Open bookmark

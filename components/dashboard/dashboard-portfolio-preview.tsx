@@ -20,21 +20,21 @@ export function DashboardPortfolioPreviewSection({
       title="Portfolio Preview"
       description="Turn completed missions and learning milestones into career artifacts."
     >
-      <article className="surface-panel-hover space-y-3 rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+      <article className="content-card surface-panel-hover space-y-3 p-4">
         <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className="rounded-lg border border-slate-800/80 bg-slate-900/50 p-2.5">
-            <p className="text-slate-500">Total entries</p>
-            <p className="mt-1 text-base font-semibold text-slate-100">{totalEntries}</p>
+          <div className="track-info-box p-2.5">
+            <p className="track-info-label">Total entries</p>
+            <p className="track-info-value mt-1 text-base font-semibold">{totalEntries}</p>
           </div>
-          <div className="rounded-lg border border-slate-800/80 bg-slate-900/50 p-2.5">
-            <p className="text-slate-500">Mission artifacts</p>
-            <p className="mt-1 text-base font-semibold text-slate-100">{missionArtifacts}</p>
+          <div className="track-info-box p-2.5">
+            <p className="track-info-label">Mission artifacts</p>
+            <p className="track-info-value mt-1 text-base font-semibold">{missionArtifacts}</p>
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-800/80 bg-slate-900/50 p-2.5 text-xs">
-          <p className="text-slate-500">Latest artifact</p>
-          <p className="mt-1 line-clamp-2 text-slate-200">{recentEntryTitle ?? "Complete a mission to create your first entry."}</p>
+        <div className="track-info-box p-2.5 text-xs">
+          <p className="track-info-label">Latest artifact</p>
+          <p className="track-info-value mt-1 line-clamp-2">{recentEntryTitle ?? "Complete a mission to create your first entry."}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">

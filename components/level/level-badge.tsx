@@ -7,11 +7,11 @@ type LevelBadgeProps = {
 };
 
 const levelStyles: Record<LevelTier, string> = {
-  Beginner: "border-slate-600 bg-slate-700/60 text-slate-100",
-  Explorer: "border-sky-400/40 bg-sky-500/15 text-sky-200",
-  Professional: "border-violet-400/40 bg-violet-500/15 text-violet-200",
-  Expert: "border-orange-400/40 bg-orange-500/15 text-orange-200",
-  Master: "border-emerald-400/40 bg-emerald-500/15 text-emerald-200",
+  Beginner: "level-beginner",
+  Explorer: "level-explorer",
+  Professional: "level-professional",
+  Expert: "level-expert",
+  Master: "level-master",
 };
 
 export function LevelBadge({ level, className }: LevelBadgeProps) {

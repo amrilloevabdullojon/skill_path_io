@@ -13,7 +13,7 @@ export function SpeedReviewMode({ cards }: { cards: ReviewCard[] }) {
   if (!current) {
     return (
       <section className="surface-elevated p-5">
-        <p className="text-sm text-slate-400">No review cards yet.</p>
+        <p className="text-sm text-muted-foreground">No review cards yet.</p>
       </section>
     );
   }
@@ -28,15 +28,15 @@ export function SpeedReviewMode({ cards }: { cards: ReviewCard[] }) {
 
       <article className="surface-elevated space-y-4 p-5">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-semibold text-slate-100">Card {index + 1}/{cards.length}</p>
-          <span className="rounded-full border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs text-slate-300">
+          <p className="text-sm font-semibold text-foreground">Card {index + 1}/{cards.length}</p>
+          <span className="chip-neutral px-2.5 py-1 text-xs">
             {current.type}
           </span>
         </div>
 
         <div className="surface-subtle space-y-2 p-4">
-          <p className="text-lg font-semibold text-slate-100">{current.title}</p>
-          <p className="text-sm text-slate-300">{current.detail}</p>
+          <p className="text-lg font-semibold text-foreground">{current.title}</p>
+          <p className="text-sm text-muted-foreground">{current.detail}</p>
         </div>
 
         <div className="flex flex-wrap gap-2">

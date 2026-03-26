@@ -55,15 +55,15 @@ export default async function PermissionsPage() {
       ) : (
         <>
           {/* Desktop table */}
-          <div className="hidden overflow-x-auto rounded-xl border border-slate-800 md:block">
+          <div className="hidden overflow-x-auto rounded-xl border border-border md:block">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-900/60">
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.email")}</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.role")}</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400 hidden lg:table-cell">{t("columns.permissions")}</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.status")}</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400 hidden sm:table-cell">{t("columns.created")}</th>
+                <tr className="border-b border-border bg-card">
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("columns.email")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("columns.role")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">{t("columns.permissions")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("columns.status")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">{t("columns.created")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -74,11 +74,11 @@ export default async function PermissionsPage() {
                       key={role.id}
                       className={
                         idx % 2 === 0
-                          ? "border-b border-slate-800/50 bg-slate-950/30"
-                          : "border-b border-slate-800/50 bg-slate-900/20"
+                          ? "border-b border-border bg-background/30"
+                          : "border-b border-border bg-card/20"
                       }
                     >
-                      <td className="px-4 py-3 font-mono text-xs text-slate-200">{role.email}</td>
+                      <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{role.email}</td>
                       <td className="px-4 py-3">
                         <span
                           className={`inline-flex rounded-lg border px-2 py-0.5 text-xs font-semibold ${ROLE_COLORS[role.role]}`}
@@ -91,13 +91,13 @@ export default async function PermissionsPage() {
                           {permissions.slice(0, 4).map((perm) => (
                             <span
                               key={perm}
-                              className="rounded border border-slate-700 bg-slate-800/60 px-1.5 py-0.5 font-mono text-xs text-slate-300"
+                              className="chip-neutral font-mono"
                             >
                               {perm}
                             </span>
                           ))}
                           {permissions.length > 4 && (
-                            <span className="rounded border border-slate-700 bg-slate-800/60 px-1.5 py-0.5 text-xs text-slate-500">
+                            <span className="chip-neutral">
                               {t("morePermissions", { count: permissions.length - 4 })}
                             </span>
                           )}
@@ -105,12 +105,12 @@ export default async function PermissionsPage() {
                       </td>
                       <td className="px-4 py-3">
                         <span
-                          className={`inline-flex rounded-lg border px-2 py-0.5 text-xs font-semibold ${role.isActive ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300" : "border-slate-600/40 bg-slate-700/30 text-slate-400"}`}
+                          className={`inline-flex rounded-lg border px-2 py-0.5 text-xs font-semibold ${role.isActive ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300" : "border-border bg-card text-muted-foreground"}`}
                         >
                           {role.isActive ? t("active") : t("inactive")}
                         </span>
                       </td>
-                      <td className="hidden px-4 py-3 text-xs text-slate-500 sm:table-cell">
+                      <td className="hidden px-4 py-3 text-xs text-muted-foreground sm:table-cell">
                         {role.createdAt.toLocaleDateString("ru-RU")}
                       </td>
                     </tr>
@@ -133,30 +133,30 @@ export default async function PermissionsPage() {
                       {ROLE_LABELS[role.role]}
                     </span>
                     <span
-                      className={`inline-flex rounded-lg border px-2 py-0.5 text-xs font-semibold ${role.isActive ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300" : "border-slate-600/40 bg-slate-700/30 text-slate-400"}`}
+                      className={`inline-flex rounded-lg border px-2 py-0.5 text-xs font-semibold ${role.isActive ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300" : "border-border bg-card text-muted-foreground"}`}
                     >
                       {role.isActive ? t("active") : t("inactive")}
                     </span>
                   </div>
-                  <p className="font-mono text-xs text-slate-200">{role.email}</p>
+                  <p className="font-mono text-xs text-muted-foreground">{role.email}</p>
                   {permissions.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       {permissions.slice(0, 6).map((perm) => (
                         <span
                           key={perm}
-                          className="rounded border border-slate-700 bg-slate-800/60 px-1.5 py-0.5 font-mono text-xs text-slate-300"
+                          className="chip-neutral font-mono"
                         >
                           {perm}
                         </span>
                       ))}
                       {permissions.length > 6 && (
-                        <span className="rounded border border-slate-700 bg-slate-800/60 px-1.5 py-0.5 text-xs text-slate-500">
+                        <span className="chip-neutral">
                           {t("morePermissions", { count: permissions.length - 6 })}
                         </span>
                       )}
                     </div>
                   )}
-                  <p className="text-xs text-slate-500">{role.createdAt.toLocaleDateString("ru-RU")}</p>
+                  <p className="text-xs text-muted-foreground">{role.createdAt.toLocaleDateString("ru-RU")}</p>
                 </article>
               );
             })}
@@ -172,7 +172,7 @@ export default async function PermissionsPage() {
               <span className={`inline-flex rounded-lg border px-2 py-0.5 text-xs font-semibold ${ROLE_COLORS[roleKey]}`}>
                 {ROLE_LABELS[roleKey]}
               </span>
-              <ul className="space-y-0.5 text-xs text-slate-400">
+              <ul className="space-y-0.5 text-xs text-muted-foreground">
                 {roleKey === "SUPER_ADMIN" && (
                   <>
                     <li>All permissions granted</li>

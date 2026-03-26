@@ -32,7 +32,7 @@ export function Drawer({ open, onClose, title, side = "right", className, childr
 
   return (
     <div className="fixed inset-0 z-[90]" role="dialog" aria-modal="true">
-      <button type="button" className="absolute inset-0 bg-slate-950/65" onClick={onClose} aria-label="Close drawer" />
+      <button type="button" className="overlay-backdrop-drawer absolute inset-0" onClick={onClose} aria-label="Close drawer" />
       <aside
         className={cn(
           "surface-elevated absolute bottom-0 top-0 w-[min(92vw,25rem)] p-4 transition-transform duration-300 ease-smooth",
@@ -41,7 +41,7 @@ export function Drawer({ open, onClose, title, side = "right", className, childr
         )}
       >
         <header className="mb-3 flex items-center justify-between gap-3">
-          {title ? <h2 className="text-base font-semibold text-slate-100">{title}</h2> : <span />}
+          {title ? <h2 className="overlay-title text-base">{title}</h2> : <span />}
           <button type="button" onClick={onClose} className="btn-secondary h-9 w-9 p-0" aria-label="Close">
             <X className="h-4 w-4" />
           </button>

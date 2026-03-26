@@ -123,13 +123,13 @@ export function StudioEntitiesPage({ type, title, description }: StudioEntitiesP
   return (
     <section className="surface-elevated space-y-4 p-5">
       <header className="space-y-2">
-        <h1 className="text-2xl font-semibold text-slate-100">{title}</h1>
-        <p className="text-sm text-slate-400">{description}</p>
+        <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </header>
 
       <div className="grid gap-3 md:grid-cols-[1fr_220px]">
         <label className="relative">
-          <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
+          <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
           <input
             className="input-base pl-9"
             value={query}

@@ -49,8 +49,8 @@ export function LocalLoginPanel() {
     <div className="surface-elevated space-y-4 p-5 sm:p-6">
       <div>
         <p className="kicker">Demo access</p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-100">Continue to your workspace</h2>
-        <p className="mt-2 text-sm text-slate-400">
+        <h2 className="mt-2 text-2xl font-semibold text-foreground">Continue to your workspace</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
           Choose a role to preview student or admin flows locally.
         </p>
       </div>
@@ -66,7 +66,7 @@ export function LocalLoginPanel() {
               type="button"
               onClick={() => handleLogin(user.role)}
               disabled={Boolean(pendingRole)}
-              className="surface-subtle surface-panel-hover flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:border-slate-600"
+              className="surface-subtle surface-panel-hover flex w-full items-center justify-between gap-3 p-4 text-left transition-colors"
             >
               <div className="flex min-w-0 items-center gap-3">
                 <span
@@ -79,16 +79,16 @@ export function LocalLoginPanel() {
                   <Icon className="h-5 w-5" />
                 </span>
                 <div className="min-w-0">
-                  <p className="font-semibold text-slate-100">
+                  <p className="font-semibold text-foreground">
                     Continue as {user.role === "ADMIN" ? "Admin" : "Student"}
                   </p>
-                  <p className="truncate text-xs text-slate-400">{user.email}</p>
+                  <p className="truncate text-xs text-muted-foreground">{user.email}</p>
                 </div>
               </div>
               {isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin text-slate-300" />
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
               ) : (
-                <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Enter</span>
+                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Enter</span>
               )}
             </button>
           );

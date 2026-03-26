@@ -29,20 +29,20 @@ export function TeamLearningHub({ team, isLocked, upgradePlanId }: TeamLearningH
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <article className="surface-elevated p-4">
-          <p className="text-xs text-slate-500">Members</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-100">{team.members.length}</p>
+          <p className="text-xs text-muted-foreground">Members</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{team.members.length}</p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="text-xs text-slate-500">Average progress</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-100">{team.averageProgress}%</p>
+          <p className="text-xs text-muted-foreground">Average progress</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{team.averageProgress}%</p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="text-xs text-slate-500">Learning velocity</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-100">{team.averageVelocity}</p>
+          <p className="text-xs text-muted-foreground">Learning velocity</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{team.averageVelocity}</p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="text-xs text-slate-500">Skill clusters</p>
-          <p className="mt-1 text-2xl font-semibold text-slate-100">{team.skillDistribution.length}</p>
+          <p className="text-xs text-muted-foreground">Skill clusters</p>
+          <p className="mt-1 text-2xl font-semibold text-foreground">{team.skillDistribution.length}</p>
         </article>
       </div>
 
@@ -53,15 +53,15 @@ export function TeamLearningHub({ team, isLocked, upgradePlanId }: TeamLearningH
             <article key={member.userId} className="surface-subtle space-y-2 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p className="text-sm font-semibold text-slate-100">{member.name}</p>
-                  <p className="text-xs text-slate-500">{member.role} | {member.assignedTrack}</p>
+                  <p className="text-sm font-semibold text-foreground">{member.name}</p>
+                  <p className="text-xs text-muted-foreground">{member.role} | {member.assignedTrack}</p>
                 </div>
-                <p className="text-sm font-semibold text-slate-100">{member.progressPercent}%</p>
+                <p className="text-sm font-semibold text-foreground">{member.progressPercent}%</p>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-slate-800">
+              <div className="progress-track h-2">
                 <div className="h-full rounded-full bg-sky-400 transition-all duration-500" style={{ width: `${member.progressPercent}%` }} />
               </div>
-              <p className="text-xs text-slate-400">Velocity: {member.velocity} | Strongest: {member.strongestSkill}</p>
+              <p className="text-xs text-muted-foreground">Velocity: {member.velocity} | Strongest: {member.strongestSkill}</p>
             </article>
           ))}
         </div>
@@ -72,8 +72,8 @@ export function TeamLearningHub({ team, isLocked, upgradePlanId }: TeamLearningH
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {team.skillDistribution.map((item) => (
             <article key={item.skill} className="surface-subtle p-4">
-              <p className="text-sm font-semibold text-slate-100">{item.skill}</p>
-              <p className="mt-1 text-xs text-slate-400">{item.members} team members</p>
+              <p className="text-sm font-semibold text-foreground">{item.skill}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{item.members} team members</p>
             </article>
           ))}
         </div>

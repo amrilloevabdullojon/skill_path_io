@@ -47,7 +47,7 @@ function SortableModuleRow({ id, title, status, selected, onSelect }: SortableMo
       style={{ transform: CSS.Transform.toString(transform), transition }}
       onClick={onSelect}
       className={`flex w-full items-center justify-between gap-2 rounded-xl border px-2.5 py-2 text-left text-sm ${
-        selected ? "border-sky-400/50 bg-sky-500/10 text-sky-100" : "border-slate-700 bg-slate-900/80 text-slate-200"
+        selected ? "border-sky-400/50 bg-sky-500/10 text-sky-100" : "border-border bg-card/80 text-muted-foreground"
       }`}
     >
       <span className="inline-flex items-center gap-2">
@@ -55,13 +55,13 @@ function SortableModuleRow({ id, title, status, selected, onSelect }: SortableMo
           {...attributes}
           {...listeners}
           onClick={(event) => event.stopPropagation()}
-          className="cursor-grab rounded-md border border-slate-700 p-1 text-slate-500 active:cursor-grabbing"
+          className="cursor-grab rounded-md border border-border p-1 text-muted-foreground active:cursor-grabbing"
         >
           <GripVertical className="h-3.5 w-3.5" />
         </span>
         {title}
       </span>
-      <span className="text-[10px] uppercase tracking-wide text-slate-500">{status}</span>
+      <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{status}</span>
     </button>
   );
 }
@@ -99,7 +99,7 @@ export function StructureTree({
   return (
     <aside className="surface-elevated space-y-3 p-4 xl:sticky xl:top-24 xl:h-[calc(100vh-150px)] xl:overflow-y-auto">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-slate-100">Structure tree</p>
+        <p className="text-sm font-semibold text-foreground">Structure tree</p>
         <button type="button" className="btn-secondary px-2 py-1 text-xs" onClick={onAddModule}>
           <Plus className="h-3.5 w-3.5" />
         </button>
@@ -111,7 +111,7 @@ export function StructureTree({
         className={`w-full rounded-xl border px-3 py-2 text-left text-sm ${
           selected.type === "course"
             ? "border-sky-400/50 bg-sky-500/10 text-sky-100"
-            : "border-slate-700 bg-slate-900/80 text-slate-200"
+            : "border-border bg-card/80 text-muted-foreground"
         }`}
       >
         {entity.course.title}
@@ -128,7 +128,7 @@ export function StructureTree({
               const cases = entity.cases.filter((caseItem) => caseItem.moduleId === moduleItem.id);
               const collapsed = Boolean(collapsedModules[moduleItem.id]);
               return (
-                <div key={moduleItem.id} className="space-y-1 rounded-xl border border-slate-800 bg-slate-950/65 p-2">
+                <div key={moduleItem.id} className="content-card space-y-1 p-2">
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
@@ -173,7 +173,7 @@ export function StructureTree({
                           </span>
                         ) : null}
                         {moduleItem.unlockRule.hiddenByDefault ? (
-                          <span className="rounded-full border border-slate-600/40 bg-slate-700/40 px-2 py-1 text-[10px] text-slate-300">
+                          <span className="chip-neutral px-2 py-1 text-[10px]">
                             hidden
                           </span>
                         ) : (
@@ -185,27 +185,27 @@ export function StructureTree({
 
                       <div className="space-y-1 pl-2">
                         {lessons.map((item) => (
-                          <button key={item.id} type="button" onClick={() => onSelect({ type: "lesson", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "lesson" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-slate-400 hover:bg-slate-800/70 hover:text-slate-200"}`}>
+                          <button key={item.id} type="button" onClick={() => onSelect({ type: "lesson", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "lesson" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
                             Lesson: {item.title}
                           </button>
                         ))}
                         {quizzes.map((item) => (
-                          <button key={item.id} type="button" onClick={() => onSelect({ type: "quiz", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "quiz" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-slate-400 hover:bg-slate-800/70 hover:text-slate-200"}`}>
+                          <button key={item.id} type="button" onClick={() => onSelect({ type: "quiz", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "quiz" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
                             Quiz: {item.title}
                           </button>
                         ))}
                         {assignments.map((item) => (
-                          <button key={item.id} type="button" onClick={() => onSelect({ type: "assignment", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "assignment" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-slate-400 hover:bg-slate-800/70 hover:text-slate-200"}`}>
+                          <button key={item.id} type="button" onClick={() => onSelect({ type: "assignment", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "assignment" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
                             Assignment: {item.title}
                           </button>
                         ))}
                         {simulations.map((item) => (
-                          <button key={item.id} type="button" onClick={() => onSelect({ type: "simulation", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "simulation" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-slate-400 hover:bg-slate-800/70 hover:text-slate-200"}`}>
+                          <button key={item.id} type="button" onClick={() => onSelect({ type: "simulation", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "simulation" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
                             Simulation: {item.title}
                           </button>
                         ))}
                         {cases.map((item) => (
-                          <button key={item.id} type="button" onClick={() => onSelect({ type: "case", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "case" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-slate-400 hover:bg-slate-800/70 hover:text-slate-200"}`}>
+                          <button key={item.id} type="button" onClick={() => onSelect({ type: "case", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "case" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
                             Case: {item.title}
                           </button>
                         ))}

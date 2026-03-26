@@ -55,14 +55,14 @@ export function DashboardWelcome({ name }: DashboardWelcomeProps) {
           return (
             <article key={step.title} className={`surface-subtle rounded-2xl border p-4 space-y-3 ${step.bg}`}>
               <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-800/80 text-xs font-bold text-slate-300">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-card/80 text-xs font-bold text-muted-foreground">
                   {idx + 1}
                 </span>
                 <Icon className={`h-4 w-4 ${step.color}`} />
               </div>
               <div>
-                <p className="text-sm font-semibold text-slate-100">{step.title}</p>
-                <p className="mt-0.5 text-xs text-slate-400">{step.description}</p>
+                <p className="text-sm font-semibold text-foreground">{step.title}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{step.description}</p>
               </div>
               <Link href={step.href} className="btn-secondary inline-flex h-8 px-3 text-xs">
                 {step.cta}

@@ -42,8 +42,8 @@ export function SubscriptionBillingPanel({ currentPlanId, plans, usage }: Subscr
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-sm font-semibold text-slate-100">{plan.name}</p>
-                  <p className="text-xs text-slate-500">{plan.description}</p>
+                  <p className="text-sm font-semibold text-foreground">{plan.name}</p>
+                  <p className="text-xs text-muted-foreground">{plan.description}</p>
                 </div>
                 {isCurrent ? (
                   <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2 py-0.5 text-[11px] text-sky-200">
@@ -51,11 +51,11 @@ export function SubscriptionBillingPanel({ currentPlanId, plans, usage }: Subscr
                   </span>
                 ) : null}
               </div>
-              <p className="text-2xl font-semibold text-slate-100">${plan.monthlyPriceUsd}</p>
-              <p className="text-xs text-slate-500">Monthly (annual: ${plan.annualPriceUsd})</p>
+              <p className="text-2xl font-semibold text-foreground">${plan.monthlyPriceUsd}</p>
+              <p className="text-xs text-muted-foreground">Monthly (annual: ${plan.annualPriceUsd})</p>
               <ul className="space-y-1">
                 {plan.featureBundle.features.slice(0, 6).map((feature) => (
-                  <li key={feature} className="inline-flex items-center gap-2 text-xs text-slate-300">
+                  <li key={feature} className="inline-flex items-center gap-2 text-xs text-muted-foreground">
                     <Check className="h-3.5 w-3.5 text-emerald-300" />
                     {feature}
                   </li>
@@ -81,7 +81,7 @@ export function SubscriptionBillingPanel({ currentPlanId, plans, usage }: Subscr
             <tbody>
               {allFeatures.map((feature) => (
                 <tr key={feature} className="table-row">
-                  <td className="px-3 py-3 text-slate-300">{feature}</td>
+                  <td className="px-3 py-3 text-muted-foreground">{feature}</td>
                   {plans.map((plan) => {
                     const enabled = plan.featureBundle.features.includes(feature);
                     return (
@@ -89,7 +89,7 @@ export function SubscriptionBillingPanel({ currentPlanId, plans, usage }: Subscr
                         {enabled ? (
                           <Check className="mx-auto h-4 w-4 text-emerald-300" />
                         ) : (
-                          <Lock className="mx-auto h-4 w-4 text-slate-600" />
+                          <Lock className="mx-auto h-4 w-4 text-muted-foreground" />
                         )}
                       </td>
                     );
@@ -106,11 +106,11 @@ export function SubscriptionBillingPanel({ currentPlanId, plans, usage }: Subscr
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {usage.map((item) => (
             <article key={item.meter} className="surface-subtle space-y-2 p-4">
-              <p className="text-xs uppercase tracking-[0.14em] text-slate-500">{item.meter}</p>
-              <p className="text-lg font-semibold text-slate-100">
+              <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">{item.meter}</p>
+              <p className="text-lg font-semibold text-foreground">
                 {item.used} / {formatLimit(item.limit)}
               </p>
-              <p className="text-xs text-slate-400">Window: {item.window}</p>
+              <p className="text-xs text-muted-foreground">Window: {item.window}</p>
               <p className={`text-xs ${item.reached ? "text-rose-300" : "text-emerald-300"}`}>
                 {item.reached ? "Limit reached" : `Remaining: ${item.remaining === null ? "Unlimited" : item.remaining}`}
               </p>

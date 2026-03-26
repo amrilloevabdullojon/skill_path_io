@@ -28,11 +28,11 @@ export function ProductTourOverlay({ steps }: ProductTourOverlayProps) {
   }
 
   return (
-    <div className="fixed bottom-6 left-1/2 z-[90] w-[min(92vw,440px)] -translate-x-1/2 rounded-2xl border border-slate-700 bg-slate-950/96 p-4 shadow-2xl">
-      <p className="text-xs uppercase tracking-[0.16em] text-slate-500">Product tour</p>
-      <p className="mt-2 text-sm font-semibold text-slate-100">{step.title}</p>
-      <p className="mt-1 text-xs text-slate-300">{step.description}</p>
-      <p className="mt-1 text-[11px] text-slate-500">Target section: #{step.targetId}</p>
+    <div className="fixed bottom-6 left-1/2 z-[90] w-[min(92vw,440px)] -translate-x-1/2 rounded-2xl border border-border bg-background p-4 shadow-2xl">
+      <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Product tour</p>
+      <p className="mt-2 text-sm font-semibold text-foreground">{step.title}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{step.description}</p>
+      <p className="mt-1 text-[11px] text-muted-foreground">Target section: #{step.targetId}</p>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
         <button

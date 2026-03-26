@@ -105,8 +105,8 @@ export function MockInterviewPanel() {
     <section className="surface-elevated space-y-5 p-5 sm:p-6">
       <header className="space-y-2">
         <p className="kicker">AI Mock Interview</p>
-        <h1 className="text-2xl font-semibold text-slate-100">Practice real interview flow</h1>
-        <p className="text-sm text-slate-400">
+        <h1 className="text-2xl font-semibold text-foreground">Practice real interview flow</h1>
+        <p className="text-sm text-muted-foreground">
           AI asks questions by track and gives detailed feedback after completion.
         </p>
       </header>
@@ -121,7 +121,7 @@ export function MockInterviewPanel() {
             className={`rounded-xl border px-3 py-2 text-sm font-medium transition ${
               track === item
                 ? "border-sky-400/45 bg-sky-500/12 text-sky-200"
-                : "border-slate-700 bg-slate-900/85 text-slate-300 hover:border-slate-600"
+                : "border-border bg-card/85 text-muted-foreground hover:border-border/70"
             }`}
           >
             {interviewTrackLabel(item)}
@@ -130,7 +130,7 @@ export function MockInterviewPanel() {
       </div>
 
       {questions.length === 0 && (
-        <div className="surface-subtle p-4 text-sm text-slate-400">
+        <div className="surface-subtle p-4 text-sm text-muted-foreground">
           Click a track to start mock interview.
         </div>
       )}
@@ -138,11 +138,11 @@ export function MockInterviewPanel() {
       {questions.length > 0 && !evaluation && currentQuestion && (
         <div className="space-y-4">
           <div className="surface-subtle p-4">
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               Question {currentIndex + 1}/{questions.length}
             </p>
-            <p className="mt-2 text-base font-semibold text-slate-100">{currentQuestion.text}</p>
-            <p className="mt-1 text-xs text-slate-500">Expected focus: {currentQuestion.expectedFocus}</p>
+            <p className="mt-2 text-base font-semibold text-foreground">{currentQuestion.text}</p>
+            <p className="mt-1 text-xs text-muted-foreground">Expected focus: {currentQuestion.expectedFocus}</p>
           </div>
 
           <textarea
@@ -195,12 +195,12 @@ export function MockInterviewPanel() {
       {evaluation && (
         <article className="surface-subtle space-y-4 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-xl font-semibold text-slate-100">Interview Result</h2>
-            <div className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-sm text-slate-200">
+            <h2 className="text-xl font-semibold text-foreground">Interview Result</h2>
+            <div className="chip-neutral inline-flex items-center gap-2 px-3 py-1 text-sm">
               Score: {evaluation.score} | Level: {evaluation.level}
             </div>
           </div>
-          <p className="text-sm text-slate-300">{evaluation.summary}</p>
+          <p className="text-sm text-muted-foreground">{evaluation.summary}</p>
 
           <div className="grid gap-3 md:grid-cols-3">
             <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3">

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-xl bg-slate-800/80", className)} aria-hidden />;
+  return <div className={cn("skeleton rounded-xl", className)} aria-hidden />;
 }
 
 export function TrackCardSkeleton() {
@@ -52,10 +52,10 @@ export function DashboardSectionSkeleton({ rows = 3 }: { rows?: number }) {
 export function LeaderboardSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <div className="surface-elevated overflow-hidden" aria-hidden>
-      <div className="border-b border-slate-800/80 p-5">
+      <div className="border-b border-border p-5">
         <Skeleton className="h-6 w-32" />
       </div>
-      <div className="divide-y divide-slate-800/60">
+      <div className="divide-y divide-border/60">
         {Array.from({ length: rows }).map((_, i) => (
           <div key={i} className="flex items-center gap-3 px-5 py-3">
             <Skeleton className="h-5 w-5 rounded" />

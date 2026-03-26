@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
+import { Manrope } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 
 import "@/styles/globals.css";
-
 import { AppShell } from "@/components/layout/app-shell";
 import { Providers } from "@/components/providers";
+
+const manrope = Manrope({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-manrope",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "SkillPath Academy",
@@ -21,7 +27,15 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className={manrope.variable}>
+      {/* Синхронный скрипт — применяет тему ДО гидратации React, предотвращает мерцание */}
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('sp-theme');var theme=(t==='light'||t==='dark')?t:(window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',theme);}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-background text-foreground">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>

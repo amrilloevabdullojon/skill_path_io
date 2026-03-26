@@ -1,17 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
 
-import { initTheme, useUiStore } from "@/store/use-ui-store";
+import { useUiStore } from "@/store/use-ui-store";
 
 export function ThemeToggle() {
-  const { theme, toggleTheme, setTheme } = useUiStore();
-
-  useEffect(() => {
-    const detected = initTheme();
-    setTheme(detected);
-  }, [setTheme]);
+  const { theme, toggleTheme } = useUiStore();
 
   return (
     <button
@@ -22,9 +16,9 @@ export function ThemeToggle() {
       title={theme === "dark" ? "Light mode" : "Dark mode"}
     >
       {theme === "dark" ? (
-        <Sun className="h-4 w-4 text-slate-300" />
+        <Sun className="h-4 w-4 text-muted-foreground" />
       ) : (
-        <Moon className="h-4 w-4 text-slate-600" />
+        <Moon className="h-4 w-4 text-muted-foreground" />
       )}
     </button>
   );

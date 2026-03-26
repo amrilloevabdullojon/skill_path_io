@@ -22,21 +22,21 @@ export function JobMatchingBoard({ jobs }: { jobs: JobMatchResult[] }) {
           <article key={job.id} className="surface-elevated space-y-4 p-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-lg font-semibold text-slate-100">{job.title}</p>
-                <p className="text-xs text-slate-500">{job.level} | {job.location}</p>
+                <p className="text-lg font-semibold text-foreground">{job.title}</p>
+                <p className="text-xs text-muted-foreground">{job.level} | {job.location}</p>
               </div>
               <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${matchTone(job.matchPercent)}`}>
                 {job.matchPercent}% match
               </span>
             </div>
 
-            <p className="text-sm text-slate-300">{job.description}</p>
+            <p className="text-sm text-muted-foreground">{job.description}</p>
 
             <div>
-              <p className="text-xs uppercase tracking-wide text-slate-500">Required skills</p>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Required skills</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {job.requiredSkills.map((skill) => (
-                  <span key={skill} className="rounded-full border border-slate-700 bg-slate-900/80 px-2.5 py-1 text-xs text-slate-200">
+                  <span key={skill} className="chip-neutral px-2.5 py-1 text-xs">
                     {skill}
                   </span>
                 ))}
@@ -44,12 +44,12 @@ export function JobMatchingBoard({ jobs }: { jobs: JobMatchResult[] }) {
             </div>
 
             <div className="surface-subtle space-y-2 p-3">
-              <p className="inline-flex items-center gap-2 text-xs font-semibold text-slate-200">
+              <p className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground">
                 <Briefcase className="h-4 w-4 text-sky-300" />
                 Missing requirements
               </p>
               {job.missingRequirements.length > 0 ? (
-                <ul className="list-disc space-y-1 pl-4 text-xs text-slate-300">
+                <ul className="list-disc space-y-1 pl-4 text-xs text-muted-foreground">
                   {job.missingRequirements.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
@@ -67,7 +67,7 @@ export function JobMatchingBoard({ jobs }: { jobs: JobMatchResult[] }) {
               {job.recommendation}
             </p>
 
-            <p className="inline-flex items-center gap-2 text-xs text-slate-500">
+            <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
               <CircleAlert className="h-3.5 w-3.5" />
               Mock vacancies now, easily replaceable with real source/API.
             </p>

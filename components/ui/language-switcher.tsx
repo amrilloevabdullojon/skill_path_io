@@ -24,7 +24,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "flex items-center gap-0.5 rounded-xl border border-slate-700/70 bg-slate-900/70 p-0.5",
+        "lang-switcher flex items-center gap-0.5 p-0.5",
         className,
       )}
       aria-label={t("switchTo")}
@@ -37,9 +37,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
           aria-pressed={currentLocale === code}
           className={cn(
             "h-8 rounded-lg px-2.5 text-xs font-semibold transition-colors",
-            currentLocale === code
-              ? "bg-slate-700 text-slate-100"
-              : "text-slate-400 hover:bg-slate-800 hover:text-slate-100",
+            currentLocale === code ? "lang-btn-active" : "lang-btn",
           )}
         >
           {label}

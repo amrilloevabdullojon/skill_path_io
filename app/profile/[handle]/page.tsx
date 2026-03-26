@@ -22,7 +22,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
   if (!dashboard) {
     return (
       <section className="page-shell">
-        <div className="surface-elevated p-6 text-sm text-slate-400">Profile not found.</div>
+        <div className="surface-elevated p-6 text-sm text-muted-foreground">Profile not found.</div>
       </section>
     );
   }

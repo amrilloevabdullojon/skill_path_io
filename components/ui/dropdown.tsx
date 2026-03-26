@@ -114,7 +114,7 @@ export function Dropdown({ trigger, items, align = "right", className }: Dropdow
               {items.map((item) => {
                 const itemClassName = cn(
                   "flex w-full items-center rounded-lg px-3 py-2 text-left text-sm transition-colors",
-                  item.destructive ? "text-rose-200 hover:bg-rose-500/10" : "text-slate-200 hover:bg-slate-800/70",
+                  item.destructive ? "dropdown-item-destructive" : "dropdown-item",
                 );
 
                 if (item.href) {

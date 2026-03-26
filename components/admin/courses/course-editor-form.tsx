@@ -40,8 +40,8 @@ export function CourseEditorForm({ courseId }: CourseEditorFormProps) {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="kicker">Course metadata</p>
-          <h1 className="text-2xl font-semibold text-slate-100">{course.title}</h1>
-          <p className="text-sm text-slate-400">Version {course.version} | Last update {new Date(course.updatedAt).toLocaleString()}</p>
+          <h1 className="text-2xl font-semibold text-foreground">{course.title}</h1>
+          <p className="text-sm text-muted-foreground">Version {course.version} | Last update {new Date(course.updatedAt).toLocaleString()}</p>
         </div>
         <div className="flex items-center gap-2">
           <StudioStatusBadge status={course.status} />
@@ -92,7 +92,7 @@ export function CourseEditorForm({ courseId }: CourseEditorFormProps) {
 
       <div className="grid gap-3 md:grid-cols-2">
         <div className="surface-subtle p-4">
-          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Publishing workflow</p>
+          <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Publishing workflow</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {statusOptions.map((item) => (
               <button
@@ -100,7 +100,7 @@ export function CourseEditorForm({ courseId }: CourseEditorFormProps) {
                 type="button"
                 onClick={() => setCourseStatus(courseId, item)}
                 className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${
-                  item === course.status ? "border-sky-400/45 bg-sky-500/15 text-sky-200" : "border-slate-700 bg-slate-900/85 text-slate-300"
+                  item === course.status ? "border-sky-400/45 bg-sky-500/15 text-sky-200" : "chip-neutral"
                 }`}
               >
                 {item}
@@ -109,7 +109,7 @@ export function CourseEditorForm({ courseId }: CourseEditorFormProps) {
           </div>
         </div>
         <div className="surface-subtle p-4">
-          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Version history</p>
+          <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Version history</p>
           <input className="input-base mt-3" value={versionNote} onChange={(event) => setVersionNote(event.target.value)} placeholder="Changelog note" />
           <Button className="mt-2 w-full gap-2" onClick={() => addVersion(courseId, versionNote)}>
             <Save className="h-4 w-4" />

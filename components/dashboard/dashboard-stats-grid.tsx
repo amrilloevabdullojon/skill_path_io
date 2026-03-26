@@ -35,7 +35,7 @@ export function DashboardStatsGrid({ stats }: DashboardStatsGridProps) {
   return (
     <section className="space-y-5">
       <div className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-400">Primary stats</h2>
+        <h2 className="data-label font-semibold text-sm">Primary stats</h2>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {primaryStats.map((stat) => (
             <MetricCard
@@ -49,7 +49,7 @@ export function DashboardStatsGrid({ stats }: DashboardStatsGridProps) {
         </div>
       </div>
       <div className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-400">Learning stats</h2>
+        <h2 className="data-label font-semibold text-sm">Learning stats</h2>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {learningStats.map((stat) => (
             <MetricCard

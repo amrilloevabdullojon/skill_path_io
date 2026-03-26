@@ -69,7 +69,7 @@ export default async function DashboardPage({
   }
 
   return (
-    <section className="page-shell text-slate-100">
+    <section className="page-shell text-foreground">
       <DashboardLayout
         topbar={
           <DashboardTopbar
@@ -137,14 +137,14 @@ export default async function DashboardPage({
                     Manage plan
                   </Link>
                 </div>
-                <p className="text-sm text-slate-300">
+                <p className="text-sm text-muted-foreground">
                   Plan: {data.subscription.plan.name} ({data.subscription.state.planId})
                 </p>
                 <div className="grid gap-2 md:grid-cols-2">
                   {data.subscription.usage.slice(0, 4).map((usage) => (
                     <article key={usage.meter} className="surface-subtle p-3">
-                      <p className="text-xs text-slate-500">{usage.meter}</p>
-                      <p className="text-sm font-semibold text-slate-100">
+                      <p className="text-xs text-muted-foreground">{usage.meter}</p>
+                      <p className="text-sm font-semibold text-foreground">
                         {usage.used} / {usage.limit === null ? "Unlimited" : usage.limit}
                       </p>
                     </article>
@@ -180,8 +180,8 @@ export default async function DashboardPage({
               <div className="grid gap-3 md:grid-cols-2">
                 {data.smartRecommendations.map((item) => (
                   <article key={item.id} className="surface-subtle space-y-1 p-3">
-                    <p className="text-sm font-semibold text-slate-100">{item.title}</p>
-                    <p className="text-xs text-slate-400">{item.reason}</p>
+                    <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                    <p className="text-xs text-muted-foreground">{item.reason}</p>
                     <Link href={item.href} className="text-xs text-sky-300 hover:text-sky-200">
                       Open
                     </Link>
@@ -193,10 +193,7 @@ export default async function DashboardPage({
               <h2 className="section-title">Gamification achievements</h2>
               <div className="flex flex-wrap gap-2">
                 {data.saasGamification.badges.map((badge) => (
-                  <span
-                    key={badge.id}
-                    className="rounded-full border border-slate-700 bg-slate-900/80 px-2.5 py-1 text-xs text-slate-200"
-                  >
+                  <span key={badge.id} className="chip-neutral px-2.5 py-1 text-xs">
                     {badge.label}
                   </span>
                 ))}
@@ -204,9 +201,9 @@ export default async function DashboardPage({
               <div className="grid gap-2 md:grid-cols-2">
                 {data.saasGamification.achievements.map((achievement) => (
                   <article key={achievement.id} className="surface-subtle p-3">
-                    <p className="text-sm font-semibold text-slate-100">{achievement.title}</p>
-                    <p className="text-xs text-slate-400">{achievement.description}</p>
-                    <p className={`text-xs ${achievement.unlocked ? "text-emerald-300" : "text-slate-500"}`}>
+                    <p className="text-sm font-semibold text-foreground">{achievement.title}</p>
+                    <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                    <p className={`text-xs ${achievement.unlocked ? "text-emerald-300" : "text-muted-foreground"}`}>
                       {achievement.unlocked ? "Unlocked" : "Locked"}
                     </p>
                   </article>
@@ -241,13 +238,13 @@ export default async function DashboardPage({
                   Open hiring marketplace
                 </Link>
               </div>
-              <p className="text-sm text-slate-300">Public profile URL: {data.growth.publicProfileUrl}</p>
+              <p className="text-sm text-muted-foreground">Public profile URL: {data.growth.publicProfileUrl}</p>
               <div className="grid gap-2 md:grid-cols-2">
                 {data.jobMarketplace.topMatches.slice(0, 2).map((item) => (
                   <article key={item.roleId} className="surface-subtle p-3">
-                    <p className="text-sm font-semibold text-slate-100">{item.title}</p>
-                    <p className="text-xs text-slate-400">Match: {item.matchPercent}%</p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                    <p className="text-xs text-muted-foreground">Match: {item.matchPercent}%</p>
+                    <p className="text-xs text-muted-foreground">
                       Missing: {item.missingSkills.length > 0 ? item.missingSkills.join(", ") : "None"}
                     </p>
                   </article>

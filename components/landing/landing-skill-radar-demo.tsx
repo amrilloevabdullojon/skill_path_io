@@ -52,7 +52,7 @@ export function LandingSkillRadarDemo() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <p className="kicker">Interactive demo</p>
-            <h3 className="mt-1 text-xl font-semibold text-slate-100">Skill growth radar</h3>
+            <h3 className="mt-1 text-xl font-semibold text-foreground">Skill growth radar</h3>
           </div>
           <span className="inline-flex items-center gap-1 rounded-full border border-violet-400/35 bg-violet-500/15 px-2.5 py-1 text-[11px] text-violet-200">
             <Sparkles className="h-3.5 w-3.5" />
@@ -60,7 +60,7 @@ export function LandingSkillRadarDemo() {
           </span>
         </div>
 
-        <div className="mt-4 h-[20rem] min-w-0 rounded-xl border border-slate-800 bg-slate-950/60 p-2 sm:p-3">
+        <div className="content-card mt-4 h-[20rem] min-w-0 p-2 sm:p-3">
           <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={240}>
             <RadarChart data={chartData} margin={{ top: 20, right: 30, left: 30, bottom: 20 }}>
               <PolarGrid stroke="#334155" strokeOpacity={0.7} />
@@ -84,7 +84,7 @@ export function LandingSkillRadarDemo() {
                 "rounded-full border px-3 py-1 text-xs transition-colors",
                 activeSkill === skill
                   ? "border-sky-400/35 bg-sky-500/15 text-sky-200"
-                  : "border-slate-700 bg-slate-900/75 text-slate-300 hover:border-slate-600",
+                  : "border-border bg-card/75 text-muted-foreground hover:border-border/70",
               )}
             >
               {skill}
@@ -101,16 +101,16 @@ export function LandingSkillRadarDemo() {
         transition={{ duration: 0.42 }}
       >
         <article className="surface-elevated p-4">
-          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Strongest skill</p>
-          <p className="mt-1 text-lg font-semibold text-slate-100">{strongestSkill}</p>
+          <p className="data-label">Strongest skill</p>
+          <p className="mt-1 text-lg font-semibold text-foreground">{strongestSkill}</p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Next focus</p>
-          <p className="mt-1 text-lg font-semibold text-slate-100">Automation</p>
-          <p className="mt-1 text-xs text-slate-400">Boost interview readiness by adding one automation sprint.</p>
+          <p className="data-label">Next focus</p>
+          <p className="mt-1 text-lg font-semibold text-foreground">Automation</p>
+          <p className="mt-1 text-xs text-muted-foreground">Boost interview readiness by adding one automation sprint.</p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Projected growth</p>
+          <p className="data-label">Projected growth</p>
           <p className="mt-1 text-lg font-semibold text-emerald-200">+12% in 6 weeks</p>
           <p className="mt-1 inline-flex items-center gap-1 text-xs text-sky-300">
             Open personalized roadmap

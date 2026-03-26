@@ -54,9 +54,9 @@ const moduleStateView: Record<
 > = {
   locked: {
     label: "Locked",
-    badge: "border-slate-700 bg-slate-800/85 text-slate-300",
-    dot: "bg-slate-600",
-    panel: "border-slate-700/80 bg-slate-900/65",
+    badge: "border-border bg-card/85 text-muted-foreground",
+    dot: "bg-border",
+    panel: "border-border/80 bg-card/65",
   },
   available: {
     label: "Available",
@@ -81,7 +81,7 @@ const moduleStateView: Record<
 const statusView = {
   [ProgressStatus.NOT_STARTED]: {
     label: "Not started",
-    badge: "bg-slate-800 text-slate-300",
+    badge: "bg-card text-muted-foreground",
   },
   [ProgressStatus.IN_PROGRESS]: {
     label: "In progress",
@@ -339,18 +339,18 @@ export default async function ModulePage({ params }: ModulePageProps) {
   return (
     <>
       <section className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)] sm:gap-6">
-        <aside className="surface-elevated space-y-6 p-4 text-slate-100 sm:p-5 xl:sticky xl:top-20 xl:h-[calc(100vh-6rem)] xl:overflow-y-auto">
+        <aside className="surface-elevated space-y-6 p-4 text-foreground sm:p-5 xl:sticky xl:top-20 xl:h-[calc(100vh-6rem)] xl:overflow-y-auto">
           <div className="space-y-2">
             <p className="kicker">Track progress</p>
             <h2 className="text-lg font-semibold">{track.title}</h2>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-muted-foreground">
               {completedCount}/{track.modules.length} modules completed
             </p>
-            <div className="h-2 overflow-hidden rounded-full bg-slate-800">
+            <div className="progress-track h-2">
               <div className="h-full rounded-full bg-sky-400 transition-all duration-500" style={{ width: `${progressPercent}%` }} />
             </div>
-            <p className="text-xs text-slate-400">{progressPercent}% overall</p>
-            {isDemoUser && user ? <p className="text-xs text-slate-500">Demo user: {user.email}</p> : null}
+            <p className="text-xs text-muted-foreground">{progressPercent}% overall</p>
+            {isDemoUser && user ? <p className="text-xs text-muted-foreground">Demo user: {user.email}</p> : null}
           </div>
 
           <div className="space-y-2">
@@ -365,15 +365,15 @@ export default async function ModulePage({ params }: ModulePageProps) {
                     key={moduleItem.id}
                     href={`/tracks/${track.slug}/modules/${moduleItem.id}`}
                     className={cn(
-                      "surface-panel-hover block rounded-xl border border-slate-800 bg-slate-900/80 p-3",
-                      isCurrent && "border-sky-500/60 bg-slate-900",
+                      "surface-panel-hover block rounded-xl border border-border bg-card/80 p-3",
+                      isCurrent && "border-sky-500/60 bg-card",
                       moduleItem.state === "locked" && "pointer-events-none opacity-60",
                     )}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-xs text-slate-400">Module {moduleItem.order}</p>
-                        <p className="break-words text-sm font-medium text-slate-100">{moduleItem.title}</p>
+                        <p className="text-xs text-muted-foreground">Module {moduleItem.order}</p>
+                        <p className="break-words text-sm font-medium text-foreground">{moduleItem.title}</p>
                       </div>
                       <span className={cn("mt-0.5 h-2.5 w-2.5 rounded-full", stateStyle.dot)} />
                     </div>
@@ -381,7 +381,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
                       <span className={cn("inline-flex rounded-full border px-2 py-0.5 text-[11px] font-medium", stateStyle.badge)}>
                         {stateStyle.label}
                       </span>
-                      <span className="text-[11px] text-slate-400">{moduleItem.progressPercent}%</span>
+                      <span className="text-[11px] text-muted-foreground">{moduleItem.progressPercent}%</span>
                     </div>
                   </Link>
                 );
@@ -391,16 +391,16 @@ export default async function ModulePage({ params }: ModulePageProps) {
 
           <div className="space-y-2">
             <p className="kicker">Lesson checkpoints</p>
-            <div className="space-y-1.5 rounded-2xl border border-slate-800 bg-slate-900/55 p-2">
+            <div className="space-y-1.5 rounded-2xl border border-border bg-card/55 p-2">
               {timelineNodes.map((node) => {
                 const style = moduleStateView[node.state];
                 return (
-                  <div key={node.id} className="rounded-xl border border-slate-800/70 bg-slate-900/70 px-2.5 py-2">
+                  <div key={node.id} className="rounded-xl border border-border/70 bg-card/70 px-2.5 py-2">
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-xs font-medium text-slate-200">{node.title}</p>
+                      <p className="text-xs font-medium text-foreground">{node.title}</p>
                       <span className={cn("mt-0.5 h-2 w-2 rounded-full", style.dot)} />
                     </div>
-                    <p className="mt-1 text-[11px] text-slate-500">{timelineKindLabel(node.kind)}</p>
+                    <p className="mt-1 text-[11px] text-muted-foreground">{timelineKindLabel(node.kind)}</p>
                   </div>
                 );
               })}
@@ -409,7 +409,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
 
           <nav className="space-y-2">
             <p className="kicker">Lesson navigation</p>
-            <div className="space-y-1 rounded-2xl border border-slate-800 bg-slate-900/55 p-2">
+            <div className="space-y-1 rounded-2xl border border-border bg-card/55 p-2">
               {navLinks.map((item) => (
                 <a key={item.id} href={`#${item.id}`} className="nav-link block">
                   {item.label}
@@ -424,22 +424,22 @@ export default async function ModulePage({ params }: ModulePageProps) {
             <p className="kicker">Module</p>
             <div className="space-y-2">
               <h1 className="break-words text-2xl font-semibold tracking-tight sm:text-3xl">{currentModule.title}</h1>
-              <p className="text-sm text-slate-300">{currentModule.description}</p>
+              <p className="text-sm text-muted-foreground">{currentModule.description}</p>
             </div>
             <div className="flex flex-wrap gap-2 text-xs">
-              <span className="inline-flex items-center gap-1 rounded-full bg-slate-800 px-2.5 py-1 text-slate-300">
+              <span className="chip-neutral inline-flex items-center gap-1 px-2.5 py-1">
                 <Layers3 className="h-3.5 w-3.5" />
                 Module {currentModule.order}/{track.modules.length}
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-slate-800 px-2.5 py-1 text-slate-300">
+              <span className="chip-neutral inline-flex items-center gap-1 px-2.5 py-1">
                 <Clock3 className="h-3.5 w-3.5" />
                 {formatMinutes(currentModule.estimatedDuration)}
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-slate-800 px-2.5 py-1 text-slate-300">
+              <span className="chip-neutral inline-flex items-center gap-1 px-2.5 py-1">
                 <Flag className="h-3.5 w-3.5" />
                 {currentModule.lessons.length} lessons
               </span>
-              <span className="inline-flex items-center gap-1 rounded-full bg-slate-800 px-2.5 py-1 text-slate-300">
+              <span className="chip-neutral inline-flex items-center gap-1 px-2.5 py-1">
                 <Sparkles className="h-3.5 w-3.5" />+{currentModuleCard.xpReward} XP
               </span>
               <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-1", statusView[currentStatus].badge)}>
@@ -464,31 +464,31 @@ export default async function ModulePage({ params }: ModulePageProps) {
             <h2 className="section-title">Module overview</h2>
             <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
               <article className="surface-subtle space-y-3 p-4">
-                <h3 className="text-base font-semibold text-slate-100">Learning objectives</h3>
-                <p className="text-sm text-slate-300">{parsedContent.overview || currentModule.description}</p>
-                <ul className="list-disc space-y-1 pl-5 text-sm text-slate-300">
+                <h3 className="text-base font-semibold text-foreground">Learning objectives</h3>
+                <p className="text-sm text-muted-foreground">{parsedContent.overview || currentModule.description}</p>
+                <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
                   {(parsedContent.objectives.length > 0 ? parsedContent.objectives : parsedContent.outcomes).map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
               </article>
               <article className={cn("surface-subtle space-y-3 p-4", moduleStateView[currentState].panel)}>
-                <h3 className="text-base font-semibold text-slate-100">Progression rewards</h3>
-                <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
-                  <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Lesson XP: +{currentModuleCard.lessonXpReward}</p>
-                  <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Quiz XP: +{currentModuleCard.quizXpReward}</p>
-                  <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Simulation XP: +{currentModuleCard.simulationXpReward}</p>
-                  <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Difficulty: {currentModuleCard.difficulty}</p>
+                <h3 className="text-base font-semibold text-foreground">Progression rewards</h3>
+                <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">Lesson XP: +{currentModuleCard.lessonXpReward}</p>
+                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">Quiz XP: +{currentModuleCard.quizXpReward}</p>
+                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">Simulation XP: +{currentModuleCard.simulationXpReward}</p>
+                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">Difficulty: {currentModuleCard.difficulty}</p>
                 </div>
-                <p className="text-xs text-slate-400">{trackCareerOutcome(trackCategory)}</p>
+                <p className="text-xs text-muted-foreground">{trackCareerOutcome(trackCategory)}</p>
               </article>
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-base font-semibold text-slate-100">What you will learn</h3>
+              <h3 className="text-base font-semibold text-foreground">What you will learn</h3>
               <div className="flex flex-wrap gap-2">
                 {(parsedContent.whatYouWillLearn.length > 0 ? parsedContent.whatYouWillLearn : currentModuleCard.outcomes).map((item) => (
-                  <span key={item} className="rounded-full border border-slate-700 bg-slate-900/75 px-2.5 py-1 text-xs text-slate-200">
+                  <span key={item} className="skill-tag px-2.5 py-1 text-xs">
                     {item}
                   </span>
                 ))}
@@ -499,7 +499,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
           <section id="lessons-timeline" className="surface-elevated space-y-4 p-5">
             <div className="flex items-center justify-between">
               <h2 className="section-title">Lessons timeline</h2>
-              <span className="text-xs text-slate-500">Learning path</span>
+              <span className="text-xs text-muted-foreground">Learning path</span>
             </div>
 
             <div className="space-y-3">
@@ -510,9 +510,9 @@ export default async function ModulePage({ params }: ModulePageProps) {
                     <article className={cn("surface-subtle p-4", style.panel)}>
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="space-y-1">
-                          <p className="text-xs uppercase tracking-[0.16em] text-slate-500">{timelineKindLabel(node.kind)}</p>
-                          <p className="text-sm font-semibold text-slate-100">{node.title}</p>
-                          <p className="text-xs text-slate-300">{node.description}</p>
+                          <p className="module-order-label tracking-[0.16em]">{timelineKindLabel(node.kind)}</p>
+                          <p className="text-sm font-semibold text-foreground">{node.title}</p>
+                          <p className="text-xs text-muted-foreground">{node.description}</p>
                         </div>
                         <span className={cn("inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold", style.badge)}>
                           {style.label}
@@ -533,7 +533,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
                     </article>
                     {index < timelineNodes.length - 1 ? (
                       <div className="flex justify-center">
-                        <ChevronRight className="h-4 w-4 rotate-90 text-slate-600" />
+                        <ChevronRight className="h-4 w-4 rotate-90 text-muted-foreground" />
                       </div>
                     ) : null}
                   </div>
@@ -583,8 +583,8 @@ export default async function ModulePage({ params }: ModulePageProps) {
             <div className="grid gap-3 md:grid-cols-3">
               {recommendations.map((item) => (
                 <article key={item.id} className="surface-subtle space-y-2 p-4">
-                  <p className="text-sm font-semibold text-slate-100">{item.title}</p>
-                  <p className="text-xs leading-6 text-slate-400">{item.description}</p>
+                  <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                  <p className="text-xs leading-6 text-muted-foreground">{item.description}</p>
                 </article>
               ))}
             </div>
@@ -610,9 +610,9 @@ export default async function ModulePage({ params }: ModulePageProps) {
             <div className="space-y-2">
               {remediationSuggestions.map((item) => (
                 <article key={item.id} className="surface-subtle space-y-1 p-3">
-                  <p className="text-sm font-semibold text-slate-100">{item.title}</p>
-                  <p className="text-xs text-slate-400">{item.reason}</p>
-                  <p className="text-xs text-slate-300">{item.action}</p>
+                  <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                  <p className="text-xs text-muted-foreground">{item.reason}</p>
+                  <p className="text-xs text-muted-foreground">{item.action}</p>
                 </article>
               ))}
             </div>
@@ -648,7 +648,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
                 <Trophy className="h-4 w-4" />
                 Track completion unlocked
               </div>
-              <p className="text-sm text-slate-200">
+              <p className="text-sm text-muted-foreground">
                 Congratulations. You finished all modules in this track and unlocked progression rewards.
               </p>
             </section>

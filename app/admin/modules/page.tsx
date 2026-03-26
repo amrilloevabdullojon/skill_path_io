@@ -70,10 +70,10 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
   ]);
 
   return (
-    <section className="surface-elevated space-y-4 p-5 text-slate-100">
+    <section className="surface-elevated space-y-4 p-5 text-foreground">
       <header className="space-y-2">
         <h2 className="text-xl font-semibold">Modules</h2>
-        <p className="text-sm text-slate-400">Filter by track, search modules, and edit module metadata.</p>
+        <p className="text-sm text-muted-foreground">Filter by track, search modules, and edit module metadata.</p>
       </header>
 
       <form className="surface-subtle grid gap-3 p-4 md:grid-cols-[1fr_240px_auto]">
@@ -121,7 +121,7 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
           <tbody>
             {modules.map((moduleItem) => (
               <tr key={moduleItem.id} className="table-row">
-                <td className="px-3 py-3 text-slate-300">{moduleItem.track.title}</td>
+                <td className="px-3 py-3 text-muted-foreground">{moduleItem.track.title}</td>
                 <td className="px-3 py-3">
                   <input
                     form={`module-edit-${moduleItem.id}`}
@@ -150,8 +150,8 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
                     className="input-base h-9 w-28 px-2 py-1.5"
                   />
                 </td>
-                <td className="px-3 py-3 text-slate-300">{moduleItem._count.lessons}</td>
-                <td className="px-3 py-3 text-slate-300">{moduleItem.quiz ? "Yes" : "No"}</td>
+                <td className="px-3 py-3 text-muted-foreground">{moduleItem._count.lessons}</td>
+                <td className="px-3 py-3 text-muted-foreground">{moduleItem.quiz ? "Yes" : "No"}</td>
                 <td className="px-3 py-3">
                   <a
                     href={`/tracks/${moduleItem.track.slug}/modules/${moduleItem.id}`}
@@ -175,7 +175,7 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
             ))}
             {modules.length === 0 && (
               <tr>
-                <td className="px-3 py-6 text-center text-slate-400" colSpan={8}>
+                <td className="px-3 py-6 text-center text-muted-foreground" colSpan={8}>
                   No modules found.
                 </td>
               </tr>

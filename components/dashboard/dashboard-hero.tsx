@@ -45,35 +45,29 @@ export async function DashboardHero({
   return (
     <section
       id={id}
-      className="surface-panel overflow-hidden border-slate-700/70 bg-gradient-to-br from-slate-950/95 via-slate-900/90 to-indigo-950/50 p-5 sm:p-7"
+      className="surface-panel hero-gradient-bg overflow-hidden p-5 sm:p-6"
     >
       <div className="relative space-y-6">
         {/* Header row */}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-1.5">
             <p className="kicker">{t("kicker")}</p>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-100 sm:text-3xl">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               {t("title", { name })}
             </h1>
-            <p className="max-w-lg text-sm text-slate-400 sm:text-base">
+            <p className="max-w-lg text-sm text-muted-foreground sm:text-base">
               {t("description", { track: primaryTrackTitle })}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {role === "ADMIN" ? (
-              <span className="inline-flex rounded-lg border border-orange-400/35 bg-orange-500/15 px-2.5 py-1 text-xs font-semibold text-orange-200">
-                {t("badges.admin")}
-              </span>
+              <span className="badge-role-admin">{t("badges.admin")}</span>
             ) : (
-              <span className="inline-flex rounded-lg border border-emerald-400/35 bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-200">
-                {t("badges.student")}
-              </span>
+              <span className="badge-role-student">{t("badges.student")}</span>
             )}
             <LevelBadge level={level} />
             {isDemoUser ? (
-              <span className="inline-flex rounded-lg border border-slate-700 bg-slate-800/60 px-2.5 py-1 text-xs text-slate-400">
-                {t("badges.demo")}
-              </span>
+              <span className="badge-role-demo">{t("badges.demo")}</span>
             ) : null}
           </div>
         </div>
@@ -111,18 +105,18 @@ export async function DashboardHero({
         </div>
 
         {/* Module progress */}
-        <div className="rounded-xl border border-slate-700/60 bg-slate-950/50 px-4 py-3">
+        <div className="hero-module-progress">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-medium text-slate-300">
+            <span className="font-medium text-foreground">
               {t("progress.modulesCompleted", { done: completedModules, total: totalModules })}
             </span>
-            <span className="text-slate-500">
+            <span className="text-muted-foreground">
               {totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0}%
             </span>
           </div>
-          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-800">
+          <div className="progress-track mt-2">
             <div
-              className="h-full rounded-full bg-sky-400 transition-all duration-700"
+              className="progress-fill"
               style={{ width: totalModules > 0 ? `${Math.round((completedModules / totalModules) * 100)}%` : "0%" }}
             />
           </div>
@@ -130,24 +124,15 @@ export async function DashboardHero({
 
         {/* CTAs */}
         <div className="grid gap-2 sm:grid-cols-3">
-          <Link
-            href={continueHref}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-sky-400 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-[0_6px_20px_rgba(56,189,248,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-sky-300 hover:shadow-[0_10px_28px_rgba(56,189,248,0.3)] active:scale-[0.98]"
-          >
+          <Link href={continueHref} className="btn-primary gap-2">
             {t("cta.continueLearning")}
             <ArrowRight className="h-4 w-4" />
           </Link>
-          <Link
-            href={roadmapHref}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700/80 bg-slate-900/70 px-4 py-2.5 text-sm font-semibold text-slate-100 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-600 hover:bg-slate-900 active:scale-[0.98]"
-          >
-            <Target className="h-4 w-4 text-slate-400" />
+          <Link href={roadmapHref} className="btn-secondary gap-2">
+            <Target className="h-4 w-4 text-muted-foreground" />
             {t("cta.openRoadmap")}
           </Link>
-          <Link
-            href={mentorHref}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-violet-400/35 bg-violet-500/12 px-4 py-2.5 text-sm font-semibold text-violet-100 transition-all duration-200 hover:-translate-y-0.5 hover:bg-violet-500/20 active:scale-[0.98]"
-          >
+          <Link href={mentorHref} className="btn-accent gap-2">
             <Bot className="h-4 w-4" />
             {t("cta.askAiMentor")}
           </Link>
@@ -177,31 +162,31 @@ export async function DashboardProgressSnapshotCard({
   return (
     <section className="surface-elevated space-y-4 p-4 sm:p-5">
       <div className="flex items-center gap-2">
-        <Sparkles className="h-4 w-4 text-sky-300" />
-        <p className="text-sm font-semibold text-slate-100">{t("title")}</p>
+        <Sparkles className="h-4 w-4 text-sky-400" />
+        <p className="text-sm font-semibold text-foreground">{t("title")}</p>
       </div>
 
       <div className="space-y-3">
         <div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-400">{t("totalCompletion")}</span>
-            <span className="font-semibold text-slate-300">{overallProgress}%</span>
+            <span className="text-muted-foreground">{t("totalCompletion")}</span>
+            <span className="font-semibold text-foreground">{overallProgress}%</span>
           </div>
-          <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-800">
+          <div className="progress-track mt-1.5 h-2">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-sky-500 to-sky-400 transition-all duration-500"
+              className="progress-fill h-full"
               style={{ width: `${overallProgress}%` }}
             />
           </div>
         </div>
         <div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-400">{primaryTrackTitle}</span>
-            <span className="font-semibold text-slate-300">{primaryTrackProgress}%</span>
+            <span className="text-muted-foreground">{primaryTrackTitle}</span>
+            <span className="font-semibold text-foreground">{primaryTrackProgress}%</span>
           </div>
-          <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-800">
+          <div className="progress-track mt-1.5 h-2">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-slow ease-smooth"
               style={{ width: `${primaryTrackProgress}%` }}
             />
           </div>

@@ -69,16 +69,16 @@ export function HiringMarketplaceHub({
             <article key={role.id} className="surface-subtle space-y-3 p-4">
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <p className="text-base font-semibold text-slate-100">{role.title}</p>
-                  <p className="text-xs text-slate-500">{role.company} | {role.location}</p>
+                  <p className="text-base font-semibold text-foreground">{role.title}</p>
+                  <p className="text-xs text-muted-foreground">{role.company} | {role.location}</p>
                 </div>
-                <span className="rounded-full border border-slate-700 bg-slate-900/80 px-2 py-0.5 text-[11px] text-slate-300">
+                <span className="chip-neutral px-2 py-0.5 text-[11px]">
                   Min readiness: {role.minReadinessScore}
                 </span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {role.requiredSkills.map((skill) => (
-                  <span key={skill} className="rounded-full border border-slate-700 bg-slate-900 px-2 py-0.5 text-[11px] text-slate-300">
+                  <span key={skill} className="chip-neutral px-2 py-0.5 text-[11px]">
                     {skill}
                   </span>
                 ))}
@@ -94,7 +94,7 @@ export function HiringMarketplaceHub({
             </article>
           ))}
         </div>
-        {statusText ? <p className="text-xs text-slate-300">{statusText}</p> : null}
+        {statusText ? <p className="text-xs text-muted-foreground">{statusText}</p> : null}
       </section>
 
       <section className="surface-elevated space-y-4 p-5">
@@ -102,9 +102,9 @@ export function HiringMarketplaceHub({
         <div className="grid gap-3 xl:grid-cols-2">
           {candidates.map((candidate) => (
             <article key={candidate.userId} className="surface-subtle space-y-2 p-4">
-              <p className="text-sm font-semibold text-slate-100">{candidate.name}</p>
-              <p className="text-xs text-slate-500">@{candidate.publicHandle}</p>
-              <p className="text-xs text-slate-300">Readiness: {candidate.readinessScore}</p>
+              <p className="text-sm font-semibold text-foreground">{candidate.name}</p>
+              <p className="text-xs text-muted-foreground">@{candidate.publicHandle}</p>
+              <p className="text-xs text-muted-foreground">Readiness: {candidate.readinessScore}</p>
               <div className="flex flex-wrap gap-1.5">
                 {candidate.badges.map((badge) => (
                   <span key={badge} className="rounded-full border border-sky-400/30 bg-sky-500/12 px-2 py-0.5 text-[11px] text-sky-200">
@@ -123,16 +123,16 @@ export function HiringMarketplaceHub({
           {topMatches.map((match) => (
             <article key={match.roleId} className="surface-subtle space-y-2 p-4">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-slate-100">{match.title}</p>
+                <p className="text-sm font-semibold text-foreground">{match.title}</p>
                 <span className="rounded-full border border-emerald-400/35 bg-emerald-500/12 px-2 py-0.5 text-[11px] text-emerald-200">
                   Match: {match.matchPercent}%
                 </span>
               </div>
-              <p className="text-xs text-slate-500">{match.company}</p>
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-muted-foreground">{match.company}</p>
+              <p className="text-xs text-muted-foreground">
                 Missing skills: {match.missingSkills.length > 0 ? match.missingSkills.join(", ") : "None"}
               </p>
-              <ul className="list-disc space-y-1 pl-4 text-xs text-slate-400">
+              <ul className="list-disc space-y-1 pl-4 text-xs text-muted-foreground">
                 {match.evidenceSignals.map((item) => (
                   <li key={item}>{item}</li>
                 ))}

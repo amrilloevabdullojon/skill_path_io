@@ -61,8 +61,8 @@ export function CareerRoadmapVisual({ readinessScore }: CareerRoadmapVisualProps
   return (
     <section className="surface-elevated space-y-4 p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold text-slate-100">Career Roadmap</h2>
-        <span className="rounded-full border border-slate-700 bg-slate-900/80 px-2.5 py-1 text-xs text-slate-300">
+        <h2 className="text-lg font-semibold text-foreground">Career Roadmap</h2>
+        <span className="chip-neutral px-2.5 py-1 text-xs">
           readiness {readinessScore}%
         </span>
       </div>
@@ -79,20 +79,20 @@ export function CareerRoadmapVisual({ readinessScore }: CareerRoadmapVisualProps
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-semibold text-slate-100">{stage.title}</p>
-                    <p className="text-xs text-slate-400">{stage.description}</p>
-                    <p className="mt-1 text-xs text-slate-300">Unlock: {stage.unlockOutcome}</p>
+                    <p className="text-sm font-semibold text-foreground">{stage.title}</p>
+                    <p className="text-xs text-muted-foreground">{stage.description}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Unlock: {stage.unlockOutcome}</p>
                   </div>
                   <span className="mt-0.5">
                     {unlocked ? (
                       <CheckCircle2 className="h-4 w-4 text-emerald-300" />
                     ) : (
-                      <Circle className="h-4 w-4 text-slate-500" />
+                      <Circle className="h-4 w-4 text-muted-foreground" />
                     )}
                   </span>
                 </div>
               </article>
-              {index < stages.length - 1 ? <div className="mx-2 h-4 border-l border-slate-700/80" /> : null}
+              {index < stages.length - 1 ? <div className="mx-2 h-4 border-l border-border" /> : null}
             </div>
           );
         })}

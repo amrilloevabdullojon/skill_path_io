@@ -67,10 +67,10 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
   ]);
 
   return (
-    <section className="surface-elevated space-y-4 p-5 text-slate-100">
+    <section className="surface-elevated space-y-4 p-5 text-foreground">
       <header className="space-y-2">
         <h2 className="text-xl font-semibold">Certificates</h2>
-        <p className="text-sm text-slate-400">Search, filter, and edit certificate URLs.</p>
+        <p className="text-sm text-muted-foreground">Search, filter, and edit certificate URLs.</p>
       </header>
 
       <form className="surface-subtle grid gap-3 p-4 md:grid-cols-[1fr_240px_auto]">
@@ -116,9 +116,9 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
           <tbody>
             {certificates.map((certificate) => (
               <tr key={certificate.id} className="table-row">
-                <td className="px-3 py-3 text-slate-300">{certificate.issuedAt.toLocaleString()}</td>
+                <td className="px-3 py-3 text-muted-foreground">{certificate.issuedAt.toLocaleString()}</td>
                 <td className="px-3 py-3">{certificate.user.name}</td>
-                <td className="px-3 py-3 text-slate-300">{certificate.user.email}</td>
+                <td className="px-3 py-3 text-muted-foreground">{certificate.user.email}</td>
                 <td className="px-3 py-3">{certificate.track.title}</td>
                 <td className="px-3 py-3">
                   <div className="space-y-1.5">
@@ -153,7 +153,7 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
             ))}
             {certificates.length === 0 && (
               <tr>
-                <td className="px-3 py-6 text-center text-slate-400" colSpan={6}>
+                <td className="px-3 py-6 text-center text-muted-foreground" colSpan={6}>
                   No certificates found.
                 </td>
               </tr>

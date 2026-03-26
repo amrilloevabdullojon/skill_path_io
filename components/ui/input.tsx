@@ -52,7 +52,7 @@ export function FormField({ label, error, success, hint, children, className }: 
   return (
     <div className={cn("space-y-1.5", className)}>
       {label ? (
-        <label className="text-xs font-medium text-slate-300">{label}</label>
+        <label className="form-label">{label}</label>
       ) : null}
       {children}
       {error ? (
@@ -60,7 +60,7 @@ export function FormField({ label, error, success, hint, children, className }: 
       ) : success ? (
         <p className="flex items-center gap-1 text-xs text-emerald-400">{success}</p>
       ) : hint ? (
-        <p className="text-xs text-slate-500">{hint}</p>
+        <p className="form-hint">{hint}</p>
       ) : null}
     </div>
   );

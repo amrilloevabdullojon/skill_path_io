@@ -30,7 +30,7 @@ export function TrackCard({ track }: TrackCardProps) {
         <CardDescription>{track.description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <Clock3 className="h-4 w-4" />
             {track.durationWeeks} weeks

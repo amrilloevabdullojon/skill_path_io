@@ -28,8 +28,8 @@ export function CourseStudentPreview({ courseId }: CourseStudentPreviewProps) {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="kicker">Preview as student</p>
-          <h1 className="text-2xl font-semibold text-slate-100">{unified?.title ?? entity.course.title}</h1>
-          <p className="text-sm text-slate-400">{entity.course.shortDescription}</p>
+          <h1 className="text-2xl font-semibold text-foreground">{unified?.title ?? entity.course.title}</h1>
+          <p className="text-sm text-muted-foreground">{entity.course.shortDescription}</p>
         </div>
         <div className="flex items-center gap-2">
           <StudioStatusBadge status={entity.course.status} />
@@ -46,8 +46,8 @@ export function CourseStudentPreview({ courseId }: CourseStudentPreviewProps) {
 
       <div className="surface-subtle p-4">
         <p className="data-label">Course card preview</p>
-        <h2 className="mt-2 text-xl font-semibold text-slate-100">{entity.course.shortTitle}</h2>
-        <p className="mt-2 text-sm text-slate-300">{unified?.description ?? entity.course.description}</p>
+        <h2 className="mt-2 text-xl font-semibold text-foreground">{entity.course.shortTitle}</h2>
+        <p className="mt-2 text-sm text-muted-foreground">{unified?.description ?? entity.course.description}</p>
       </div>
 
       <div className="space-y-3">
@@ -60,8 +60,8 @@ export function CourseStudentPreview({ courseId }: CourseStudentPreviewProps) {
             <article key={moduleItem.id} className="surface-subtle p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold text-slate-100">{moduleItem.order}. {moduleItem.title}</p>
-                  <p className="text-xs text-slate-500">{moduleItem.description || "No module description yet."}</p>
+                  <p className="text-sm font-semibold text-foreground">{moduleItem.order}. {moduleItem.title}</p>
+                  <p className="text-xs text-muted-foreground">{moduleItem.description || "No module description yet."}</p>
                 </div>
                 <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[10px] ${locked ? "border-rose-400/30 bg-rose-500/10 text-rose-200" : "border-emerald-400/30 bg-emerald-500/10 text-emerald-200"}`}>
                   {locked ? <Lock className="h-3 w-3" /> : <Unlock className="h-3 w-3" />}
@@ -69,17 +69,17 @@ export function CourseStudentPreview({ courseId }: CourseStudentPreviewProps) {
                 </span>
               </div>
               <div className="mt-3 grid gap-2 md:grid-cols-3">
-                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                  <p className="text-xs text-slate-500">Lessons</p>
-                  <p className="text-lg font-semibold text-slate-100">{lessons.length}</p>
+                <div className="content-card p-3">
+                  <p className="text-xs text-muted-foreground">Lessons</p>
+                  <p className="text-lg font-semibold text-foreground">{lessons.length}</p>
                 </div>
-                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                  <p className="text-xs text-slate-500">Quizzes</p>
-                  <p className="text-lg font-semibold text-slate-100">{quizzes.length}</p>
+                <div className="content-card p-3">
+                  <p className="text-xs text-muted-foreground">Quizzes</p>
+                  <p className="text-lg font-semibold text-foreground">{quizzes.length}</p>
                 </div>
-                <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-3">
-                  <p className="text-xs text-slate-500">Assignments</p>
-                  <p className="text-lg font-semibold text-slate-100">{assignments.length}</p>
+                <div className="content-card p-3">
+                  <p className="text-xs text-muted-foreground">Assignments</p>
+                  <p className="text-lg font-semibold text-foreground">{assignments.length}</p>
                 </div>
               </div>
             </article>

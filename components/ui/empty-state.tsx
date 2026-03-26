@@ -37,7 +37,7 @@ export function EmptyState({
     >
       <div
         className={cn(
-          "mb-4 flex items-center justify-center rounded-2xl border border-slate-700/60 bg-slate-800/50",
+          "mb-4 flex items-center justify-center rounded-2xl border border-border/60 bg-card/50",
           size === "sm" && "h-10 w-10",
           size === "md" && "h-14 w-14",
           size === "lg" && "h-18 w-18",
@@ -45,7 +45,7 @@ export function EmptyState({
       >
         <Icon
           className={cn(
-            "text-slate-400",
+            "text-muted-foreground",
             size === "sm" && "h-4 w-4",
             size === "md" && "h-6 w-6",
             size === "lg" && "h-8 w-8",
@@ -54,7 +54,7 @@ export function EmptyState({
       </div>
       <h3
         className={cn(
-          "font-semibold text-slate-200",
+          "font-semibold text-foreground",
           size === "sm" && "text-sm",
           size === "md" && "text-base",
           size === "lg" && "text-lg",
@@ -62,7 +62,7 @@ export function EmptyState({
       >
         {title}
       </h3>
-      <p className="mt-1 max-w-sm text-center text-sm text-slate-400">{description}</p>
+      <p className="mt-1 max-w-sm text-center text-sm text-muted-foreground">{description}</p>
       {actionLabel && (actionHref ?? onAction) ? (
         actionHref ? (
           <Link href={actionHref} className="btn-secondary mt-5 inline-flex">

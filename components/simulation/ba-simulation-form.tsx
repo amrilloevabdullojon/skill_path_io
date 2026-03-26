@@ -50,8 +50,8 @@ export function BaSimulationForm() {
     <section className="surface-elevated space-y-5 p-5 sm:p-6">
       <header className="space-y-2">
         <p className="kicker">BA Simulation</p>
-        <h1 className="text-2xl font-semibold text-slate-100">User Story + Acceptance Criteria</h1>
-        <p className="text-sm text-slate-400">
+        <h1 className="text-2xl font-semibold text-foreground">User Story + Acceptance Criteria</h1>
+        <p className="text-sm text-muted-foreground">
           Build a realistic story and get AI review on quality and completeness.
         </p>
       </header>
@@ -81,7 +81,7 @@ export function BaSimulationForm() {
 
       {review && (
         <article className="surface-subtle space-y-3 p-4">
-          <p className="text-sm font-semibold text-slate-100">Score: {review.score}/100</p>
+          <p className="text-sm font-semibold text-foreground">Score: {review.score}/100</p>
           <div className="grid gap-3 md:grid-cols-3">
             <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-100">
               <p className="font-semibold uppercase tracking-wide text-emerald-200">Strengths</p>

@@ -128,6 +128,8 @@ model UserProgress {
   module      Module         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
   @@unique([userId, moduleId])
+  @@index([userId])
+  @@index([status])
 }
 
 model Certificate {
@@ -140,6 +142,7 @@ model Certificate {
   track          Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
 
   @@unique([userId, trackId])
+  @@index([userId])
 }
 
 enum StudioContentStatus {
@@ -478,6 +481,10 @@ model AdminActivityLog {
   entityId   String
   note       String             @default("")
   timestamp  DateTime           @default(now())
+
+  @@index([actorEmail])
+  @@index([timestamp])
+  @@index([entityType, entityId])
 }
 
 model CourseAnalyticsSnapshot {
@@ -495,6 +502,9 @@ model CourseAnalyticsSnapshot {
   progressByModule       Json     @default("[]")
   capturedAt             DateTime @default(now())
   course                 Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+  @@index([capturedAt])
 }
 
 model PermissionRole {
@@ -547,6 +557,8 @@ model CareerGoal {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model JobRole {
@@ -638,6 +650,8 @@ model LearningPlan {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
 }
 
 model KnowledgeNode {
@@ -711,6 +725,8 @@ model UserNote {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model UserBookmark {
@@ -740,6 +756,10 @@ model DiscussionThread {
   updatedAt DateTime            @updatedAt
   user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments  DiscussionComment[]
+
+  @@index([userId])
+  @@index([track])
+  @@index([createdAt])
 }
 
 model DiscussionComment {
@@ -751,6 +771,9 @@ model DiscussionComment {
   updatedAt DateTime         @updatedAt
   thread    DiscussionThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@index([userId])
 }
 
 model SkillGapSnapshot {
@@ -761,6 +784,8 @@ model SkillGapSnapshot {
   strongestSkills Json           @default("[]")
   capturedAt      DateTime       @default(now())
   user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, capturedAt])
 }
 
 model ReadinessScoreSnapshot {
@@ -772,4 +797,7 @@ model ReadinessScoreSnapshot {
   breakdown  Json     @default("{}")
   capturedAt DateTime @default(now())
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, capturedAt])
+  @@index([targetRole])
 }

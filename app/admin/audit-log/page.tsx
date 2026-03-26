@@ -9,12 +9,12 @@ const ACTION_COLORS: Record<string, string> = {
   DELETE: "border-red-400/30 bg-red-500/10 text-red-300",
   PUBLISH: "border-violet-400/30 bg-violet-500/10 text-violet-300",
   ARCHIVE: "border-amber-400/30 bg-amber-500/10 text-amber-300",
-  LOGIN: "border-slate-600/40 bg-slate-700/20 text-slate-400",
+  LOGIN: "border-border bg-card text-muted-foreground",
 };
 
 function actionColor(action: string) {
   const key = Object.keys(ACTION_COLORS).find((k) => action.toUpperCase().includes(k));
-  return key ? ACTION_COLORS[key] : "border-slate-600/40 bg-slate-700/20 text-slate-400";
+  return key ? ACTION_COLORS[key] : "border-border bg-card text-muted-foreground";
 }
 
 export default async function AuditLogPage() {
@@ -59,16 +59,16 @@ export default async function AuditLogPage() {
       ) : (
         <>
           {/* Desktop table */}
-          <div className="hidden overflow-x-auto rounded-xl border border-slate-800 md:block">
+          <div className="hidden overflow-x-auto rounded-xl border border-border md:block">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-800 bg-slate-900/60">
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.time")}</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.actor")}</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400 hidden lg:table-cell">{t("columns.role")}</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.action")}</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400">{t("columns.entity")}</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-400 hidden xl:table-cell">{t("columns.note")}</th>
+                <tr className="border-b border-border bg-card">
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("columns.time")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("columns.actor")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">{t("columns.role")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("columns.action")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("columns.entity")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden xl:table-cell">{t("columns.note")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -77,11 +77,11 @@ export default async function AuditLogPage() {
                     key={log.id}
                     className={
                       idx % 2 === 0
-                        ? "border-b border-slate-800/50 bg-slate-950/30"
-                        : "border-b border-slate-800/50 bg-slate-900/20"
+                        ? "border-b border-border bg-background/30"
+                        : "border-b border-border bg-card/20"
                     }
                   >
-                    <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-slate-500">
+                    <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-muted-foreground">
                       {log.timestamp.toLocaleString("ru-RU", {
                         day: "2-digit",
                         month: "2-digit",
@@ -89,9 +89,9 @@ export default async function AuditLogPage() {
                         minute: "2-digit",
                       })}
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-slate-300">{log.actorEmail}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{log.actorEmail}</td>
                     <td className="hidden px-4 py-3 lg:table-cell">
-                      <span className="rounded border border-slate-700 bg-slate-800/50 px-1.5 py-0.5 text-xs text-slate-400">
+                      <span className="chip-neutral">
                         {log.actorRole}
                       </span>
                     </td>
@@ -100,15 +100,15 @@ export default async function AuditLogPage() {
                         {log.action}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-slate-300">
+                    <td className="px-4 py-3 text-xs text-muted-foreground">
                       <span className="font-semibold">{log.entityType}</span>
                       {log.entityId && (
-                        <span className="ml-1 font-mono text-xs text-slate-500">
+                        <span className="ml-1 font-mono text-xs text-muted-foreground">
                           #{log.entityId.slice(-6)}
                         </span>
                       )}
                     </td>
-                    <td className="hidden max-w-xs truncate px-4 py-3 text-xs text-slate-500 xl:table-cell">
+                    <td className="hidden max-w-xs truncate px-4 py-3 text-xs text-muted-foreground xl:table-cell">
                       {log.note ?? "—"}
                     </td>
                   </tr>
@@ -125,7 +125,7 @@ export default async function AuditLogPage() {
                   <span className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-semibold ${actionColor(log.action)}`}>
                     {log.action}
                   </span>
-                  <span className="font-mono text-xs text-slate-500">
+                  <span className="font-mono text-xs text-muted-foreground">
                     {log.timestamp.toLocaleString("ru-RU", {
                       day: "2-digit",
                       month: "2-digit",
@@ -135,19 +135,19 @@ export default async function AuditLogPage() {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs text-slate-300">{log.actorEmail}</span>
-                  <span className="rounded border border-slate-700 bg-slate-800/50 px-1.5 py-0.5 text-xs text-slate-400">
+                  <span className="font-mono text-xs text-muted-foreground">{log.actorEmail}</span>
+                  <span className="chip-neutral">
                     {log.actorRole}
                   </span>
                 </div>
-                <div className="flex items-center gap-1 text-xs text-slate-300">
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <span className="font-semibold">{log.entityType}</span>
                   {log.entityId && (
-                    <span className="font-mono text-slate-500">#{log.entityId.slice(-6)}</span>
+                    <span className="font-mono text-muted-foreground">#{log.entityId.slice(-6)}</span>
                   )}
                 </div>
                 {log.note ? (
-                  <p className="text-xs text-slate-500 truncate">{log.note}</p>
+                  <p className="text-xs text-muted-foreground truncate">{log.note}</p>
                 ) : null}
               </article>
             ))}

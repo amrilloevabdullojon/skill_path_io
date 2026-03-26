@@ -95,8 +95,8 @@ export function CoursesManager() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="kicker">Academy Studio</p>
-          <h1 className="text-2xl font-semibold text-slate-100">Courses</h1>
-          <p className="text-sm text-slate-400">Create, assemble, publish, and analyze courses without code edits.</p>
+          <h1 className="text-2xl font-semibold text-foreground">Courses</h1>
+          <p className="text-sm text-muted-foreground">Create, assemble, publish, and analyze courses without code edits.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => fileInputRef.current?.click()} variant="secondary" className="gap-2">
@@ -113,7 +113,7 @@ export function CoursesManager() {
 
       <div className="grid gap-3 lg:grid-cols-[1fr_220px_220px]">
         <label className="relative">
-          <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
+          <Search className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -122,7 +122,7 @@ export function CoursesManager() {
           />
         </label>
         <label className="relative">
-          <Filter className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-slate-500" />
+          <Filter className="pointer-events-none absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
           <select value={category} onChange={(event) => setCategory(event.target.value as CourseCategory | "ALL")} className="select-base pl-9">
             {categoryList.map((item) => (
               <option key={item} value={item}>
@@ -199,8 +199,8 @@ export function CoursesManager() {
                   </td>
                   <td>
                     <div>
-                      <p className="font-semibold text-slate-100">{entity.course.title}</p>
-                      <p className="text-xs text-slate-500">{entity.course.slug}</p>
+                      <p className="font-semibold text-foreground">{entity.course.title}</p>
+                      <p className="text-xs text-muted-foreground">{entity.course.slug}</p>
                     </div>
                   </td>
                   <td><StudioStatusBadge status={entity.course.status} /></td>

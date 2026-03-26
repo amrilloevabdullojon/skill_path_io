@@ -137,7 +137,7 @@ export function MainEditor({ entity, selected, canWrite }: MainEditorProps) {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="kicker">Main editor</p>
-          <h2 className="text-xl font-semibold text-slate-100">{
+          <h2 className="text-xl font-semibold text-foreground">{
             selected.type === "course"
               ? entity.course.title
               : moduleItem?.title ?? lesson?.title ?? quiz?.title ?? assignment?.title ?? simulation?.title ?? caseStudy?.title ?? "Select an entity"
@@ -207,7 +207,7 @@ export function MainEditor({ entity, selected, canWrite }: MainEditorProps) {
               {[...lesson.blocks].sort((a, b) => a.order - b.order).map((block, index) => (
                 <article key={block.id} className="surface-subtle space-y-2 p-3">
                   <div className="flex flex-wrap items-center justify-between gap-1.5">
-                    <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Block {index + 1} - {block.type}</p>
+                    <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Block {index + 1} - {block.type}</p>
                     <div className="flex gap-1">
                       <button type="button" className="btn-secondary px-2 py-1 text-xs" onClick={() => toggleLessonBlockCollapsed(lesson.id, block.id)} disabled={!canWrite}>{block.collapsed ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}</button>
                       <button type="button" className="btn-secondary px-2 py-1 text-xs" onClick={() => reorderLessonBlock(lesson.id, index, index - 1)} disabled={!canWrite || index === 0}><ArrowUp className="h-3.5 w-3.5" /></button>
@@ -248,7 +248,7 @@ export function MainEditor({ entity, selected, canWrite }: MainEditorProps) {
             </div>
             <textarea className="textarea-base min-h-[90px]" value={quiz.description} onChange={(event) => updateQuiz(quiz.id, { description: event.target.value })} disabled={!canWrite} />
             <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-slate-100">Questions</p>
+              <p className="text-sm font-semibold text-foreground">Questions</p>
               <button type="button" className="btn-primary px-3 py-2 text-xs" onClick={() => addQuizQuestion(quiz.id)} disabled={!canWrite}><Plus className="mr-1 h-3.5 w-3.5" />Add question</button>
             </div>
             {quiz.questions.length === 0 ? (
@@ -258,7 +258,7 @@ export function MainEditor({ entity, selected, canWrite }: MainEditorProps) {
                 {quiz.questions.map((question, index) => (
                   <article key={question.id} className="surface-subtle space-y-2 p-3">
                     <div className="flex flex-wrap items-center justify-between gap-1.5">
-                      <p className="text-xs uppercase tracking-[0.12em] text-slate-500">Question {index + 1}</p>
+                      <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Question {index + 1}</p>
                       <div className="flex gap-1">
                         <button type="button" className="btn-secondary px-2 py-1 text-xs" onClick={() => reorderQuizQuestions(quiz.id, index, index - 1)} disabled={!canWrite || index === 0}><ArrowUp className="h-3.5 w-3.5" /></button>
                         <button type="button" className="btn-secondary px-2 py-1 text-xs" onClick={() => reorderQuizQuestions(quiz.id, index, index + 1)} disabled={!canWrite || index === quiz.questions.length - 1}><ArrowDown className="h-3.5 w-3.5" /></button>

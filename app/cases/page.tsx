@@ -37,11 +37,11 @@ export default function CasesPage() {
       <div className="grid gap-4 md:grid-cols-3">
         {cases.map((item) => (
           <article key={item.id} className="surface-panel surface-panel-hover p-4">
-            <p className="inline-flex rounded-full border border-slate-700 bg-slate-900 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-slate-300">
+            <p className="chip-neutral inline-flex px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide">
               {item.track}
             </p>
-            <h2 className="mt-3 text-lg font-semibold text-slate-100">{item.title}</h2>
-            <p className="mt-2 text-sm text-slate-400">{item.description}</p>
+            <h2 className="mt-3 text-lg font-semibold text-foreground">{item.title}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
             <Link
               href={item.href}
               className="btn-secondary mt-4 inline-flex"

@@ -15,8 +15,8 @@ export function ProgressBar({
 
   return (
     <div className={cn("space-y-1", className)}>
-      {label ? <p className="text-xs text-slate-400">{label}</p> : null}
-      <div className="h-2 overflow-hidden rounded-full bg-slate-800">
+      {label ? <p className="text-xs text-muted-foreground">{label}</p> : null}
+      <div className="progress-track h-2">
         <div
           className={cn("h-full rounded-full bg-sky-400 transition-all duration-500", fillClassName)}
           style={{ width: `${safe}%` }}

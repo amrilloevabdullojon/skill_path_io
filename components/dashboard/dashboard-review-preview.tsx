@@ -12,9 +12,9 @@ export function DashboardReviewPreviewSection({
 }) {
   return (
     <DashboardSection id="review" title="Review Preview" description="Speed revision mode built from your notes and bookmarks.">
-      <article className="surface-panel-hover rounded-xl border border-slate-800 bg-slate-950/70 p-4">
-        <p className="text-sm font-semibold text-slate-100">Saved review assets</p>
-        <p className="mt-2 text-xs text-slate-400">{bookmarkCount} bookmarks | {noteCount} notes</p>
+      <article className="content-card surface-panel-hover p-4">
+        <p className="text-sm font-semibold text-foreground">Saved review assets</p>
+        <p className="mt-2 text-xs text-muted-foreground">{bookmarkCount} bookmarks | {noteCount} notes</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Link href="/review" className="btn-secondary px-3 py-1.5 text-xs">Open review mode</Link>
           <Link href="/bookmarks" className="btn-secondary px-3 py-1.5 text-xs">Bookmarks</Link>

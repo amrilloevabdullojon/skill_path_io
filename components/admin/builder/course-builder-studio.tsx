@@ -83,8 +83,8 @@ export function CourseBuilderStudio({ courseId, canWrite, canPublish }: CourseBu
       <header className="surface-elevated flex flex-wrap items-center justify-between gap-3 p-4 sm:p-5">
         <div>
           <p className="kicker">Academy Studio</p>
-          <h1 className="text-2xl font-semibold text-slate-100">{entity.course.title} Builder</h1>
-          <p className="text-sm text-slate-400">3-column course constructor: structure, editor, and publish logic.</p>
+          <h1 className="text-2xl font-semibold text-foreground">{entity.course.title} Builder</h1>
+          <p className="text-sm text-muted-foreground">3-column course constructor: structure, editor, and publish logic.</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button

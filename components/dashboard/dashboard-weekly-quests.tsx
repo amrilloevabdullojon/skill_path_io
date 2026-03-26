@@ -39,11 +39,11 @@ export function DashboardWeeklyQuestsSection({ quests }: { quests: WeeklyQuest[]
         {items.map((quest) => {
           const percent = Math.round((quest.progress / Math.max(quest.goal, 1)) * 100);
           return (
-            <article key={quest.id} className="surface-panel-hover rounded-xl border border-slate-800 bg-slate-950/70 p-4">
+            <article key={quest.id} className="content-card surface-panel-hover p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-sm font-semibold text-slate-100">{quest.title}</p>
-                  <p className="text-xs text-slate-400">{quest.description}</p>
+                  <p className="text-sm font-semibold text-foreground">{quest.title}</p>
+                  <p className="text-xs text-muted-foreground">{quest.description}</p>
                 </div>
                 <span className="rounded-full border border-emerald-400/30 bg-emerald-500/12 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-200">
                   +{quest.rewardXp} XP
@@ -51,7 +51,7 @@ export function DashboardWeeklyQuestsSection({ quests }: { quests: WeeklyQuest[]
               </div>
               <ProgressBar value={percent} className="mt-3" />
               <div className="mt-2 flex items-center justify-between gap-2">
-                <p className="text-xs text-slate-400">{quest.progress}/{quest.goal} completed</p>
+                <p className="text-xs text-muted-foreground">{quest.progress}/{quest.goal} completed</p>
                 {quest.status === "completed" ? (
                   <p className="inline-flex items-center gap-1 text-xs text-emerald-200">
                     <CheckCircle2 className="h-3.5 w-3.5" />

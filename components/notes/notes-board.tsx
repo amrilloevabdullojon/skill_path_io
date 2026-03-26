@@ -121,13 +121,13 @@ export function NotesBoard({ initialNotes }: { initialNotes: UserNote[] }) {
         {notes.map((note) => (
           <article key={note.id} className="surface-elevated space-y-2 p-4">
             <div className="flex items-start justify-between gap-3">
-              <p className="text-sm font-semibold text-slate-100">{note.title}</p>
-              <button type="button" onClick={() => removeNote(note.id)} className="text-xs text-slate-500 hover:text-slate-300">
+              <p className="text-sm font-semibold text-foreground">{note.title}</p>
+              <button type="button" onClick={() => removeNote(note.id)} className="text-xs text-muted-foreground hover:text-foreground">
                 Remove
               </button>
             </div>
-            <p className="text-sm text-slate-300">{note.content}</p>
-            <p className="inline-flex items-center gap-2 text-xs text-slate-500">
+            <p className="text-sm text-muted-foreground">{note.content}</p>
+            <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
               <NotebookPen className="h-3.5 w-3.5" />
               {note.lessonRef}
             </p>

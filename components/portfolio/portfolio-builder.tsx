@@ -97,8 +97,8 @@ export function PortfolioBuilder({ initialEntries }: PortfolioBuilderProps) {
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         {sourceStats.map((item) => (
           <article key={item.value} className="surface-subtle p-3">
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-500">{item.label}</p>
-            <p className="mt-1 text-xl font-semibold text-slate-100">{item.count}</p>
+            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">{item.label}</p>
+            <p className="mt-1 text-xl font-semibold text-foreground">{item.count}</p>
           </article>
         ))}
       </div>
@@ -151,7 +151,7 @@ export function PortfolioBuilder({ initialEntries }: PortfolioBuilderProps) {
         {filteredEntries.length === 0 ? (
           <div className="state-panel">
             <p className="inline-flex items-center gap-2">
-              <FolderOpenDot className="h-4 w-4 text-slate-500" />
+              <FolderOpenDot className="h-4 w-4 text-muted-foreground" />
               No portfolio entries yet. Complete a mission and add it from the mission result panel.
             </p>
           </div>
@@ -164,13 +164,13 @@ export function PortfolioBuilder({ initialEntries }: PortfolioBuilderProps) {
                 <article key={entry.id} className="surface-subtle space-y-3 p-4">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
-                      <p className="text-base font-semibold text-slate-100">{entry.title}</p>
-                      <p className="mt-1 text-xs text-slate-500">
+                      <p className="text-base font-semibold text-foreground">{entry.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {entry.source} | {new Date(entry.createdAt).toLocaleString()}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="rounded-full border border-slate-700 bg-slate-900/70 px-2.5 py-1 text-[11px] text-slate-300">
+                      <span className="chip-neutral px-2.5 py-1 text-[11px]">
                         {entry.source}
                       </span>
                       {isLocal ? (
@@ -189,7 +189,7 @@ export function PortfolioBuilder({ initialEntries }: PortfolioBuilderProps) {
                     </div>
                   </div>
 
-                  <p className="text-sm text-slate-300">{entry.description}</p>
+                  <p className="text-sm text-muted-foreground">{entry.description}</p>
 
                   <div className="flex flex-wrap gap-1.5">
                     {entry.skillsUsed.map((skill) => (
@@ -202,7 +202,7 @@ export function PortfolioBuilder({ initialEntries }: PortfolioBuilderProps) {
                     ))}
                   </div>
 
-                  <p className="rounded-xl border border-slate-800 bg-slate-950/70 px-3 py-2 text-xs text-slate-300">
+                  <p className="content-card px-3 py-2 text-xs text-muted-foreground">
                     {entry.resultSummary}
                   </p>
                 </article>

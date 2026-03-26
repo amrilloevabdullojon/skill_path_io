@@ -14,15 +14,15 @@ export default async function AdminLayout({
 
   return (
     <section className="page-shell">
-      <header className="surface-elevated space-y-4 p-5 text-slate-100">
+      <header className="surface-elevated space-y-4 p-5 text-foreground">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="kicker">Admin panel</p>
             <h1 className="text-2xl font-semibold tracking-tight">SkillPath Academy</h1>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-muted-foreground">
               Signed as {admin.email ?? "admin"} ({admin.source === "session" ? "session" : "local demo"})
             </p>
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Role: {admin.adminRole}</p>
+            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Role: {admin.adminRole}</p>
           </div>
           <Link
             href="/dashboard"

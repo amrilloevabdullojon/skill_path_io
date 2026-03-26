@@ -8,8 +8,8 @@ export function WeeklyAiReportCard({ report }: WeeklyAiReportCardProps) {
   return (
     <section id="report" className="surface-elevated space-y-4 p-5">
       <h2 className="section-title">{report.headline}</h2>
-      <p className="text-sm text-slate-300">{report.summary}</p>
-      <ul className="list-disc space-y-1 pl-5 text-sm text-slate-300">
+      <p className="text-sm text-muted-foreground">{report.summary}</p>
+      <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
         {report.highlights.map((item) => (
           <li key={item}>{item}</li>
         ))}

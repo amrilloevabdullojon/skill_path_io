@@ -2,7 +2,6 @@ import { Award, BookOpenCheck, CheckCircle2, Medal, Sparkles, Timer } from "luci
 
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
 import type { DashboardActivityItem } from "@/lib/dashboard/data";
-import { cn } from "@/lib/utils";
 
 type DashboardRecentActivityProps = {
   activity: DashboardActivityItem[];
@@ -45,25 +44,21 @@ export function DashboardRecentActivitySection({ activity }: DashboardRecentActi
     >
       <div className="space-y-3">
         {activity.length === 0 ? (
-          <p className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 text-sm text-slate-400">
+          <p className="content-card p-4 text-sm text-muted-foreground">
             No activity yet. Open a module to start building your timeline.
           </p>
         ) : (
           activity.map((item) => (
             <article
               key={item.id}
-              className="surface-panel-hover relative rounded-xl border border-slate-800 bg-slate-950/70 p-4 pl-12"
+              className="content-card surface-panel-hover relative p-4 pl-12"
             >
-              <span
-                className={cn(
-                  "absolute left-4 top-4 inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-700 bg-slate-900/80",
-                )}
-              >
+              <span className="icon-badge absolute left-4 top-4 h-7 w-7">
                 {activityIcon(item.kind)}
               </span>
-              <p className="text-sm font-semibold text-slate-100">{item.title}</p>
-              <p className="mt-1 text-xs text-slate-400">{item.description}</p>
-              <p className="mt-2 text-[11px] text-slate-500">{formatDateTime(item.timestamp)}</p>
+              <p className="text-sm font-semibold text-foreground">{item.title}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{item.description}</p>
+              <p className="mt-2 text-[11px] text-muted-foreground">{formatDateTime(item.timestamp)}</p>
             </article>
           ))
         )}

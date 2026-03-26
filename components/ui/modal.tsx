@@ -31,10 +31,10 @@ export function Modal({ open, onClose, title, className, children }: ModalProps)
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" role="dialog" aria-modal="true">
-      <button type="button" className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" onClick={onClose} aria-label="Close modal" />
+      <button type="button" className="overlay-backdrop absolute inset-0" onClick={onClose} aria-label="Close modal" />
       <section className={cn("surface-elevated relative z-10 w-full max-w-xl p-4 sm:p-5", className)}>
         <header className="mb-3 flex items-center justify-between gap-3">
-          {title ? <h2 className="text-lg font-semibold text-slate-100">{title}</h2> : <span />}
+          {title ? <h2 className="overlay-title text-lg">{title}</h2> : <span />}
           <button type="button" onClick={onClose} className="btn-secondary h-9 w-9 p-0" aria-label="Close">
             <X className="h-4 w-4" />
           </button>

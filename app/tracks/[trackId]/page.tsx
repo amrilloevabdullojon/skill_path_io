@@ -74,8 +74,8 @@ function stateStyles(state: LearningPathState) {
     };
   }
   return {
-    badge: "border-slate-600/60 bg-slate-700/50 text-slate-300",
-    dot: "bg-slate-600",
+    badge: "border-border/60 bg-card/50 text-muted-foreground",
+    dot: "bg-muted-foreground/40",
   };
 }
 
@@ -198,10 +198,10 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
             <p className="body-text">{track.description}</p>
             <div className="flex flex-wrap items-center gap-2">
               <LevelBadge level={level} />
-              <span className="rounded-full border border-slate-700 bg-slate-900/80 px-2.5 py-1 text-xs text-slate-300">
+              <span className="xp-pill px-2.5 py-1 text-xs">
                 {progression.earnedXp} XP earned
               </span>
-              <span className="rounded-full border border-slate-700 bg-slate-900/80 px-2.5 py-1 text-xs text-slate-300">
+              <span className="xp-pill px-2.5 py-1 text-xs">
                 ETA: {formatMinutes(progression.estimatedMinutesLeft)}
               </span>
             </div>
@@ -209,14 +209,14 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
 
           <div className={cn("surface-subtle space-y-3 p-4 ring-1", accent.ring)}>
             <p className="kicker">Track progress</p>
-            <p className="text-3xl font-semibold text-slate-100">{progression.overallProgressPercent}%</p>
-            <div className="h-2 overflow-hidden rounded-full bg-slate-800">
+            <p className="text-3xl font-semibold text-foreground">{progression.overallProgressPercent}%</p>
+            <div className="progress-track h-2">
               <div className={cn("h-full rounded-full transition-all duration-500", accent.progress)} style={{ width: `${progression.overallProgressPercent}%` }} />
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-muted-foreground">
               {progression.completedCount}/{progression.totalModules} modules completed
             </p>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-muted-foreground">
               XP to next level: {levelProgress.xpNeededForNext}
             </p>
           </div>
@@ -226,7 +226,7 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <section className="surface-elevated space-y-4 p-5">
             <h2 className="section-title">What you will learn</h2>
-          <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
+          <ul className="list-disc space-y-1.5 pl-5 text-sm text-muted-foreground">
             {whatYouLearnToShow.map((item) => (
               <li key={item}>{item}</li>
             ))}
@@ -237,19 +237,19 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
           <h2 className="section-title">Skills you will gain</h2>
           <div className="flex flex-wrap gap-2">
             {skillsToShow.map((skill) => (
-              <span key={skill} className="rounded-full border border-slate-700 bg-slate-900/80 px-2.5 py-1 text-xs text-slate-200">
+              <span key={skill} className="skill-tag px-2.5 py-1 text-xs">
                 {skill}
               </span>
             ))}
           </div>
-          <p className="text-xs text-slate-500">Strongest now: {strongestSkill} | Focus next: {weakestSkill}</p>
+          <p className="text-xs text-muted-foreground">Strongest now: {strongestSkill} | Focus next: {weakestSkill}</p>
         </section>
       </div>
 
       <section className="surface-elevated space-y-4 p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="section-title">Skill radar</h2>
-          <p className="text-xs text-slate-500">Live estimation from module progression and XP milestones.</p>
+          <p className="text-xs text-muted-foreground">Live estimation from module progression and XP milestones.</p>
         </div>
         <SkillRadarChart data={radarData} />
       </section>
@@ -273,18 +273,18 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
                 <article className="surface-subtle p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="space-y-1">
-                      <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Module {moduleItem.order}</p>
-                      <p className="text-lg font-semibold text-slate-100">{moduleItem.title}</p>
-                      <p className="text-sm text-slate-400">{moduleItem.shortDescription}</p>
+                      <p className="module-order-label">Module {moduleItem.order}</p>
+                      <p className="section-heading">{moduleItem.title}</p>
+                      <p className="text-sm text-muted-foreground">{moduleItem.shortDescription}</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                       <span className={cn("inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold", style.badge)}>
                         {moduleItem.stateLabel}
                       </span>
-                      {moduleItem.state === "locked" ? <Lock className="h-4 w-4 text-slate-500" /> : null}
+                      {moduleItem.state === "locked" ? <Lock className="h-4 w-4 text-muted-foreground" /> : null}
                     </div>
                   </div>
-                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
+                  <div className="progress-track mt-3 h-2">
                     <div className={cn("h-full rounded-full transition-all duration-500", accent.progress)} style={{ width: `${moduleItem.progressPercent}%` }} />
                   </div>
                   {moduleItem.unlockRequirement ? (
@@ -293,15 +293,15 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
                 </article>
                 {index < progression.modules.length - 1 ? (
                   <div className="flex justify-center">
-                    <ArrowRight className="h-4 w-4 rotate-90 text-slate-600" />
+                    <ArrowRight className="h-4 w-4 rotate-90 text-muted-foreground" />
                   </div>
                 ) : null}
               </div>
             );
           })}
           <article className={cn("surface-subtle border p-4", accent.subtle)}>
-            <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Final challenge</p>
-            <p className="mt-1 text-sm text-slate-200">{progression.modules[progression.modules.length - 1]?.finalChallenge}</p>
+            <p className="module-order-label">Final challenge</p>
+            <p className="mt-1 text-sm text-foreground">{progression.modules[progression.modules.length - 1]?.finalChallenge}</p>
           </article>
         </div>
       </section>
@@ -315,38 +315,38 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
               <article key={moduleItem.id} className="surface-subtle space-y-3 p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Module {moduleItem.order}</p>
-                    <h3 className="text-lg font-semibold text-slate-100">{moduleItem.title}</h3>
+                    <p className="module-order-label">Module {moduleItem.order}</p>
+                    <h3 className="section-heading">{moduleItem.title}</h3>
                   </div>
                   <span className={cn("inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold", style.badge)}>
                     {moduleItem.stateLabel}
                   </span>
                 </div>
-                <p className="text-sm text-slate-400">{moduleItem.shortDescription}</p>
+                <p className="text-sm text-muted-foreground">{moduleItem.shortDescription}</p>
 
-                <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
-                  <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Duration: {moduleItem.durationMinutes} min</p>
-                  <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">XP reward: +{moduleItem.xpReward}</p>
-                  <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Lessons: {moduleItem.lessonsCount}</p>
-                  <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Quiz: {moduleItem.quizCount}</p>
-                  <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Simulation: {moduleItem.simulationCount}</p>
-                  <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Difficulty: {moduleItem.difficulty}</p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <p className="data-pill px-2 py-1.5">Duration: {moduleItem.durationMinutes} min</p>
+                  <p className="data-pill px-2 py-1.5">XP reward: +{moduleItem.xpReward}</p>
+                  <p className="data-pill px-2 py-1.5">Lessons: {moduleItem.lessonsCount}</p>
+                  <p className="data-pill px-2 py-1.5">Quiz: {moduleItem.quizCount}</p>
+                  <p className="data-pill px-2 py-1.5">Simulation: {moduleItem.simulationCount}</p>
+                  <p className="data-pill px-2 py-1.5">Difficulty: {moduleItem.difficulty}</p>
                 </div>
 
                 <div className="flex flex-wrap gap-1.5">
-                  <span className="rounded-full border border-slate-700 bg-slate-900/80 px-2 py-1 text-[10px] text-slate-300">Lesson</span>
-                  <span className="rounded-full border border-slate-700 bg-slate-900/80 px-2 py-1 text-[10px] text-slate-300">Quiz</span>
-                  <span className="rounded-full border border-slate-700 bg-slate-900/80 px-2 py-1 text-[10px] text-slate-300">Practice</span>
-                  <span className="rounded-full border border-slate-700 bg-slate-900/80 px-2 py-1 text-[10px] text-slate-300">Simulation</span>
+                  <span className="skill-tag px-2 py-1 text-[10px]">Lesson</span>
+                  <span className="skill-tag px-2 py-1 text-[10px]">Quiz</span>
+                  <span className="skill-tag px-2 py-1 text-[10px]">Practice</span>
+                  <span className="skill-tag px-2 py-1 text-[10px]">Simulation</span>
                 </div>
 
-                <div className="h-2 overflow-hidden rounded-full bg-slate-800">
+                <div className="progress-track h-2">
                   <div className={cn("h-full rounded-full transition-all duration-500", accent.progress)} style={{ width: `${moduleItem.progressPercent}%` }} />
                 </div>
-                <p className="text-xs text-slate-400">{moduleItem.progressPercent}% progress</p>
+                <p className="text-xs text-muted-foreground">{moduleItem.progressPercent}% progress</p>
 
-                <p className="text-xs text-slate-500">Final challenge: {moduleItem.finalChallenge}</p>
-                <p className="text-xs text-slate-500">Real world example: {moduleItem.realWorldExample}</p>
+                <p className="text-xs text-muted-foreground">Final challenge: {moduleItem.finalChallenge}</p>
+                <p className="text-xs text-muted-foreground">Real world example: {moduleItem.realWorldExample}</p>
 
                 <Link
                   href={`/tracks/${track.slug}/modules/${moduleItem.id}`}
@@ -367,14 +367,14 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
       <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
         <article className="surface-elevated space-y-3 p-5">
           <h2 className="section-title">XP and badges</h2>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-muted-foreground">
             XP rules: Lesson +20, Quiz +50, Simulation +100.
           </p>
-          <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
-            <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Earned XP: {progression.earnedXp}</p>
-            <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Total XP available: {progression.totalXpAvailable}</p>
-            <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Current level: {level}</p>
-            <p className="rounded-lg border border-slate-800 bg-slate-900/70 px-2 py-1.5">Streak: {progression.completionStreakDays} days</p>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <p className="data-pill px-2 py-1.5">Earned XP: {progression.earnedXp}</p>
+            <p className="data-pill px-2 py-1.5">Total XP available: {progression.totalXpAvailable}</p>
+            <p className="data-pill px-2 py-1.5">Current level: {level}</p>
+            <p className="data-pill px-2 py-1.5">Streak: {progression.completionStreakDays} days</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {progression.earnedBadges.map((badge) => (
@@ -394,10 +394,10 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
 
         <article className="surface-elevated space-y-3 p-5">
           <h2 className="section-title">Career outcome</h2>
-          <p className="text-sm text-slate-300">{trackCareerOutcome(trackCategory)}</p>
-          <p className="text-sm text-slate-400">{trackNextSuggestion(trackCategory)}</p>
-          <p className="text-xs text-slate-500">Estimated completion time left: {formatMinutes(progression.estimatedMinutesLeft)}</p>
-          <p className="text-xs text-slate-500">Current active modules: {progression.inProgressCount}</p>
+          <p className="text-sm text-foreground">{trackCareerOutcome(trackCategory)}</p>
+          <p className="text-sm text-muted-foreground">{trackNextSuggestion(trackCategory)}</p>
+          <p className="text-xs text-muted-foreground">Estimated completion time left: {formatMinutes(progression.estimatedMinutesLeft)}</p>
+          <p className="text-xs text-muted-foreground">Current active modules: {progression.inProgressCount}</p>
         </article>
       </section>
 
@@ -407,8 +407,8 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
             <Trophy className="h-4 w-4" />
             Congratulations - Track completed
           </div>
-          <h2 className="text-2xl font-semibold text-slate-100">You completed {track.title}</h2>
-          <p className="text-sm text-slate-300">
+          <h2 className="text-2xl font-semibold text-foreground">You completed {track.title}</h2>
+          <p className="text-sm text-muted-foreground">
             Skills gained: {skillsToShow.join(", ")}
           </p>
           <div className="flex flex-wrap gap-2">
@@ -418,7 +418,7 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
                 Open certificate
               </Link>
             ) : (
-              <span className="rounded-xl border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-slate-300">
+              <span className="xp-pill rounded-xl px-3 py-2 text-sm">
                 Certificate will be available after final quiz confirmation.
               </span>
             )}

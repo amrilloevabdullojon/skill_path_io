@@ -69,7 +69,7 @@ export function AIExerciseReview({ moduleTitle, trackTitle }: AIExerciseReviewPr
     <section className="surface-subtle space-y-4 p-4 sm:p-5">
       <header className="space-y-1">
         <p className="kicker">AI Exercise Review</p>
-        <h3 className="text-lg font-semibold text-slate-100">Check practical task quality</h3>
+        <h3 className="text-lg font-semibold text-foreground">Check practical task quality</h3>
       </header>
 
       <div className="grid gap-3 sm:grid-cols-[220px_1fr]">
@@ -104,20 +104,20 @@ export function AIExerciseReview({ moduleTitle, trackTitle }: AIExerciseReviewPr
       />
 
       {result && (
-        <article className="rounded-xl border border-slate-700 bg-slate-900/70 p-4">
-          <p className="text-sm font-semibold text-slate-100">Score: {result.score}/100</p>
+        <article className="content-card p-4">
+          <p className="text-sm font-semibold text-foreground">Score: {result.score}/100</p>
           <div className="mt-2 grid gap-2 sm:grid-cols-3 text-xs">
-            <p className="rounded-lg border border-slate-700 bg-slate-950/70 px-2 py-1 text-slate-300">
+            <p className="data-pill px-2 py-1">
               Accuracy: {result.accuracy}%
             </p>
-            <p className="rounded-lg border border-slate-700 bg-slate-950/70 px-2 py-1 text-slate-300">
+            <p className="data-pill px-2 py-1">
               Completeness: {result.completeness}%
             </p>
-            <p className="rounded-lg border border-slate-700 bg-slate-950/70 px-2 py-1 text-slate-300">
+            <p className="data-pill px-2 py-1">
               Logic: {result.logic}%
             </p>
           </div>
-          <ul className="mt-3 list-disc space-y-1 pl-4 text-xs text-slate-300">
+          <ul className="mt-3 list-disc space-y-1 pl-4 text-xs text-muted-foreground">
             {result.feedback.map((item) => (
               <li key={item}>{item}</li>
             ))}

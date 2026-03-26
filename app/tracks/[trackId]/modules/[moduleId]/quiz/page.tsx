@@ -75,19 +75,19 @@ export default async function QuizPage({ params }: QuizPageProps) {
     .slice(0, 2000);
 
   return (
-    <section className="surface-elevated space-y-6 p-4 text-slate-100 sm:p-6 lg:p-7">
-      <header className="space-y-3 border-b border-slate-800 pb-5">
-        <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Interactive quiz</p>
+    <section className="surface-elevated space-y-6 p-4 text-foreground sm:p-6 lg:p-7">
+      <header className="space-y-3 border-b border-border pb-5">
+        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Interactive quiz</p>
         <h1 className="break-words text-2xl font-semibold sm:text-3xl">{moduleItem.quiz.title}</h1>
-        <p className="flex flex-col gap-1 text-sm text-slate-300 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
+        <p className="flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
           <span className="break-words">Track: {track.title}</span>
-          <span className="hidden px-1 text-slate-500 sm:inline">|</span>
+          <span className="hidden px-1 text-muted-foreground sm:inline">|</span>
           <span className="break-words">Module: {moduleItem.title}</span>
-          <span className="hidden px-1 text-slate-500 sm:inline">|</span>
+          <span className="hidden px-1 text-muted-foreground sm:inline">|</span>
           <span>Passing score: {moduleItem.quiz.passingScore}%</span>
         </p>
         {progress && progress.score !== null && (
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-muted-foreground">
             Previous score: {progress.score}% {progress.status === "COMPLETED" ? "(module completed)" : ""}
           </p>
         )}
@@ -103,7 +103,7 @@ export default async function QuizPage({ params }: QuizPageProps) {
         lessonContext={lessonContext}
       />
 
-      <div className="border-t border-slate-800 pt-4">
+      <div className="border-t border-border pt-4">
         <Link
           href={`/tracks/${track.slug}/modules/${moduleItem.id}`}
           className="btn-secondary inline-flex w-full justify-center sm:w-auto"
