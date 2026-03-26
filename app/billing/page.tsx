@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { SubscriptionBillingPanel } from "@/components/saas/subscription-billing-panel";
 import { EmptyState } from "@/components/ui/empty-state";
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Billing — SkillPath Academy",
+  description: "Manage your subscription plan and billing details.",
+  robots: { index: false },
+};
 import { getDashboardData } from "@/lib/dashboard/data";
 import { listSubscriptionPlans } from "@/lib/saas/subscriptions";
 

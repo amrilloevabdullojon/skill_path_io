@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { EntryExperience } from "@/components/auth/entry-experience";
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Sign In — SkillPath Academy",
+  description: "Sign in to your SkillPath Academy account to continue learning.",
+  robots: { index: false },
+};
 import { getDashboardData } from "@/lib/dashboard/data";
 
 export const dynamic = "force-dynamic";

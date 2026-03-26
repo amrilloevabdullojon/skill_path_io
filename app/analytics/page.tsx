@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { StudentAnalyticsDashboard } from "@/components/analytics/student-analytics-dashboard";
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "My Analytics — SkillPath Academy",
+  description: "Track your learning progress, quiz scores, and XP growth over time.",
+  robots: { index: false },
+};
 import { getDashboardData } from "@/lib/dashboard/data";
 import { StudentAnalyticsSnapshot } from "@/types/personalization";
 

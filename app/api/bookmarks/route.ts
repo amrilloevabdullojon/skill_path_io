@@ -38,12 +38,15 @@ export const POST = withErrorHandler(async (request: Request) => {
   const title = body.title?.trim() ?? "";
   const href = body.href?.trim() ?? "";
   if (!title || !href) throw Errors.validation("title and href are required.");
+  if (title.length > 200) throw Errors.validation("title must be 200 characters or fewer.");
+  if (href.length > 500) throw Errors.validation("href must be 500 characters or fewer.");
+  if (!/^(\/|https?:\/\/)/.test(href)) throw Errors.validation("href must be a relative path or https URL.");
 
   const type =
     body.type === "module" || body.type === "quiz" || body.type === "mission"
       ? body.type
       : "lesson";
-  const tag = body.tag?.trim() || "General";
+  const tag = (body.tag?.trim() || "General").slice(0, 50);
 
   const existing = await prisma.userBookmark.findFirst({
     where: { userId: user.id, title, href },

@@ -1,7 +1,18 @@
+import type { Metadata } from "next";
 import { LeaderboardTable } from "@/components/leaderboard/leaderboard-table";
 import { PageHeader } from "@/components/ui/page-header";
 import { buildLeaderboard } from "@/features/gamification/leaderboard";
 import { prisma } from "@/lib/prisma";
+
+export const metadata: Metadata = {
+  title: "Leaderboard — SkillPath Academy",
+  description: "Top learners ranked by XP, completed modules, and certificates on SkillPath Academy.",
+  openGraph: {
+    title: "Learning Leaderboard — SkillPath Academy",
+    description: "See who's leading the QA, BA, and DA learning tracks.",
+    type: "website",
+  },
+};
 
 export const dynamic = "force-dynamic";
 

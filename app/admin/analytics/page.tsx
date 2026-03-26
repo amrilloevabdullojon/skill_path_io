@@ -180,34 +180,34 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
   return (
     <section className="page-shell">
       <header className="surface-elevated space-y-2 p-5 text-foreground">
-        <h2 className="text-xl font-semibold">Analytics</h2>
+        <h2 className="section-title">Analytics</h2>
         <p className="text-sm text-muted-foreground">Local metrics for users, content, progress, and certificates.</p>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        <div className="surface-panel surface-panel-hover p-4 text-foreground">
+        <div className="surface-panel p-4 text-foreground">
           <p className="text-xs text-muted-foreground">Users</p>
           <p className="text-2xl font-semibold">{users}</p>
         </div>
-        <div className="surface-panel surface-panel-hover p-4 text-foreground">
+        <div className="surface-panel p-4 text-foreground">
           <p className="text-xs text-muted-foreground">Tracks / Modules</p>
           <p className="text-2xl font-semibold">
             {tracks} / {modules}
           </p>
         </div>
-        <div className="surface-panel surface-panel-hover p-4 text-foreground">
+        <div className="surface-panel p-4 text-foreground">
           <p className="text-xs text-muted-foreground">Quizzes / Questions</p>
           <p className="text-2xl font-semibold">
             {quizzes} / {questions}
           </p>
         </div>
-        <div className="surface-panel surface-panel-hover p-4 text-foreground">
+        <div className="surface-panel p-4 text-foreground">
           <p className="text-xs text-muted-foreground">Progress statuses</p>
           <p className="text-sm text-muted-foreground">Completed: {completedProgress}</p>
           <p className="text-sm text-muted-foreground">In progress: {inProgress}</p>
           <p className="text-sm text-muted-foreground">Not started: {notStarted}</p>
         </div>
-        <div className="surface-panel surface-panel-hover p-4 text-foreground">
+        <div className="surface-panel p-4 text-foreground">
           <p className="text-xs text-muted-foreground">Certificates</p>
           <p className="text-2xl font-semibold">{certificates}</p>
         </div>

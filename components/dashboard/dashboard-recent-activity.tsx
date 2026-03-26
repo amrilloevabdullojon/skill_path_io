@@ -1,6 +1,7 @@
-import { Award, BookOpenCheck, CheckCircle2, Medal, Sparkles, Timer } from "lucide-react";
+import { Activity, Award, BookOpenCheck, CheckCircle2, Medal, Sparkles, Timer } from "lucide-react";
 
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { DashboardActivityItem } from "@/lib/dashboard/data";
 
 type DashboardRecentActivityProps = {
@@ -44,9 +45,14 @@ export function DashboardRecentActivitySection({ activity }: DashboardRecentActi
     >
       <div className="space-y-3">
         {activity.length === 0 ? (
-          <p className="content-card p-4 text-sm text-muted-foreground">
-            No activity yet. Open a module to start building your timeline.
-          </p>
+          <EmptyState
+            icon={BookOpenCheck}
+            title="No activity yet"
+            description="Open a module and complete a lesson — your timeline will appear here."
+            actionLabel="Browse tracks"
+            actionHref="/tracks"
+            size="sm"
+          />
         ) : (
           activity.map((item) => (
             <article

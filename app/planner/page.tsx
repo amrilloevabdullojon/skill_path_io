@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { PersonalLearningPlanner } from "@/components/planner/personal-learning-planner";
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Learning Planner — SkillPath Academy",
+  description: "Plan your weekly study schedule and track your learning goals.",
+  robots: { index: false },
+};
 import { buildCareerSystem } from "@/lib/career/system";
 import { getDashboardData } from "@/lib/dashboard/data";
 import { getOnboardingProfileFromCookie } from "@/lib/personalization/profile-storage";

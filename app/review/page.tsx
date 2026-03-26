@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { SpeedReviewMode } from "@/components/review/speed-review-mode";
 import { buildSpeedReviewCards } from "@/features/review/speed-review";
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Speed Review — SkillPath Academy",
+  description: "Review your saved bookmarks and notes in rapid flashcard mode.",
+  robots: { index: false },
+};
 import { prisma } from "@/lib/prisma";
 import { UserBookmark, UserNote } from "@/types/personalization";
 

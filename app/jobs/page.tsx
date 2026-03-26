@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { JobMatchingBoard } from "@/components/jobs/job-matching-board";
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Job Matches — SkillPath Academy",
+  description: "Browse job listings matched to your current skill level and track progression.",
+};
 import { buildCareerSystem } from "@/lib/career/system";
 import { getDashboardData } from "@/lib/dashboard/data";
 import { getOnboardingProfileFromCookie } from "@/lib/personalization/profile-storage";

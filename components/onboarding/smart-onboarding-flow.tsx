@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Sparkles, Target } from "lucide-react";
@@ -34,6 +35,16 @@ export function SmartOnboardingFlow({ initialProfile }: { initialProfile: Onboar
 
   const starterTrack = useMemo(() => starterTrackByProfession(profile.profession), [profile.profession]);
   const roadmap = useMemo(() => buildStarterRoadmap(profile.profession), [profile.profession]);
+
+  const completionSteps = [
+    Boolean(profile.profession),
+    Boolean(profile.currentLevel),
+    profile.goal.trim().length > 0,
+    profile.hoursPerWeek > 0,
+    profile.interests.length > 0,
+  ];
+  const completionCount = completionSteps.filter(Boolean).length;
+  const completionPercent = Math.round((completionCount / completionSteps.length) * 100);
 
   async function saveProfile() {
     setIsSaving(true);
@@ -73,11 +84,28 @@ export function SmartOnboardingFlow({ initialProfile }: { initialProfile: Onboar
     <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
       <article className="surface-elevated space-y-5 p-5 sm:p-6">
         <header className="space-y-2">
-          <p className="kicker">Smart Onboarding</p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="kicker">Smart Onboarding</p>
+            <Link href="/dashboard" className="text-xs text-muted-foreground transition-colors hover:text-foreground">
+              Skip for now →
+            </Link>
+          </div>
           <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">Build your personal learning plan</h1>
           <p className="text-sm text-muted-foreground">
             Tell us your goal and weekly capacity. SkillPath will adapt roadmap, missions, and recommendations.
           </p>
+          <div className="pt-1">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>Profile completion</span>
+              <span className={completionPercent === 100 ? "text-emerald-400" : ""}>{completionPercent}%</span>
+            </div>
+            <div className="progress-track mt-1.5">
+              <div
+                className="progress-fill"
+                style={{ width: `${completionPercent}%` }}
+              />
+            </div>
+          </div>
         </header>
 
         <div className="grid gap-4 md:grid-cols-2">

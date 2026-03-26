@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { BookmarksBoard } from "@/components/bookmarks/bookmarks-board";
+
+export const metadata: Metadata = {
+  title: "Bookmarks — SkillPath Academy",
+  description: "Saved lessons, modules, and quizzes for quick access.",
+  robots: { index: false },
+};
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { UserBookmark } from "@/types/personalization";

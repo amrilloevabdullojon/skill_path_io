@@ -1,6 +1,7 @@
 import { Crown, Medal, Trophy } from "lucide-react";
 
 import { LevelBadge } from "@/components/level/level-badge";
+import { EmptyState } from "@/components/ui/empty-state";
 import { LeaderboardRow } from "@/features/gamification/leaderboard";
 import { LevelTier } from "@/lib/progress/xp";
 
@@ -30,6 +31,16 @@ function toLevelTier(value: string): LevelTier {
 }
 
 export function LeaderboardTable({ rows, compact = false }: LeaderboardTableProps) {
+  if (rows.length === 0) {
+    return (
+      <EmptyState
+        icon={Trophy}
+        title="Leaderboard is empty"
+        description="Complete lessons and quizzes to earn XP and appear on the leaderboard."
+      />
+    );
+  }
+
   return (
     <div className="table-shell">
       <table className="table-base min-w-[760px]">
@@ -62,13 +73,6 @@ export function LeaderboardTable({ rows, compact = false }: LeaderboardTableProp
               {!compact && <td className="px-3 py-3 text-muted-foreground">{row.certificates}</td>}
             </tr>
           ))}
-          {rows.length === 0 && (
-            <tr>
-              <td className="px-3 py-6 text-center text-muted-foreground" colSpan={compact ? 4 : 6}>
-                No leaderboard data available.
-              </td>
-            </tr>
-          )}
         </tbody>
       </table>
     </div>

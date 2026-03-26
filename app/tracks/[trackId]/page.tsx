@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { TrackCategory } from "@prisma/client";
@@ -21,6 +22,7 @@ import {
   trackNextSuggestion,
   trackWhatYouLearn,
 } from "@/lib/tracks/progression";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { cn } from "@/lib/utils";
 
 type TrackDetailsProps = {
@@ -97,6 +99,29 @@ function formatMinutes(minutes: number) {
   if (minutes < 60) return `${minutes} min`;
   const hours = Math.round((minutes / 60) * 10) / 10;
   return `${hours}h`;
+}
+
+export async function generateMetadata({ params }: TrackDetailsProps): Promise<Metadata> {
+  const [runtimeTrack, localeValue] = await Promise.all([
+    resolveRuntimeCourseBySlug(params.trackId, { includeCourseEntities: false }),
+    getLocale(),
+  ]);
+
+  const track = runtimeTrack
+    ? applyTrackContentOverrides(runtimeTrack, normalizeLearningLocale(localeValue))
+    : null;
+
+  if (!track) return { title: "Track not found — SkillPath Academy" };
+
+  return {
+    title: `${track.title} — SkillPath Academy`,
+    description: `${track.category} career track with ${track.modules.length} modules. Master real-world skills and land your first tech role.`,
+    openGraph: {
+      title: track.title,
+      description: `${track.category} career track on SkillPath Academy`,
+      type: "website",
+    },
+  };
 }
 
 export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
@@ -183,6 +208,7 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
   return (
     <section className="page-shell">
       <header className="surface-elevated space-y-5 p-5 sm:p-7">
+            <Breadcrumb items={[{ label: track.title }]} />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className={cn("inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide", accent.badge)}>
             {categoryLabel(trackCategory)} Track
@@ -211,7 +237,7 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
             <p className="kicker">Track progress</p>
             <p className="text-3xl font-semibold text-foreground">{progression.overallProgressPercent}%</p>
             <div className="progress-track h-2">
-              <div className={cn("h-full rounded-full transition-all duration-500", accent.progress)} style={{ width: `${progression.overallProgressPercent}%` }} />
+              <div className={cn("h-full rounded-full progress-fill", accent.progress)} style={{ width: `${progression.overallProgressPercent}%` }} />
             </div>
             <p className="text-xs text-muted-foreground">
               {progression.completedCount}/{progression.totalModules} modules completed
@@ -285,7 +311,7 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
                     </div>
                   </div>
                   <div className="progress-track mt-3 h-2">
-                    <div className={cn("h-full rounded-full transition-all duration-500", accent.progress)} style={{ width: `${moduleItem.progressPercent}%` }} />
+                    <div className={cn("h-full rounded-full progress-fill", accent.progress)} style={{ width: `${moduleItem.progressPercent}%` }} />
                   </div>
                   {moduleItem.unlockRequirement ? (
                     <p className="mt-2 text-xs text-amber-300">{moduleItem.unlockRequirement}</p>
@@ -341,7 +367,7 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
                 </div>
 
                 <div className="progress-track h-2">
-                  <div className={cn("h-full rounded-full transition-all duration-500", accent.progress)} style={{ width: `${moduleItem.progressPercent}%` }} />
+                  <div className={cn("h-full rounded-full progress-fill", accent.progress)} style={{ width: `${moduleItem.progressPercent}%` }} />
                 </div>
                 <p className="text-xs text-muted-foreground">{moduleItem.progressPercent}% progress</p>
 

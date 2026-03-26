@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { QuizPlayer } from "@/components/quiz/quiz-player";
 import { authOptions } from "@/lib/auth";
 import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
@@ -16,6 +18,17 @@ type QuizPageProps = {
     moduleId: string;
   };
 };
+
+export async function generateMetadata({ params }: QuizPageProps): Promise<Metadata> {
+  const runtimeTrack = await resolveRuntimeCourseBySlug(params.trackId, { includeCourseEntities: true });
+  const moduleItem = runtimeTrack?.modules.find((m) => m.id === params.moduleId);
+  if (!runtimeTrack || !moduleItem) return {};
+  return {
+    title: `Quiz: ${moduleItem.title} — SkillPath Academy`,
+    description: `Test your knowledge of ${moduleItem.title} in the ${runtimeTrack.title} track.`,
+    robots: { index: false },
+  };
+}
 
 type QuizQuestionView = {
   id: string;
@@ -77,6 +90,13 @@ export default async function QuizPage({ params }: QuizPageProps) {
   return (
     <section className="surface-elevated space-y-6 p-4 text-foreground sm:p-6 lg:p-7">
       <header className="space-y-3 border-b border-border pb-5">
+        <Breadcrumb
+          items={[
+            { label: track.title, href: `/tracks/${track.slug}` },
+            { label: moduleItem.title, href: `/tracks/${track.slug}/modules/${moduleItem.id}` },
+            { label: "Quiz" },
+          ]}
+        />
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Interactive quiz</p>
         <h1 className="break-words text-2xl font-semibold sm:text-3xl">{moduleItem.quiz.title}</h1>
         <p className="flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">

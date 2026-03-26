@@ -58,7 +58,7 @@ export default async function UsersAdminPage({ searchParams }: UsersAdminPagePro
   return (
     <section className="surface-elevated space-y-4 p-5 text-foreground">
       <header className="space-y-2">
-        <h2 className="text-xl font-semibold">Users</h2>
+        <h2 className="section-title">Users</h2>
         <p className="text-sm text-muted-foreground">Search, filter, and edit user roles locally.</p>
       </header>
 

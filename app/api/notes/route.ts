@@ -38,6 +38,8 @@ export const POST = withErrorHandler(async (request: Request) => {
   const title = body.title?.trim() ?? "";
   const content = body.content?.trim() ?? "";
   if (!title || !content) throw Errors.validation("title and content are required.");
+  if (title.length > 200) throw Errors.validation("title must be 200 characters or fewer.");
+  if (content.length > 10_000) throw Errors.validation("content must be 10 000 characters or fewer.");
 
   const track = body.track === "BA" || body.track === "DA" ? body.track : "QA";
   const lessonRef = body.lessonRef?.trim() || "Manual note";

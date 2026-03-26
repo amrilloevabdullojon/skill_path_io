@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { NotesBoard } from "@/components/notes/notes-board";
+
+export const metadata: Metadata = {
+  title: "My Notes — SkillPath Academy",
+  description: "Personal learning notes captured during your studies.",
+  robots: { index: false },
+};
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { UserNote } from "@/types/personalization";

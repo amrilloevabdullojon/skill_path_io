@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { TeamLearningHub } from "@/components/saas/team-learning-hub";
 import { EmptyState } from "@/components/ui/empty-state";
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Team Learning — SkillPath Academy",
+  description: "Manage team learning plans, track progress, and coordinate training across your organization.",
+  robots: { index: false },
+};
 import { getDashboardData } from "@/lib/dashboard/data";
 
 export const dynamic = "force-dynamic";

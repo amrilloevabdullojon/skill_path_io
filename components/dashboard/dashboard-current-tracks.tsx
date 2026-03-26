@@ -48,14 +48,16 @@ export function DashboardCurrentTracks({ tracks }: DashboardCurrentTracksProps) 
       actionHref="/tracks"
     >
       <div className="grid gap-4 xl:grid-cols-3">
-        {tracks.map((track) => {
+        {tracks.map((track, i) => {
           const style = categoryStyle[track.category];
+          const isFirstUntouched = i === 0 && track.progressPercent === 0 && track.completedModules === 0;
           return (
             <article
               key={track.id}
               className={cn(
                 "group surface-panel-hover flex h-full min-w-0 flex-col rounded-2xl border bg-card/70 p-4 sm:p-5",
                 style.border,
+                isFirstUntouched && "ring-2 ring-sky-400/40",
               )}
             >
               <div className="flex items-start justify-between gap-3">
@@ -120,7 +122,7 @@ export function DashboardCurrentTracks({ tracks }: DashboardCurrentTracksProps) 
                 href={track.nextModuleHref}
                 className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-semibold text-sky-300 transition-all group-hover:translate-x-0.5 hover:text-sky-200"
               >
-                Continue
+                {isFirstUntouched ? "Start here" : "Continue"}
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
             </article>

@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { DiscussionsHub } from "@/components/discussion/discussions-hub";
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Discussions — SkillPath Academy",
+  description: "Ask questions, share insights, and discuss learning topics with your peers.",
+};
 import { prisma } from "@/lib/prisma";
 import { DiscussionThread } from "@/types/personalization";
 

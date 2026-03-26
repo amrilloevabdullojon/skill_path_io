@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { PortfolioBuilder } from "@/components/portfolio/portfolio-builder";
@@ -8,6 +9,12 @@ import { prisma } from "@/lib/prisma";
 import { PortfolioEntry } from "@/types/personalization";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Portfolio — SkillPath Academy",
+  description: "Your professional portfolio built from completed missions and track achievements.",
+  robots: { index: false },
+};
 
 export default async function PortfolioPage() {
   const session = await getServerSession(authOptions);

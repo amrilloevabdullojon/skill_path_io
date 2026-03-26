@@ -30,7 +30,11 @@
       "Read(//opt/homebrew/**)",
       "Bash(ls /Users/panda/Documents/GitHub/skill_path_io/.env*)",
       "Bash(find /Users/panda/Documents/GitHub/skill_path_io/components/admin -name *.tsx -type f)",
-      "Bash(find /Users/panda/Documents/GitHub/skill_path_io/components/analytics -name *.tsx -type f)"
+      "Bash(find /Users/panda/Documents/GitHub/skill_path_io/components/analytics -name *.tsx -type f)",
+      "Bash(find /Users/panda/Documents/GitHub/skill_path_io -name *.tsx -exec grep -l \"InView\\\\|useScroll\\\\|useTransform\\\\|viewport\" {})",
+      "Bash(2)",
+      "Bash(grep -E \"next\\\\.config\\\\.\\(js|ts\\)$\")",
+      "Bash(grep -n \"generateStaticParams\\\\|force-static\\\\|revalidate\" /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/page.tsx)"
     ]
   }
 }

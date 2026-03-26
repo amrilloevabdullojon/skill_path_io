@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { PublicProfileView } from "@/components/saas/public-profile-view";
@@ -11,6 +12,18 @@ type PublicProfilePageProps = {
 };
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: PublicProfilePageProps): Promise<Metadata> {
+  return {
+    title: `@${params.handle} — SkillPath Academy`,
+    description: `Public learning profile on SkillPath Academy. See skills, badges, and mission outcomes.`,
+    openGraph: {
+      title: `@${params.handle} on SkillPath Academy`,
+      description: "Learner profile with skills, badges, and career readiness score.",
+      type: "profile",
+    },
+  };
+}
 
 export default async function PublicProfilePage({ params }: PublicProfilePageProps) {
   const session = await getServerSession(authOptions);

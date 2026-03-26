@@ -4,6 +4,7 @@ import { useState } from "react";
 import { NotebookPen, Plus } from "lucide-react";
 
 import { UserNote } from "@/types/personalization";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type ApiNote = {
   id: string;
@@ -118,21 +119,31 @@ export function NotesBoard({ initialNotes }: { initialNotes: UserNote[] }) {
       </article>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        {notes.map((note) => (
-          <article key={note.id} className="surface-elevated space-y-2 p-4">
-            <div className="flex items-start justify-between gap-3">
-              <p className="text-sm font-semibold text-foreground">{note.title}</p>
-              <button type="button" onClick={() => removeNote(note.id)} className="text-xs text-muted-foreground hover:text-foreground">
-                Remove
-              </button>
-            </div>
-            <p className="text-sm text-muted-foreground">{note.content}</p>
-            <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-              <NotebookPen className="h-3.5 w-3.5" />
-              {note.lessonRef}
-            </p>
-          </article>
-        ))}
+        {notes.length === 0 ? (
+          <div className="xl:col-span-2">
+            <EmptyState
+              icon={NotebookPen}
+              title="No notes yet"
+              description="Capture key ideas, shortcuts, and reminders as you study — they'll appear here for quick review."
+            />
+          </div>
+        ) : (
+          notes.map((note) => (
+            <article key={note.id} className="surface-elevated space-y-2 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm font-semibold text-foreground">{note.title}</p>
+                <button type="button" onClick={() => removeNote(note.id)} className="text-xs text-muted-foreground hover:text-foreground">
+                  Remove
+                </button>
+              </div>
+              <p className="text-sm text-muted-foreground">{note.content}</p>
+              <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                <NotebookPen className="h-3.5 w-3.5" />
+                {note.lessonRef}
+              </p>
+            </article>
+          ))
+        )}
       </div>
     </section>
   );

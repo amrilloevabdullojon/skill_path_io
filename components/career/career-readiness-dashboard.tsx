@@ -1,5 +1,8 @@
+"use client";
+
 import { ArrowUpRight, BriefcaseBusiness, TrendingUp } from "lucide-react";
 
+import { FadeInUp, StaggerList } from "@/components/ui/fade-in";
 import { ReadinessSnapshot } from "@/types/personalization";
 
 export function CareerReadinessDashboard({
@@ -15,12 +18,15 @@ export function CareerReadinessDashboard({
 }) {
   return (
     <section className="space-y-6">
-      <header className="surface-elevated space-y-3 p-5 sm:p-6">
-        <p className="kicker">Career Readiness</p>
-        <h1 className="page-title">Target role: {role}</h1>
-        <p className="section-description">Track your readiness score, missing skills, and next milestone toward job-level outcomes.</p>
-      </header>
+      <FadeInUp delay={0}>
+        <header className="surface-elevated space-y-3 p-5 sm:p-6">
+          <p className="kicker">Career Readiness</p>
+          <h1 className="page-title">Target role: {role}</h1>
+          <p className="section-description">Track your readiness score, missing skills, and next milestone toward job-level outcomes.</p>
+        </header>
+      </FadeInUp>
 
+      <FadeInUp delay={0.08}>
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <article className="surface-elevated space-y-4 p-5">
           <div className="flex items-center justify-between">
@@ -49,14 +55,14 @@ export function CareerReadinessDashboard({
 
         <article className="surface-elevated space-y-4 p-5">
           <h2 className="text-lg font-semibold text-foreground">Skill gap indicators</h2>
-          <div className="space-y-2">
+          <StaggerList className="space-y-2">
             {readiness.missingSkills.map((skill) => (
               <div key={skill} className="flex items-center justify-between rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-2">
                 <span className="text-sm text-amber-100">{skill}</span>
                 <span className="text-xs text-amber-300">Gap</span>
               </div>
             ))}
-          </div>
+          </StaggerList>
           <div className="surface-subtle p-3">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">Recommended learning actions</p>
             <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-muted-foreground">
@@ -67,20 +73,22 @@ export function CareerReadinessDashboard({
           </div>
         </article>
       </div>
+      </FadeInUp>
 
+      <FadeInUp delay={0.16}>
       <div className="grid gap-6 xl:grid-cols-[1fr_1fr]">
         <article className="surface-elevated space-y-3 p-5">
           <p className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-200">
             <TrendingUp className="h-4 w-4" />
             Skills already covered
           </p>
-          <div className="flex flex-wrap gap-2">
+          <StaggerList className="flex flex-wrap gap-2">
             {coveredSkills.map((skill) => (
               <span key={skill} className="rounded-full border border-emerald-400/30 bg-emerald-500/12 px-2.5 py-1 text-xs text-emerald-200">
                 {skill}
               </span>
             ))}
-          </div>
+          </StaggerList>
         </article>
 
         <article className="surface-elevated space-y-3 p-5">
@@ -95,6 +103,7 @@ export function CareerReadinessDashboard({
           </a>
         </article>
       </div>
+      </FadeInUp>
     </section>
   );
 }

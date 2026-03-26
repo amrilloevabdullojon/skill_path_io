@@ -69,7 +69,7 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
   return (
     <section className="surface-elevated space-y-4 p-5 text-foreground">
       <header className="space-y-2">
-        <h2 className="text-xl font-semibold">Certificates</h2>
+        <h2 className="section-title">Certificates</h2>
         <p className="text-sm text-muted-foreground">Search, filter, and edit certificate URLs.</p>
       </header>
 

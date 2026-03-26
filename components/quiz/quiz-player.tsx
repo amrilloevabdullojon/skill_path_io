@@ -65,6 +65,60 @@ export function QuizPlayer({
   const isLastQuestion = currentIndex === totalQuestions - 1;
   const hasSelection = selectedAnswers.length > 0;
 
+  useEffect(() => {
+    if (result) return;
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (!currentQuestion) return;
+      // Ignore when user is typing in a textarea
+      if (document.activeElement?.tagName === "TEXTAREA") return;
+
+      // 1–9: select nth option
+      const num = parseInt(e.key, 10);
+      if (num >= 1 && num <= currentQuestion.options.length) {
+        const option = currentQuestion.options[num - 1];
+        if (option) {
+          selectOption(
+            currentQuestion.id,
+            currentQuestion.type,
+            option.id,
+            !selectedAnswers.includes(option.id),
+          );
+        }
+        return;
+      }
+
+      // ArrowRight or Enter → next / submit
+      if (e.key === "ArrowRight" || e.key === "Enter") {
+        if (document.activeElement?.tagName === "INPUT") return;
+        if (hasSelection && !isPending) {
+          isLastQuestion ? void handleSubmitQuiz() : goNext();
+        }
+        return;
+      }
+
+      // ArrowLeft → previous
+      if (e.key === "ArrowLeft") {
+        if (document.activeElement?.tagName === "INPUT") return;
+        if (canGoPrevious && !isPending) goPrevious();
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [
+    result,
+    currentQuestion,
+    selectedAnswers,
+    isLastQuestion,
+    hasSelection,
+    canGoPrevious,
+    isPending,
+    goNext,
+    goPrevious,
+    selectOption,
+  ]);
+
   const answerPayload = useMemo(() => {
     return Object.fromEntries(
       Object.entries(answers).map(([questionId, answerIds]) => [questionId, Array.from(new Set(answerIds))]),
@@ -198,6 +252,9 @@ export function QuizPlayer({
             transition={{ duration: 0.25, ease: "easeOut" }}
           />
         </div>
+        <p className="mt-2 text-[11px] text-muted-foreground/60">
+          Press <kbd className="rounded border border-border px-1 font-mono">1</kbd>–<kbd className="rounded border border-border px-1 font-mono">{Math.min(currentQuestion?.options.length ?? 4, 9)}</kbd> to select · <kbd className="rounded border border-border px-1 font-mono">→</kbd> next · <kbd className="rounded border border-border px-1 font-mono">←</kbd> back
+        </p>
       </div>
 
       <AnimatePresence mode="wait">

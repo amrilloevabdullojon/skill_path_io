@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { GroupsHub } from "@/components/groups/groups-hub";
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Study Groups — SkillPath Academy",
+  description: "Join or create study groups to learn together and stay accountable.",
+};
 import { prisma } from "@/lib/prisma";
 import { StudyGroup } from "@/types/personalization";
 

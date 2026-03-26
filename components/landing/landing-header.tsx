@@ -27,6 +27,7 @@ export function LandingHeader() {
   useEffect(() => {
     function onScroll() {
       setIsScrolled(window.scrollY > 12);
+      setMobileOpen(false);
     }
 
     onScroll();

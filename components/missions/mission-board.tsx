@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import { CheckCircle2, Crosshair, Loader2, Sparkles } from "lucide-react";
 
+import { EmptyState } from "@/components/ui/empty-state";
+import { FadeInUp } from "@/components/ui/fade-in";
 import { upsertPortfolioEntry } from "@/lib/portfolio/local-portfolio";
 import { LearningMission, MissionEvaluation } from "@/types/personalization";
 
@@ -66,11 +68,20 @@ export function MissionBoard({ missions, isPlanLimited = false, upgradeMessage =
         ) : null}
       </header>
 
+      {missions.length === 0 ? (
+        <EmptyState
+          icon={Crosshair}
+          title="No missions available"
+          description="Missions are tailored to your learning track. Complete more lessons to unlock them."
+          actionLabel="Go to tracks"
+          actionHref="/tracks"
+        />
+      ) : (
       <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
         <aside className="surface-elevated space-y-3 p-4">
-          {missions.map((mission) => (
+          {missions.map((mission, i) => (
+            <FadeInUp key={mission.id} delay={i * 0.04}>
             <button
-              key={mission.id}
               type="button"
               onClick={() => {
                 setActiveId(mission.id);
@@ -92,6 +103,7 @@ export function MissionBoard({ missions, isPlanLimited = false, upgradeMessage =
                 <span className="chip-neutral px-2 py-0.5">{mission.status}</span>
               </div>
             </button>
+            </FadeInUp>
           ))}
         </aside>
 
@@ -213,6 +225,7 @@ export function MissionBoard({ missions, isPlanLimited = false, upgradeMessage =
           </article>
         ) : null}
       </div>
+      )}
     </section>
   );
 }

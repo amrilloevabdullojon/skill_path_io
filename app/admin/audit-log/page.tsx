@@ -42,7 +42,7 @@ export default async function AuditLogPage() {
     <section className="page-shell">
       <header className="surface-elevated space-y-2 p-5 sm:p-7">
         <p className="kicker">{t("kicker")}</p>
-        <h1 className="section-title text-2xl">{t("title")}</h1>
+        <h1 className="section-title">{t("title")}</h1>
         <p className="body-text text-sm">
           {t("description", { count: Math.min(100, total), total })}
         </p>

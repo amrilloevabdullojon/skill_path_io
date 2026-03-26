@@ -21,8 +21,22 @@ import { LandingHeader } from "@/components/landing/landing-header";
 import { LandingHeroPreview } from "@/components/landing/landing-hero-preview";
 import { LandingSkillRadarDemo } from "@/components/landing/landing-skill-radar-demo";
 import { SectionReveal } from "@/components/landing/section-reveal";
+import type { Metadata } from "next";
+
 import { resolveRuntimeCatalog } from "@/lib/learning/runtime-content";
 import { mapRuntimeCatalogToMissions } from "@/lib/missions/runtime-missions";
+
+export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: "SkillPath Academy — QA, BA & DA Career Tracks",
+  description: "Structured learning paths for QA Engineers, Business Analysts, and Data Analysts. Learn with missions, quizzes, and AI-powered feedback.",
+  openGraph: {
+    title: "SkillPath Academy",
+    description: "Role-focused career tracks for QA, BA, and DA professionals.",
+    type: "website",
+  },
+};
 
 const valueProps = [
   {
@@ -340,13 +354,12 @@ export default async function HomePage() {
           </SectionReveal>
 
           {/* ── Value props ──────────────────────────────── */}
-          <SectionReveal>
-            <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {valueProps.map((prop) => {
-                const Icon = prop.icon;
-                return (
+          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {valueProps.map((prop, i) => {
+              const Icon = prop.icon;
+              return (
+                <SectionReveal key={prop.title} delay={i * 0.08}>
                   <article
-                    key={prop.title}
                     className={cn(
                       "surface-panel surface-panel-hover flex flex-col gap-3 p-5",
                     )}
@@ -359,10 +372,10 @@ export default async function HomePage() {
                       <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{prop.description}</p>
                     </div>
                   </article>
-                );
-              })}
-            </section>
-          </SectionReveal>
+                </SectionReveal>
+              );
+            })}
+          </section>
 
           {/* ── How it works ─────────────────────────────── */}
           <SectionReveal>
@@ -511,19 +524,21 @@ export default async function HomePage() {
               </div>
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {roadmapStages.map((stage, index) => (
-                  <article key={stage.title} className="surface-subtle surface-panel-hover p-5">
-                    <div className="flex items-center gap-2.5">
-                      <span className="step-number">{index + 1}</span>
-                      <h3 className="text-base font-semibold text-foreground">{stage.title}</h3>
-                    </div>
-                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{stage.description}</p>
-                    <div className="mt-3 flex items-center gap-1.5">
-                      <Zap className="h-3 w-3 shrink-0 text-amber-400" />
-                      <span className="text-xs text-muted-foreground">
-                        Unlock: <span className="text-foreground">{stage.unlock}</span>
-                      </span>
-                    </div>
-                  </article>
+                  <SectionReveal key={stage.title} delay={index * 0.06}>
+                    <article className="surface-subtle surface-panel-hover p-5">
+                      <div className="flex items-center gap-2.5">
+                        <span className="step-number">{index + 1}</span>
+                        <h3 className="text-base font-semibold text-foreground">{stage.title}</h3>
+                      </div>
+                      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{stage.description}</p>
+                      <div className="mt-3 flex items-center gap-1.5">
+                        <Zap className="h-3 w-3 shrink-0 text-amber-400" />
+                        <span className="text-xs text-muted-foreground">
+                          Unlock: <span className="text-foreground">{stage.unlock}</span>
+                        </span>
+                      </div>
+                    </article>
+                  </SectionReveal>
                 ))}
               </div>
             </section>
@@ -644,9 +659,9 @@ export default async function HomePage() {
                 <h2 className="section-title">Simple plans for every stage</h2>
               </div>
               <div className="grid gap-5 md:grid-cols-3">
-                {pricingPlans.map((plan) => (
+                {pricingPlans.map((plan, i) => (
+                  <SectionReveal key={plan.name} delay={i * 0.1}>
                   <article
-                    key={plan.name}
                     className={cn(
                       "relative flex flex-col gap-5 rounded-2xl border p-6",
                       plan.highlight
@@ -692,6 +707,7 @@ export default async function HomePage() {
                       {plan.cta}
                     </Link>
                   </article>
+                  </SectionReveal>
                 ))}
               </div>
             </section>

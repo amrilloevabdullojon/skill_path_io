@@ -21,7 +21,7 @@ export function DashboardSection({
   className,
 }: DashboardSectionProps) {
   return (
-    <section id={id} className={`surface-elevated surface-panel-hover min-w-0 space-y-4 p-5 sm:p-6 ${className ?? ""}`}>
+    <section id={id} className={`surface-elevated min-w-0 space-y-4 p-5 sm:p-6 ${className ?? ""}`}>
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="section-heading">{title}</h2>

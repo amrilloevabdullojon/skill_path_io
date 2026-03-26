@@ -18,11 +18,13 @@ export function DashboardXpLevelSection({ xp, weeklyProgress }: DashboardXpLevel
       description="Track your progress towards the next level with lightweight weekly trend analytics."
     >
       <div className="grid min-w-0 gap-4 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <div className="mini-stat-box min-w-0 space-y-4 rounded-2xl p-4">
+        <div className="mini-stat-box card-elevated min-w-0 space-y-4 rounded-2xl p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="kicker">Level progress</p>
-              <p className="mt-1 text-3xl font-semibold tracking-tight text-foreground">{xp.totalXp} XP</p>
+              <p className="mt-1 bg-gradient-to-r from-sky-400 to-violet-400 bg-clip-text text-3xl font-semibold tracking-tight text-transparent">
+                {xp.totalXp} XP
+              </p>
             </div>
             <LevelBadge level={xp.currentLevel} className="shrink-0 whitespace-nowrap" />
           </div>
@@ -33,7 +35,7 @@ export function DashboardXpLevelSection({ xp, weeklyProgress }: DashboardXpLevel
               <span>{xp.progressPercent}%</span>
             </div>
             <div className="progress-track mt-2 h-2">
-              <div className="h-full rounded-full bg-sky-400 transition-all duration-500" style={{ width: `${xp.progressPercent}%` }} />
+              <div className="progress-fill h-full rounded-full bg-sky-400" style={{ width: `${xp.progressPercent}%` }} />
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
               {xp.nextLevel ? `${xp.xpNeededForNext} XP to ${xp.nextLevel}` : "Maximum level reached"}

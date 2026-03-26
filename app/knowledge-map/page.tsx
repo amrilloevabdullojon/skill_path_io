@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { KnowledgeMapView } from "@/components/knowledge-map/knowledge-map-view";
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Knowledge Map — SkillPath Academy",
+  description: "Visual map of your acquired skills and remaining learning objectives.",
+  robots: { index: false },
+};
 import { getDashboardData } from "@/lib/dashboard/data";
 import { resolveRuntimeCatalog } from "@/lib/learning/content-resolver";
 import { prisma } from "@/lib/prisma";

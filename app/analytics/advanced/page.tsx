@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { AdvancedLearningAnalyticsDashboard } from "@/components/saas/advanced-learning-analytics-dashboard";
 import { EmptyState } from "@/components/ui/empty-state";
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Advanced Analytics — SkillPath Academy",
+  description: "Detailed learning analytics: skill gaps, completion trends, and performance benchmarks.",
+  robots: { index: false },
+};
 import { getDashboardData } from "@/lib/dashboard/data";
 
 export const dynamic = "force-dynamic";

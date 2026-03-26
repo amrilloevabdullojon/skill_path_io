@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { HTMLMotionProps } from "framer-motion";
 
 type FadeInUpProps = HTMLMotionProps<"div"> & {
@@ -10,11 +10,12 @@ type FadeInUpProps = HTMLMotionProps<"div"> & {
 };
 
 export function FadeInUp({ delay = 0, duration = 0.4, children, ...props }: FadeInUpProps) {
+  const reduced = useReducedMotion();
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration, delay, ease: [0.22, 1, 0.36, 1] }}
+      initial={reduced ? {} : { opacity: 0, y: 16 }}
+      animate={reduced ? {} : { opacity: 1, y: 0 }}
+      transition={reduced ? {} : { duration, delay, ease: [0.22, 1, 0.36, 1] }}
       {...props}
     >
       {children}
@@ -29,6 +30,7 @@ type StaggerListProps = {
 };
 
 export function StaggerList({ children, staggerDelay = 0.07, className }: StaggerListProps) {
+  const reduced = useReducedMotion();
   return (
     <motion.div
       className={className}
@@ -36,16 +38,20 @@ export function StaggerList({ children, staggerDelay = 0.07, className }: Stagge
       animate="visible"
       variants={{
         hidden: {},
-        visible: { transition: { staggerChildren: staggerDelay } },
+        visible: { transition: { staggerChildren: reduced ? 0 : staggerDelay } },
       }}
     >
       {children.map((child, i) => (
         <motion.div
           key={i}
-          variants={{
-            hidden: { opacity: 0, y: 12 },
-            visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
-          }}
+          variants={
+            reduced
+              ? { hidden: {}, visible: {} }
+              : {
+                  hidden: { opacity: 0, y: 12 },
+                  visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
+                }
+          }
         >
           {child}
         </motion.div>

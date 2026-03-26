@@ -62,7 +62,7 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
   return (
     <section className="surface-elevated space-y-4 p-5 text-foreground">
       <header className="space-y-2">
-        <h2 className="text-xl font-semibold">Tracks</h2>
+        <h2 className="section-title">Tracks</h2>
         <p className="text-sm text-muted-foreground">Search tracks, filter by category, and edit metadata.</p>
       </header>
 

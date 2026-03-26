@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes progress-enter {
+  from { width: 0 !important; }
+}
+
 :root {
   --background-primary: 226 42% 5%;
   --background-secondary: 225 34% 8%;
@@ -253,23 +257,19 @@ textarea {
   }
 
   .card-title {
-    @apply text-xl font-semibold tracking-tight text-slate-100;
+    @apply text-xl font-semibold tracking-tight text-foreground;
   }
 
   .body-text {
-    @apply text-sm leading-7 text-slate-300 sm:text-[15px];
+    @apply text-sm leading-7 text-muted-foreground sm:text-[15px];
   }
 
   .muted-text {
-    @apply text-sm text-slate-400;
+    @apply text-sm text-muted-foreground;
   }
 
   .data-label {
-    @apply text-[11px] uppercase tracking-[0.14em] text-slate-400;
-  }
-
-  [data-theme="light"] .data-label {
-    @apply text-slate-500;
+    @apply text-[11px] uppercase tracking-[0.14em] text-muted-foreground;
   }
 
   /* Stat card — small metric box used across dashboard and landing */
@@ -357,26 +357,30 @@ textarea {
     @apply transition-all duration-normal ease-smooth hover:-translate-y-0.5;
   }
 
+  .card-elevated {
+    @apply shadow-[0_6px_28px_-4px_rgba(0,0,0,0.35)];
+  }
+
+  [data-theme="light"] .card-elevated {
+    @apply shadow-[0_6px_28px_-4px_rgba(0,0,0,0.09)];
+  }
+
   .kicker {
-    @apply text-xs font-semibold uppercase tracking-[0.18em] text-slate-400;
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground;
   }
 
   .section-title {
     font-size: clamp(1.25rem, 2vw + 0.5rem, 1.65rem);
-    @apply font-semibold tracking-tight text-slate-100;
+    @apply font-semibold tracking-tight text-foreground;
   }
 
   .page-title {
     font-size: clamp(1.75rem, 3vw + 0.5rem, 2.25rem);
-    @apply font-semibold tracking-tight text-slate-100 sm:text-4xl;
+    @apply font-semibold tracking-tight text-foreground sm:text-4xl;
   }
 
   .section-description {
-    @apply text-sm text-slate-300;
-  }
-
-  [data-theme="light"] .section-description {
-    @apply text-slate-600;
+    @apply text-sm text-muted-foreground;
   }
 
   .input-base {
@@ -564,6 +568,7 @@ textarea {
 
   .progress-fill {
     @apply h-full rounded-full bg-gradient-to-r from-sky-500 to-sky-400 transition-all duration-500 ease-smooth;
+    animation: progress-enter 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   [data-theme="light"] .progress-track {
@@ -577,30 +582,6 @@ textarea {
 
   [data-theme="light"] .hero-title-gradient {
     @apply from-slate-900 via-sky-700 to-violet-600;
-  }
-
-  [data-theme="light"] .card-title {
-    @apply text-slate-800;
-  }
-
-  [data-theme="light"] .body-text {
-    @apply text-slate-700;
-  }
-
-  [data-theme="light"] .muted-text {
-    @apply text-slate-500;
-  }
-
-  [data-theme="light"] .kicker {
-    @apply text-slate-500;
-  }
-
-  [data-theme="light"] .section-title {
-    @apply text-slate-800;
-  }
-
-  [data-theme="light"] .page-title {
-    @apply text-slate-900;
   }
 
   [data-theme="light"] .step-number {

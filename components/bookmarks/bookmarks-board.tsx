@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Bookmark, Plus } from "lucide-react";
 
 import { UserBookmark } from "@/types/personalization";
+import { EmptyState } from "@/components/ui/empty-state";
 
 type ApiBookmark = {
   id: string;
@@ -113,21 +114,31 @@ export function BookmarksBoard({ initialBookmarks }: { initialBookmarks: UserBoo
       </article>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        {bookmarks.map((bookmark) => (
-          <article key={bookmark.id} className="surface-elevated space-y-3 p-4">
-            <div className="flex items-start justify-between gap-2">
-              <p className="text-sm font-semibold text-foreground">{bookmark.title}</p>
-              <button type="button" onClick={() => removeBookmark(bookmark.id)} className="text-xs text-muted-foreground hover:text-foreground">
-                Remove
-              </button>
-            </div>
-            <p className="text-xs text-muted-foreground">{bookmark.type} | {bookmark.tag}</p>
-            <Link href={bookmark.href} className="inline-flex items-center gap-2 text-sm text-sky-300 hover:text-sky-200">
-              <Bookmark className="h-4 w-4" />
-              Open bookmark
-            </Link>
-          </article>
-        ))}
+        {bookmarks.length === 0 ? (
+          <div className="xl:col-span-2">
+            <EmptyState
+              icon={Bookmark}
+              title="No bookmarks yet"
+              description="Save lessons, modules, and quizzes here to revisit them anytime or use in speed review mode."
+            />
+          </div>
+        ) : (
+          bookmarks.map((bookmark) => (
+            <article key={bookmark.id} className="surface-elevated space-y-3 p-4">
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-sm font-semibold text-foreground">{bookmark.title}</p>
+                <button type="button" onClick={() => removeBookmark(bookmark.id)} className="text-xs text-muted-foreground hover:text-foreground">
+                  Remove
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground">{bookmark.type} | {bookmark.tag}</p>
+              <Link href={bookmark.href} className="inline-flex items-center gap-2 text-sm text-sky-300 hover:text-sky-200">
+                <Bookmark className="h-4 w-4" />
+                Open bookmark
+              </Link>
+            </article>
+          ))
+        )}
       </div>
     </section>
   );

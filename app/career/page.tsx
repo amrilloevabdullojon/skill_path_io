@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 
@@ -9,6 +10,16 @@ import { buildCareerSystem } from "@/lib/career/system";
 import { getDashboardData } from "@/lib/dashboard/data";
 import { getOnboardingProfileFromCookie } from "@/lib/personalization/profile-storage";
 import { getAdaptivePath } from "@/lib/recommendations/adaptive-path";
+
+export const metadata: Metadata = {
+  title: "Career Readiness — SkillPath Academy",
+  description: "Track your career readiness score, identify skill gaps, and get a personalised roadmap to your first tech role.",
+  openGraph: {
+    title: "Career Readiness Dashboard — SkillPath Academy",
+    description: "Measure your readiness for Junior QA, BA, and Data Analyst roles.",
+    type: "website",
+  },
+};
 
 export const dynamic = "force-dynamic";
 

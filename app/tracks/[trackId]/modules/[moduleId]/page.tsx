@@ -24,8 +24,21 @@ import {
   parseModuleContent,
   trackCareerOutcome,
 } from "@/lib/tracks/progression";
+import type { Metadata } from "next";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { cn } from "@/lib/utils";
 import { markModuleAsCompleted } from "./actions";
+
+export async function generateMetadata({ params }: ModulePageProps): Promise<Metadata> {
+  const runtimeTrack = await resolveRuntimeCourseBySlug(params.trackId, { includeCourseEntities: true });
+  const moduleItem = runtimeTrack?.modules.find((m) => m.id === params.moduleId);
+  if (!runtimeTrack || !moduleItem) return {};
+  return {
+    title: `${moduleItem.title} — ${runtimeTrack.title} | SkillPath Academy`,
+    description: moduleItem.description || `${runtimeTrack.category} module: ${moduleItem.title}`,
+    robots: { index: false },
+  };
+}
 
 type ModulePageProps = {
   params: {
@@ -421,6 +434,12 @@ export default async function ModulePage({ params }: ModulePageProps) {
 
         <div className="space-y-6">
           <header className="surface-elevated space-y-4 p-5 sm:p-6">
+            <Breadcrumb
+              items={[
+                { label: track.title, href: `/tracks/${track.slug}` },
+                { label: currentModule.title },
+              ]}
+            />
             <p className="kicker">Module</p>
             <div className="space-y-2">
               <h1 className="break-words text-2xl font-semibold tracking-tight sm:text-3xl">{currentModule.title}</h1>

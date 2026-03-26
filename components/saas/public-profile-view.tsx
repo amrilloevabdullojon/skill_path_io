@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 
+import { FadeInUp, StaggerList } from "@/components/ui/fade-in";
 import { PublicProfileSnapshot } from "@/types/saas";
 
 type PublicProfileViewProps = {
@@ -9,13 +12,16 @@ type PublicProfileViewProps = {
 export function PublicProfileView({ profile }: PublicProfileViewProps) {
   return (
     <section className="space-y-5">
-      <header className="surface-elevated space-y-2 p-5 sm:p-6">
-        <p className="kicker">Public Profile</p>
-        <h1 className="page-title">{profile.name}</h1>
-        <p className="section-description">{profile.headline}</p>
-        <p className="text-xs text-muted-foreground">Handle: @{profile.handle}</p>
-      </header>
+      <FadeInUp delay={0}>
+        <header className="surface-elevated space-y-2 p-5 sm:p-6">
+          <p className="kicker">Public Profile</p>
+          <h1 className="page-title">{profile.name}</h1>
+          <p className="section-description">{profile.headline}</p>
+          <p className="text-xs text-muted-foreground">Handle: @{profile.handle}</p>
+        </header>
+      </FadeInUp>
 
+      <FadeInUp delay={0.08}>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <article className="surface-elevated p-4">
           <p className="text-xs text-muted-foreground">Readiness score</p>
@@ -34,10 +40,12 @@ export function PublicProfileView({ profile }: PublicProfileViewProps) {
           <p className="mt-1 text-2xl font-semibold text-foreground">{profile.missionOutcomes.length}</p>
         </article>
       </div>
+      </FadeInUp>
 
+      <FadeInUp delay={0.14}>
       <section className="surface-elevated space-y-4 p-5">
         <h2 className="section-title">Skill radar snapshot</h2>
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+        <StaggerList className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
           {profile.skillRadar.map((skill) => (
             <article key={skill.skill} className="surface-subtle space-y-2 p-3">
               <p className="text-xs text-muted-foreground">{skill.skill}</p>
@@ -47,9 +55,11 @@ export function PublicProfileView({ profile }: PublicProfileViewProps) {
               </div>
             </article>
           ))}
-        </div>
+        </StaggerList>
       </section>
+      </FadeInUp>
 
+      <FadeInUp delay={0.20}>
       <section className="surface-elevated space-y-4 p-5">
         <h2 className="section-title">Badges</h2>
         <div className="flex flex-wrap gap-2">
@@ -63,7 +73,9 @@ export function PublicProfileView({ profile }: PublicProfileViewProps) {
           ))}
         </div>
       </section>
+      </FadeInUp>
 
+      <FadeInUp delay={0.26}>
       <section className="surface-elevated space-y-4 p-5">
         <h2 className="section-title">Mission outcomes</h2>
         <div className="grid gap-3 md:grid-cols-2">
@@ -75,13 +87,16 @@ export function PublicProfileView({ profile }: PublicProfileViewProps) {
           ))}
         </div>
       </section>
+      </FadeInUp>
 
+      <FadeInUp delay={0.32}>
       <section className="surface-elevated flex flex-wrap items-center justify-between gap-3 p-5">
         <p className="text-sm text-muted-foreground">Explore full learning workspace and live progress updates.</p>
         <Link href="/dashboard" className="btn-secondary">
           Open dashboard
         </Link>
       </section>
+      </FadeInUp>
     </section>
   );
 }

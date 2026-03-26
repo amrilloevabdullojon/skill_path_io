@@ -318,6 +318,13 @@ export function AppShell({ children }: AppShellProps) {
           </>
         ) : null}
 
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-foreground focus:ring-2 focus:ring-sky-500 focus:outline-none"
+        >
+          Skip to main content
+        </a>
+
         <div className="app-main">
           {!isAuthScreen && !isFocusLearningMode ? (
             <header className="app-topbar premium-glow">
@@ -404,7 +411,7 @@ export function AppShell({ children }: AppShellProps) {
             </div>
           ) : null}
 
-          <main className={cn("min-w-0", !isAuthScreen ? "px-1 pb-2 sm:px-2" : "px-1")}>{children}</main>
+          <main id="main-content" className={cn("min-w-0", !isAuthScreen ? "px-1 pb-2 sm:px-2" : "px-1")}>{children}</main>
           {!isFocusLearningMode ? <SiteFooter /> : null}
         </div>
       </div>

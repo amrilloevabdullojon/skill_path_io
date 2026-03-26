@@ -72,7 +72,7 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
   return (
     <section className="surface-elevated space-y-4 p-5 text-foreground">
       <header className="space-y-2">
-        <h2 className="text-xl font-semibold">Modules</h2>
+        <h2 className="section-title">Modules</h2>
         <p className="text-sm text-muted-foreground">Filter by track, search modules, and edit module metadata.</p>
       </header>
 

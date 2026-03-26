@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { HiringMarketplaceHub } from "@/components/saas/hiring-marketplace-hub";
 import { EmptyState } from "@/components/ui/empty-state";
 import { authOptions } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Hiring Marketplace — SkillPath Academy",
+  description: "Connect with companies hiring QA Engineers, Business Analysts, and Data Analysts.",
+};
 import { getDashboardData } from "@/lib/dashboard/data";
 import { buildCandidateProfile, listMarketplaceRoles } from "@/lib/saas/marketplace";
 

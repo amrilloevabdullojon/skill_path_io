@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
+
+export const metadata: Metadata = {
+  title: "Dashboard — SkillPath Academy",
+  description: "Your learning dashboard: progress, XP, tracks, and career readiness.",
+  robots: { index: false },
+};
 
 import { DashboardAiRecommendationsSection } from "@/components/dashboard/dashboard-ai-recommendations";
 import { DashboardAdaptivePathSection } from "@/components/dashboard/dashboard-adaptive-path";
@@ -32,6 +39,7 @@ import { NotificationsCenter } from "@/components/saas/notifications-center";
 import { ProductTourOverlay } from "@/components/saas/product-tour-overlay";
 import { WeeklyAiReportCard } from "@/components/saas/weekly-ai-report-card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { FadeInUp } from "@/components/ui/fade-in";
 import { authOptions } from "@/lib/auth";
 import { getDashboardData } from "@/lib/dashboard/data";
 import { productTourSteps } from "@/lib/saas/tour";
@@ -116,10 +124,18 @@ export default async function DashboardPage({
 
         {currentTab === "overview" ? (
           <>
-            <DashboardStatsGrid stats={data.stats} />
-            <DashboardDailyGoalSection goal={data.dailyGoal} />
-            <DashboardCurrentTracks tracks={data.tracks} />
-            <DashboardUpcomingActionsSection actions={data.upcomingActions} />
+            <FadeInUp delay={0.05}>
+              <DashboardStatsGrid stats={data.stats} />
+            </FadeInUp>
+            <FadeInUp delay={0.1}>
+              <DashboardDailyGoalSection goal={data.dailyGoal} />
+            </FadeInUp>
+            <FadeInUp delay={0.15}>
+              <DashboardCurrentTracks tracks={data.tracks} />
+            </FadeInUp>
+            <FadeInUp delay={0.2}>
+              <DashboardUpcomingActionsSection actions={data.upcomingActions} />
+            </FadeInUp>
             <DashboardWeeklyQuestsSection quests={data.weeklyQuests} />
             <div className="grid gap-6 xl:grid-cols-2">
               <DashboardMissionPreviewSection missions={data.missionPreview} />
@@ -160,98 +176,126 @@ export default async function DashboardPage({
 
         {currentTab === "skills" ? (
           <>
-            <div className="grid min-w-0 gap-6 2xl:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
-              <DashboardSkillRadarSection radar={data.skillRadar} />
-              <DashboardXpLevelSection xp={data.xp} weeklyProgress={data.weeklyProgress} />
-            </div>
-            <DashboardSkillEvolutionSection weeklyProgress={data.weeklyProgress} />
-            <DashboardLearningHeatmapSection heatmap={data.heatmap} streak={data.xp.streak} />
-            <div className="grid gap-6 xl:grid-cols-2">
-              <DashboardSkillTreePreviewSection skillTree={data.skillTree} />
-              <DashboardAiRecommendationsSection recommendations={data.recommendations} />
-            </div>
-            <section className="surface-elevated space-y-3 p-5">
-              <div className="flex items-center justify-between gap-2">
-                <h2 className="section-title">Smart recommendations</h2>
-                <Link href="/analytics/advanced" className="btn-secondary px-3 py-1.5 text-xs">
-                  Open advanced analytics
-                </Link>
+            <FadeInUp delay={0.05}>
+              <div className="grid min-w-0 gap-6 2xl:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
+                <DashboardSkillRadarSection radar={data.skillRadar} />
+                <DashboardXpLevelSection xp={data.xp} weeklyProgress={data.weeklyProgress} />
               </div>
-              <div className="grid gap-3 md:grid-cols-2">
-                {data.smartRecommendations.map((item) => (
-                  <article key={item.id} className="surface-subtle space-y-1 p-3">
-                    <p className="text-sm font-semibold text-foreground">{item.title}</p>
-                    <p className="text-xs text-muted-foreground">{item.reason}</p>
-                    <Link href={item.href} className="text-xs text-sky-300 hover:text-sky-200">
-                      Open
-                    </Link>
-                  </article>
-                ))}
+            </FadeInUp>
+            <FadeInUp delay={0.1}>
+              <DashboardSkillEvolutionSection weeklyProgress={data.weeklyProgress} />
+            </FadeInUp>
+            <FadeInUp delay={0.15}>
+              <DashboardLearningHeatmapSection heatmap={data.heatmap} streak={data.xp.streak} />
+            </FadeInUp>
+            <FadeInUp delay={0.2}>
+              <div className="grid gap-6 xl:grid-cols-2">
+                <DashboardSkillTreePreviewSection skillTree={data.skillTree} />
+                <DashboardAiRecommendationsSection recommendations={data.recommendations} />
               </div>
-            </section>
-            <section className="surface-elevated space-y-3 p-5">
-              <h2 className="section-title">Gamification achievements</h2>
-              <div className="flex flex-wrap gap-2">
-                {data.saasGamification.badges.map((badge) => (
-                  <span key={badge.id} className="chip-neutral px-2.5 py-1 text-xs">
-                    {badge.label}
-                  </span>
-                ))}
-              </div>
-              <div className="grid gap-2 md:grid-cols-2">
-                {data.saasGamification.achievements.map((achievement) => (
-                  <article key={achievement.id} className="surface-subtle p-3">
-                    <p className="text-sm font-semibold text-foreground">{achievement.title}</p>
-                    <p className="text-xs text-muted-foreground">{achievement.description}</p>
-                    <p className={`text-xs ${achievement.unlocked ? "text-emerald-300" : "text-muted-foreground"}`}>
-                      {achievement.unlocked ? "Unlocked" : "Locked"}
-                    </p>
-                  </article>
-                ))}
-              </div>
-            </section>
-            <DashboardAdaptivePathSection suggestions={data.adaptiveSuggestions} />
+            </FadeInUp>
+            <FadeInUp delay={0.25}>
+              <section className="surface-elevated space-y-3 p-5">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="section-title">Smart recommendations</h2>
+                  <Link href="/analytics/advanced" className="btn-secondary px-3 py-1.5 text-xs">
+                    Open advanced analytics
+                  </Link>
+                </div>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {data.smartRecommendations.map((item) => (
+                    <article key={item.id} className="surface-subtle space-y-1 p-3">
+                      <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                      <p className="text-xs text-muted-foreground">{item.reason}</p>
+                      <Link href={item.href} className="text-xs text-sky-300 hover:text-sky-200">
+                        Open
+                      </Link>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            </FadeInUp>
+            <FadeInUp delay={0.3}>
+              <section className="surface-elevated space-y-3 p-5">
+                <h2 className="section-title">Gamification achievements</h2>
+                <div className="flex flex-wrap gap-2">
+                  {data.saasGamification.badges.map((badge) => (
+                    <span key={badge.id} className="chip-neutral px-2.5 py-1 text-xs">
+                      {badge.label}
+                    </span>
+                  ))}
+                </div>
+                <div className="grid gap-2 md:grid-cols-2">
+                  {data.saasGamification.achievements.map((achievement) => (
+                    <article key={achievement.id} className="surface-subtle p-3">
+                      <p className="text-sm font-semibold text-foreground">{achievement.title}</p>
+                      <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                      <p className={`text-xs ${achievement.unlocked ? "text-emerald-300" : "text-muted-foreground"}`}>
+                        {achievement.unlocked ? "Unlocked" : "Locked"}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            </FadeInUp>
+            <FadeInUp delay={0.35}>
+              <DashboardAdaptivePathSection suggestions={data.adaptiveSuggestions} />
+            </FadeInUp>
           </>
         ) : null}
 
         {currentTab === "career" ? (
           <>
-            <DashboardCareerPreviewSection career={data.career} />
-            <div className="grid gap-6 xl:grid-cols-2">
-              <DashboardJobMatchingPreviewSection jobs={data.jobMatchingPreview} />
-              <DashboardReviewPreviewSection
-                bookmarkCount={data.reviewPreview.bookmarkCount}
-                noteCount={data.reviewPreview.noteCount}
+            <FadeInUp delay={0.05}>
+              <DashboardCareerPreviewSection career={data.career} />
+            </FadeInUp>
+            <FadeInUp delay={0.1}>
+              <div className="grid gap-6 xl:grid-cols-2">
+                <DashboardJobMatchingPreviewSection jobs={data.jobMatchingPreview} />
+                <DashboardReviewPreviewSection
+                  bookmarkCount={data.reviewPreview.bookmarkCount}
+                  noteCount={data.reviewPreview.noteCount}
+                />
+              </div>
+            </FadeInUp>
+            <FadeInUp delay={0.15}>
+              <DashboardPortfolioPreviewSection
+                totalEntries={data.portfolioPreview.totalEntries}
+                missionArtifacts={data.portfolioPreview.missionArtifacts}
+                recentEntryTitle={data.portfolioPreview.recentEntryTitle}
               />
-            </div>
-            <DashboardPortfolioPreviewSection
-              totalEntries={data.portfolioPreview.totalEntries}
-              missionArtifacts={data.portfolioPreview.missionArtifacts}
-              recentEntryTitle={data.portfolioPreview.recentEntryTitle}
-            />
-            <DashboardInterviewPracticeSection />
-            <DashboardLeaderboardPreviewSection leaderboard={data.leaderboard} />
-            <section className="surface-elevated space-y-3 p-5">
-              <div className="flex items-center justify-between gap-2">
-                <h2 className="section-title">Public profile and marketplace</h2>
-                <Link href="/marketplace" className="btn-secondary px-3 py-1.5 text-xs">
-                  Open hiring marketplace
-                </Link>
-              </div>
-              <p className="text-sm text-muted-foreground">Public profile URL: {data.growth.publicProfileUrl}</p>
-              <div className="grid gap-2 md:grid-cols-2">
-                {data.jobMarketplace.topMatches.slice(0, 2).map((item) => (
-                  <article key={item.roleId} className="surface-subtle p-3">
-                    <p className="text-sm font-semibold text-foreground">{item.title}</p>
-                    <p className="text-xs text-muted-foreground">Match: {item.matchPercent}%</p>
-                    <p className="text-xs text-muted-foreground">
-                      Missing: {item.missingSkills.length > 0 ? item.missingSkills.join(", ") : "None"}
-                    </p>
-                  </article>
-                ))}
-              </div>
-            </section>
-            <GrowthLoopCards cards={data.growth.cards} />
+            </FadeInUp>
+            <FadeInUp delay={0.2}>
+              <DashboardInterviewPracticeSection />
+            </FadeInUp>
+            <FadeInUp delay={0.25}>
+              <DashboardLeaderboardPreviewSection leaderboard={data.leaderboard} />
+            </FadeInUp>
+            <FadeInUp delay={0.3}>
+              <section className="surface-elevated space-y-3 p-5">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="section-title">Public profile and marketplace</h2>
+                  <Link href="/marketplace" className="btn-secondary px-3 py-1.5 text-xs">
+                    Open hiring marketplace
+                  </Link>
+                </div>
+                <p className="text-sm text-muted-foreground">Public profile URL: {data.growth.publicProfileUrl}</p>
+                <div className="grid gap-2 md:grid-cols-2">
+                  {data.jobMarketplace.topMatches.slice(0, 2).map((item) => (
+                    <article key={item.roleId} className="surface-subtle p-3">
+                      <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                      <p className="text-xs text-muted-foreground">Match: {item.matchPercent}%</p>
+                      <p className="text-xs text-muted-foreground">
+                        Missing: {item.missingSkills.length > 0 ? item.missingSkills.join(", ") : "None"}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            </FadeInUp>
+            <FadeInUp delay={0.35}>
+              <GrowthLoopCards cards={data.growth.cards} />
+            </FadeInUp>
           </>
         ) : null}
       </DashboardLayout>

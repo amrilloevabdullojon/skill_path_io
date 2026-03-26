@@ -27,6 +27,10 @@ export function DashboardLayout({ topbar, sidebar, insights, children }: Dashboa
         <div className="min-w-0 space-y-6">{children}</div>
       </div>
 
+      {/* Shown below main content on lg and smaller; hidden on xl+ where it moves to the grid column */}
+      <aside className="min-w-0 self-start xl:hidden">{insights}</aside>
+
+      {/* In the grid's right column on xl+ */}
       <aside className="hidden min-w-0 self-start xl:block">{insights}</aside>
     </div>
   );
