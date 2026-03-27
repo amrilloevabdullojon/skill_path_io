@@ -37,6 +37,7 @@ export default function ModuleDetailLoading() {
           <div className="flex gap-3">
             <Skeleton className="h-10 w-32 rounded-xl" />
             <Skeleton className="h-10 w-20 rounded-xl" />
+            <Skeleton className="ml-auto h-10 w-24 rounded-xl" />
           </div>
         </div>
 
@@ -55,12 +56,13 @@ export default function ModuleDetailLoading() {
           </div>
           <div className="surface-elevated space-y-3 p-5">
             <div className="flex items-center justify-between">
-              <Skeleton className="h-5 w-16" />
+              <Skeleton className="h-5 w-20" />
               <Skeleton className="h-4 w-24" />
             </div>
             {Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="h-10 w-full rounded-lg" />
             ))}
+            <Skeleton className="h-9 w-full rounded-xl" />
           </div>
           <div className="surface-elevated p-5">
             <Skeleton className="mb-3 h-5 w-24" />

@@ -1,11 +1,20 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { TrackCategory } from "@prisma/client";
 
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
-import { ModulesTable, type TrackGroup } from "@/components/admin/modules/modules-table";
+import type { TrackGroup } from "@/components/admin/modules/modules-table";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+
+const ModulesTable = dynamic(
+  () =>
+    import("@/components/admin/modules/modules-table").then((m) => ({
+      default: m.ModulesTable,
+    })),
+  { ssr: false, loading: () => <div className="h-40 animate-pulse rounded-xl bg-card" /> },
+);
 
 export const metadata: Metadata = {
   title: "Modules — Admin",
@@ -114,9 +123,16 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
               </option>
             ))}
           </select>
-          <button type="submit" className="btn-secondary">
-            Apply
-          </button>
+          <div className="flex gap-2">
+            <button type="submit" className="btn-secondary">
+              Apply
+            </button>
+            {(query || trackIdFilter) && (
+              <a href="/admin/modules" className="btn-secondary text-muted-foreground">
+                Reset
+              </a>
+            )}
+          </div>
         </form>
       </section>
 

@@ -4,6 +4,7 @@ import { TrackCategory } from "@prisma/client";
 
 import { updateTrackAction } from "@/app/admin/actions";
 import { SaveRowButton } from "@/components/admin/save-row-button";
+import { DeleteTrackButton } from "@/components/admin/tracks/delete-track-button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
@@ -72,6 +73,8 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
         kicker="Content"
         title="Tracks"
         description="Search, filter by category, and edit track metadata inline."
+        actionLabel="New track"
+        actionHref="/admin/tracks/new"
       />
 
       {/* ── Filter ────────────────────────────────────────────────── */}
@@ -127,6 +130,7 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
                   <th className="px-3 py-3 text-left">Modules</th>
                   <th className="px-3 py-3 text-left">Certs</th>
                   <th className="px-3 py-3 text-left">Save</th>
+                  <th className="px-3 py-3 text-left">Del</th>
                 </tr>
               </thead>
               <tbody>
@@ -223,6 +227,15 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
                         <input type="hidden" name="trackId" value={track.id} />
                         <SaveRowButton />
                       </form>
+                    </td>
+
+                    {/* Delete */}
+                    <td className="px-3 py-2">
+                      <DeleteTrackButton
+                        trackId={track.id}
+                        trackTitle={track.title}
+                        moduleCount={track._count.modules}
+                      />
                     </td>
                   </tr>
                 ))}

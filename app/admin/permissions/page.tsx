@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { PermissionRoleType } from "@prisma/client";
 
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+import { DeletePermissionButton } from "@/components/admin/permissions/delete-permission-button";
 
 export const metadata: Metadata = {
   title: "Permissions — Admin",
@@ -44,10 +46,15 @@ export default async function PermissionsPage() {
 
   return (
     <section className="page-shell">
-      <header className="surface-elevated space-y-2 p-5 sm:p-7">
-        <p className="kicker">{t("kicker")}</p>
-        <h1 className="section-title">{t("title")}</h1>
-        <p className="body-text text-sm">{t("description")}</p>
+      <header className="surface-elevated flex items-start justify-between gap-4 p-5 sm:p-7">
+        <div className="space-y-2">
+          <p className="kicker">{t("kicker")}</p>
+          <h1 className="section-title">{t("title")}</h1>
+          <p className="body-text text-sm">{t("description")}</p>
+        </div>
+        <Link href="/admin/permissions/new" className="btn-primary shrink-0">
+          New permission
+        </Link>
       </header>
 
       {error ? (
@@ -70,6 +77,8 @@ export default async function PermissionsPage() {
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">{t("columns.permissions")}</th>
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground">{t("columns.status")}</th>
                   <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">{t("columns.created")}</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">Edit</th>
+                  <th className="px-4 py-3 text-left font-medium text-muted-foreground">Delete</th>
                 </tr>
               </thead>
               <tbody>
@@ -119,6 +128,17 @@ export default async function PermissionsPage() {
                       <td className="hidden px-4 py-3 text-xs text-muted-foreground sm:table-cell">
                         {role.createdAt.toLocaleDateString("ru-RU")}
                       </td>
+                      <td className="px-4 py-3">
+                        <Link
+                          href={`/admin/permissions/${role.id}`}
+                          className="inline-flex items-center rounded-lg border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:border-sky-500/40 hover:bg-sky-500/10 hover:text-sky-300"
+                        >
+                          Edit
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3">
+                        <DeletePermissionButton permId={role.id} email={role.email} />
+                      </td>
                     </tr>
                   );
                 })}
@@ -163,6 +183,15 @@ export default async function PermissionsPage() {
                     </div>
                   )}
                   <p className="text-xs text-muted-foreground">{role.createdAt.toLocaleDateString("ru-RU")}</p>
+                  <div className="flex items-center gap-2 pt-1">
+                    <Link
+                      href={`/admin/permissions/${role.id}`}
+                      className="inline-flex items-center rounded-lg border border-border px-2 py-1 text-xs text-muted-foreground transition-colors hover:border-sky-500/40 hover:bg-sky-500/10 hover:text-sky-300"
+                    >
+                      Edit
+                    </Link>
+                    <DeletePermissionButton permId={role.id} email={role.email} />
+                  </div>
                 </article>
               );
             })}
@@ -183,19 +212,19 @@ export default async function PermissionsPage() {
                   <>
                     <li>All permissions granted</li>
                     <li>User management</li>
-                    <li>Settings & security</li>
+                    <li>Settings &amp; security</li>
                   </>
                 )}
                 {roleKey === "CONTENT_ADMIN" && (
                   <>
                     <li>Create, edit, publish courses</li>
-                    <li>Manage templates & media</li>
+                    <li>Manage templates &amp; media</li>
                     <li>View analytics</li>
                   </>
                 )}
                 {roleKey === "COURSE_EDITOR" && (
                   <>
-                    <li>Create & edit courses (no publish)</li>
+                    <li>Create &amp; edit courses (no publish)</li>
                     <li>Manage course builder</li>
                   </>
                 )}

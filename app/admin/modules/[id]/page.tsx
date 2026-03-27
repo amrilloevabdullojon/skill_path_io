@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { BookOpen, CheckCircle2, Clock3, Minus } from "lucide-react";
 
 import { updateModuleDetailAction } from "@/app/admin/actions";
+import { DuplicateModuleButton } from "@/components/admin/modules/duplicate-module-button";
 import { SubmitModuleButton } from "@/components/admin/modules/submit-module-button";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
@@ -135,6 +136,9 @@ export default async function ModuleDetailPage({ params }: Props) {
               <Link href="/admin/modules" className="btn-secondary">
                 Cancel
               </Link>
+              <span className="ml-auto">
+                <DuplicateModuleButton moduleId={mod.id} />
+              </span>
             </div>
           </form>
         </section>
@@ -183,35 +187,56 @@ export default async function ModuleDetailPage({ params }: Props) {
           {/* Lessons list */}
           <section className="surface-elevated space-y-3 p-5">
             <div className="flex items-center justify-between gap-2">
-              <h2 className="section-title">Lessons</h2>
+              <h2 className="section-title">
+                Lessons
+                <span className="ml-1.5 text-xs font-normal text-muted-foreground">
+                  ({mod._count.lessons})
+                </span>
+              </h2>
               <Link
                 href="/admin/lessons"
                 className="text-xs text-sky-300 hover:underline"
               >
-                Open lessons →
+                Manage all →
               </Link>
             </div>
 
             {mod.lessons.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No lessons yet.</p>
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">No lessons yet.</p>
+                <Link
+                  href="/admin/lessons"
+                  className="btn-secondary inline-flex w-full justify-center text-xs"
+                >
+                  + Add lessons in Lessons admin
+                </Link>
+              </div>
             ) : (
-              <ol className="space-y-1.5">
-                {mod.lessons.map((lesson) => (
-                  <li
-                    key={lesson.id}
-                    className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm"
-                  >
-                    <span className="text-xs tabular-nums text-muted-foreground">
-                      {lesson.order}.
-                    </span>
-                    <BookOpen className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                    <span className="flex-1 truncate text-foreground">{lesson.title}</span>
-                    <span className="shrink-0 rounded border border-border px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
-                      {lesson.type}
-                    </span>
-                  </li>
-                ))}
-              </ol>
+              <>
+                <ol className="space-y-1.5">
+                  {mod.lessons.map((lesson) => (
+                    <li
+                      key={lesson.id}
+                      className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm transition-colors hover:border-border/80 hover:bg-card/60"
+                    >
+                      <span className="w-4 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+                        {lesson.order}.
+                      </span>
+                      <BookOpen className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      <span className="flex-1 truncate text-foreground">{lesson.title}</span>
+                      <span className="shrink-0 rounded border border-border px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
+                        {lesson.type}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+                <Link
+                  href="/admin/lessons"
+                  className="btn-secondary inline-flex w-full justify-center text-xs"
+                >
+                  + Add / edit lessons
+                </Link>
+              </>
             )}
           </section>
 

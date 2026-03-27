@@ -38,6 +38,7 @@ import {
   updateModuleAction,
 } from "@/app/admin/actions";
 import { DeleteModuleButton } from "./delete-module-button";
+import { DuplicateModuleButton } from "./duplicate-module-button";
 import { SaveModuleButton } from "./save-module-button";
 import { cn } from "@/lib/utils";
 
@@ -71,7 +72,7 @@ const TRACK_BADGE: Record<string, string> = {
   DA: "track-badge-da",
 };
 
-const COL_COUNT = 10; // handle + checkbox + title+desc + order + dur + lessons + quiz + preview + save + delete
+const COL_COUNT = 11; // handle + checkbox + title+desc + order + dur + lessons + quiz + preview + save + dupe + delete
 
 /* ─── Sortable row ───────────────────────────────────────────────────────── */
 
@@ -223,6 +224,11 @@ function SortableRow({ mod, selected, onToggle }: RowProps) {
         </form>
       </td>
 
+      {/* Duplicate */}
+      <td className="px-3 py-3">
+        <DuplicateModuleButton moduleId={mod.id} />
+      </td>
+
       {/* Delete */}
       <td className="px-3 py-3">
         <DeleteModuleButton moduleId={mod.id} moduleTitle={mod.title} />
@@ -344,7 +350,7 @@ export function ModulesTable({ groups: initialGroups }: { groups: TrackGroup[] }
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
         >
-          <table className="table-base min-w-[1180px]">
+          <table className="table-base min-w-[1280px]">
             <thead className="table-head">
               <tr>
                 <th className="w-8 px-2 py-3" aria-label="Drag to reorder" />
@@ -364,6 +370,7 @@ export function ModulesTable({ groups: initialGroups }: { groups: TrackGroup[] }
                 <th className="px-3 py-3 text-left">Quiz</th>
                 <th className="px-3 py-3 text-left">Preview</th>
                 <th className="px-3 py-3 text-left">Save</th>
+                <th className="px-3 py-3 text-left">Dupe</th>
                 <th className="px-3 py-3 text-left">Delete</th>
               </tr>
             </thead>

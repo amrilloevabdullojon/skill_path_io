@@ -39,7 +39,16 @@
       "Bash(find /Users/panda/Documents/GitHub/skill_path_io/app -type f -name \"page.tsx\" -exec grep -L \"metadata\" {})",
       "Bash(grep -n \"surface-panel-hover\" /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/modules/[moduleId]/page.tsx)",
       "Bash(grep -B 5 \"surface-panel-hover\" /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/modules/[moduleId]/page.tsx)",
-      "Bash(ls -la /Users/panda/Documents/GitHub/skill_path_io/app/admin/*/loading.tsx)"
+      "Bash(ls -la /Users/panda/Documents/GitHub/skill_path_io/app/admin/*/loading.tsx)",
+      "Bash(done)",
+      "Bash(grep -l \"export.*function.*not.*implemented\\\\|TODO\\\\|FIXME\" /Users/panda/Documents/GitHub/skill_path_io/lib/**/*.ts)",
+      "Bash(ls -la /Users/panda/Documents/GitHub/skill_path_io/app/\\\\\\(simulation\\\\\\)/simulation/)",
+      "Bash(ls -la /Users/panda/Documents/GitHub/skill_path_io/app/\\\\\\(sandbox\\\\\\)/sandbox/)",
+      "Bash(grep -E \"\\\\.tsx$|^d\")",
+      "Bash(find /Users/panda/Documents/GitHub/skill_path_io/app/simulation -type f -name *.tsx)",
+      "Bash(find /Users/panda/Documents/GitHub/skill_path_io/app/sandbox -type f -name *.tsx)",
+      "Bash(mkdir -p \"/Users/panda/Documents/GitHub/skill_path_io/app/admin/assignments/[id]\")",
+      "Bash(mkdir -p \"/Users/panda/Documents/GitHub/skill_path_io/app/admin/simulations/[id]\")"
     ]
   }
 }

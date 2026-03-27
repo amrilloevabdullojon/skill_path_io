@@ -1,0 +1,11 @@
+{
+  "siteName": "SkillPath Academy",
+  "siteDescription": "Professional skills learning platform",
+  "allowRegistration": true,
+  "requireEmailVerification": false,
+  "maintenanceMode": false,
+  "analyticsEnabled": true,
+  "defaultUserRole": "STUDENT",
+  "maxUploadSizeMb": 10,
+  "supportEmail": "support@skillpath.io"
+}
