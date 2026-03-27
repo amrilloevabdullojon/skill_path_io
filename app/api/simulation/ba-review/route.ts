@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-
+import { Errors, apiOk, withErrorHandler } from "@/lib/api/error-handler";
 import { reviewUserStoryLocally } from "@/features/simulations/ba-simulation";
 
 type Body = {
@@ -9,7 +8,7 @@ type Body = {
   acceptanceCriteria?: string;
 };
 
-export async function POST(request: Request) {
+export const POST = withErrorHandler(async (request: Request) => {
   const body = (await request.json()) as Body;
 
   if (
@@ -18,12 +17,7 @@ export async function POST(request: Request) {
     typeof body.value !== "string" ||
     typeof body.acceptanceCriteria !== "string"
   ) {
-    return NextResponse.json(
-      {
-        error: "Invalid user story payload.",
-      },
-      { status: 400 },
-    );
+    throw Errors.validation("Invalid user story payload.");
   }
 
   const review = reviewUserStoryLocally({
@@ -33,5 +27,5 @@ export async function POST(request: Request) {
     acceptanceCriteria: body.acceptanceCriteria,
   });
 
-  return NextResponse.json(review, { status: 200 });
-}
+  return apiOk(review);
+});

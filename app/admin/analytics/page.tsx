@@ -1,6 +1,8 @@
 import { ProgressStatus, TrackCategory } from "@prisma/client";
+import { Award, BarChart3, BookOpen, CheckCircle2, Users2 } from "lucide-react";
 
 import { StudioCourseAnalytics } from "@/components/admin/analytics/studio-course-analytics";
+import { StudioKpiCard } from "@/components/admin/studio-kpi-card";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
@@ -185,32 +187,38 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        <div className="surface-panel p-4 text-foreground">
-          <p className="text-xs text-muted-foreground">Users</p>
-          <p className="text-2xl font-semibold">{users}</p>
-        </div>
-        <div className="surface-panel p-4 text-foreground">
-          <p className="text-xs text-muted-foreground">Tracks / Modules</p>
-          <p className="text-2xl font-semibold">
-            {tracks} / {modules}
-          </p>
-        </div>
-        <div className="surface-panel p-4 text-foreground">
-          <p className="text-xs text-muted-foreground">Quizzes / Questions</p>
-          <p className="text-2xl font-semibold">
-            {quizzes} / {questions}
-          </p>
-        </div>
-        <div className="surface-panel p-4 text-foreground">
-          <p className="text-xs text-muted-foreground">Progress statuses</p>
-          <p className="text-sm text-muted-foreground">Completed: {completedProgress}</p>
-          <p className="text-sm text-muted-foreground">In progress: {inProgress}</p>
-          <p className="text-sm text-muted-foreground">Not started: {notStarted}</p>
-        </div>
-        <div className="surface-panel p-4 text-foreground">
-          <p className="text-xs text-muted-foreground">Certificates</p>
-          <p className="text-2xl font-semibold">{certificates}</p>
-        </div>
+        <StudioKpiCard
+          label="Users"
+          value={users}
+          icon={<Users2 className="h-4 w-4" />}
+          accent="sky"
+        />
+        <StudioKpiCard
+          label="Tracks / Modules"
+          value={`${tracks} / ${modules}`}
+          helper="Content library"
+          icon={<BookOpen className="h-4 w-4" />}
+          accent="violet"
+        />
+        <StudioKpiCard
+          label="Quizzes / Questions"
+          value={`${quizzes} / ${questions}`}
+          icon={<BarChart3 className="h-4 w-4" />}
+          accent="amber"
+        />
+        <StudioKpiCard
+          label="Progress completed"
+          value={completedProgress}
+          helper={`${inProgress} in progress · ${notStarted} not started`}
+          icon={<CheckCircle2 className="h-4 w-4" />}
+          accent="emerald"
+        />
+        <StudioKpiCard
+          label="Certificates"
+          value={certificates}
+          icon={<Award className="h-4 w-4" />}
+          accent="rose"
+        />
       </div>
 
       <section className="surface-elevated space-y-4 p-5 text-foreground">

@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PermissionRoleType } from "@prisma/client";
 
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+
+export const metadata: Metadata = {
+  title: "Permissions — Admin",
+  robots: { index: false },
+};
 
 const ROLE_COLORS: Record<PermissionRoleType, string> = {
   SUPER_ADMIN: "border-red-400/35 bg-red-500/15 text-red-200",

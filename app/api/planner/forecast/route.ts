@@ -1,17 +1,10 @@
-import { NextResponse } from "next/server";
-
+import { Errors, apiOk, withErrorHandler } from "@/lib/api/error-handler";
 import { plannerForecast } from "@/lib/planner/service";
 import { LearningPlan } from "@/types/personalization";
 
-export async function POST(request: Request) {
-  try {
-    const body = (await request.json()) as { plan?: LearningPlan };
-    if (!body.plan) {
-      return NextResponse.json({ error: "Plan is required" }, { status: 400 });
-    }
+export const POST = withErrorHandler(async (request: Request) => {
+  const body = (await request.json()) as { plan?: LearningPlan };
+  if (!body.plan) throw Errors.validation("Plan is required.");
 
-    return NextResponse.json(plannerForecast(body.plan));
-  } catch {
-    return NextResponse.json({ error: "Planner forecast failed" }, { status: 400 });
-  }
-}
+  return apiOk(plannerForecast(body.plan));
+});

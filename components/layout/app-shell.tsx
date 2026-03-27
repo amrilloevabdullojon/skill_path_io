@@ -238,8 +238,15 @@ export function AppShell({ children }: AppShellProps) {
                     isSidebarCollapsed ? "justify-center" : "justify-between",
                   )}
                 >
-                  <Link href="/" className="site-header-logo-text truncate text-sm font-semibold">
-                    {isSidebarCollapsed ? "SP" : "SkillPath Academy"}
+                  <Link href="/" className="flex min-w-0 items-center gap-2">
+                    <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-sky-400/30 bg-sky-500/15 text-sky-300">
+                      <Sparkles className="h-3 w-3" />
+                    </span>
+                    {!isSidebarCollapsed && (
+                      <span className="site-header-logo-text truncate text-sm font-semibold">
+                        SkillPath Academy
+                      </span>
+                    )}
                   </Link>
                   <button
                     type="button"
@@ -284,9 +291,10 @@ export function AppShell({ children }: AppShellProps) {
                               "app-sidebar-link",
                               active && "app-sidebar-link-active",
                               isSidebarCollapsed && "mx-auto h-10 w-10 justify-center rounded-2xl border border-transparent px-0",
-                              isSidebarCollapsed && active && "border-sky-400/35 bg-sky-500/15 text-sky-100 shadow-[0_0_0_1px_rgba(56,189,248,0.25),0_10px_20px_rgba(2,6,23,0.42)]",
+                              isSidebarCollapsed && active && "border-transparent bg-gradient-to-br from-sky-500/25 to-indigo-500/20 text-white shadow-[0_0_0_1px_rgba(56,189,248,0.22),0_6px_16px_rgba(2,6,23,0.4)]",
                             )}
                             aria-label={isSidebarCollapsed ? label : undefined}
+                            aria-current={active ? "page" : undefined}
                             title={isSidebarCollapsed ? label : undefined}
                           >
                             <Icon className="h-4 w-4 shrink-0" />
@@ -299,10 +307,13 @@ export function AppShell({ children }: AppShellProps) {
                 </nav>
 
                 {!isSidebarCollapsed ? (
-                  <div className="sidebar-quick-tip">
-                    <p className="sidebar-quick-tip-title">{t("quickTip")}</p>
+                  <button type="button" onClick={openCommandPalette} className="sidebar-quick-tip">
+                    <div className="flex items-center gap-1.5">
+                      <Command className="h-3 w-3 shrink-0 text-sky-400/70" />
+                      <p className="sidebar-quick-tip-title">{t("quickTip")}</p>
+                    </div>
                     <p className="mt-1">{t("quickTipText")}</p>
-                  </div>
+                  </button>
                 ) : null}
               </div>
             </aside>
@@ -425,6 +436,7 @@ export function AppShell({ children }: AppShellProps) {
               <Link
                 key={item.id}
                 href={item.href}
+                aria-current={isActive(pathname, item.href) ? "page" : undefined}
                 className={cn("mobile-bottom-link", isActive(pathname, item.href) && "mobile-bottom-link-active")}
               >
                 <Icon className="h-4 w-4" />

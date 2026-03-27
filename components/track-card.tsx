@@ -12,13 +12,13 @@ type TrackCardProps = {
 };
 
 const trackAccentBySlug: Record<string, string> = {
-  "qa-engineer": "border-emerald-400/30 bg-emerald-500/10 text-emerald-200",
-  "business-analyst": "border-orange-400/30 bg-orange-500/10 text-orange-200",
-  "data-analyst": "border-violet-400/30 bg-violet-500/10 text-violet-200",
+  "qa-engineer": "track-badge-qa",
+  "business-analyst": "track-badge-ba",
+  "data-analyst": "track-badge-da",
 };
 
 export function TrackCard({ track }: TrackCardProps) {
-  const accent = trackAccentBySlug[track.slug] ?? "border-sky-400/30 bg-sky-500/10 text-sky-200";
+  const accent = trackAccentBySlug[track.slug] ?? "track-badge-qa";
 
   return (
     <Card variant="module" className="group h-full overflow-hidden">

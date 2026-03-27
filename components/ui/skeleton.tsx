@@ -85,3 +85,47 @@ export function StatsGridSkeleton() {
     </div>
   );
 }
+
+export function PageHeaderSkeleton() {
+  return (
+    <div className="surface-elevated space-y-2 p-5 sm:p-6" aria-hidden>
+      <Skeleton className="h-3.5 w-20 rounded-full" />
+      <Skeleton className="h-8 w-64" />
+      <Skeleton className="h-4 w-96 max-w-full" />
+    </div>
+  );
+}
+
+export function CardGridSkeleton({ cols = 2, rows = 4 }: { cols?: number; rows?: number }) {
+  return (
+    <div
+      className={`grid gap-4 ${cols === 3 ? "sm:grid-cols-2 xl:grid-cols-3" : "xl:grid-cols-2"}`}
+      aria-hidden
+    >
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="surface-elevated space-y-3 p-4">
+          <div className="flex items-start justify-between gap-2">
+            <Skeleton className="h-4 w-3/5" />
+            <Skeleton className="h-4 w-12 rounded-full" />
+          </div>
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-3 w-4/5" />
+          <Skeleton className="h-8 w-28 rounded-xl" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function FormSkeleton({ fields = 2 }: { fields?: number }) {
+  return (
+    <div className="surface-elevated space-y-3 p-4" aria-hidden>
+      <div className={`grid gap-3 ${fields === 2 ? "md:grid-cols-[1fr_1fr_auto]" : ""}`}>
+        {Array.from({ length: fields }).map((_, i) => (
+          <Skeleton key={i} className="h-10 rounded-xl" />
+        ))}
+        <Skeleton className="h-10 w-24 rounded-xl" />
+      </div>
+    </div>
+  );
+}

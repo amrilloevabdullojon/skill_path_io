@@ -104,13 +104,15 @@ export function BookmarksBoard({ initialBookmarks }: { initialBookmarks: UserBoo
       </header>
 
       <article className="surface-elevated grid gap-3 p-4 md:grid-cols-[1fr_1fr_auto]">
-        <input value={title} onChange={(event) => setTitle(event.target.value)} className="input-base" placeholder="Bookmark title" />
-        <input value={href} onChange={(event) => setHref(event.target.value)} className="input-base" placeholder="/tracks/..." />
+        <label htmlFor="bookmark-title" className="sr-only">Bookmark title</label>
+        <input id="bookmark-title" value={title} onChange={(event) => setTitle(event.target.value)} className="input-base" placeholder="Bookmark title" />
+        <label htmlFor="bookmark-href" className="sr-only">URL or path</label>
+        <input id="bookmark-href" value={href} onChange={(event) => setHref(event.target.value)} className="input-base" placeholder="/tracks/..." />
         <button type="button" onClick={addBookmark} disabled={isSubmitting} className="btn-primary inline-flex items-center gap-2">
           <Plus className="h-4 w-4" />
           {isSubmitting ? "Saving..." : "Save"}
         </button>
-        {error ? <p className="text-xs text-rose-300 md:col-span-3">{error}</p> : null}
+        {error ? <p role="alert" className="text-xs text-rose-300 md:col-span-3">{error}</p> : null}
       </article>
 
       <div className="grid gap-4 xl:grid-cols-2">

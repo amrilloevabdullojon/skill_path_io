@@ -186,11 +186,11 @@ textarea {
   }
 
   .app-sidebar-link-active {
-    @apply border-sky-500/40 bg-sky-500/10 text-sky-300 shadow-[0_0_0_1px_rgba(56,189,248,0.18),0_8px_20px_rgba(2,6,23,0.38)];
+    @apply border-transparent bg-gradient-to-r from-sky-500/25 to-indigo-500/20 text-white shadow-[0_0_0_1px_rgba(56,189,248,0.22),0_6px_18px_rgba(2,6,23,0.4)];
   }
 
   [data-theme="light"] .app-sidebar-link-active {
-    @apply border-sky-300 bg-sky-50 text-sky-700 shadow-[0_0_0_1px_rgba(14,165,233,0.25)];
+    @apply border-transparent bg-gradient-to-r from-sky-100 to-indigo-100 text-sky-800 shadow-[0_0_0_1px_rgba(14,165,233,0.25)];
   }
 
   [data-theme="light"] .mobile-bottom-nav {
@@ -202,11 +202,7 @@ textarea {
   }
 
   [data-theme="light"] .mobile-bottom-link-active {
-    @apply text-sky-600;
-  }
-
-  [data-theme="light"] .mobile-bottom-link-active::before {
-    @apply bg-sky-500;
+    @apply bg-sky-100 text-sky-600;
   }
 
   .mobile-bottom-nav {
@@ -218,12 +214,7 @@ textarea {
   }
 
   .mobile-bottom-link-active {
-    @apply text-sky-400;
-  }
-
-  .mobile-bottom-link-active::before {
-    content: "";
-    @apply absolute -top-1 left-1/2 h-0.5 w-5 -translate-x-1/2 rounded-full bg-sky-400;
+    @apply rounded-xl bg-sky-500/10 text-sky-400;
   }
 
   .premium-glow {
@@ -611,11 +602,11 @@ textarea {
   }
 
   .sidebar-quick-tip {
-    @apply mt-3 shrink-0 rounded-xl border border-slate-800 bg-slate-900/75 p-3 text-xs text-slate-400;
+    @apply mt-3 w-full shrink-0 cursor-pointer rounded-xl border border-sky-500/15 bg-sky-500/5 p-3 text-left text-xs text-slate-400 transition-colors duration-fast hover:border-sky-500/25 hover:bg-sky-500/10;
   }
 
   [data-theme="light"] .sidebar-quick-tip {
-    @apply border-slate-200 bg-slate-50 text-slate-500;
+    @apply border-sky-200/60 bg-sky-50 text-slate-500 hover:border-sky-300 hover:bg-sky-100;
   }
 
   .sidebar-quick-tip-title {
@@ -655,11 +646,20 @@ textarea {
   }
 
   .sidebar-group-label {
-    @apply px-2 text-[10px] uppercase tracking-[0.16em] text-slate-500;
+    @apply flex items-center gap-1.5 px-2 pb-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500;
+  }
+
+  .sidebar-group-label::before {
+    content: "";
+    @apply h-1 w-1 shrink-0 rounded-full bg-slate-600;
   }
 
   [data-theme="light"] .sidebar-group-label {
     @apply text-slate-400;
+  }
+
+  [data-theme="light"] .sidebar-group-label::before {
+    @apply bg-slate-300;
   }
 
   .topbar-user-trigger {
@@ -1059,3 +1059,93 @@ textarea {
 /* ─── Site header logo gradient text ─────────────────────────────────────── */
 .site-header-logo-text { @apply bg-gradient-to-r from-slate-100 via-sky-100 to-violet-200 bg-clip-text text-transparent; }
 [data-theme="light"] .site-header-logo-text { @apply from-slate-900 via-sky-700 to-violet-600; }
+
+/* ─── Track category badges ──────────────────────────────────────────────── */
+.track-badge-qa { @apply border-emerald-400/40 bg-emerald-500/10 text-emerald-300; }
+[data-theme="light"] .track-badge-qa { @apply border-emerald-600/40 bg-emerald-50 text-emerald-700; }
+
+.track-badge-ba { @apply border-orange-400/40 bg-orange-500/10 text-orange-300; }
+[data-theme="light"] .track-badge-ba { @apply border-orange-600/40 bg-orange-50 text-orange-700; }
+
+.track-badge-da { @apply border-violet-400/40 bg-violet-500/10 text-violet-300; }
+[data-theme="light"] .track-badge-da { @apply border-violet-600/40 bg-violet-50 text-violet-700; }
+
+/* ─── Light theme: fix text-*-100/200/300 utilities ─────────────────────── */
+/*
+  In dark mode, text-*-100/200/300 are appropriately light on dark backgrounds.
+  In light mode they become near-invisible on white/light backgrounds.
+  -100/-200 → -700 equivalent (WCAG AA ≥ 4.5:1)
+  -300      → -600 equivalent (still colored, sufficient contrast)
+*/
+[data-theme="light"] .text-emerald-100,
+[data-theme="light"] .text-emerald-200 { color: rgb(4 120 87); }
+[data-theme="light"] .text-emerald-300 { color: rgb(5 150 105); }
+
+[data-theme="light"] .text-sky-100,
+[data-theme="light"] .text-sky-200 { color: rgb(3 105 161); }
+[data-theme="light"] .text-sky-300 { color: rgb(2 132 199); }
+
+[data-theme="light"] .text-amber-100,
+[data-theme="light"] .text-amber-200 { color: rgb(180 83 9); }
+[data-theme="light"] .text-amber-300 { color: rgb(217 119 6); }
+
+[data-theme="light"] .text-orange-100,
+[data-theme="light"] .text-orange-200 { color: rgb(194 65 12); }
+[data-theme="light"] .text-orange-300 { color: rgb(234 88 12); }
+
+[data-theme="light"] .text-rose-100,
+[data-theme="light"] .text-rose-200 { color: rgb(190 18 60); }
+[data-theme="light"] .text-rose-300 { color: rgb(225 29 72); }
+
+[data-theme="light"] .text-violet-100,
+[data-theme="light"] .text-violet-200 { color: rgb(109 40 217); }
+[data-theme="light"] .text-violet-300 { color: rgb(124 58 237); }
+
+[data-theme="light"] .text-cyan-100,
+[data-theme="light"] .text-cyan-200 { color: rgb(14 116 144); }
+[data-theme="light"] .text-cyan-300 { color: rgb(8 145 178); }
+
+[data-theme="light"] .text-indigo-100,
+[data-theme="light"] .text-indigo-200 { color: rgb(67 56 202); }
+[data-theme="light"] .text-indigo-300 { color: rgb(79 70 229); }
+
+[data-theme="light"] .text-purple-100,
+[data-theme="light"] .text-purple-200 { color: rgb(126 34 206); }
+[data-theme="light"] .text-purple-300 { color: rgb(147 51 234); }
+
+[data-theme="light"] .text-red-100,
+[data-theme="light"] .text-red-200 { color: rgb(185 28 28); }
+[data-theme="light"] .text-red-300 { color: rgb(220 38 38); }
+
+[data-theme="light"] .text-teal-100,
+[data-theme="light"] .text-teal-200 { color: rgb(15 118 110); }
+[data-theme="light"] .text-teal-300 { color: rgb(13 148 136); }
+
+[data-theme="light"] .text-pink-100,
+[data-theme="light"] .text-pink-200 { color: rgb(190 24 93); }
+[data-theme="light"] .text-pink-300 { color: rgb(219 39 119); }
+
+/* ─── Admin nav ──────────────────────────────────────────────────────────── */
+.admin-nav-group-label {
+  @apply shrink-0 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-600;
+}
+[data-theme="light"] .admin-nav-group-label { @apply text-slate-400; }
+
+.admin-nav-link {
+  @apply rounded-lg border border-transparent px-2.5 py-1.5 text-xs font-medium
+         text-slate-400 transition-colors duration-fast
+         hover:border-slate-700 hover:bg-slate-800/80 hover:text-slate-200;
+}
+[data-theme="light"] .admin-nav-link {
+  @apply text-slate-500 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-900;
+}
+
+.admin-nav-link-active { @apply border-sky-500/30 bg-sky-500/10 text-sky-300; }
+[data-theme="light"] .admin-nav-link-active { @apply border-sky-300/60 bg-sky-50 text-sky-700; }
+
+/* ─── Light theme: chip/badge tinted backgrounds ─────────────────────────── */
+/*
+  PostCSS cannot parse selectors containing unescaped "/" (e.g. .bg-emerald-500/10).
+  We address this via Tailwind's @layer utilities instead — see tailwind.config.
+  The semantic .track-badge-* classes above already set correct bg values.
+*/

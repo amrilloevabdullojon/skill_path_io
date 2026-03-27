@@ -157,7 +157,7 @@ export function MissionBoard({ missions, isPlanLimited = false, upgradeMessage =
               Evaluate with AI
             </button>
 
-            {errorText ? <p className="state-error">{errorText}</p> : null}
+            {errorText ? <p role="alert" className="state-error">{errorText}</p> : null}
 
             {evaluation ? (
               <div className="space-y-3 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4">

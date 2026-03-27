@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-
+import { Errors, apiOk, withErrorHandler } from "@/lib/api/error-handler";
 import { BugSeverity, reviewBugReportLocally } from "@/features/simulations/bug-tracker";
 
 type Body = {
@@ -14,7 +13,7 @@ function isSeverity(value: unknown): value is BugSeverity {
   return value === "LOW" || value === "MEDIUM" || value === "HIGH" || value === "CRITICAL";
 }
 
-export async function POST(request: Request) {
+export const POST = withErrorHandler(async (request: Request) => {
   const body = (await request.json()) as Body;
 
   if (
@@ -24,12 +23,7 @@ export async function POST(request: Request) {
     typeof body.expectedResult !== "string" ||
     typeof body.actualResult !== "string"
   ) {
-    return NextResponse.json(
-      {
-        error: "Invalid bug report payload.",
-      },
-      { status: 400 },
-    );
+    throw Errors.validation("Invalid bug report payload.");
   }
 
   const review = reviewBugReportLocally({
@@ -40,5 +34,5 @@ export async function POST(request: Request) {
     actualResult: body.actualResult,
   });
 
-  return NextResponse.json(review, { status: 200 });
-}
+  return apiOk(review);
+});

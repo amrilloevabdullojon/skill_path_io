@@ -1,8 +1,17 @@
+import type { Metadata } from "next";
 import { UserRole } from "@prisma/client";
 
 import { updateUserAction } from "@/app/admin/actions";
+import { SaveRowButton } from "@/components/admin/save-row-button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+
+export const metadata: Metadata = {
+  title: "Users — Admin",
+  robots: { index: false },
+};
 
 type UsersAdminPageProps = {
   searchParams?: {
@@ -12,9 +21,7 @@ type UsersAdminPageProps = {
 };
 
 function paramValue(value: string | string[] | undefined) {
-  if (Array.isArray(value)) {
-    return value[0] ?? "";
-  }
+  if (Array.isArray(value)) return value[0] ?? "";
   return value ?? "";
 }
 
@@ -23,7 +30,8 @@ export default async function UsersAdminPage({ searchParams }: UsersAdminPagePro
 
   const query = paramValue(searchParams?.q);
   const roleParam = paramValue(searchParams?.role);
-  const roleFilter = roleParam === UserRole.ADMIN || roleParam === UserRole.STUDENT ? roleParam : "ALL";
+  const roleFilter =
+    roleParam === UserRole.ADMIN || roleParam === UserRole.STUDENT ? roleParam : "ALL";
 
   const users = await prisma.user.findMany({
     where: {
@@ -37,118 +45,139 @@ export default async function UsersAdminPage({ searchParams }: UsersAdminPagePro
         : {}),
       ...(roleFilter !== "ALL" ? { role: roleFilter } : {}),
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: { createdAt: "desc" },
     select: {
       id: true,
       name: true,
       email: true,
       role: true,
       createdAt: true,
-      _count: {
-        select: {
-          progresses: true,
-          certificates: true,
-        },
-      },
+      _count: { select: { progresses: true, certificates: true } },
     },
   });
 
   return (
-    <section className="surface-elevated space-y-4 p-5 text-foreground">
-      <header className="space-y-2">
-        <h2 className="section-title">Users</h2>
-        <p className="text-sm text-muted-foreground">Search, filter, and edit user roles locally.</p>
-      </header>
+    <section className="page-shell">
+      <PageHeader
+        kicker="People"
+        title="Users"
+        description="Search, filter, and edit user roles. Changes apply immediately."
+      />
 
-      <form className="surface-subtle grid gap-3 p-4 md:grid-cols-[1fr_180px_auto]">
-        <input
-          type="text"
-          name="q"
-          defaultValue={query}
-          placeholder="Search by name or email"
-          className="input-base"
-        />
-        <select
-          name="role"
-          defaultValue={roleFilter}
-          className="select-base"
-        >
-          <option value="ALL">All roles</option>
-          <option value={UserRole.ADMIN}>ADMIN</option>
-          <option value={UserRole.STUDENT}>STUDENT</option>
-        </select>
-        <button
-          type="submit"
-          className="btn-secondary"
-        >
-          Apply
-        </button>
-      </form>
+      {/* ── Filter ────────────────────────────────────────────────── */}
+      <section className="surface-elevated p-5">
+        <form className="grid gap-3 md:grid-cols-[1fr_180px_auto]">
+          <input
+            type="text"
+            name="q"
+            defaultValue={query}
+            placeholder="Search by name or email…"
+            className="input-base"
+          />
+          <select name="role" defaultValue={roleFilter} className="select-base">
+            <option value="ALL">All roles</option>
+            <option value={UserRole.ADMIN}>ADMIN</option>
+            <option value={UserRole.STUDENT}>STUDENT</option>
+          </select>
+          <button type="submit" className="btn-secondary">
+            Apply
+          </button>
+        </form>
+      </section>
 
-      <div className="table-shell">
-        <table className="table-base min-w-[900px]">
-          <thead className="table-head">
-            <tr>
-              <th className="px-3 py-3">Name</th>
-              <th className="px-3 py-3">Email</th>
-              <th className="px-3 py-3">Role</th>
-              <th className="px-3 py-3">Progress</th>
-              <th className="px-3 py-3">Certificates</th>
-              <th className="px-3 py-3">Created</th>
-              <th className="px-3 py-3">Edit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id} className="table-row">
-                <td className="px-3 py-3">
-                  <input
-                    form={`user-edit-${user.id}`}
-                    name="name"
-                    defaultValue={user.name}
-                    className="input-base h-9 px-2 py-1.5"
-                  />
-                </td>
-                <td className="px-3 py-3 text-muted-foreground">{user.email}</td>
-                <td className="px-3 py-3">
-                  <select
-                    form={`user-edit-${user.id}`}
-                    name="role"
-                    defaultValue={user.role}
-                    className="select-base h-9 px-2 py-1.5"
-                  >
-                    <option value={UserRole.ADMIN}>ADMIN</option>
-                    <option value={UserRole.STUDENT}>STUDENT</option>
-                  </select>
-                </td>
-                <td className="px-3 py-3 text-muted-foreground">{user._count.progresses}</td>
-                <td className="px-3 py-3 text-muted-foreground">{user._count.certificates}</td>
-                <td className="px-3 py-3 text-muted-foreground">{user.createdAt.toLocaleDateString()}</td>
-                <td className="px-3 py-3">
-                  <form id={`user-edit-${user.id}`} action={updateUserAction} className="inline-flex">
-                    <input type="hidden" name="userId" value={user.id} />
-                    <button
-                      type="submit"
-                      className="btn-primary px-3 py-1.5 text-xs"
-                    >
-                      Save
-                    </button>
-                  </form>
-                </td>
-              </tr>
-            ))}
-            {users.length === 0 && (
-              <tr>
-                <td className="px-3 py-6 text-center text-muted-foreground" colSpan={7}>
-                  No users found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      {/* ── Table ─────────────────────────────────────────────────── */}
+      <section className="surface-elevated space-y-3 p-5">
+        <p className="text-xs text-muted-foreground">
+          {users.length} user{users.length !== 1 ? "s" : ""}
+          {query ? ` matching "${query}"` : ""}
+          {roleFilter !== "ALL" ? ` · role: ${roleFilter}` : ""}
+        </p>
+
+        {users.length === 0 ? (
+          <EmptyState
+            title="No users found"
+            description={
+              query || roleFilter !== "ALL"
+                ? "Try changing the search query or role filter."
+                : "No users exist yet."
+            }
+            size="sm"
+          />
+        ) : (
+          <div className="table-shell">
+            <table className="table-base min-w-[900px]">
+              <thead className="table-head">
+                <tr>
+                  <th className="px-3 py-3 text-left">Name</th>
+                  <th className="px-3 py-3 text-left">Email</th>
+                  <th className="px-3 py-3 text-left">Role</th>
+                  <th className="px-3 py-3 text-left">Progress</th>
+                  <th className="px-3 py-3 text-left">Certs</th>
+                  <th className="px-3 py-3 text-left">Joined</th>
+                  <th className="px-3 py-3 text-left">Save</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user.id} className="table-row">
+                    {/* Name (editable) */}
+                    <td className="px-3 py-2">
+                      <input
+                        form={`user-edit-${user.id}`}
+                        name="name"
+                        defaultValue={user.name}
+                        maxLength={120}
+                        className="input-base h-9 min-w-[140px] px-2 py-1.5 text-sm"
+                      />
+                    </td>
+
+                    {/* Email (read-only) */}
+                    <td className="px-3 py-2 font-mono text-xs text-muted-foreground">
+                      {user.email}
+                    </td>
+
+                    {/* Role (editable select) */}
+                    <td className="px-3 py-2">
+                      <select
+                        form={`user-edit-${user.id}`}
+                        name="role"
+                        defaultValue={user.role}
+                        className="select-base h-9 px-2 py-1 text-xs"
+                      >
+                        <option value={UserRole.ADMIN}>ADMIN</option>
+                        <option value={UserRole.STUDENT}>STUDENT</option>
+                      </select>
+                    </td>
+
+                    {/* Progress count */}
+                    <td className="px-3 py-2 text-sm text-muted-foreground">
+                      {user._count.progresses}
+                    </td>
+
+                    {/* Certificates count */}
+                    <td className="px-3 py-2 text-sm text-muted-foreground">
+                      {user._count.certificates}
+                    </td>
+
+                    {/* Joined date */}
+                    <td className="px-3 py-2 text-xs text-muted-foreground">
+                      {user.createdAt.toLocaleDateString()}
+                    </td>
+
+                    {/* Save */}
+                    <td className="px-3 py-2">
+                      <form id={`user-edit-${user.id}`} action={updateUserAction}>
+                        <input type="hidden" name="userId" value={user.id} />
+                        <SaveRowButton />
+                      </form>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </section>
   );
 }

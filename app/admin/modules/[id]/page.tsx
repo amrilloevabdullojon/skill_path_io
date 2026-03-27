@@ -1,0 +1,234 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { BookOpen, CheckCircle2, Clock3, Minus } from "lucide-react";
+
+import { updateModuleDetailAction } from "@/app/admin/actions";
+import { SubmitModuleButton } from "@/components/admin/modules/submit-module-button";
+import { PageHeader } from "@/components/ui/page-header";
+import { requireAdminPermission } from "@/lib/admin-auth";
+import { prisma } from "@/lib/prisma";
+
+export const metadata: Metadata = {
+  title: "Edit Module — Admin",
+  robots: { index: false },
+};
+
+type Props = { params: { id: string } };
+
+export default async function ModuleDetailPage({ params }: Props) {
+  await requireAdminPermission("courses.write");
+
+  const mod = await prisma.module.findUnique({
+    where: { id: params.id },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      order: true,
+      duration: true,
+      trackId: true,
+      track: { select: { id: true, title: true, slug: true, category: true } },
+      quiz: { select: { id: true, title: true, passingScore: true } },
+      lessons: {
+        orderBy: { order: "asc" },
+        select: { id: true, title: true, order: true, type: true },
+      },
+      _count: { select: { lessons: true, userProgresses: true } },
+    },
+  });
+
+  if (!mod) notFound();
+
+  return (
+    <section className="page-shell">
+      <PageHeader
+        kicker="Content"
+        title={mod.title}
+        description={`Module in ${mod.track.title} · ${mod._count.lessons} lessons · ${mod.duration} min`}
+        actionLabel="Back to modules"
+        actionHref="/admin/modules"
+      />
+
+      <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+        {/* ── Edit form ─────────────────────────────────────────── */}
+        <section className="surface-elevated space-y-5 p-5 sm:p-7">
+          <h2 className="section-title">Edit metadata</h2>
+
+          <form action={updateModuleDetailAction} className="space-y-5">
+            <input type="hidden" name="moduleId" value={mod.id} />
+
+            {/* Track (read-only) */}
+            <div className="space-y-1.5">
+              <p className="text-sm font-medium text-muted-foreground">Track</p>
+              <p className="text-sm text-foreground">{mod.track.title}</p>
+            </div>
+
+            {/* Title */}
+            <div className="space-y-1.5">
+              <label htmlFor="mod-title" className="text-sm font-medium text-foreground">
+                Title <span className="text-rose-400">*</span>
+              </label>
+              <input
+                id="mod-title"
+                name="title"
+                type="text"
+                required
+                maxLength={200}
+                defaultValue={mod.title}
+                className="input-base w-full"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="space-y-1.5">
+              <label htmlFor="mod-desc" className="text-sm font-medium text-foreground">
+                Description
+              </label>
+              <textarea
+                id="mod-desc"
+                name="description"
+                rows={4}
+                maxLength={1000}
+                defaultValue={mod.description ?? ""}
+                placeholder="Short description shown to learners…"
+                className="input-base w-full resize-none py-2"
+              />
+            </div>
+
+            {/* Order + Duration */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label htmlFor="mod-order" className="text-sm font-medium text-foreground">
+                  Order <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  id="mod-order"
+                  name="order"
+                  type="number"
+                  required
+                  min={1}
+                  max={999}
+                  defaultValue={mod.order}
+                  className="input-base w-full"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label htmlFor="mod-duration" className="text-sm font-medium text-foreground">
+                  Duration (min) <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  id="mod-duration"
+                  name="duration"
+                  type="number"
+                  required
+                  min={1}
+                  max={600}
+                  defaultValue={mod.duration}
+                  className="input-base w-full"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-1">
+              <SubmitModuleButton label="Save changes" />
+              <Link href="/admin/modules" className="btn-secondary">
+                Cancel
+              </Link>
+            </div>
+          </form>
+        </section>
+
+        {/* ── Side info ─────────────────────────────────────────── */}
+        <div className="space-y-4">
+
+          {/* Stats */}
+          <section className="surface-elevated space-y-3 p-5">
+            <h2 className="section-title">Stats</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="surface-subtle space-y-0.5 p-3">
+                <p className="text-xs text-muted-foreground">Lessons</p>
+                <p className="text-xl font-semibold text-foreground">{mod._count.lessons}</p>
+              </div>
+              <div className="surface-subtle space-y-0.5 p-3">
+                <p className="text-xs text-muted-foreground">Completions</p>
+                <p className="text-xl font-semibold text-foreground">{mod._count.userProgresses}</p>
+              </div>
+              <div className="surface-subtle space-y-0.5 p-3">
+                <p className="text-xs text-muted-foreground">Duration</p>
+                <p className="flex items-center gap-1 text-xl font-semibold text-foreground">
+                  <Clock3 className="h-4 w-4 text-muted-foreground" />
+                  {mod.duration} min
+                </p>
+              </div>
+              <div className="surface-subtle space-y-0.5 p-3">
+                <p className="text-xs text-muted-foreground">Quiz</p>
+                <p className="text-sm font-semibold text-foreground">
+                  {mod.quiz ? (
+                    <span className="inline-flex items-center gap-1 text-emerald-300">
+                      <CheckCircle2 className="h-4 w-4" />
+                      {mod.quiz.passingScore}% pass
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1 text-muted-foreground">
+                      <Minus className="h-4 w-4" />
+                      None
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Lessons list */}
+          <section className="surface-elevated space-y-3 p-5">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="section-title">Lessons</h2>
+              <Link
+                href="/admin/lessons"
+                className="text-xs text-sky-300 hover:underline"
+              >
+                Open lessons →
+              </Link>
+            </div>
+
+            {mod.lessons.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No lessons yet.</p>
+            ) : (
+              <ol className="space-y-1.5">
+                {mod.lessons.map((lesson) => (
+                  <li
+                    key={lesson.id}
+                    className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm"
+                  >
+                    <span className="text-xs tabular-nums text-muted-foreground">
+                      {lesson.order}.
+                    </span>
+                    <BookOpen className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                    <span className="flex-1 truncate text-foreground">{lesson.title}</span>
+                    <span className="shrink-0 rounded border border-border px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
+                      {lesson.type}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </section>
+
+          {/* Preview link */}
+          <section className="surface-elevated p-5">
+            <h2 className="section-title mb-3">Student view</h2>
+            <Link
+              href={`/tracks/${mod.track.slug}/modules/${mod.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary inline-flex w-full justify-center gap-2"
+            >
+              Open module page ↗
+            </Link>
+          </section>
+        </div>
+      </div>
+    </section>
+  );
+}

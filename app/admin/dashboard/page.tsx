@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
+
 import { prisma } from "@/lib/prisma";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { StudioDashboard } from "@/components/admin/dashboard/studio-dashboard";
+
+export const metadata: Metadata = {
+  title: "Dashboard — Admin",
+  robots: { index: false },
+};
 
 export default async function AdminDashboardPage() {
   await requireAdminPermission("courses.read");

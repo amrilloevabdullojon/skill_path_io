@@ -388,7 +388,7 @@ export default async function HomePage() {
                 {howItWorks.map((item, index) => {
                   const Icon = item.icon;
                   return (
-                    <article key={item.title} className="surface-subtle surface-panel-hover relative p-5">
+                    <article key={item.title} className="surface-subtle relative p-5">
                       <div className="mb-4 flex items-center gap-3">
                         <span className="step-number">{index + 1}</span>
                         <div className="h-px flex-1 bg-border" />

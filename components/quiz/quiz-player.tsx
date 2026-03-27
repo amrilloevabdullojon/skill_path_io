@@ -157,7 +157,7 @@ export function QuizPlayer({
     return (
       <AnimatePresence mode="wait">
         <motion.section key="result-screen" className="space-y-6" {...containerMotion}>
-          <div className="surface-subtle rounded-2xl p-4 text-foreground sm:p-6">
+          <div className="surface-subtle rounded-2xl p-4 text-foreground sm:p-6" aria-live="polite" aria-atomic="true">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Quiz result</p>
@@ -168,7 +168,7 @@ export function QuizPlayer({
                   result.passed ? "bg-emerald-500/20 text-emerald-300" : "bg-rose-500/20 text-rose-300"
                 }`}
               >
-                {result.passed ? <CheckCircle2 className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+                {result.passed ? <CheckCircle2 className="h-4 w-4" aria-hidden="true" /> : <XCircle className="h-4 w-4" aria-hidden="true" />}
                 {result.passed ? "Passed" : "Not passed"}
               </div>
             </div>
@@ -244,7 +244,14 @@ export function QuizPlayer({
           </div>
         </div>
 
-        <div className="progress-track mt-4 h-2">
+        <div
+          className="progress-track mt-4 h-2"
+          role="progressbar"
+          aria-valuenow={currentIndex + 1}
+          aria-valuemin={1}
+          aria-valuemax={totalQuestions}
+          aria-label={`Question ${currentIndex + 1} of ${totalQuestions}`}
+        >
           <motion.div
             className="h-full rounded-full bg-sky-400"
             initial={false}
@@ -304,7 +311,7 @@ export function QuizPlayer({
       </AnimatePresence>
 
       {submitError && (
-        <p className="state-error">
+        <p role="alert" className="state-error">
           {submitError}
         </p>
       )}

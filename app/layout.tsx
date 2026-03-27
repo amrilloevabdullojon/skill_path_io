@@ -14,8 +14,38 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "SkillPath Academy",
-  description: "Learning platform for QA engineers, business analysts, and data analysts.",
+  metadataBase: new URL("https://skillpath.io"),
+  title: {
+    default: "SkillPath Academy — QA, BA & DA Career Tracks",
+    template: "%s — SkillPath Academy",
+  },
+  description: "Structured career tracks for QA Engineers, Business Analysts, and Data Analysts. Learn with missions, quizzes, and AI-powered feedback.",
+  keywords: ["QA engineer", "business analyst", "data analyst", "learning platform", "career track"],
+  authors: [{ name: "SkillPath Academy" }],
+  creator: "SkillPath Academy",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://skillpath.io",
+    siteName: "SkillPath Academy",
+    title: "SkillPath Academy — QA, BA & DA Career Tracks",
+    description: "Structured career tracks for QA Engineers, Business Analysts, and Data Analysts.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SkillPath Academy",
+    description: "Structured career tracks for QA, BA, and DA professionals.",
+    creator: "@skillpathio",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/icon-192.png",
+  },
 };
 
 export default async function RootLayout({

@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+
+export const metadata: Metadata = {
+  title: "Audit Log — Admin",
+  robots: { index: false },
+};
 
 const ACTION_COLORS: Record<string, string> = {
   CREATE: "border-emerald-400/30 bg-emerald-500/10 text-emerald-300",

@@ -1,6 +1,16 @@
+import type { Metadata } from "next";
+
 import { updateCertificateAction } from "@/app/admin/actions";
+import { SaveRowButton } from "@/components/admin/save-row-button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+
+export const metadata: Metadata = {
+  title: "Certificates — Admin",
+  robots: { index: false },
+};
 
 type CertificatesAdminPageProps = {
   searchParams?: {
@@ -10,9 +20,7 @@ type CertificatesAdminPageProps = {
 };
 
 function paramValue(value: string | string[] | undefined) {
-  if (Array.isArray(value)) {
-    return value[0] ?? "";
-  }
+  if (Array.isArray(value)) return value[0] ?? "";
   return value ?? "";
 }
 
@@ -25,10 +33,7 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
   const [tracks, certificates] = await prisma.$transaction([
     prisma.track.findMany({
       orderBy: { title: "asc" },
-      select: {
-        id: true,
-        title: true,
-      },
+      select: { id: true, title: true },
     }),
     prisma.certificate.findMany({
       where: {
@@ -44,123 +49,127 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
           : {}),
         ...(trackIdFilter ? { trackId: trackIdFilter } : {}),
       },
-      orderBy: {
-        issuedAt: "desc",
-      },
+      orderBy: { issuedAt: "desc" },
       select: {
         id: true,
         issuedAt: true,
         certificateUrl: true,
-        user: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
-        track: {
-          select: {
-            title: true,
-          },
-        },
+        user: { select: { name: true, email: true } },
+        track: { select: { title: true, category: true } },
       },
     }),
   ]);
 
+  const activeTrackLabel = trackIdFilter
+    ? (tracks.find((t) => t.id === trackIdFilter)?.title ?? "selected track")
+    : null;
+
   return (
-    <section className="surface-elevated space-y-4 p-5 text-foreground">
-      <header className="space-y-2">
-        <h2 className="section-title">Certificates</h2>
-        <p className="text-sm text-muted-foreground">Search, filter, and edit certificate URLs.</p>
-      </header>
+    <section className="page-shell">
+      <PageHeader
+        kicker="People"
+        title="Certificates"
+        description="Search, filter, and update certificate PDF URLs."
+      />
 
-      <form className="surface-subtle grid gap-3 p-4 md:grid-cols-[1fr_240px_auto]">
-        <input
-          type="text"
-          name="q"
-          defaultValue={query}
-          placeholder="Search by user, track, or URL"
-          className="input-base"
-        />
-        <select
-          name="trackId"
-          defaultValue={trackIdFilter}
-          className="select-base"
-        >
-          <option value="">All tracks</option>
-          {tracks.map((track) => (
-            <option key={track.id} value={track.id}>
-              {track.title}
-            </option>
-          ))}
-        </select>
-        <button
-          type="submit"
-          className="btn-secondary"
-        >
-          Apply
-        </button>
-      </form>
-
-      <div className="table-shell">
-        <table className="table-base min-w-[1080px]">
-          <thead className="table-head">
-            <tr>
-              <th className="px-3 py-3">Issued at</th>
-              <th className="px-3 py-3">User</th>
-              <th className="px-3 py-3">Email</th>
-              <th className="px-3 py-3">Track</th>
-              <th className="px-3 py-3">Certificate URL</th>
-              <th className="px-3 py-3">Edit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {certificates.map((certificate) => (
-              <tr key={certificate.id} className="table-row">
-                <td className="px-3 py-3 text-muted-foreground">{certificate.issuedAt.toLocaleString()}</td>
-                <td className="px-3 py-3">{certificate.user.name}</td>
-                <td className="px-3 py-3 text-muted-foreground">{certificate.user.email}</td>
-                <td className="px-3 py-3">{certificate.track.title}</td>
-                <td className="px-3 py-3">
-                  <div className="space-y-1.5">
-                    <input
-                      form={`certificate-edit-${certificate.id}`}
-                      name="certificateUrl"
-                      defaultValue={certificate.certificateUrl}
-                      className="input-base h-9 px-2 py-1.5"
-                    />
-                    <a
-                      href={certificate.certificateUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex text-xs text-sky-300 hover:underline"
-                    >
-                      Open PDF
-                    </a>
-                  </div>
-                </td>
-                <td className="px-3 py-3">
-                  <form id={`certificate-edit-${certificate.id}`} action={updateCertificateAction}>
-                    <input type="hidden" name="certificateId" value={certificate.id} />
-                    <button
-                      type="submit"
-                      className="btn-primary px-3 py-1.5 text-xs"
-                    >
-                      Save
-                    </button>
-                  </form>
-                </td>
-              </tr>
+      {/* ── Filter ────────────────────────────────────────────────── */}
+      <section className="surface-elevated p-5">
+        <form className="grid gap-3 md:grid-cols-[1fr_240px_auto]">
+          <input
+            type="text"
+            name="q"
+            defaultValue={query}
+            placeholder="Search by user, track, or URL…"
+            className="input-base"
+          />
+          <select name="trackId" defaultValue={trackIdFilter} className="select-base">
+            <option value="">All tracks</option>
+            {tracks.map((track) => (
+              <option key={track.id} value={track.id}>
+                {track.title}
+              </option>
             ))}
-            {certificates.length === 0 && (
-              <tr>
-                <td className="px-3 py-6 text-center text-muted-foreground" colSpan={6}>
-                  No certificates found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+          </select>
+          <button type="submit" className="btn-secondary">
+            Apply
+          </button>
+        </form>
+      </section>
+
+      {/* ── Table ─────────────────────────────────────────────────── */}
+      <section className="surface-elevated space-y-3 p-5">
+        <p className="text-xs text-muted-foreground">
+          {certificates.length} certificate{certificates.length !== 1 ? "s" : ""}
+          {query ? ` matching "${query}"` : ""}
+          {activeTrackLabel ? ` in ${activeTrackLabel}` : ""}
+        </p>
+
+        {certificates.length === 0 ? (
+          <EmptyState
+            title="No certificates found"
+            description={
+              query || trackIdFilter
+                ? "Try changing the search query or track filter."
+                : "No certificates have been issued yet."
+            }
+            size="sm"
+          />
+        ) : (
+          <div className="table-shell">
+            <table className="table-base min-w-[1100px]">
+              <thead className="table-head">
+                <tr>
+                  <th className="px-3 py-3 text-left">Issued</th>
+                  <th className="px-3 py-3 text-left">User</th>
+                  <th className="px-3 py-3 text-left">Email</th>
+                  <th className="px-3 py-3 text-left">Track</th>
+                  <th className="px-3 py-3 text-left">Certificate URL</th>
+                  <th className="px-3 py-3 text-left">Save</th>
+                </tr>
+              </thead>
+              <tbody>
+                {certificates.map((cert) => (
+                  <tr key={cert.id} className="table-row align-top">
+                    <td className="px-3 py-2 text-xs text-muted-foreground">
+                      {cert.issuedAt.toLocaleDateString()}
+                    </td>
+                    <td className="px-3 py-2 text-sm">{cert.user.name}</td>
+                    <td className="px-3 py-2 font-mono text-xs text-muted-foreground">
+                      {cert.user.email}
+                    </td>
+                    <td className="px-3 py-2 text-sm text-muted-foreground">{cert.track.title}</td>
+                    <td className="px-3 py-2">
+                      <div className="space-y-1.5">
+                        <input
+                          form={`cert-edit-${cert.id}`}
+                          name="certificateUrl"
+                          defaultValue={cert.certificateUrl}
+                          placeholder="https://…"
+                          className="input-base h-9 min-w-[240px] px-2 py-1.5 text-xs"
+                        />
+                        <a
+                          href={cert.certificateUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex text-xs text-sky-300 hover:underline"
+                        >
+                          Open PDF ↗
+                        </a>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2">
+                      <form id={`cert-edit-${cert.id}`} action={updateCertificateAction}>
+                        <input type="hidden" name="certificateId" value={cert.id} />
+                        <SaveRowButton />
+                      </form>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </section>
   );
 }

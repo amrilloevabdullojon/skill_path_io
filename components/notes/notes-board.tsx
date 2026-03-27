@@ -104,8 +104,11 @@ export function NotesBoard({ initialNotes }: { initialNotes: UserNote[] }) {
       </header>
 
       <article className="surface-elevated space-y-3 p-4">
-        <input value={title} onChange={(event) => setTitle(event.target.value)} className="input-base" placeholder="Note title" />
+        <label htmlFor="note-title" className="sr-only">Note title</label>
+        <input id="note-title" value={title} onChange={(event) => setTitle(event.target.value)} className="input-base" placeholder="Note title" />
+        <label htmlFor="note-content" className="sr-only">Note content</label>
         <textarea
+          id="note-content"
           value={content}
           onChange={(event) => setContent(event.target.value)}
           className="textarea-base min-h-[120px]"
@@ -115,7 +118,7 @@ export function NotesBoard({ initialNotes }: { initialNotes: UserNote[] }) {
           <Plus className="h-4 w-4" />
           {isSubmitting ? "Saving..." : "Add note"}
         </button>
-        {error ? <p className="text-xs text-rose-300">{error}</p> : null}
+        {error ? <p role="alert" className="text-xs text-rose-300">{error}</p> : null}
       </article>
 
       <div className="grid gap-4 xl:grid-cols-2">
