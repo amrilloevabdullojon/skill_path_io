@@ -29,7 +29,7 @@ const trackTemplates = [
   {
     slug: "business-analyst",
     title: "Business Analyst",
-    description: "Track for requirements analysis and stakeholder communication.",
+    description: "Трек по бизнес-анализу: сбор требований, работа со стейкхолдерами, постановка задач и документирование.",
     icon: "briefcase",
     color: "#F97316",
     category: TrackCategory.BA,
@@ -44,7 +44,7 @@ const trackTemplates = [
   {
     slug: "data-analyst",
     title: "Data Analyst",
-    description: "Track for data analytics, SQL, and visualization.",
+    description: "Трек по аналитике данных: SQL, визуализация, продуктовые метрики и работа с BI-инструментами.",
     icon: "bar-chart-3",
     color: "#10B981",
     category: TrackCategory.DA,

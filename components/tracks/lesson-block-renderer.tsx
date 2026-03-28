@@ -47,7 +47,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "heading") {
           return (
             <BlockCard key={block.id} className="border-sky-400/20 bg-sky-500/5">
-              <p className="kicker">Lesson heading</p>
+              <p className="kicker">Заголовок урока</p>
               <h2 className="text-2xl font-semibold text-foreground">{block.title || block.content}</h2>
               {block.content ? <p className="text-sm text-muted-foreground">{block.content}</p> : null}
             </BlockCard>
@@ -114,11 +114,11 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "callout" || block.type === "important_concept") {
           return (
             <BlockCard key={block.id} title={block.title} className="border-amber-400/25 bg-amber-500/8">
-              <p className="inline-flex items-center gap-2 text-sm font-medium text-amber-200">
+              <p className="inline-flex items-center gap-2 text-sm font-medium text-amber-700">
                 <Lightbulb className="h-4 w-4" />
-                Important concept
+                Важная концепция
               </p>
-              <p className="text-sm text-amber-100/90">{block.content}</p>
+              <p className="text-sm text-amber-800">{block.content}</p>
             </BlockCard>
           );
         }
@@ -140,7 +140,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={block.media.url}
-                  alt={block.media.alt || "Lesson visual"}
+                  alt={block.media.alt || "Иллюстрация к уроку"}
                   className="w-full rounded-xl border border-border/80"
                 />
               ) : null}
@@ -150,7 +150,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
 
         if (block.type === "video") {
           return (
-            <BlockCard key={block.id} title={block.title || "Video explanation"}>
+            <BlockCard key={block.id} title={block.title || "Видео-объяснение"}>
               <div className="aspect-video overflow-hidden rounded-xl border border-border/80">
                 <iframe
                   src={block.media?.url}
@@ -168,7 +168,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
           return (
             <BlockCard key={block.id}>
               <blockquote className="data-pill inline-flex items-start gap-2 rounded-xl px-3 py-2 text-sm">
-                <Quote className="mt-0.5 h-4 w-4 text-sky-300" />
+                <Quote className="mt-0.5 h-4 w-4 text-sky-500" />
                 <span>{block.content}</span>
               </blockquote>
             </BlockCard>
@@ -182,7 +182,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "key_idea") {
           return (
             <BlockCard key={block.id} title={block.title} className="border-sky-400/25 bg-sky-500/8">
-              <p className="text-sm text-sky-100">{block.content}</p>
+              <p className="text-sm text-sky-800">{block.content}</p>
               <AskAiHintButton question={`Explain this key idea in simple words: ${block.content || ""}`} />
             </BlockCard>
           );
@@ -191,7 +191,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "common_mistakes") {
           return (
             <BlockCard key={block.id} title={block.title} className="border-rose-400/25 bg-rose-500/8">
-              <ul className="list-disc space-y-1 pl-5 text-sm text-rose-100/90">
+              <ul className="list-disc space-y-1 pl-5 text-sm text-rose-700">
                 {(block.items || []).map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -203,7 +203,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "real_world_example") {
           return (
             <BlockCard key={block.id} title={block.title} className="border-violet-400/25 bg-violet-500/8">
-              <p className="text-sm text-violet-100/90">{block.content}</p>
+              <p className="text-sm text-violet-700">{block.content}</p>
             </BlockCard>
           );
         }
@@ -216,8 +216,8 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
           }
           const isCorrect = state.submitted && state.selectedIndex === qc.correctIndex;
           return (
-            <BlockCard key={block.id} title={block.title || "Quick Check"} className="border-emerald-400/25 bg-emerald-500/8">
-              <p className="text-sm font-medium text-emerald-100">{qc.question}</p>
+            <BlockCard key={block.id} title={block.title || "Быстрая проверка"} className="border-emerald-400/25 bg-emerald-500/8">
+              <p className="text-sm font-medium text-emerald-800">{qc.question}</p>
               <div className="space-y-2">
                 {qc.options.map((option, index) => (
                   <label key={option} className="quiz-option-default flex items-start gap-2 rounded-xl p-2 text-sm text-foreground">
@@ -248,13 +248,13 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                 disabled={state.selectedIndex === null}
                 className="btn-secondary"
               >
-                Check answer
+                Проверить ответ
               </button>
               {state.submitted ? (
-                <div className={`rounded-xl border px-3 py-2 text-sm ${isCorrect ? "border-emerald-400/35 bg-emerald-500/10 text-emerald-200" : "border-amber-400/35 bg-amber-500/10 text-amber-100"}`}>
+                <div className={`rounded-xl border px-3 py-2 text-sm ${isCorrect ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-amber-300 bg-amber-50 text-amber-700"}`}>
                   <p className="inline-flex items-center gap-2">
                     {isCorrect ? <CheckCircle2 className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
-                    {isCorrect ? "Correct!" : "Not quite yet"}
+                    {isCorrect ? "Верно!" : "Не совсем верно"}
                   </p>
                   <p className="mt-1 text-xs">{qc.explanation}</p>
                 </div>
@@ -267,8 +267,8 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
           const draft = challengeDrafts[block.id] ?? "";
           const submitted = challengeSubmitted[block.id] ?? false;
           return (
-            <BlockCard key={block.id} title={block.title || "Mini Challenge"} className="border-cyan-400/25 bg-cyan-500/8">
-              <p className="text-sm text-cyan-100">{block.challengePrompt}</p>
+            <BlockCard key={block.id} title={block.title || "Мини-задание"} className="border-cyan-400/25 bg-cyan-500/8">
+              <p className="text-sm text-cyan-800">{block.challengePrompt}</p>
               <textarea
                 value={draft}
                 onChange={(event) =>
@@ -278,7 +278,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                   }))
                 }
                 className="textarea-base min-h-[110px]"
-                placeholder="Write your short answer..."
+                placeholder="Напиши короткий ответ..."
               />
               <div className="flex flex-wrap items-center gap-2">
                 <button
@@ -292,17 +292,17 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                   className="btn-secondary"
                   disabled={draft.trim().length < 12}
                 >
-                  Submit challenge
+                  Отправить
                 </button>
                 <AskAiHintButton question={`Give me a hint for this challenge: ${block.challengePrompt || ""}`} />
               </div>
               {submitted ? (
-                <p className="inline-flex items-center gap-2 rounded-xl border border-emerald-400/35 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+                <p className="inline-flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
                   <Sparkles className="h-4 w-4" />
-                  Great start. Next step: validate your answer with module quiz or simulation.
+                  Отлично! Следующий шаг: проверь ответ через тест или симуляцию модуля.
                 </p>
               ) : block.challengeHint ? (
-                <p className="text-xs text-cyan-100/80">Hint: {block.challengeHint}</p>
+                <p className="text-xs text-cyan-600">Подсказка: {block.challengeHint}</p>
               ) : null}
             </BlockCard>
           );
@@ -320,8 +320,8 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                 </ul>
               ) : null}
               <p className="data-pill inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs">
-                <PlayCircle className="h-4 w-4 text-sky-300" />
-                Recommended next step: complete quiz and continue timeline.
+                <PlayCircle className="h-4 w-4 text-sky-500" />
+                Рекомендуемый следующий шаг: пройди тест и продолжи путь обучения.
               </p>
             </BlockCard>
           );

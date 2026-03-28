@@ -62,6 +62,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
           ...(query ? { title: { contains: query, mode: "insensitive" } } : {}),
           ...(categoryFilter !== "ALL" ? { category: categoryFilter } : {}),
         },
+        take: 10,
         orderBy: { title: "asc" },
         select: {
           id: true,
@@ -89,7 +90,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
         },
       }),
       prisma.certificate.findMany({
-        take: 10,
+        take: 20,
         orderBy: { issuedAt: "desc" },
         select: {
           id: true,
@@ -156,6 +157,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
 
   const growthRows = Object.entries(growthByMonth)
     .sort((a, b) => a[0].localeCompare(b[0]))
+    .slice(-12)
     .map(([month, count]) => ({ month, count }));
 
   const completionRows = completionRateRaw.map((track) => {
@@ -177,13 +179,27 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
     ? Math.round((missionSuccessCount / missionSubmissionCount) * 100)
     : 0;
   const missionAvg = missionAverageScore._avg.score ? Math.round(missionAverageScore._avg.score) : 0;
-  const popularTracks = [...completionRows].sort((a, b) => b.started - a.started).slice(0, 5);
+  const popularTracks = [...completionRows].sort((a, b) => b.started - a.started).slice(0, 10);
 
   return (
     <section className="page-shell">
       <header className="surface-elevated space-y-2 p-5 text-foreground">
-        <h2 className="section-title">Analytics</h2>
-        <p className="text-sm text-muted-foreground">Local metrics for users, content, progress, and certificates.</p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-2">
+            <h2 className="section-title">Analytics</h2>
+            <p className="text-sm text-muted-foreground">Local metrics for users, content, progress, and certificates.</p>
+            <p className="text-xs text-muted-foreground">
+              Last updated: {new Date().toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}
+            </p>
+          </div>
+          <a
+            href="/api/admin/export/activity"
+            className="btn-secondary text-sm shrink-0"
+            download
+          >
+            Export activity CSV
+          </a>
+        </div>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
@@ -248,6 +264,8 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
           </button>
         </form>
 
+        <p className="text-xs text-muted-foreground">Showing top 10 tracks for current filters.</p>
+
         <div className="table-shell">
           <table className="table-base min-w-[760px]">
             <thead className="table-head">
@@ -289,7 +307,12 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
       </section>
 
       <section className="surface-elevated space-y-3 p-5 text-foreground">
-        <h3 className="text-lg font-semibold">Latest certificates</h3>
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-lg font-semibold">Latest 20 certificates</h3>
+          <a href="/admin/certificates" className="text-xs text-muted-foreground hover:text-foreground">
+            View all →
+          </a>
+        </div>
         <div className="table-shell">
           <table className="table-base min-w-[700px]">
             <thead className="table-head">
@@ -345,7 +368,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
       </section>
 
       <section className="surface-elevated space-y-4 p-5 text-foreground">
-        <h3 className="text-lg font-semibold">User growth by month</h3>
+        <h3 className="text-lg font-semibold">User growth by month <span className="text-sm font-normal text-muted-foreground">(last 12 months)</span></h3>
         <div className="table-shell">
           <table className="table-base min-w-[520px]">
             <thead className="table-head">
@@ -407,7 +430,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
       </section>
 
       <section className="surface-elevated space-y-4 p-5 text-foreground">
-        <h3 className="text-lg font-semibold">Popular tracks</h3>
+        <h3 className="text-lg font-semibold">Top 10 popular tracks</h3>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {popularTracks.map((track) => (
             <article key={track.id} className="surface-subtle p-4">

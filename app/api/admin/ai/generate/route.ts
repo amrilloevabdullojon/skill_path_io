@@ -70,14 +70,12 @@ function toolInstruction(tool: AdminAiTool) {
 }
 
 async function requestAnthropic(payload: AdminAiRequest) {
-  const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) {
     return null;
   }
 
-  const model = process.env.ANTHROPIC_MODEL?.trim() || "claude-3-5-sonnet-latest";
-  const maxTokensRaw = Number(process.env.ANTHROPIC_MAX_TOKENS);
-  const maxTokens = Number.isFinite(maxTokensRaw) && maxTokensRaw > 0 ? Math.floor(maxTokensRaw) : 700;
+  const model = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
   const contextText = [
     `Course: ${payload.context.courseTitle || "N/A"}`,
     `Module: ${payload.context.moduleTitle || "N/A"}`,
@@ -97,19 +95,14 @@ async function requestAnthropic(payload: AdminAiRequest) {
     .filter(Boolean)
     .join("\n\n");
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const response = await fetch(url, {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model,
-      max_tokens: maxTokens,
-      temperature: 0.35,
-      system: "You are an LMS content architect helping admin users build high quality courses.",
-      messages: [{ role: "user", content: prompt }],
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      systemInstruction: { parts: [{ text: "You are an LMS content architect helping admin users build high quality courses." }] },
+      generationConfig: { temperature: 0.35, maxOutputTokens: 700 },
     }),
   });
 
@@ -118,14 +111,13 @@ async function requestAnthropic(payload: AdminAiRequest) {
   }
 
   const body = (await response.json()) as {
-    content?: Array<{ type?: string; text?: string }>;
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
   };
 
-  const text = (body.content || [])
-    .filter((item) => item.type === "text" && typeof item.text === "string")
-    .map((item) => item.text?.trim() || "")
+  const text = body.candidates?.[0]?.content?.parts
+    ?.map((p) => p.text?.trim() ?? "")
     .filter(Boolean)
-    .join("\n\n");
+    .join("\n\n") ?? "";
   return text || null;
 }
 

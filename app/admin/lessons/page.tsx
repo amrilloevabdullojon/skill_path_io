@@ -4,6 +4,7 @@ import { LessonType } from "@prisma/client";
 
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
+import { Pagination } from "@/components/ui/pagination";
 import type { LessonGroup } from "@/components/admin/lessons/lessons-table";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
@@ -12,6 +13,8 @@ export const metadata: Metadata = {
   title: "Lessons — Admin",
   robots: { index: false },
 };
+
+const PAGE_SIZE = 50;
 
 const LessonsTable = dynamic(
   () =>
@@ -26,6 +29,7 @@ type LessonsAdminPageProps = {
     q?: string | string[];
     moduleId?: string | string[];
     type?: string | string[];
+    page?: string | string[];
   };
 };
 
@@ -46,22 +50,29 @@ export default async function LessonsAdminPage({ searchParams }: LessonsAdminPag
     ? (typeFilter as LessonType)
     : null;
 
-  const [modules, lessons] = await prisma.$transaction([
+  const page = Math.max(1, parseInt(paramValue(searchParams?.page) || "1", 10));
+  const skip = (page - 1) * PAGE_SIZE;
+
+  const lessonWhere = {
+    ...(query ? { title: { contains: query, mode: "insensitive" as const } } : {}),
+    ...(moduleIdFilter ? { moduleId: moduleIdFilter } : {}),
+    ...(validType ? { type: validType } : {}),
+  };
+
+  const [modules, lessons, total] = await prisma.$transaction([
     prisma.module.findMany({
       orderBy: [{ track: { title: "asc" } }, { order: "asc" }],
       select: { id: true, title: true },
     }),
     prisma.lesson.findMany({
-      where: {
-        ...(query ? { title: { contains: query, mode: "insensitive" } } : {}),
-        ...(moduleIdFilter ? { moduleId: moduleIdFilter } : {}),
-        ...(validType ? { type: validType } : {}),
-      },
+      where: lessonWhere,
       orderBy: [
         { module: { track: { title: "asc" } } },
         { module: { order: "asc" } },
         { order: "asc" },
       ],
+      take: PAGE_SIZE,
+      skip,
       select: {
         id: true,
         title: true,
@@ -78,7 +89,12 @@ export default async function LessonsAdminPage({ searchParams }: LessonsAdminPag
         },
       },
     }),
+    prisma.lesson.count({ where: lessonWhere }),
   ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const from = total === 0 ? 0 : skip + 1;
+  const to = Math.min(skip + PAGE_SIZE, total);
 
   // Group by module
   const groupMap = new Map<string, LessonGroup>();
@@ -152,7 +168,9 @@ export default async function LessonsAdminPage({ searchParams }: LessonsAdminPag
       {/* ── Table ─────────────────────────────────────────────────── */}
       <section className="surface-elevated space-y-3 p-5">
         <p className="text-xs text-muted-foreground">
-          {lessons.length} lesson{lessons.length !== 1 ? "s" : ""}
+          {totalPages > 1
+            ? `Showing ${from}–${to} of ${total} lesson${total !== 1 ? "s" : ""} across ${groups.length} module${groups.length !== 1 ? "s" : ""}`
+            : `${total} lesson${total !== 1 ? "s" : ""}`}
           {query ? ` matching "${query}"` : ""}
           {typeFilter ? ` · type: ${typeFilter}` : ""}
         </p>
@@ -173,6 +191,22 @@ export default async function LessonsAdminPage({ searchParams }: LessonsAdminPag
           <LessonsTable groups={groups} />
         )}
       </section>
+
+      {/* ── Pagination ────────────────────────────────────────────── */}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        basePath="/admin/lessons"
+        params={{
+          q: query || undefined,
+          moduleId: moduleIdFilter || undefined,
+          type: typeFilter || undefined,
+        }}
+        itemLabel="lessons"
+        from={from}
+        to={to}
+        total={total}
+      />
     </section>
   );
 }

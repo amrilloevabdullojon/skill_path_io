@@ -5,6 +5,7 @@ import { updateUserAction } from "@/app/admin/actions";
 import { SaveRowButton } from "@/components/admin/save-row-button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
+import { Pagination } from "@/components/ui/pagination";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
@@ -13,10 +14,13 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
+const PAGE_SIZE = 25;
+
 type UsersAdminPageProps = {
   searchParams?: {
     q?: string | string[];
     role?: string | string[];
+    page?: string | string[];
   };
 };
 
@@ -33,28 +37,42 @@ export default async function UsersAdminPage({ searchParams }: UsersAdminPagePro
   const roleFilter =
     roleParam === UserRole.ADMIN || roleParam === UserRole.STUDENT ? roleParam : "ALL";
 
-  const users = await prisma.user.findMany({
-    where: {
-      ...(query
-        ? {
-            OR: [
-              { name: { contains: query, mode: "insensitive" } },
-              { email: { contains: query, mode: "insensitive" } },
-            ],
-          }
-        : {}),
-      ...(roleFilter !== "ALL" ? { role: roleFilter } : {}),
-    },
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      createdAt: true,
-      _count: { select: { progresses: true, certificates: true } },
-    },
-  });
+  const page = Math.max(1, parseInt(paramValue(searchParams?.page) || "1", 10));
+  const skip = (page - 1) * PAGE_SIZE;
+
+  const where = {
+    ...(query
+      ? {
+          OR: [
+            { name: { contains: query, mode: "insensitive" as const } },
+            { email: { contains: query, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
+    ...(roleFilter !== "ALL" ? { role: roleFilter as UserRole } : {}),
+  };
+
+  const [users, total] = await prisma.$transaction([
+    prisma.user.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: PAGE_SIZE,
+      skip,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        _count: { select: { progresses: true, certificates: true } },
+      },
+    }),
+    prisma.user.count({ where }),
+  ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const from = total === 0 ? 0 : skip + 1;
+  const to = Math.min(skip + PAGE_SIZE, total);
 
   return (
     <section className="page-shell">
@@ -62,6 +80,15 @@ export default async function UsersAdminPage({ searchParams }: UsersAdminPagePro
         kicker="People"
         title="Users"
         description="Search, filter, and edit user roles. Changes apply immediately."
+        aside={
+          <a
+            href="/api/admin/export/users"
+            className="btn-secondary text-sm"
+            download
+          >
+            Export CSV
+          </a>
+        }
       />
 
       {/* ── Filter ────────────────────────────────────────────────── */}
@@ -88,7 +115,7 @@ export default async function UsersAdminPage({ searchParams }: UsersAdminPagePro
       {/* ── Table ─────────────────────────────────────────────────── */}
       <section className="surface-elevated space-y-3 p-5">
         <p className="text-xs text-muted-foreground">
-          {users.length} user{users.length !== 1 ? "s" : ""}
+          {total} user{total !== 1 ? "s" : ""}
           {query ? ` matching "${query}"` : ""}
           {roleFilter !== "ALL" ? ` · role: ${roleFilter}` : ""}
         </p>
@@ -178,6 +205,18 @@ export default async function UsersAdminPage({ searchParams }: UsersAdminPagePro
           </div>
         )}
       </section>
+
+      {/* ── Pagination ────────────────────────────────────────────── */}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        basePath="/admin/users"
+        params={{ q: query || undefined, role: roleFilter !== "ALL" ? roleFilter : undefined }}
+        itemLabel="users"
+        from={from}
+        to={to}
+        total={total}
+      />
     </section>
   );
 }

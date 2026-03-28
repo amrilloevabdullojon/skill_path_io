@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { TrackCategory } from "@prisma/client";
+import { getTranslations } from "next-intl/server";
 
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -35,6 +35,7 @@ function paramValue(value: string | string[] | undefined) {
 
 export default async function ModulesAdminPage({ searchParams }: ModulesAdminPageProps) {
   await requireAdminPermission("courses.read");
+  const t = await getTranslations("admin.modules");
 
   const query = paramValue(searchParams?.q);
   const trackIdFilter = paramValue(searchParams?.trackId);
@@ -72,7 +73,7 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
   ]);
 
   const activeTrackLabel = trackIdFilter
-    ? (tracks.find((t) => t.id === trackIdFilter)?.title ?? "selected track")
+    ? (tracks.find((track) => track.id === trackIdFilter)?.title ?? t("list.selectedTrack"))
     : null;
 
   // Group modules by track preserving fetch order
@@ -98,10 +99,10 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
   return (
     <section className="page-shell">
       <PageHeader
-        kicker="Content"
-        title="Modules"
-        description="Search, filter, and edit module metadata inline. Drag rows to reorder within a track."
-        actionLabel="New module"
+        kicker={t("shared.kicker")}
+        title={t("list.title")}
+        description={t("list.description")}
+        actionLabel={t("list.newModule")}
         actionHref="/admin/modules/new"
       />
 
@@ -112,11 +113,11 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
             type="text"
             name="q"
             defaultValue={query}
-            placeholder="Search title or description…"
+            placeholder={t("list.searchPlaceholder")}
             className="input-base"
           />
           <select name="trackId" defaultValue={trackIdFilter} className="select-base">
-            <option value="">All tracks</option>
+            <option value="">{t("list.allTracks")}</option>
             {tracks.map((track) => (
               <option key={track.id} value={track.id}>
                 {track.title}
@@ -125,11 +126,11 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
           </select>
           <div className="flex gap-2">
             <button type="submit" className="btn-secondary">
-              Apply
+              {t("list.apply")}
             </button>
             {(query || trackIdFilter) && (
               <a href="/admin/modules" className="btn-secondary text-muted-foreground">
-                Reset
+                {t("list.reset")}
               </a>
             )}
           </div>
@@ -139,20 +140,24 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
       {/* ── Table ─────────────────────────────────────────────────── */}
       <section className="surface-elevated space-y-3 p-5">
         <p className="text-xs text-muted-foreground">
-          {modules.length} module{modules.length !== 1 ? "s" : ""}
-          {query ? ` matching "${query}"` : ""}
-          {activeTrackLabel ? ` in ${activeTrackLabel}` : ""}
+          {query && activeTrackLabel
+            ? t("list.summaryMatchingInTrack", { count: modules.length, query, track: activeTrackLabel })
+            : query
+              ? t("list.summaryMatching", { count: modules.length, query })
+              : activeTrackLabel
+                ? t("list.summaryInTrack", { count: modules.length, track: activeTrackLabel })
+                : t("list.summary", { count: modules.length })}
         </p>
 
         {modules.length === 0 ? (
           <EmptyState
-            title="No modules found"
+            title={t("list.emptyTitle")}
             description={
               query || trackIdFilter
-                ? "Try changing the search query or track filter."
-                : "No modules exist yet. Create the first one."
+                ? t("list.emptyFiltered")
+                : t("list.emptyDefault")
             }
-            actionLabel="New module"
+            actionLabel={t("list.newModule")}
             actionHref="/admin/modules/new"
             size="sm"
           />

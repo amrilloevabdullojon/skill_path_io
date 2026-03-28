@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { createModuleAction } from "@/app/admin/actions";
 import { SubmitModuleButton } from "@/components/admin/modules/submit-module-button";
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 
 export default async function NewModulePage() {
   await requireAdminPermission("courses.write");
+  const t = await getTranslations("admin.modules");
 
   const tracks = await prisma.track.findMany({
     orderBy: { title: "asc" },
@@ -30,10 +32,10 @@ export default async function NewModulePage() {
   return (
     <section className="page-shell">
       <PageHeader
-        kicker="Content"
-        title="New Module"
-        description="Create a new module and assign it to a track."
-        actionLabel="Back to modules"
+        kicker={t("shared.kicker")}
+        title={t("new.title")}
+        description={t("new.description")}
+        actionLabel={t("shared.backToModules")}
         actionHref="/admin/modules"
       />
 
@@ -42,10 +44,10 @@ export default async function NewModulePage() {
           {/* Track */}
           <div className="space-y-1.5">
             <label htmlFor="trackId" className="text-sm font-medium text-foreground">
-              Track <span className="text-rose-400">*</span>
+              {t("shared.track")} <span className="text-rose-400">*</span>
             </label>
             <select id="trackId" name="trackId" required className="select-base w-full">
-              <option value="">Select a track…</option>
+              <option value="">{t("new.selectTrack")}</option>
               {tracks.map((track) => (
                 <option key={track.id} value={track.id}>
                   {track.title} ({track.category})
@@ -57,7 +59,7 @@ export default async function NewModulePage() {
           {/* Title */}
           <div className="space-y-1.5">
             <label htmlFor="title" className="text-sm font-medium text-foreground">
-              Title <span className="text-rose-400">*</span>
+              {t("shared.title")} <span className="text-rose-400">*</span>
             </label>
             <input
               id="title"
@@ -65,7 +67,7 @@ export default async function NewModulePage() {
               type="text"
               required
               maxLength={200}
-              placeholder="e.g. Introduction to Test Automation"
+              placeholder={t("new.titlePlaceholder")}
               className="input-base w-full"
             />
           </div>
@@ -73,7 +75,7 @@ export default async function NewModulePage() {
           {/* Description */}
           <div className="space-y-1.5">
             <label htmlFor="description" className="text-sm font-medium text-foreground">
-              Description <span className="text-rose-400">*</span>
+              {t("shared.description")} <span className="text-rose-400">*</span>
             </label>
             <textarea
               id="description"
@@ -81,7 +83,7 @@ export default async function NewModulePage() {
               required
               rows={3}
               maxLength={1000}
-              placeholder="Short description shown to learners…"
+              placeholder={t("shared.descriptionPlaceholder")}
               className="input-base w-full resize-none py-2"
             />
           </div>
@@ -90,7 +92,7 @@ export default async function NewModulePage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label htmlFor="order" className="text-sm font-medium text-foreground">
-                Order <span className="text-rose-400">*</span>
+                {t("shared.order")} <span className="text-rose-400">*</span>
               </label>
               <input
                 id="order"
@@ -104,7 +106,7 @@ export default async function NewModulePage() {
             </div>
             <div className="space-y-1.5">
               <label htmlFor="duration" className="text-sm font-medium text-foreground">
-                Duration (min) <span className="text-rose-400">*</span>
+                {t("shared.durationMinutes")} <span className="text-rose-400">*</span>
               </label>
               <input
                 id="duration"
@@ -120,9 +122,9 @@ export default async function NewModulePage() {
           </div>
 
           <div className="flex items-center gap-3 pt-2">
-            <SubmitModuleButton />
+            <SubmitModuleButton label={t("new.submit")} pendingLabel={t("new.submitting")} />
             <Link href="/admin/modules" className="btn-secondary">
-              Cancel
+              {t("shared.cancel")}
             </Link>
           </div>
         </form>

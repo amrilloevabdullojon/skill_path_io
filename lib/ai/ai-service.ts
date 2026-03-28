@@ -42,47 +42,43 @@ export function getClientIp(request: Request): string {
   return request.headers.get("x-real-ip")?.trim() ?? "local";
 }
 
-// ─── Core Anthropic call ─────────────────────────────────────────────────────
+// ─── Core Gemini call ────────────────────────────────────────────────────────
 
 /**
- * Low-level call to the Anthropic Messages API.
- * Returns the text content or throws on failure.
+ * Low-level call to the Google Gemini API.
+ * Returns the text content or an error result.
+ * Named callAnthropic for backward compatibility with existing callers.
  */
 export async function callAnthropic(opts: AiCallOptions): Promise<AiResult> {
-  let env;
-  try {
-    env = getServerEnv();
-  } catch (err) {
-    return { ok: false, status: 500, error: "Server environment misconfigured" };
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return { ok: false, status: 500, error: "AI service is not configured" };
   }
 
-  if (!env.anthropicApiKey) {
-    return { ok: false, status: 500, error: "ANTHROPIC_API_KEY is not configured" };
-  }
+  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const maxTokens = opts.maxTokens ?? 2048;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-  const model = env.anthropicModel ?? "claude-3-5-sonnet-latest";
-  const maxTokens = opts.maxTokens ?? env.anthropicMaxTokens ?? 700;
+  // Map Anthropic-style messages to Gemini format ("assistant" → "model")
+  const contents = opts.messages.map((m) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
 
   let response: Response;
   try {
-    response = await fetch("https://api.anthropic.com/v1/messages", {
+    response = await fetch(url, {
       method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": env.anthropicApiKey,
-        "anthropic-version": "2023-06-01",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model,
-        max_tokens: maxTokens,
-        temperature: opts.temperature ?? 0.4,
-        system: opts.systemPrompt,
-        messages: opts.messages,
+        contents,
+        systemInstruction: { parts: [{ text: opts.systemPrompt }] },
+        generationConfig: { temperature: opts.temperature ?? 0.4, maxOutputTokens: maxTokens },
       }),
     });
   } catch (err) {
     const detail = err instanceof Error ? err.message : "Network error";
-    return { ok: false, status: 502, error: `Anthropic request failed: ${detail}` };
+    return { ok: false, status: 502, error: `AI request failed: ${detail}` };
   }
 
   if (!response.ok) {
@@ -90,19 +86,18 @@ export async function callAnthropic(opts: AiCallOptions): Promise<AiResult> {
     return {
       ok: false,
       status: response.status >= 500 ? 502 : response.status,
-      error: `Anthropic error ${response.status}: ${text.slice(0, 500)}`,
+      error: `AI error ${response.status}: ${text.slice(0, 500)}`,
     };
   }
 
   const data = (await response.json()) as {
-    content?: Array<{ type?: string; text?: string }>;
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
   };
 
-  const text = (data.content ?? [])
-    .filter((c) => c.type === "text" && typeof c.text === "string")
-    .map((c) => c.text!.trim())
+  const text = data.candidates?.[0]?.content?.parts
+    ?.map((p) => p.text?.trim() ?? "")
     .filter(Boolean)
-    .join("\n\n");
+    .join("\n\n") ?? "";
 
   return { ok: true, data: text };
 }

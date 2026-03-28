@@ -24,7 +24,8 @@ export type RecommendationLowScoreProgress = {
   trackSlug: string;
 };
 
-export function trackSkillsByCategory(category: TrackCategory) {
+export function getTrackSkills(category: TrackCategory, customSkills?: string[]): string[] {
+  if (customSkills && customSkills.length > 0) return customSkills;
   if (category === TrackCategory.QA) {
     return ["Testing strategy", "API validation", "Bug reporting"];
   }
@@ -34,7 +35,13 @@ export function trackSkillsByCategory(category: TrackCategory) {
   return ["SQL analysis", "Metrics reasoning", "Data storytelling"];
 }
 
-export function trackCareerImpact(category: TrackCategory) {
+/** @deprecated Use getTrackSkills() instead */
+export function trackSkillsByCategory(category: TrackCategory): string[] {
+  return getTrackSkills(category);
+}
+
+export function getTrackCareerImpact(category: TrackCategory, customCareerImpact?: string): string {
+  if (customCareerImpact) return customCareerImpact;
   if (category === TrackCategory.QA) {
     return "Build confidence for Junior QA release cycles";
   }
@@ -42,6 +49,11 @@ export function trackCareerImpact(category: TrackCategory) {
     return "Strengthen BA delivery for backlog and requirement quality";
   }
   return "Increase readiness for Junior Data Analyst insights delivery";
+}
+
+/** @deprecated Use getTrackCareerImpact() instead */
+export function trackCareerImpact(category: TrackCategory): string {
+  return getTrackCareerImpact(category);
 }
 
 export function buildDashboardRecommendations(input: {

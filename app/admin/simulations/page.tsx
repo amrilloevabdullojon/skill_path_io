@@ -26,10 +26,36 @@ const DIFFICULTY_BADGE: Record<string, string> = {
   HARD: "border-rose-500/30 bg-rose-500/10 text-rose-400",
 };
 
-export default async function AdminSimulationsPage() {
+const STATUS_OPTIONS: StudioContentStatus[] = ["DRAFT", "IN_REVIEW", "PUBLISHED", "ARCHIVED"];
+
+type AdminSimulationsPageProps = {
+  searchParams?: {
+    q?: string | string[];
+    status?: string | string[];
+  };
+};
+
+function paramValue(value: string | string[] | undefined) {
+  if (Array.isArray(value)) return value[0] ?? "";
+  return value ?? "";
+}
+
+export default async function AdminSimulationsPage({ searchParams }: AdminSimulationsPageProps) {
   await requireAdminPermission("courses.read");
 
+  const query = paramValue(searchParams?.q);
+  const statusFilter = paramValue(searchParams?.status);
+  const validStatus = STATUS_OPTIONS.includes(statusFilter as StudioContentStatus)
+    ? (statusFilter as StudioContentStatus)
+    : undefined;
+
   const simulations = await prisma.simulation.findMany({
+    where: {
+      ...(query
+        ? { title: { contains: query, mode: "insensitive" } }
+        : {}),
+      ...(validStatus ? { status: validStatus } : {}),
+    },
     orderBy: [{ module: { course: { title: "asc" } } }, { createdAt: "desc" }],
     select: {
       id: true,
@@ -60,15 +86,52 @@ export default async function AdminSimulationsPage() {
         actionHref="/admin/simulations/new"
       />
 
+      {/* ── Filter ────────────────────────────────────────────────── */}
+      <section className="surface-elevated p-5">
+        <form className="grid gap-3 md:grid-cols-[1fr_200px_auto]">
+          <input
+            type="text"
+            name="q"
+            defaultValue={query}
+            placeholder="Search simulations…"
+            className="input-base"
+          />
+          <select name="status" defaultValue={statusFilter} className="select-base">
+            <option value="">All statuses</option>
+            {STATUS_OPTIONS.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          <div className="flex gap-2">
+            <button type="submit" className="btn-secondary">
+              Apply
+            </button>
+            {(query || statusFilter) && (
+              <a href="/admin/simulations" className="btn-secondary text-muted-foreground">
+                Reset
+              </a>
+            )}
+          </div>
+        </form>
+      </section>
+
+      {/* ── Table ─────────────────────────────────────────────────── */}
       <section className="surface-elevated space-y-3 p-5">
         <p className="text-xs text-muted-foreground">
           {simulations.length} simulation{simulations.length !== 1 ? "s" : ""}
+          {query && ` matching "${query}"`}
         </p>
 
         {simulations.length === 0 ? (
           <EmptyState
             title="No simulations found"
-            description="No simulations have been created yet."
+            description={
+              query || statusFilter
+                ? "No simulations match your filters."
+                : "No simulations have been created yet."
+            }
             actionLabel="New simulation"
             actionHref="/admin/simulations/new"
             size="sm"

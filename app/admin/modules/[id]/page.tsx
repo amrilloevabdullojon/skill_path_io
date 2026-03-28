@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BookOpen, CheckCircle2, Clock3, Minus } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 import { updateModuleDetailAction } from "@/app/admin/actions";
 import { DuplicateModuleButton } from "@/components/admin/modules/duplicate-module-button";
@@ -19,6 +20,7 @@ type Props = { params: { id: string } };
 
 export default async function ModuleDetailPage({ params }: Props) {
   await requireAdminPermission("courses.write");
+  const t = await getTranslations("admin.modules");
 
   const mod = await prisma.module.findUnique({
     where: { id: params.id },
@@ -44,31 +46,35 @@ export default async function ModuleDetailPage({ params }: Props) {
   return (
     <section className="page-shell">
       <PageHeader
-        kicker="Content"
+        kicker={t("shared.kicker")}
         title={mod.title}
-        description={`Module in ${mod.track.title} · ${mod._count.lessons} lessons · ${mod.duration} min`}
-        actionLabel="Back to modules"
+        description={t("detail.description", {
+          track: mod.track.title,
+          lessons: mod._count.lessons,
+          duration: mod.duration,
+        })}
+        actionLabel={t("shared.backToModules")}
         actionHref="/admin/modules"
       />
 
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
         {/* ── Edit form ─────────────────────────────────────────── */}
         <section className="surface-elevated space-y-5 p-5 sm:p-7">
-          <h2 className="section-title">Edit metadata</h2>
+          <h2 className="section-title">{t("detail.editMetadata")}</h2>
 
           <form action={updateModuleDetailAction} className="space-y-5">
             <input type="hidden" name="moduleId" value={mod.id} />
 
             {/* Track (read-only) */}
             <div className="space-y-1.5">
-              <p className="text-sm font-medium text-muted-foreground">Track</p>
+              <p className="text-sm font-medium text-muted-foreground">{t("shared.track")}</p>
               <p className="text-sm text-foreground">{mod.track.title}</p>
             </div>
 
             {/* Title */}
             <div className="space-y-1.5">
               <label htmlFor="mod-title" className="text-sm font-medium text-foreground">
-                Title <span className="text-rose-400">*</span>
+                {t("shared.title")} <span className="text-rose-400">*</span>
               </label>
               <input
                 id="mod-title"
@@ -84,7 +90,7 @@ export default async function ModuleDetailPage({ params }: Props) {
             {/* Description */}
             <div className="space-y-1.5">
               <label htmlFor="mod-desc" className="text-sm font-medium text-foreground">
-                Description
+                {t("shared.description")}
               </label>
               <textarea
                 id="mod-desc"
@@ -92,7 +98,7 @@ export default async function ModuleDetailPage({ params }: Props) {
                 rows={4}
                 maxLength={1000}
                 defaultValue={mod.description ?? ""}
-                placeholder="Short description shown to learners…"
+                placeholder={t("shared.descriptionPlaceholder")}
                 className="input-base w-full resize-none py-2"
               />
             </div>
@@ -101,7 +107,7 @@ export default async function ModuleDetailPage({ params }: Props) {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label htmlFor="mod-order" className="text-sm font-medium text-foreground">
-                  Order <span className="text-rose-400">*</span>
+                  {t("shared.order")} <span className="text-rose-400">*</span>
                 </label>
                 <input
                   id="mod-order"
@@ -116,7 +122,7 @@ export default async function ModuleDetailPage({ params }: Props) {
               </div>
               <div className="space-y-1.5">
                 <label htmlFor="mod-duration" className="text-sm font-medium text-foreground">
-                  Duration (min) <span className="text-rose-400">*</span>
+                  {t("shared.durationMinutes")} <span className="text-rose-400">*</span>
                 </label>
                 <input
                   id="mod-duration"
@@ -132,9 +138,9 @@ export default async function ModuleDetailPage({ params }: Props) {
             </div>
 
             <div className="flex items-center gap-3 pt-1">
-              <SubmitModuleButton label="Save changes" />
+              <SubmitModuleButton label={t("detail.saveChanges")} pendingLabel={t("detail.savingChanges")} />
               <Link href="/admin/modules" className="btn-secondary">
-                Cancel
+                {t("shared.cancel")}
               </Link>
               <span className="ml-auto">
                 <DuplicateModuleButton moduleId={mod.id} />
@@ -148,35 +154,35 @@ export default async function ModuleDetailPage({ params }: Props) {
 
           {/* Stats */}
           <section className="surface-elevated space-y-3 p-5">
-            <h2 className="section-title">Stats</h2>
+            <h2 className="section-title">{t("detail.stats")}</h2>
             <div className="grid grid-cols-2 gap-3">
               <div className="surface-subtle space-y-0.5 p-3">
-                <p className="text-xs text-muted-foreground">Lessons</p>
+                <p className="text-xs text-muted-foreground">{t("shared.lessons")}</p>
                 <p className="text-xl font-semibold text-foreground">{mod._count.lessons}</p>
               </div>
               <div className="surface-subtle space-y-0.5 p-3">
-                <p className="text-xs text-muted-foreground">Completions</p>
+                <p className="text-xs text-muted-foreground">{t("detail.completions")}</p>
                 <p className="text-xl font-semibold text-foreground">{mod._count.userProgresses}</p>
               </div>
               <div className="surface-subtle space-y-0.5 p-3">
-                <p className="text-xs text-muted-foreground">Duration</p>
+                <p className="text-xs text-muted-foreground">{t("shared.durationMinutes")}</p>
                 <p className="flex items-center gap-1 text-xl font-semibold text-foreground">
                   <Clock3 className="h-4 w-4 text-muted-foreground" />
-                  {mod.duration} min
+                  {mod.duration} {t("shared.durationShort")}
                 </p>
               </div>
               <div className="surface-subtle space-y-0.5 p-3">
-                <p className="text-xs text-muted-foreground">Quiz</p>
+                <p className="text-xs text-muted-foreground">{t("shared.quiz")}</p>
                 <p className="text-sm font-semibold text-foreground">
                   {mod.quiz ? (
                     <span className="inline-flex items-center gap-1 text-emerald-300">
                       <CheckCircle2 className="h-4 w-4" />
-                      {mod.quiz.passingScore}% pass
+                      {t("detail.passScore", { score: mod.quiz.passingScore })}
                     </span>
                   ) : (
                     <span className="flex items-center gap-1 text-muted-foreground">
                       <Minus className="h-4 w-4" />
-                      None
+                      {t("shared.none")}
                     </span>
                   )}
                 </p>
@@ -188,7 +194,7 @@ export default async function ModuleDetailPage({ params }: Props) {
           <section className="surface-elevated space-y-3 p-5">
             <div className="flex items-center justify-between gap-2">
               <h2 className="section-title">
-                Lessons
+                {t("shared.lessons")}
                 <span className="ml-1.5 text-xs font-normal text-muted-foreground">
                   ({mod._count.lessons})
                 </span>
@@ -197,18 +203,18 @@ export default async function ModuleDetailPage({ params }: Props) {
                 href="/admin/lessons"
                 className="text-xs text-sky-300 hover:underline"
               >
-                Manage all →
+                {t("detail.manageAll")}
               </Link>
             </div>
 
             {mod.lessons.length === 0 ? (
               <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">No lessons yet.</p>
+                <p className="text-sm text-muted-foreground">{t("detail.noLessons")}</p>
                 <Link
                   href="/admin/lessons"
                   className="btn-secondary inline-flex w-full justify-center text-xs"
                 >
-                  + Add lessons in Lessons admin
+                  {t("detail.addLessons")}
                 </Link>
               </div>
             ) : (
@@ -234,7 +240,7 @@ export default async function ModuleDetailPage({ params }: Props) {
                   href="/admin/lessons"
                   className="btn-secondary inline-flex w-full justify-center text-xs"
                 >
-                  + Add / edit lessons
+                  {t("detail.addOrEditLessons")}
                 </Link>
               </>
             )}
@@ -242,14 +248,14 @@ export default async function ModuleDetailPage({ params }: Props) {
 
           {/* Preview link */}
           <section className="surface-elevated p-5">
-            <h2 className="section-title mb-3">Student view</h2>
+            <h2 className="section-title mb-3">{t("detail.studentView")}</h2>
             <Link
               href={`/tracks/${mod.track.slug}/modules/${mod.id}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-secondary inline-flex w-full justify-center gap-2"
             >
-              Open module page ↗
+              {t("detail.openModulePage")}
             </Link>
           </section>
         </div>

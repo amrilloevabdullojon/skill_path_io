@@ -8,8 +8,8 @@ import { missionXpSummary } from "@/features/missions/engine";
 import { buildCareerSummary } from "@/lib/dashboard/career-data";
 import {
   buildDashboardRecommendations,
-  trackCareerImpact,
-  trackSkillsByCategory,
+  getTrackCareerImpact,
+  getTrackSkills,
 } from "@/lib/dashboard/recommendations-data";
 import {
   buildHeatmapFromCompletedAt,
@@ -1382,8 +1382,14 @@ export async function getDashboardData(params: {
         nextModuleTitle: track.nextModuleTitle,
         nextModuleHref: track.nextModuleHref,
         estimatedCompletion: track.estimatedCompletion,
-        skillsGained: trackSkillsByCategory(track.category),
-        careerImpact: trackCareerImpact(track.category),
+        skillsGained: getTrackSkills(
+          track.category,
+          'skills' in track ? (track as unknown as { skills: string[] }).skills : undefined,
+        ),
+        careerImpact: getTrackCareerImpact(
+          track.category,
+          'careerImpact' in track ? (track as unknown as { careerImpact?: string }).careerImpact : undefined,
+        ),
         modulePreview: hasFullTrackAccess ? track.modulePreview : track.modulePreview.slice(0, 2),
       })),
     activeTrackCount,

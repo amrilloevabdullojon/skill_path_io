@@ -48,7 +48,30 @@
       "Bash(find /Users/panda/Documents/GitHub/skill_path_io/app/simulation -type f -name *.tsx)",
       "Bash(find /Users/panda/Documents/GitHub/skill_path_io/app/sandbox -type f -name *.tsx)",
       "Bash(mkdir -p \"/Users/panda/Documents/GitHub/skill_path_io/app/admin/assignments/[id]\")",
-      "Bash(mkdir -p \"/Users/panda/Documents/GitHub/skill_path_io/app/admin/simulations/[id]\")"
+      "Bash(mkdir -p \"/Users/panda/Documents/GitHub/skill_path_io/app/admin/simulations/[id]\")",
+      "Bash(python3 -c \":*)",
+      "Bash(find /Users/panda/Documents/GitHub/skill_path_io/components -name *track* -type f)",
+      "Bash(kill %1)",
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(grep -n \"getTrackSkills\\\\|getTrackCareerImpact\\\\|getTrackCareerOutcome\\\\|getTrackLearningOutcomes\\\\|trackSkillsByCategory\\\\|trackCareerImpact\\\\|trackWhatYouLearn\\\\|trackCareerOutcome\" /Users/panda/Documents/GitHub/skill_path_io/lib/dashboard/recommendations-data.ts /Users/panda/Documents/GitHub/skill_path_io/lib/tracks/progression.ts /Users/panda/Documents/GitHub/skill_path_io/lib/dashboard/data.ts /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/page.tsx /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/modules/[moduleId]/page.tsx)",
+      "Bash(find /Users/panda/Documents/GitHub/skill_path_io/app/admin/tracks -type f -name *.tsx)",
+      "Bash(grep -n \"export\\\\|import\" /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/modules/[moduleId]/actions.ts)",
+      "Bash(node -e \"const { TrackStatus } = require\\(''@prisma/client''\\); console.log\\(TrackStatus\\);\")",
+      "Bash(ls /Users/panda/Documents/GitHub/skill_path_io/lib/auth*)",
+      "Bash(grep -rn \"ANTHROPIC_API_KEY\\\\|anthropicApiKey\\\\|api.anthropic.com\\\\|x-api-key.*anthropic\" /Users/panda/Documents/GitHub/skill_path_io/lib/ /Users/panda/Documents/GitHub/skill_path_io/app/ /Users/panda/Documents/GitHub/skill_path_io/features/ --include=*.ts --include=*.tsx)",
+      "Bash(grep -n \"timelineNodes\\\\|timeline\\\\|flow\" /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/modules/[moduleId]/page.tsx)",
+      "Bash(wc -l /Users/panda/Documents/GitHub/skill_path_io/app/tracks/page.tsx /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/page.tsx /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/modules/[moduleId]/page.tsx)",
+      "Bash(find /Users/panda/Documents/GitHub/skill_path_io/components -name track-card* -o -name module-card* -o -name track-tree* -o -name progression*)",
+      "Bash(grep -n \"Module cards\\\\|module cards\\\\|stateStyles\\\\|Layers3\\\\|Clock3\\\\|Lock\\\\|Sparkles\" /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/page.tsx)",
+      "Bash(grep -n \"Lesson checkpoints\\\\|Lesson navigation\\\\|Track progress\\\\|modules completed\\\\|overall\\\\|Demo user\\\\|\"\"Modules\"\"\\\\|Module overview\\\\|Lessons timeline\\\\|Lesson blocks\\\\|Practical task\\\\|\"\"Quiz\"\"\\\\|\"\"Simulation\"\"\\\\|\"\"Recommendations\"\"\\\\|\"\"Module\"\"\\\\|\"\" lessons\"\"\\\\|Open notes\\\\|Learning objectives\\\\|Progression rewards\\\\|What you will learn\\\\|Learning path\\\\|Final challenge:\\\\|Go to quiz\\\\|Back: previous module\\\\|Back to track\\\\|Next: following module\\\\|Next: go to quiz\\\\|Next: back to track\\\\|Track completion unlocked\\\\|Congratulations\\\\.\" /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/modules/[moduleId]/page.tsx)",
+      "Bash(grep -n \"TrackModuleTree\\\\|Learning path\\\\|Учебный путь\\\\|К трекам\\\\|Прогресс\\\\|Завершено\\\\|мин\\\\|ч$\" /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/page.tsx)",
+      "Bash(wc -l /Users/panda/Documents/GitHub/skill_path_io/components/tracks/track-module-tree.tsx /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/page.tsx)",
+      "Bash(grep -c \"Module cards\" /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/page.tsx)",
+      "Bash(grep -n \"Module cards\" /Users/panda/Documents/GitHub/skill_path_io/app/tracks/[trackId]/page.tsx)",
+      "Bash(grep -rn \"Track for requirements\\\\|Track focused on\\\\|Track for data analytics\" /Users/panda/Documents/GitHub/skill_path_io/ --include=*.ts --include=*.tsx)",
+      "Bash(node -e \":*)",
+      "Bash(sed -i '' 's/description: \"\"Track for requirements analysis and stakeholder communication.\"\",/description: \"\"Трек по бизнес-анализу: сбор требований, работа со стейкхолдерами, постановка задач и документирование.\"\",/' /Users/panda/Documents/GitHub/skill_path_io/prisma/seed.ts)",
+      "Bash(sed -i '' 's/description: \"\"Track for data analytics, SQL, and visualization.\"\",/description: \"\"Трек по аналитике данных: SQL, визуализация, продуктовые метрики и работа с BI-инструментами.\"\",/' /Users/panda/Documents/GitHub/skill_path_io/prisma/seed.ts)"
     ]
   }
 }

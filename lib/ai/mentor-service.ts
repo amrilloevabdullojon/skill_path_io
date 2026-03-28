@@ -68,9 +68,10 @@ export async function handleMentorRequest(request: Request, body: { context?: Me
     );
   }
 
-  if (!env.anthropicApiKey) {
+  const geminiApiKey = process.env.GEMINI_API_KEY;
+  if (!geminiApiKey) {
     return NextResponse.json(
-      { error: "ANTHROPIC_API_KEY is not configured." },
+      { error: "AI service is not configured." },
       {
         status: 500,
         headers: {
@@ -92,7 +93,10 @@ export async function handleMentorRequest(request: Request, body: { context?: Me
         Boolean(message.content.trim()),
     )
     .slice(-12)
-    .map((message) => ({ role: message.role, content: message.content.trim() }));
+    .map((message) => ({
+      role: message.role === "assistant" ? "model" : "user",
+      parts: [{ text: message.content.trim() }],
+    }));
 
   if (messages.length === 0) {
     return NextResponse.json(
@@ -114,21 +118,18 @@ export async function handleMentorRequest(request: Request, body: { context?: Me
   const lessonText = toSafeString(body.context?.lessonText, "").slice(0, 2000);
   const systemPrompt = buildMentorSystemPrompt(trackTitle, moduleTitle, lessonText);
 
-  let anthropicResponse: Response;
+  const geminiModel = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`;
+
+  let geminiResponse: Response;
   try {
-    anthropicResponse = await fetch("https://api.anthropic.com/v1/messages", {
+    geminiResponse = await fetch(geminiUrl, {
       method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": env.anthropicApiKey,
-        "anthropic-version": "2023-06-01",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: env.anthropicModel,
-        system: systemPrompt,
-        max_tokens: env.anthropicMaxTokens,
-        temperature: 0.5,
-        messages,
+        contents: messages,
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        generationConfig: { temperature: 0.5, maxOutputTokens: 2048 },
       }),
     });
   } catch (error) {
@@ -149,15 +150,15 @@ export async function handleMentorRequest(request: Request, body: { context?: Me
     );
   }
 
-  if (!anthropicResponse.ok) {
-    const errorText = await anthropicResponse.text();
+  if (!geminiResponse.ok) {
+    const errorText = await geminiResponse.text();
     return NextResponse.json(
       {
-        error: "Anthropic request failed.",
+        error: "AI request failed.",
         details: errorText.slice(0, 1000),
       },
       {
-        status: anthropicResponse.status,
+        status: geminiResponse.status,
         headers: {
           "cache-control": "no-store",
           "x-ratelimit-limit": String(rateLimit.limit),
@@ -168,15 +169,14 @@ export async function handleMentorRequest(request: Request, body: { context?: Me
     );
   }
 
-  const result = (await anthropicResponse.json()) as {
-    content?: Array<{ type?: string; text?: string }>;
+  const result = (await geminiResponse.json()) as {
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
   };
 
-  const reply = (result.content ?? [])
-    .filter((item) => item.type === "text" && typeof item.text === "string")
-    .map((item) => item.text?.trim() ?? "")
+  const reply = result.candidates?.[0]?.content?.parts
+    ?.map((p) => p.text?.trim() ?? "")
     .filter(Boolean)
-    .join("\n\n");
+    .join("\n\n") ?? "";
 
   return NextResponse.json(
     { reply: reply || "Could not get a mentor answer. Try rephrasing your question." },

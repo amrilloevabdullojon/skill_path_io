@@ -4,6 +4,7 @@ import { updateCertificateAction } from "@/app/admin/actions";
 import { SaveRowButton } from "@/components/admin/save-row-button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
+import { Pagination } from "@/components/ui/pagination";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
@@ -12,10 +13,13 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
+const PAGE_SIZE = 25;
+
 type CertificatesAdminPageProps = {
   searchParams?: {
     q?: string | string[];
     trackId?: string | string[];
+    page?: string | string[];
   };
 };
 
@@ -30,26 +34,33 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
   const query = paramValue(searchParams?.q);
   const trackIdFilter = paramValue(searchParams?.trackId);
 
-  const [tracks, certificates] = await prisma.$transaction([
+  const page = Math.max(1, parseInt(paramValue(searchParams?.page) || "1", 10));
+  const skip = (page - 1) * PAGE_SIZE;
+
+  const certWhere = {
+    ...(query
+      ? {
+          OR: [
+            { certificateUrl: { contains: query, mode: "insensitive" as const } },
+            { user: { email: { contains: query, mode: "insensitive" as const } } },
+            { user: { name: { contains: query, mode: "insensitive" as const } } },
+            { track: { title: { contains: query, mode: "insensitive" as const } } },
+          ],
+        }
+      : {}),
+    ...(trackIdFilter ? { trackId: trackIdFilter } : {}),
+  };
+
+  const [tracks, certificates, total] = await prisma.$transaction([
     prisma.track.findMany({
       orderBy: { title: "asc" },
       select: { id: true, title: true },
     }),
     prisma.certificate.findMany({
-      where: {
-        ...(query
-          ? {
-              OR: [
-                { certificateUrl: { contains: query, mode: "insensitive" } },
-                { user: { email: { contains: query, mode: "insensitive" } } },
-                { user: { name: { contains: query, mode: "insensitive" } } },
-                { track: { title: { contains: query, mode: "insensitive" } } },
-              ],
-            }
-          : {}),
-        ...(trackIdFilter ? { trackId: trackIdFilter } : {}),
-      },
+      where: certWhere,
       orderBy: { issuedAt: "desc" },
+      take: PAGE_SIZE,
+      skip,
       select: {
         id: true,
         issuedAt: true,
@@ -58,7 +69,12 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
         track: { select: { title: true, category: true } },
       },
     }),
+    prisma.certificate.count({ where: certWhere }),
   ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const from = total === 0 ? 0 : skip + 1;
+  const to = Math.min(skip + PAGE_SIZE, total);
 
   const activeTrackLabel = trackIdFilter
     ? (tracks.find((t) => t.id === trackIdFilter)?.title ?? "selected track")
@@ -99,7 +115,7 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
       {/* ── Table ─────────────────────────────────────────────────── */}
       <section className="surface-elevated space-y-3 p-5">
         <p className="text-xs text-muted-foreground">
-          {certificates.length} certificate{certificates.length !== 1 ? "s" : ""}
+          {total} certificate{total !== 1 ? "s" : ""}
           {query ? ` matching "${query}"` : ""}
           {activeTrackLabel ? ` in ${activeTrackLabel}` : ""}
         </p>
@@ -170,6 +186,18 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
           </div>
         )}
       </section>
+
+      {/* ── Pagination ────────────────────────────────────────────── */}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        basePath="/admin/certificates"
+        params={{ q: query || undefined, trackId: trackIdFilter || undefined }}
+        itemLabel="certificates"
+        from={from}
+        to={to}
+        total={total}
+      />
     </section>
   );
 }

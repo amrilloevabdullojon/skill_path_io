@@ -20,10 +20,36 @@ const STATUS_BADGE: Record<StudioContentStatus, string> = {
   ARCHIVED: "border-red-500/30 bg-red-500/10 text-red-400",
 };
 
-export default async function AdminAssignmentsPage() {
+const STATUS_OPTIONS: StudioContentStatus[] = ["DRAFT", "IN_REVIEW", "PUBLISHED", "ARCHIVED"];
+
+type AdminAssignmentsPageProps = {
+  searchParams?: {
+    q?: string | string[];
+    status?: string | string[];
+  };
+};
+
+function paramValue(value: string | string[] | undefined) {
+  if (Array.isArray(value)) return value[0] ?? "";
+  return value ?? "";
+}
+
+export default async function AdminAssignmentsPage({ searchParams }: AdminAssignmentsPageProps) {
   await requireAdminPermission("courses.read");
 
+  const query = paramValue(searchParams?.q);
+  const statusFilter = paramValue(searchParams?.status);
+  const validStatus = STATUS_OPTIONS.includes(statusFilter as StudioContentStatus)
+    ? (statusFilter as StudioContentStatus)
+    : undefined;
+
   const assignments = await prisma.assignment.findMany({
+    where: {
+      ...(query
+        ? { title: { contains: query, mode: "insensitive" } }
+        : {}),
+      ...(validStatus ? { status: validStatus } : {}),
+    },
     orderBy: [{ module: { course: { title: "asc" } } }, { createdAt: "desc" }],
     select: {
       id: true,
@@ -53,15 +79,52 @@ export default async function AdminAssignmentsPage() {
         actionHref="/admin/assignments/new"
       />
 
+      {/* ── Filter ────────────────────────────────────────────────── */}
+      <section className="surface-elevated p-5">
+        <form className="grid gap-3 md:grid-cols-[1fr_200px_auto]">
+          <input
+            type="text"
+            name="q"
+            defaultValue={query}
+            placeholder="Search assignments…"
+            className="input-base"
+          />
+          <select name="status" defaultValue={statusFilter} className="select-base">
+            <option value="">All statuses</option>
+            {STATUS_OPTIONS.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          <div className="flex gap-2">
+            <button type="submit" className="btn-secondary">
+              Apply
+            </button>
+            {(query || statusFilter) && (
+              <a href="/admin/assignments" className="btn-secondary text-muted-foreground">
+                Reset
+              </a>
+            )}
+          </div>
+        </form>
+      </section>
+
+      {/* ── Table ─────────────────────────────────────────────────── */}
       <section className="surface-elevated space-y-3 p-5">
         <p className="text-xs text-muted-foreground">
           {assignments.length} assignment{assignments.length !== 1 ? "s" : ""}
+          {query && ` matching "${query}"`}
         </p>
 
         {assignments.length === 0 ? (
           <EmptyState
             title="No assignments found"
-            description="No assignments have been created yet."
+            description={
+              query || statusFilter
+                ? "No assignments match your filters."
+                : "No assignments have been created yet."
+            }
             actionLabel="New assignment"
             actionHref="/admin/assignments/new"
             size="sm"

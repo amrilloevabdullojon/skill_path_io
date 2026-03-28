@@ -52,6 +52,18 @@ export function LessonsTable({ groups: initialGroups }: { groups: LessonGroup[] 
     });
   }
 
+  function toggleGroup(groupIds: string[], checked: boolean) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (checked) {
+        groupIds.forEach((id) => next.add(id));
+      } else {
+        groupIds.forEach((id) => next.delete(id));
+      }
+      return next;
+    });
+  }
+
   function handleBulkDelete() {
     const ids = Array.from(selected);
     if (!confirm(`Delete ${ids.length} lesson${ids.length !== 1 ? "s" : ""}?\n\nThis cannot be undone.`))
@@ -88,7 +100,7 @@ export function LessonsTable({ groups: initialGroups }: { groups: LessonGroup[] 
         </div>
       )}
 
-      <div className="table-shell">
+      <div className={`table-shell transition-opacity${bulkPending ? " opacity-50 pointer-events-none" : ""}`}>
         <table className="table-base min-w-[960px]">
           <thead className="table-head">
             <tr>
@@ -113,7 +125,26 @@ export function LessonsTable({ groups: initialGroups }: { groups: LessonGroup[] 
               <Fragment key={group.moduleId}>
                 {/* Group header row */}
                 <tr className="border-t-2 border-border/60 bg-card/60">
-                  <td colSpan={COL_COUNT} className="px-3 py-2">
+                  <td className="px-3 py-2">
+                    {(() => {
+                      const groupIds = group.lessons.map((l) => l.id);
+                      const allChecked = groupIds.length > 0 && groupIds.every((id) => selected.has(id));
+                      const someChecked = groupIds.some((id) => selected.has(id));
+                      return (
+                        <input
+                          type="checkbox"
+                          aria-label={`Select all lessons in ${group.moduleTitle}`}
+                          className="h-3.5 w-3.5 rounded accent-sky-500"
+                          checked={allChecked}
+                          ref={(el) => {
+                            if (el) el.indeterminate = someChecked && !allChecked;
+                          }}
+                          onChange={(e) => toggleGroup(groupIds, e.target.checked)}
+                        />
+                      );
+                    })()}
+                  </td>
+                  <td colSpan={COL_COUNT - 1} className="px-3 py-2">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold text-foreground">
                         {group.moduleTitle}

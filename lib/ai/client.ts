@@ -6,52 +6,42 @@ type AiCompletionInput = {
   maxTokens?: number;
 };
 
-const DEFAULT_MODEL = process.env.ANTHROPIC_MODEL || "claude-3-5-sonnet-latest";
-const DEFAULT_MAX_TOKENS = Number(process.env.ANTHROPIC_MAX_TOKENS || 700);
+type GeminiResponse = {
+  candidates?: Array<{
+    content?: {
+      parts?: Array<{ text?: string }>;
+    };
+  }>;
+};
+
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
 export async function requestAiCompletion({
   systemPrompt,
   userPrompt,
   fallback,
   temperature = 0.4,
-  maxTokens = DEFAULT_MAX_TOKENS,
-}: AiCompletionInput) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return fallback;
-  }
+  maxTokens = 2048,
+}: AiCompletionInput): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return fallback;
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+    const response = await fetch(url, {
       method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: DEFAULT_MODEL,
-        max_tokens: maxTokens,
-        temperature,
-        system: systemPrompt,
-        messages: [{ role: "user", content: userPrompt }],
+        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        generationConfig: { temperature, maxOutputTokens: maxTokens },
       }),
     });
 
-    if (!response.ok) {
-      return fallback;
-    }
+    if (!response.ok) return fallback;
 
-    const data = (await response.json()) as {
-      content?: Array<{ type?: string; text?: string }>;
-    };
-
-    const text = (data.content ?? [])
-      .filter((item) => item.type === "text" && typeof item.text === "string")
-      .map((item) => item.text?.trim() ?? "")
-      .filter(Boolean)
-      .join("\n");
-
+    const data = (await response.json()) as GeminiResponse;
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
     return text || fallback;
   } catch {
     return fallback;

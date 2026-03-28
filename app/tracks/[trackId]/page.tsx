@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { TrackCategory } from "@prisma/client";
 import { notFound } from "next/navigation";
-import { ArrowRight, CheckCircle2, Clock3, Layers3, Lock, Sparkles, Trophy } from "lucide-react";
+import { ArrowRight, CheckCircle2, Clock3, Layers3, Sparkles, Trophy } from "lucide-react";
 import { getLocale } from "next-intl/server";
 
 import { SkillRadarChart } from "@/components/skill-radar/skill-radar";
@@ -18,16 +18,20 @@ import {
   LearningPathState,
   buildTrackProgression,
   buildTrackSkillRadar,
-  trackCareerOutcome,
+  getTrackCareerOutcome,
+  getTrackLearningOutcomes,
   trackNextSuggestion,
-  trackWhatYouLearn,
 } from "@/lib/tracks/progression";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { cn } from "@/lib/utils";
+import { TrackModuleTree } from "@/components/tracks/track-module-tree";
 
 type TrackDetailsProps = {
   params: {
     trackId: string;
+  };
+  searchParams?: {
+    locked?: string;
   };
 };
 
@@ -56,31 +60,6 @@ function categoryAccent(category: TrackCategory) {
   };
 }
 
-function stateStyles(state: LearningPathState) {
-  if (state === "completed") {
-    return {
-      badge: "border-emerald-400/35 bg-emerald-500/15 text-emerald-200",
-      dot: "bg-emerald-400",
-    };
-  }
-  if (state === "in_progress") {
-    return {
-      badge: "border-sky-400/35 bg-sky-500/15 text-sky-200",
-      dot: "bg-sky-400",
-    };
-  }
-  if (state === "available") {
-    return {
-      badge: "border-amber-400/35 bg-amber-500/15 text-amber-200",
-      dot: "bg-amber-300",
-    };
-  }
-  return {
-    badge: "border-border/60 bg-card/50 text-muted-foreground",
-    dot: "bg-muted-foreground/40",
-  };
-}
-
 function categoryLabel(category: TrackCategory) {
   if (category === TrackCategory.QA) return "QA";
   if (category === TrackCategory.BA) return "BA";
@@ -95,10 +74,10 @@ function toTrackCategory(value: string): TrackCategory {
 }
 
 function formatMinutes(minutes: number) {
-  if (minutes <= 0) return "Completed";
-  if (minutes < 60) return `${minutes} min`;
+  if (minutes <= 0) return "Завершено";
+  if (minutes < 60) return `${minutes} мин`;
   const hours = Math.round((minutes / 60) * 10) / 10;
-  return `${hours}h`;
+  return `${hours}ч`;
 }
 
 export async function generateMetadata({ params }: TrackDetailsProps): Promise<Metadata> {
@@ -124,7 +103,7 @@ export async function generateMetadata({ params }: TrackDetailsProps): Promise<M
   };
 }
 
-export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
+export default async function TrackDetailsPage({ params, searchParams }: TrackDetailsProps) {
   const [runtimeTrack, session, localeValue] = await Promise.all([
     resolveRuntimeCourseBySlug(params.trackId, { includeCourseEntities: true }),
     getServerSession(authOptions),
@@ -173,6 +152,7 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
       content: moduleItem.content,
       lessonsCount: moduleItem.lessons.length,
       quizCount: moduleItem.quiz ? 1 : 0,
+      simulationCount: moduleItem.simulations.length,
     })),
     userProgress: progressRecords.map((progress) => ({
       moduleId: progress.moduleId,
@@ -194,7 +174,10 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
     moduleItem.whatYouWillLearn.length > 0 ? moduleItem.whatYouWillLearn : moduleItem.outcomes,
   );
   const whatYouLearn = Array.from(new Set(localizedLearnings)).slice(0, 6);
-  const fallbackLearnings = trackWhatYouLearn(trackCategory);
+  const fallbackLearnings = getTrackLearningOutcomes(
+    trackCategory,
+    track.learningOutcomes ?? undefined,
+  );
   const whatYouLearnToShow = whatYouLearn.length > 0 ? whatYouLearn : fallbackLearnings;
   const fallbackSkills = progression.modules.flatMap((moduleItem) => moduleItem.skills);
   const skillsToShow = progression.unlockedSkills.length > 0
@@ -207,14 +190,19 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
 
   return (
     <section className="page-shell">
+      {searchParams?.locked && (
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-400">
+          Завершите предыдущий модуль для разблокировки этого.
+        </div>
+      )}
       <header className="surface-elevated space-y-5 p-5 sm:p-7">
             <Breadcrumb items={[{ label: track.title }]} />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className={cn("inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide", accent.badge)}>
-            {categoryLabel(trackCategory)} Track
+            {categoryLabel(trackCategory)} Трек
           </span>
           <Link href="/tracks" className="btn-secondary px-3 py-2 text-sm">
-            Back to tracks
+            К трекам
           </Link>
         </div>
 
@@ -225,25 +213,25 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
             <div className="flex flex-wrap items-center gap-2">
               <LevelBadge level={level} />
               <span className="xp-pill px-2.5 py-1 text-xs">
-                {progression.earnedXp} XP earned
+                {progression.earnedXp} XP заработано
               </span>
               <span className="xp-pill px-2.5 py-1 text-xs">
-                ETA: {formatMinutes(progression.estimatedMinutesLeft)}
+                Осталось: {formatMinutes(progression.estimatedMinutesLeft)}
               </span>
             </div>
           </div>
 
           <div className={cn("surface-subtle space-y-3 p-4 ring-1", accent.ring)}>
-            <p className="kicker">Track progress</p>
+            <p className="kicker">Прогресс</p>
             <p className="text-3xl font-semibold text-foreground">{progression.overallProgressPercent}%</p>
             <div className="progress-track h-2">
               <div className={cn("h-full rounded-full progress-fill", accent.progress)} style={{ width: `${progression.overallProgressPercent}%` }} />
             </div>
             <p className="text-xs text-muted-foreground">
-              {progression.completedCount}/{progression.totalModules} modules completed
+              {progression.completedCount}/{progression.totalModules} модулей завершено
             </p>
             <p className="text-xs text-muted-foreground">
-              XP to next level: {levelProgress.xpNeededForNext}
+              XP до следующего уровня: {levelProgress.xpNeededForNext}
             </p>
           </div>
         </div>
@@ -251,7 +239,7 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
 
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <section className="surface-elevated space-y-4 p-5">
-            <h2 className="section-title">What you will learn</h2>
+            <h2 className="section-title">Чему вы научитесь</h2>
           <ul className="list-disc space-y-1.5 pl-5 text-sm text-muted-foreground">
             {whatYouLearnToShow.map((item) => (
               <li key={item}>{item}</li>
@@ -260,7 +248,7 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
         </section>
 
         <section className="surface-elevated space-y-4 p-5">
-          <h2 className="section-title">Skills you will gain</h2>
+          <h2 className="section-title">Навыки, которые вы получите</h2>
           <div className="flex flex-wrap gap-2">
             {skillsToShow.map((skill) => (
               <span key={skill} className="skill-tag px-2.5 py-1 text-xs">
@@ -268,162 +256,173 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
               </span>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground">Strongest now: {strongestSkill} | Focus next: {weakestSkill}</p>
+          <p className="text-xs text-muted-foreground">Сильнее всего: {strongestSkill} | Развивать дальше: {weakestSkill}</p>
         </section>
       </div>
 
       <section className="surface-elevated space-y-4 p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="section-title">Skill radar</h2>
-          <p className="text-xs text-muted-foreground">Live estimation from module progression and XP milestones.</p>
+          <h2 className="section-title">Радар навыков</h2>
+          <p className="text-xs text-muted-foreground">Оценка на основе прогресса и XP.</p>
         </div>
         <SkillRadarChart data={radarData} />
       </section>
 
       <section className="surface-elevated space-y-5 p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="section-title">Learning path</h2>
+          <h2 className="section-title">Учебный путь</h2>
           <Link
             href={`/tracks/${track.slug}/modules/${firstActiveModule?.id}`}
             className="btn-primary inline-flex items-center gap-2"
           >
-            Continue learning
+            Продолжить обучение
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="space-y-3">
-          {progression.modules.map((moduleItem, index) => {
-            const style = stateStyles(moduleItem.state);
-            return (
-              <div key={moduleItem.id} className="space-y-2">
-                <article className="surface-subtle p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <p className="module-order-label">Module {moduleItem.order}</p>
-                      <p className="section-heading">{moduleItem.title}</p>
-                      <p className="text-sm text-muted-foreground">{moduleItem.shortDescription}</p>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className={cn("inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold", style.badge)}>
-                        {moduleItem.stateLabel}
-                      </span>
-                      {moduleItem.state === "locked" ? <Lock className="h-4 w-4 text-muted-foreground" /> : null}
-                    </div>
-                  </div>
-                  <div className="progress-track mt-3 h-2">
-                    <div className={cn("h-full rounded-full progress-fill", accent.progress)} style={{ width: `${moduleItem.progressPercent}%` }} />
-                  </div>
-                  {moduleItem.unlockRequirement ? (
-                    <p className="mt-2 text-xs text-amber-300">{moduleItem.unlockRequirement}</p>
-                  ) : null}
-                </article>
-                {index < progression.modules.length - 1 ? (
-                  <div className="flex justify-center">
-                    <ArrowRight className="h-4 w-4 rotate-90 text-muted-foreground" />
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
-          <article className={cn("surface-subtle border p-4", accent.subtle)}>
-            <p className="module-order-label">Final challenge</p>
-            <p className="mt-1 text-sm text-foreground">{progression.modules[progression.modules.length - 1]?.finalChallenge}</p>
-          </article>
-        </div>
-      </section>
-
-      <section className="surface-elevated space-y-5 p-5">
-        <h2 className="section-title">Module cards</h2>
-        <div className="grid gap-4 lg:grid-cols-2">
-          {progression.modules.map((moduleItem) => {
-            const style = stateStyles(moduleItem.state);
-            return (
-              <article key={moduleItem.id} className="surface-subtle space-y-3 p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="module-order-label">Module {moduleItem.order}</p>
-                    <h3 className="section-heading">{moduleItem.title}</h3>
-                  </div>
-                  <span className={cn("inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold", style.badge)}>
-                    {moduleItem.stateLabel}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">{moduleItem.shortDescription}</p>
-
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <p className="data-pill px-2 py-1.5">Duration: {moduleItem.durationMinutes} min</p>
-                  <p className="data-pill px-2 py-1.5">XP reward: +{moduleItem.xpReward}</p>
-                  <p className="data-pill px-2 py-1.5">Lessons: {moduleItem.lessonsCount}</p>
-                  <p className="data-pill px-2 py-1.5">Quiz: {moduleItem.quizCount}</p>
-                  <p className="data-pill px-2 py-1.5">Simulation: {moduleItem.simulationCount}</p>
-                  <p className="data-pill px-2 py-1.5">Difficulty: {moduleItem.difficulty}</p>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5">
-                  <span className="skill-tag px-2 py-1 text-[10px]">Lesson</span>
-                  <span className="skill-tag px-2 py-1 text-[10px]">Quiz</span>
-                  <span className="skill-tag px-2 py-1 text-[10px]">Practice</span>
-                  <span className="skill-tag px-2 py-1 text-[10px]">Simulation</span>
-                </div>
-
-                <div className="progress-track h-2">
-                  <div className={cn("h-full rounded-full progress-fill", accent.progress)} style={{ width: `${moduleItem.progressPercent}%` }} />
-                </div>
-                <p className="text-xs text-muted-foreground">{moduleItem.progressPercent}% progress</p>
-
-                <p className="text-xs text-muted-foreground">Final challenge: {moduleItem.finalChallenge}</p>
-                <p className="text-xs text-muted-foreground">Real world example: {moduleItem.realWorldExample}</p>
-
-                <Link
-                  href={`/tracks/${track.slug}/modules/${moduleItem.id}`}
-                  className={cn(
-                    "btn-secondary inline-flex w-full items-center justify-center gap-2",
-                    moduleItem.state === "locked" && "pointer-events-none opacity-50",
-                  )}
-                >
-                  Open module
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </article>
-            );
-          })}
-        </div>
+        <TrackModuleTree
+          nodes={progression.modules.map((m) => ({
+            id: m.id,
+            order: m.order,
+            title: m.title,
+            shortDescription: m.shortDescription,
+            state: m.state,
+            stateLabel: m.stateLabel,
+            progressPercent: m.progressPercent,
+            durationMinutes: m.durationMinutes,
+            xpReward: m.xpReward,
+            href: `/tracks/${track.slug}/modules/${m.id}`,
+            unlockRequirement: m.unlockRequirement,
+          }))}
+          accentProgress={accent.progress}
+        />
+        <article className={cn("surface-subtle border p-4", accent.subtle)}>
+          <p className="module-order-label">Финальное задание</p>
+          <p className="mt-1 text-sm text-foreground">{progression.modules[progression.modules.length - 1]?.finalChallenge}</p>
+        </article>
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
-        <article className="surface-elevated space-y-3 p-5">
-          <h2 className="section-title">XP and badges</h2>
-          <p className="text-sm text-muted-foreground">
-            XP rules: Lesson +20, Quiz +50, Simulation +100.
-          </p>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <p className="data-pill px-2 py-1.5">Earned XP: {progression.earnedXp}</p>
-            <p className="data-pill px-2 py-1.5">Total XP available: {progression.totalXpAvailable}</p>
-            <p className="data-pill px-2 py-1.5">Current level: {level}</p>
-            <p className="data-pill px-2 py-1.5">Streak: {progression.completionStreakDays} days</p>
+        {/* XP and Achievements */}
+        <article className="surface-elevated space-y-4 p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="section-title">XP и достижения</h2>
+            <span className={cn("rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide", accent.badge)}>
+              {level}
+            </span>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {progression.earnedBadges.map((badge) => (
-              <span key={badge} className="rounded-full border border-sky-400/30 bg-sky-500/12 px-2.5 py-1 text-xs text-sky-200">
-                {badge}
-              </span>
-            ))}
+
+          {/* XP progress bar */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-semibold text-foreground">{progression.earnedXp} XP</span>
+              <span className="text-xs text-muted-foreground">из {progression.totalXpAvailable} доступно</span>
+            </div>
+            <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+              <div
+                className={cn("h-full rounded-full transition-all duration-700", accent.progress)}
+                style={{ width: `${progression.totalXpAvailable > 0 ? Math.min(100, Math.round((progression.earnedXp / progression.totalXpAvailable) * 100)) : 0}%` }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">До следующего уровня: {levelProgress.xpNeededForNext} XP</p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {progression.unlockedSkills.map((skill) => (
-              <span key={skill} className="rounded-full border border-emerald-400/30 bg-emerald-500/12 px-2.5 py-1 text-xs text-emerald-200">
-                {skill} unlocked
-              </span>
-            ))}
+
+          {/* Stats 2x2 */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="rounded-xl border border-border bg-card/70 p-3">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Серия</p>
+              <p className="mt-1 text-xl font-bold text-foreground">
+                {progression.completionStreakDays}
+                <span className="ml-1 text-sm font-normal text-muted-foreground">дней</span>
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-card/70 p-3">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Модулей</p>
+              <p className="mt-1 text-xl font-bold text-foreground">
+                {progression.completedCount}
+                <span className="text-sm font-normal text-muted-foreground">/{progression.totalModules}</span>
+              </p>
+            </div>
           </div>
+
+          {/* Badges */}
+          {progression.earnedBadges.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Значки</p>
+              <div className="flex flex-wrap gap-1.5">
+                {progression.earnedBadges.map((badge) => (
+                  <span key={badge} className="inline-flex items-center gap-1 rounded-full border border-sky-400/30 bg-sky-50 px-2.5 py-1 text-xs text-sky-600">
+                    🏆 {badge}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Unlocked skills */}
+          {progression.unlockedSkills.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Разблокированные навыки</p>
+              <div className="flex flex-wrap gap-1.5">
+                {progression.unlockedSkills.map((skill) => (
+                  <span key={skill} className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-50 px-2.5 py-1 text-xs text-emerald-600">
+                    <CheckCircle2 className="h-3 w-3" /> {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </article>
 
-        <article className="surface-elevated space-y-3 p-5">
-          <h2 className="section-title">Career outcome</h2>
-          <p className="text-sm text-foreground">{trackCareerOutcome(trackCategory)}</p>
-          <p className="text-sm text-muted-foreground">{trackNextSuggestion(trackCategory)}</p>
-          <p className="text-xs text-muted-foreground">Estimated completion time left: {formatMinutes(progression.estimatedMinutesLeft)}</p>
-          <p className="text-xs text-muted-foreground">Current active modules: {progression.inProgressCount}</p>
+        {/* Career outcome */}
+        <article className="surface-elevated space-y-4 p-5">
+          <h2 className="section-title">Карьерный результат</h2>
+
+          {/* Career path as visual steps */}
+          <div className={cn("rounded-xl border p-4", accent.subtle)}>
+            <p className="mb-3 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Путь роста</p>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {getTrackCareerOutcome(trackCategory, track.careerImpact ?? undefined)
+                .replace(/^Карьерный путь:\s*/i, "")
+                .replace(/\.$/, "")
+                .split(/\s*→\s*/)
+                .map((step, i, arr) => (
+                  <span key={step} className="flex items-center gap-1.5">
+                    <span className={cn(
+                      "rounded-lg border px-2.5 py-1 text-xs font-semibold",
+                      i === 0 ? accent.badge : "border-border/60 bg-card/80 text-foreground",
+                    )}>
+                      {step.trim()}
+                    </span>
+                    {i < arr.length - 1 && (
+                      <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
+                    )}
+                  </span>
+                ))}
+            </div>
+          </div>
+
+          {/* Next track suggestion */}
+          <div className="flex items-start gap-3 rounded-xl border border-border bg-card/60 p-3">
+            <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Следующий трек</p>
+              <p className="mt-0.5 text-sm font-semibold text-foreground">
+                {trackNextSuggestion(trackCategory).replace(/^Следующий рекомендуемый трек:\s*/i, "")}
+              </p>
+            </div>
+          </div>
+
+          {/* Time + active modules */}
+          <div className="flex gap-4 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1">
+              <Clock3 className="h-3.5 w-3.5" />
+              Осталось: {formatMinutes(progression.estimatedMinutesLeft)}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Layers3 className="h-3.5 w-3.5" />
+              Активных модулей: {progression.inProgressCount}
+            </span>
+          </div>
         </article>
       </section>
 
@@ -431,25 +430,25 @@ export default async function TrackDetailsPage({ params }: TrackDetailsProps) {
         <section className="surface-elevated space-y-4 p-5">
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/35 bg-amber-500/12 px-3 py-1 text-xs text-amber-200">
             <Trophy className="h-4 w-4" />
-            Congratulations - Track completed
+            Поздравляем — Трек завершён
           </div>
-          <h2 className="text-2xl font-semibold text-foreground">You completed {track.title}</h2>
+          <h2 className="text-2xl font-semibold text-foreground">Вы завершили {track.title}</h2>
           <p className="text-sm text-muted-foreground">
-            Skills gained: {skillsToShow.join(", ")}
+            Получены навыки: {skillsToShow.join(", ")}
           </p>
           <div className="flex flex-wrap gap-2">
             {certificate ? (
               <Link href={certificate.certificateUrl} className="btn-primary inline-flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4" />
-                Open certificate
+                Открыть сертификат
               </Link>
             ) : (
               <span className="xp-pill rounded-xl px-3 py-2 text-sm">
-                Certificate will be available after final quiz confirmation.
+                Сертификат будет доступен после подтверждения финального теста.
               </span>
             )}
-            <Link href="/career" className="btn-secondary">Open career roadmap</Link>
-            <Link href="/tracks" className="btn-secondary">Choose next track</Link>
+            <Link href="/career" className="btn-secondary">Открыть карьерную карту</Link>
+            <Link href="/tracks" className="btn-secondary">Выбрать следующий трек</Link>
           </div>
         </section>
       ) : null}

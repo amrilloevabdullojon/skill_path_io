@@ -24,4 +24,5 @@ export const studioAdminLinks: StudioAdminLink[] = [
   { href: "/admin/tracks", label: "Legacy Tracks", permission: "courses.read" },
   { href: "/admin/permissions", label: "Permissions", permission: "users.manage" },
   { href: "/admin/audit-log", label: "Audit Log", permission: "analytics.read" },
+  { href: "/admin/activity", label: "Activity Log", permission: "analytics.read" },
 ];

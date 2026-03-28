@@ -8,6 +8,7 @@ import {
   type CSSProperties,
 } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   CheckCircle2,
   ChevronRight,
@@ -83,6 +84,7 @@ type RowProps = {
 };
 
 function SortableRow({ mod, selected, onToggle }: RowProps) {
+  const t = useTranslations("admin.modules");
   const {
     attributes,
     listeners,
@@ -110,7 +112,7 @@ function SortableRow({ mod, selected, onToggle }: RowProps) {
           {...attributes}
           {...listeners}
           type="button"
-          aria-label="Drag to reorder"
+          aria-label={t("list.dragToReorder")}
           className="cursor-grab touch-none text-muted-foreground transition-colors hover:text-foreground active:cursor-grabbing"
         >
           <GripVertical className="h-4 w-4" />
@@ -123,7 +125,7 @@ function SortableRow({ mod, selected, onToggle }: RowProps) {
           type="checkbox"
           checked={selected}
           onChange={() => onToggle(mod.id)}
-          aria-label={`Select ${mod.title}`}
+          aria-label={t("list.selectModule", { title: mod.title })}
           className="h-4 w-4 rounded border-border bg-card accent-sky-400"
         />
       </td>
@@ -143,14 +145,14 @@ function SortableRow({ mod, selected, onToggle }: RowProps) {
           name="description"
           defaultValue={mod.description}
           maxLength={500}
-          placeholder="Description…"
+          placeholder={`${t("shared.description")}…`}
           className="input-base mt-1.5 h-8 w-full min-w-[200px] px-2 py-1 text-xs text-muted-foreground"
         />
         <Link
           href={`/admin/modules/${mod.id}`}
           className="mt-1 inline-flex items-center gap-0.5 text-[11px] text-sky-400 hover:underline"
         >
-          Edit details
+          {t("shared.editDetails")}
           <ChevronRight className="h-3 w-3" />
         </Link>
       </td>
@@ -182,7 +184,7 @@ function SortableRow({ mod, selected, onToggle }: RowProps) {
             defaultValue={mod.duration}
             className="input-base h-9 w-20 px-2 py-1.5 text-sm"
           />
-          <span className="text-xs text-muted-foreground">min</span>
+          <span className="text-xs text-muted-foreground">{t("shared.durationShort")}</span>
         </div>
       </td>
 
@@ -196,7 +198,7 @@ function SortableRow({ mod, selected, onToggle }: RowProps) {
         {mod.quiz ? (
           <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-300">
             <CheckCircle2 className="h-3 w-3" />
-            Yes
+            {t("shared.yes")}
           </span>
         ) : (
           <Minus className="h-4 w-4 text-muted-foreground" />
@@ -211,7 +213,7 @@ function SortableRow({ mod, selected, onToggle }: RowProps) {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-sm text-sky-300 hover:underline"
         >
-          View
+          {t("shared.view")}
           <ExternalLink className="h-3 w-3" />
         </Link>
       </td>
@@ -240,6 +242,7 @@ function SortableRow({ mod, selected, onToggle }: RowProps) {
 /* ─── Main table ─────────────────────────────────────────────────────────── */
 
 export function ModulesTable({ groups: initialGroups }: { groups: TrackGroup[] }) {
+  const t = useTranslations("admin.modules");
   const [groups, setGroups] = useState(initialGroups);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [, startTransition] = useTransition();
@@ -298,11 +301,7 @@ export function ModulesTable({ groups: initialGroups }: { groups: TrackGroup[] }
 
   function handleBulkDelete() {
     const ids = Array.from(selected);
-    if (
-      !confirm(
-        `Delete ${ids.length} module${ids.length !== 1 ? "s" : ""}?\n\nThis also removes all associated lessons and learner progress. This cannot be undone.`,
-      )
-    )
+    if (!confirm(t("list.bulkDeleteConfirm", { count: ids.length })))
       return;
 
     setGroups((prev) =>
@@ -321,7 +320,7 @@ export function ModulesTable({ groups: initialGroups }: { groups: TrackGroup[] }
       {selected.size > 0 && (
         <div className="flex items-center justify-between rounded-xl border border-rose-500/20 bg-rose-500/5 px-4 py-2.5">
           <span className="text-sm text-foreground">
-            {selected.size} module{selected.size !== 1 ? "s" : ""} selected
+            {t("list.bulkSelected", { count: selected.size })}
           </span>
           <div className="flex items-center gap-2">
             <button
@@ -329,7 +328,7 @@ export function ModulesTable({ groups: initialGroups }: { groups: TrackGroup[] }
               onClick={() => setSelected(new Set())}
               className="btn-secondary px-3 py-1.5 text-xs"
             >
-              Clear
+              {t("list.clear")}
             </button>
             <button
               type="button"
@@ -337,7 +336,7 @@ export function ModulesTable({ groups: initialGroups }: { groups: TrackGroup[] }
               className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-medium text-rose-400 transition-colors hover:bg-rose-500/20"
             >
               <Trash2 className="h-3.5 w-3.5" />
-              Delete {selected.size}
+              {t("list.bulkDelete", { count: selected.size })}
             </button>
           </div>
         </div>
@@ -353,25 +352,25 @@ export function ModulesTable({ groups: initialGroups }: { groups: TrackGroup[] }
           <table className="table-base min-w-[1280px]">
             <thead className="table-head">
               <tr>
-                <th className="w-8 px-2 py-3" aria-label="Drag to reorder" />
+                <th className="w-8 px-2 py-3" aria-label={t("list.dragToReorder")} />
                 <th className="w-10 px-3 py-3">
                   <input
                     type="checkbox"
                     checked={allSelected}
                     onChange={toggleAll}
-                    aria-label="Select all modules"
+                    aria-label={t("shared.selectAll")}
                     className="h-4 w-4 rounded border-border bg-card accent-sky-400"
                   />
                 </th>
-                <th className="px-3 py-3 text-left">Title &amp; description</th>
-                <th className="px-3 py-3 text-left">Order</th>
-                <th className="px-3 py-3 text-left">Duration</th>
-                <th className="px-3 py-3 text-left">Lessons</th>
-                <th className="px-3 py-3 text-left">Quiz</th>
-                <th className="px-3 py-3 text-left">Preview</th>
-                <th className="px-3 py-3 text-left">Save</th>
-                <th className="px-3 py-3 text-left">Dupe</th>
-                <th className="px-3 py-3 text-left">Delete</th>
+                <th className="px-3 py-3 text-left">{t("list.titleAndDescription")}</th>
+                <th className="px-3 py-3 text-left">{t("shared.order")}</th>
+                <th className="px-3 py-3 text-left">{t("shared.durationMinutes")}</th>
+                <th className="px-3 py-3 text-left">{t("shared.lessons")}</th>
+                <th className="px-3 py-3 text-left">{t("shared.quiz")}</th>
+                <th className="px-3 py-3 text-left">{t("shared.preview")}</th>
+                <th className="px-3 py-3 text-left">{t("list.saveColumn")}</th>
+                <th className="px-3 py-3 text-left">{t("list.duplicateColumn")}</th>
+                <th className="px-3 py-3 text-left">{t("list.deleteColumn")}</th>
               </tr>
             </thead>
             <tbody>
@@ -390,7 +389,7 @@ export function ModulesTable({ groups: initialGroups }: { groups: TrackGroup[] }
                           {group.trackTitle}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {group.modules.length} module{group.modules.length !== 1 ? "s" : ""}
+                          {t("list.summary", { count: group.modules.length })}
                         </span>
                       </div>
                     </td>

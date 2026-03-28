@@ -28,7 +28,14 @@ export {
   resolveRuntimeCourseBySlug,
 } from "@/lib/learning/content-resolver";
 
-import { RuntimeCourse } from "@/lib/learning/content-types";
+import { RuntimeCategory, RuntimeCourse } from "@/lib/learning/content-types";
+
+export type TrackProgress = {
+  completedModules: number;
+  totalModules: number;
+  progressPercent: number;
+  isStarted: boolean;
+};
 
 export type RuntimeTrackCardData = {
   id: string;
@@ -37,12 +44,14 @@ export type RuntimeTrackCardData = {
   description: string;
   level: "Junior" | "Middle";
   durationWeeks: number;
+  category: RuntimeCategory;
   modules: Array<{
     id: string;
     title: string;
     description: string;
     order: number;
   }>;
+  progress?: TrackProgress;
 };
 
 export function toRuntimeTrackCardData(course: RuntimeCourse): RuntimeTrackCardData {
@@ -56,6 +65,7 @@ export function toRuntimeTrackCardData(course: RuntimeCourse): RuntimeTrackCardD
     description: course.shortDescription || course.description,
     level,
     durationWeeks,
+    category: course.category,
     modules: course.modules
       .sort((a, b) => a.order - b.order)
       .map((moduleItem) => ({

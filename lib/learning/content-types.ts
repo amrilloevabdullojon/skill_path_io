@@ -121,6 +121,11 @@ export type RuntimeCourse = {
   icon: string;
   color: string;
   modules: RuntimeModule[];
+  // Extended DB-backed fields (present when source === "prisma-track")
+  skills?: string[];
+  learningOutcomes?: string[];
+  careerImpact?: string | null;
+  estimatedWeeks?: number | null;
 };
 
 export type RuntimeCatalog = {

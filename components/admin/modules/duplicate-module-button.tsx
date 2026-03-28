@@ -2,10 +2,12 @@
 
 import { useTransition } from "react";
 import { Copy, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { duplicateModuleAction } from "@/app/admin/actions";
 
 export function DuplicateModuleButton({ moduleId }: { moduleId: string }) {
+  const t = useTranslations("admin.modules.shared");
   const [pending, startTransition] = useTransition();
 
   function handleDuplicate() {
@@ -21,7 +23,7 @@ export function DuplicateModuleButton({ moduleId }: { moduleId: string }) {
       type="button"
       disabled={pending}
       onClick={handleDuplicate}
-      title="Duplicate module"
+      title={t("duplicate")}
       className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:border-sky-500/40 hover:bg-sky-500/10 hover:text-sky-300 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {pending ? (
@@ -29,7 +31,7 @@ export function DuplicateModuleButton({ moduleId }: { moduleId: string }) {
       ) : (
         <Copy className="h-3 w-3" />
       )}
-      {pending ? "Copying…" : "Dupe"}
+      {pending ? t("duplicating") : t("duplicateShort")}
     </button>
   );
 }

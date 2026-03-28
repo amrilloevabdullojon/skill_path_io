@@ -9,10 +9,62 @@ import {
   StudioContentStatus,
   StudioSimulationType,
   TrackCategory,
+  TrackStatus,
   UserRole,
 } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { requireAdminPermission } from "@/lib/admin-auth";
+import { prisma } from "@/lib/prisma";
 
-// Default permissions per role — kept in sync with requireAdminPermission checks
+// ─── Audit log helper ─────────────────────────────────────────────────────────
+// Logs admin activity to AdminActivityLog. Never throws — logging failures must
+// not interrupt the main action.
+async function logActivity(
+  action: string,
+  entityType: string,
+  entityId: string,
+  details?: string,
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    const actorEmail =
+      typeof session?.user?.email === "string"
+        ? session.user.email
+        : "unknown@admin";
+
+    let actorRole: PermissionRoleType = PermissionRoleType.COURSE_EDITOR;
+    try {
+      const dbRole = await prisma.permissionRole.findUnique({
+        where: { email: actorEmail },
+        select: { role: true, isActive: true },
+      });
+      if (dbRole?.isActive) {
+        actorRole = dbRole.role;
+      }
+    } catch {
+      // keep default role if DB lookup fails
+    }
+
+    await prisma.adminActivityLog.create({
+      data: {
+        actorEmail,
+        actorRole,
+        action,
+        entityType,
+        entityId,
+        note: details ?? "",
+      },
+    });
+  } catch {
+    // logging must never break the main action
+  }
+}
+
+// ─── Role permissions reference ───────────────────────────────────────────────
+// NOTE: This constant is a fallback/seed reference only — it is NOT the source
+// of truth. The authoritative permissions live in the DB `PermissionRole` table.
+// Do not use this constant for runtime permission checks; use requireAdminPermission instead.
 const ROLE_PERMISSIONS: Record<PermissionRoleType, string[]> = {
   SUPER_ADMIN: [
     "courses.read","courses.write","users.manage","settings.manage",
@@ -24,9 +76,6 @@ const ROLE_PERMISSIONS: Record<PermissionRoleType, string[]> = {
   ANALYTICS_MANAGER: ["analytics.read","audit.read"],
 };
 
-import { requireAdminPermission } from "@/lib/admin-auth";
-import { prisma } from "@/lib/prisma";
-
 function stringValue(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
@@ -36,6 +85,15 @@ function numberValue(formData: FormData, key: string) {
   const raw = stringValue(formData, key);
   const parsed = Number(raw);
   return Number.isFinite(parsed) ? parsed : null;
+}
+
+// Parses a newline-separated string into a deduplicated, trimmed array of non-empty strings.
+function parseStringList(raw: string): string[] {
+  return [...new Set(
+    raw.split("\n")
+       .map((s) => s.trim())
+       .filter(Boolean),
+  )];
 }
 
 export async function updateUserAction(formData: FormData) {
@@ -53,16 +111,20 @@ export async function updateUserAction(formData: FormData) {
     return;
   }
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      name,
-      role,
-    },
-  });
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name,
+        role,
+      },
+    });
 
-  revalidatePath("/admin/users");
-  revalidatePath("/admin/analytics");
+    revalidatePath("/admin/users");
+    revalidatePath("/admin/analytics");
+  } catch (err) {
+    console.error("[updateUserAction]", err);
+  }
 }
 
 export async function updateTrackAction(formData: FormData) {
@@ -73,6 +135,11 @@ export async function updateTrackAction(formData: FormData) {
   const description = stringValue(formData, "description");
   const color = stringValue(formData, "color");
   const category = stringValue(formData, "category");
+  const status = stringValue(formData, "status");
+  const estimatedWeeksRaw = numberValue(formData, "estimatedWeeks");
+  const skillsRaw = stringValue(formData, "skills_raw");
+  const outcomesRaw = stringValue(formData, "outcomes_raw");
+  const careerImpact = stringValue(formData, "careerImpact") || null;
 
   if (!trackId || !title || !description || !color) {
     return;
@@ -82,18 +149,43 @@ export async function updateTrackAction(formData: FormData) {
     return;
   }
 
-  await prisma.track.update({
-    where: { id: trackId },
-    data: {
-      title,
-      description,
-      color,
-      category: category as TrackCategory,
-    },
-  });
+  if (status && !Object.values(TrackStatus).includes(status as TrackStatus)) {
+    return;
+  }
 
-  revalidatePath("/admin/tracks");
-  revalidatePath("/admin/analytics");
+  if (color && !/^#[0-9a-fA-F]{3,6}$/.test(color)) {
+    return;
+  }
+
+  const skills = skillsRaw ? parseStringList(skillsRaw) : undefined;
+  const learningOutcomes = outcomesRaw ? parseStringList(outcomesRaw) : undefined;
+  const estimatedWeeks =
+    estimatedWeeksRaw !== null && estimatedWeeksRaw >= 1 && estimatedWeeksRaw <= 52
+      ? estimatedWeeksRaw
+      : undefined;
+
+  try {
+    await prisma.track.update({
+      where: { id: trackId },
+      data: {
+        title,
+        description,
+        color,
+        category: category as TrackCategory,
+        ...(status ? { status: status as TrackStatus } : {}),
+        ...(estimatedWeeks !== undefined ? { estimatedWeeks } : {}),
+        ...(skills !== undefined ? { skills } : {}),
+        ...(learningOutcomes !== undefined ? { learningOutcomes } : {}),
+        ...(careerImpact !== null ? { careerImpact } : {}),
+      },
+    });
+
+    await logActivity("track.update", "Track", trackId, title);
+    revalidatePath("/admin/tracks");
+    revalidatePath("/admin/analytics");
+  } catch (err) {
+    console.error("[updateTrackAction]", err);
+  }
 }
 
 export async function updateModuleAction(formData: FormData) {
@@ -109,13 +201,18 @@ export async function updateModuleAction(formData: FormData) {
     return;
   }
 
-  await prisma.module.update({
-    where: { id: moduleId },
-    data: { title, description, duration, order },
-  });
+  try {
+    await prisma.module.update({
+      where: { id: moduleId },
+      data: { title, description, duration, order },
+    });
 
-  revalidatePath("/admin/modules");
-  revalidatePath("/admin/analytics");
+    await logActivity("UPDATE", "Module", moduleId, title);
+    revalidatePath("/admin/modules");
+    revalidatePath("/admin/analytics");
+  } catch (err) {
+    console.error("[updateModuleAction]", err);
+  }
 }
 
 export async function updateModuleDetailAction(formData: FormData) {
@@ -131,14 +228,19 @@ export async function updateModuleDetailAction(formData: FormData) {
     return;
   }
 
-  await prisma.module.update({
-    where: { id: moduleId },
-    data: { title, description, duration, order },
-  });
+  try {
+    await prisma.module.update({
+      where: { id: moduleId },
+      data: { title, description, duration, order },
+    });
 
-  revalidatePath("/admin/modules");
-  revalidatePath(`/admin/modules/${moduleId}`);
-  revalidatePath("/admin/analytics");
+    await logActivity("UPDATE", "Module", moduleId, title);
+    revalidatePath("/admin/modules");
+    revalidatePath(`/admin/modules/${moduleId}`);
+    revalidatePath("/admin/analytics");
+  } catch (err) {
+    console.error("[updateModuleDetailAction]", err);
+  }
 }
 
 export async function reorderModulesAction(
@@ -147,23 +249,33 @@ export async function reorderModulesAction(
   await requireAdminPermission("courses.write");
   if (!updates.length) return;
 
-  await prisma.$transaction(
-    updates.map(({ id, order }) =>
-      prisma.module.update({ where: { id }, data: { order } }),
-    ),
-  );
+  try {
+    await prisma.$transaction(
+      updates.map(({ id, order }) =>
+        prisma.module.update({ where: { id }, data: { order } }),
+      ),
+    );
 
-  revalidatePath("/admin/modules");
+    await logActivity("REORDER", "Module", updates.map((u) => u.id).join(","), `${updates.length} modules`);
+    revalidatePath("/admin/modules");
+  } catch (err) {
+    console.error("[reorderModulesAction]", err);
+  }
 }
 
 export async function bulkDeleteModulesAction(moduleIds: string[]) {
   await requireAdminPermission("courses.write");
   if (!moduleIds.length) return;
 
-  await prisma.module.deleteMany({ where: { id: { in: moduleIds } } });
+  try {
+    await prisma.module.deleteMany({ where: { id: { in: moduleIds } } });
 
-  revalidatePath("/admin/modules");
-  revalidatePath("/admin/analytics");
+    await logActivity("BULK_DELETE", "Module", moduleIds.join(","), `${moduleIds.length} modules`);
+    revalidatePath("/admin/modules");
+    revalidatePath("/admin/analytics");
+  } catch (err) {
+    console.error("[bulkDeleteModulesAction]", err);
+  }
 }
 
 export async function createModuleAction(formData: FormData) {
@@ -179,19 +291,24 @@ export async function createModuleAction(formData: FormData) {
     return;
   }
 
-  await prisma.module.create({
-    data: {
-      trackId,
-      title,
-      description,
-      duration,
-      order,
-      content: {},
-    },
-  });
+  try {
+    const newModule = await prisma.module.create({
+      data: {
+        trackId,
+        title,
+        description,
+        duration,
+        order,
+        content: {},
+      },
+    });
 
-  revalidatePath("/admin/modules");
-  revalidatePath("/admin/analytics");
+    await logActivity("CREATE", "Module", newModule.id, title);
+    revalidatePath("/admin/modules");
+    revalidatePath("/admin/analytics");
+  } catch (err) {
+    console.error("[createModuleAction]", err);
+  }
 }
 
 export async function deleteModuleAction(formData: FormData) {
@@ -200,10 +317,15 @@ export async function deleteModuleAction(formData: FormData) {
   const moduleId = stringValue(formData, "moduleId");
   if (!moduleId) return;
 
-  await prisma.module.delete({ where: { id: moduleId } });
+  try {
+    await prisma.module.delete({ where: { id: moduleId } });
 
-  revalidatePath("/admin/modules");
-  revalidatePath("/admin/analytics");
+    await logActivity("module.delete", "Module", moduleId);
+    revalidatePath("/admin/modules");
+    revalidatePath("/admin/analytics");
+  } catch (err) {
+    console.error("[deleteModuleAction]", err);
+  }
 }
 
 export async function duplicateModuleAction(formData: FormData) {
@@ -212,39 +334,44 @@ export async function duplicateModuleAction(formData: FormData) {
   const moduleId = stringValue(formData, "moduleId");
   if (!moduleId) return;
 
-  const mod = await prisma.module.findUnique({
-    where: { id: moduleId },
-    include: { lessons: { orderBy: { order: "asc" } } },
-  });
-  if (!mod) return;
+  try {
+    const mod = await prisma.module.findUnique({
+      where: { id: moduleId },
+      include: { lessons: { orderBy: { order: "asc" } } },
+    });
+    if (!mod) return;
 
-  const maxOrder = await prisma.module.aggregate({
-    where: { trackId: mod.trackId },
-    _max: { order: true },
-  });
-  const newOrder = (maxOrder._max.order ?? 0) + 1;
+    const maxOrder = await prisma.module.aggregate({
+      where: { trackId: mod.trackId },
+      _max: { order: true },
+    });
+    const newOrder = (maxOrder._max.order ?? 0) + 1;
 
-  await prisma.module.create({
-    data: {
-      trackId: mod.trackId,
-      title: `${mod.title} (copy)`,
-      description: mod.description,
-      duration: mod.duration,
-      order: newOrder,
-      content: mod.content as object,
-      lessons: {
-        create: mod.lessons.map((l) => ({
-          order: l.order,
-          title: l.title,
-          body: l.body,
-          type: l.type,
-        })),
+    const duplicated = await prisma.module.create({
+      data: {
+        trackId: mod.trackId,
+        title: `${mod.title} (copy)`,
+        description: mod.description,
+        duration: mod.duration,
+        order: newOrder,
+        content: mod.content as object,
+        lessons: {
+          create: mod.lessons.map((l) => ({
+            order: l.order,
+            title: l.title,
+            body: l.body,
+            type: l.type,
+          })),
+        },
       },
-    },
-  });
+    });
 
-  revalidatePath("/admin/modules");
-  revalidatePath("/admin/analytics");
+    await logActivity("CREATE", "Module", duplicated.id, `Duplicated from ${moduleId}`);
+    revalidatePath("/admin/modules");
+    revalidatePath("/admin/analytics");
+  } catch (err) {
+    console.error("[duplicateModuleAction]", err);
+  }
 }
 
 // ─── Lesson actions ──────────────────────────────────────────────────────────
@@ -261,12 +388,17 @@ export async function createLessonAction(formData: FormData) {
   if (!moduleId || !title || order === null) return;
   if (!Object.values(LessonType).includes(type as LessonType)) return;
 
-  await prisma.lesson.create({
-    data: { moduleId, title, body, type: type as LessonType, order },
-  });
+  try {
+    const newLesson = await prisma.lesson.create({
+      data: { moduleId, title, body, type: type as LessonType, order },
+    });
 
-  revalidatePath("/admin/lessons");
-  revalidatePath(`/admin/modules/${moduleId}`);
+    await logActivity("lesson.create", "Lesson", newLesson.id, title);
+    revalidatePath("/admin/lessons");
+    revalidatePath(`/admin/modules/${moduleId}`);
+  } catch (err) {
+    console.error("[createLessonAction]", err);
+  }
 }
 
 export async function updateLessonAction(formData: FormData) {
@@ -281,14 +413,19 @@ export async function updateLessonAction(formData: FormData) {
   if (!lessonId || !title || order === null) return;
   if (!Object.values(LessonType).includes(type as LessonType)) return;
 
-  const lesson = await prisma.lesson.update({
-    where: { id: lessonId },
-    data: { title, body, type: type as LessonType, order },
-    select: { moduleId: true },
-  });
+  try {
+    const lesson = await prisma.lesson.update({
+      where: { id: lessonId },
+      data: { title, body, type: type as LessonType, order },
+      select: { moduleId: true },
+    });
 
-  revalidatePath("/admin/lessons");
-  revalidatePath(`/admin/modules/${lesson.moduleId}`);
+    await logActivity("UPDATE", "Lesson", lessonId, title);
+    revalidatePath("/admin/lessons");
+    revalidatePath(`/admin/modules/${lesson.moduleId}`);
+  } catch (err) {
+    console.error("[updateLessonAction]", err);
+  }
 }
 
 export async function deleteLessonAction(formData: FormData) {
@@ -297,22 +434,32 @@ export async function deleteLessonAction(formData: FormData) {
   const lessonId = stringValue(formData, "lessonId");
   if (!lessonId) return;
 
-  const lesson = await prisma.lesson.delete({
-    where: { id: lessonId },
-    select: { moduleId: true },
-  });
+  try {
+    const lesson = await prisma.lesson.delete({
+      where: { id: lessonId },
+      select: { moduleId: true },
+    });
 
-  revalidatePath("/admin/lessons");
-  revalidatePath(`/admin/modules/${lesson.moduleId}`);
+    await logActivity("lesson.delete", "Lesson", lessonId);
+    revalidatePath("/admin/lessons");
+    revalidatePath(`/admin/modules/${lesson.moduleId}`);
+  } catch (err) {
+    console.error("[deleteLessonAction]", err);
+  }
 }
 
 export async function bulkDeleteLessonsAction(lessonIds: string[]) {
   await requireAdminPermission("courses.write");
   if (!lessonIds.length) return;
 
-  await prisma.lesson.deleteMany({ where: { id: { in: lessonIds } } });
+  try {
+    await prisma.lesson.deleteMany({ where: { id: { in: lessonIds } } });
 
-  revalidatePath("/admin/lessons");
+    await logActivity("BULK_DELETE", "Lesson", lessonIds.join(","), `${lessonIds.length} lessons`);
+    revalidatePath("/admin/lessons");
+  } catch (err) {
+    console.error("[bulkDeleteLessonsAction]", err);
+  }
 }
 
 // ─── Quiz actions ─────────────────────────────────────────────────────────────
@@ -326,11 +473,16 @@ export async function createQuizAction(formData: FormData) {
 
   if (!moduleId || !title || passingScore === null) return;
 
-  await prisma.quiz.create({ data: { moduleId, title, passingScore } });
+  try {
+    const newQuiz = await prisma.quiz.create({ data: { moduleId, title, passingScore } });
 
-  revalidatePath("/admin/quizzes");
-  revalidatePath(`/admin/modules/${moduleId}`);
-  revalidatePath("/admin/analytics");
+    await logActivity("CREATE", "Quiz", newQuiz.id, title);
+    revalidatePath("/admin/quizzes");
+    revalidatePath(`/admin/modules/${moduleId}`);
+    revalidatePath("/admin/analytics");
+  } catch (err) {
+    console.error("[createQuizAction]", err);
+  }
 }
 
 export async function updateQuizAction(formData: FormData) {
@@ -342,9 +494,14 @@ export async function updateQuizAction(formData: FormData) {
 
   if (!quizId || !title || passingScore === null) return;
 
-  await prisma.quiz.update({ where: { id: quizId }, data: { title, passingScore } });
+  try {
+    await prisma.quiz.update({ where: { id: quizId }, data: { title, passingScore } });
 
-  revalidatePath("/admin/quizzes");
+    await logActivity("UPDATE", "Quiz", quizId, title);
+    revalidatePath("/admin/quizzes");
+  } catch (err) {
+    console.error("[updateQuizAction]", err);
+  }
 }
 
 export async function deleteQuizAction(formData: FormData) {
@@ -353,14 +510,19 @@ export async function deleteQuizAction(formData: FormData) {
   const quizId = stringValue(formData, "quizId");
   if (!quizId) return;
 
-  const quiz = await prisma.quiz.delete({
-    where: { id: quizId },
-    select: { moduleId: true },
-  });
+  try {
+    const quiz = await prisma.quiz.delete({
+      where: { id: quizId },
+      select: { moduleId: true },
+    });
 
-  revalidatePath("/admin/quizzes");
-  revalidatePath(`/admin/modules/${quiz.moduleId}`);
-  revalidatePath("/admin/analytics");
+    await logActivity("DELETE", "Quiz", quizId);
+    revalidatePath("/admin/quizzes");
+    revalidatePath(`/admin/modules/${quiz.moduleId}`);
+    revalidatePath("/admin/analytics");
+  } catch (err) {
+    console.error("[deleteQuizAction]", err);
+  }
 }
 
 // ─── Question actions ─────────────────────────────────────────────────────────
@@ -377,18 +539,22 @@ export async function createQuestionAction(formData: FormData) {
   if (!quizId || !text || options.length < 2) return;
   if (!Object.values(QuestionType).includes(type as QuestionType)) return;
 
-  await prisma.question.create({
-    data: {
-      quizId,
-      text,
-      type: type as QuestionType,
-      options,
-      correctAnswer: correct,
-    },
-  });
+  try {
+    await prisma.question.create({
+      data: {
+        quizId,
+        text,
+        type: type as QuestionType,
+        options,
+        correctAnswer: correct,
+      },
+    });
 
-  revalidatePath("/admin/quizzes");
-  revalidatePath(`/admin/quizzes/${quizId}`);
+    revalidatePath("/admin/quizzes");
+    revalidatePath(`/admin/quizzes/${quizId}`);
+  } catch (err) {
+    console.error("[createQuestionAction]", err);
+  }
 }
 
 export async function updateQuestionAction(formData: FormData) {
@@ -403,14 +569,18 @@ export async function updateQuestionAction(formData: FormData) {
   if (!questionId || !text || options.length < 2) return;
   if (!Object.values(QuestionType).includes(type as QuestionType)) return;
 
-  const question = await prisma.question.update({
-    where: { id: questionId },
-    data: { text, type: type as QuestionType, options, correctAnswer: correct },
-    select: { quizId: true },
-  });
+  try {
+    const question = await prisma.question.update({
+      where: { id: questionId },
+      data: { text, type: type as QuestionType, options, correctAnswer: correct },
+      select: { quizId: true },
+    });
 
-  revalidatePath("/admin/quizzes");
-  revalidatePath(`/admin/quizzes/${question.quizId}`);
+    revalidatePath("/admin/quizzes");
+    revalidatePath(`/admin/quizzes/${question.quizId}`);
+  } catch (err) {
+    console.error("[updateQuestionAction]", err);
+  }
 }
 
 export async function deleteQuestionAction(formData: FormData) {
@@ -419,13 +589,17 @@ export async function deleteQuestionAction(formData: FormData) {
   const questionId = stringValue(formData, "questionId");
   if (!questionId) return;
 
-  const question = await prisma.question.delete({
-    where: { id: questionId },
-    select: { quizId: true },
-  });
+  try {
+    const question = await prisma.question.delete({
+      where: { id: questionId },
+      select: { quizId: true },
+    });
 
-  revalidatePath("/admin/quizzes");
-  revalidatePath(`/admin/quizzes/${question.quizId}`);
+    revalidatePath("/admin/quizzes");
+    revalidatePath(`/admin/quizzes/${question.quizId}`);
+  } catch (err) {
+    console.error("[deleteQuestionAction]", err);
+  }
 }
 
 // ─── Track create / delete ────────────────────────────────────────────────────
@@ -439,16 +613,60 @@ export async function createTrackAction(formData: FormData) {
   const icon = stringValue(formData, "icon");
   const color = stringValue(formData, "color");
   const category = stringValue(formData, "category");
+  const status = stringValue(formData, "status") || TrackStatus.DRAFT;
+  const estimatedWeeksRaw = numberValue(formData, "estimatedWeeks");
+  const skillsRaw = stringValue(formData, "skills_raw");
+  const outcomesRaw = stringValue(formData, "outcomes_raw");
+  const careerImpact = stringValue(formData, "careerImpact") || null;
 
   if (!slug || !title || !description || !icon || !color) return;
   if (!Object.values(TrackCategory).includes(category as TrackCategory)) return;
+  if (!Object.values(TrackStatus).includes(status as TrackStatus)) return;
 
-  await prisma.track.create({
-    data: { slug, title, description, icon, color, category: category as TrackCategory },
-  });
+  // Validate slug is URL-safe: lowercase letters, numbers, hyphens only
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+    const { redirect } = await import("next/navigation");
+    redirect("/admin/tracks/new?error=invalid_slug");
+    return;
+  }
 
-  revalidatePath("/admin/tracks");
-  revalidatePath("/admin/analytics");
+  if (color && !/^#[0-9a-fA-F]{3,6}$/.test(color)) return;
+
+  const skills = skillsRaw ? parseStringList(skillsRaw) : [];
+  const learningOutcomes = outcomesRaw ? parseStringList(outcomesRaw) : [];
+  const estimatedWeeks =
+    estimatedWeeksRaw !== null && estimatedWeeksRaw >= 1 && estimatedWeeksRaw <= 52
+      ? estimatedWeeksRaw
+      : null;
+
+  try {
+    const newTrack = await prisma.track.create({
+      data: {
+        slug,
+        title,
+        description,
+        icon,
+        color,
+        category: category as TrackCategory,
+        status: status as TrackStatus,
+        ...(estimatedWeeks !== null ? { estimatedWeeks } : {}),
+        skills,
+        learningOutcomes,
+        ...(careerImpact ? { careerImpact } : {}),
+      },
+    });
+
+    await logActivity("track.create", "Track", newTrack.id, title);
+    revalidatePath("/admin/tracks");
+    revalidatePath("/admin/analytics");
+  } catch (err: unknown) {
+    const prismaError = err as { code?: string };
+    if (prismaError?.code === "P2002") {
+      const { redirect } = await import("next/navigation");
+      redirect("/admin/tracks/new?error=slug_taken");
+    }
+    console.error("[createTrackAction]", err);
+  }
 }
 
 export async function deleteTrackAction(formData: FormData) {
@@ -457,11 +675,16 @@ export async function deleteTrackAction(formData: FormData) {
   const trackId = stringValue(formData, "trackId");
   if (!trackId) return;
 
-  await prisma.track.delete({ where: { id: trackId } });
+  try {
+    await prisma.track.delete({ where: { id: trackId } });
 
-  revalidatePath("/admin/tracks");
-  revalidatePath("/admin/modules");
-  revalidatePath("/admin/analytics");
+    await logActivity("track.delete", "Track", trackId);
+    revalidatePath("/admin/tracks");
+    revalidatePath("/admin/modules");
+    revalidatePath("/admin/analytics");
+  } catch (err) {
+    console.error("[deleteTrackAction]", err);
+  }
 }
 
 // ─── Permission actions ───────────────────────────────────────────────────────
@@ -471,10 +694,16 @@ export async function createPermissionAction(formData: FormData) {
   const email = stringValue(formData, "email");
   const role = stringValue(formData, "role");
   if (!email || !Object.values(PermissionRoleType).includes(role as PermissionRoleType)) return;
-  await prisma.permissionRole.create({
-    data: { email, role: role as PermissionRoleType, permissions: ROLE_PERMISSIONS[role as PermissionRoleType] },
-  });
-  revalidatePath("/admin/permissions");
+
+  try {
+    const newPerm = await prisma.permissionRole.create({
+      data: { email, role: role as PermissionRoleType, permissions: ROLE_PERMISSIONS[role as PermissionRoleType] },
+    });
+    await logActivity("permission.create", "Permission", newPerm.id, `${email} -> ${role}`);
+    revalidatePath("/admin/permissions");
+  } catch (err) {
+    console.error("[createPermissionAction]", err);
+  }
 }
 
 export async function updatePermissionAction(formData: FormData) {
@@ -483,19 +712,31 @@ export async function updatePermissionAction(formData: FormData) {
   const role = stringValue(formData, "role");
   const isActive = formData.get("isActive") === "true";
   if (!permId || !Object.values(PermissionRoleType).includes(role as PermissionRoleType)) return;
-  await prisma.permissionRole.update({
-    where: { id: permId },
-    data: { role: role as PermissionRoleType, isActive, permissions: ROLE_PERMISSIONS[role as PermissionRoleType] },
-  });
-  revalidatePath("/admin/permissions");
+
+  try {
+    await prisma.permissionRole.update({
+      where: { id: permId },
+      data: { role: role as PermissionRoleType, isActive, permissions: ROLE_PERMISSIONS[role as PermissionRoleType] },
+    });
+    await logActivity("UPDATE", "PermissionRole", permId, `${role} isActive=${isActive}`);
+    revalidatePath("/admin/permissions");
+  } catch (err) {
+    console.error("[updatePermissionAction]", err);
+  }
 }
 
 export async function deletePermissionAction(formData: FormData) {
   await requireAdminPermission("users.manage");
   const permId = stringValue(formData, "permId");
   if (!permId) return;
-  await prisma.permissionRole.delete({ where: { id: permId } });
-  revalidatePath("/admin/permissions");
+
+  try {
+    await prisma.permissionRole.delete({ where: { id: permId } });
+    await logActivity("permission.delete", "Permission", permId);
+    revalidatePath("/admin/permissions");
+  } catch (err) {
+    console.error("[deletePermissionAction]", err);
+  }
 }
 
 // ─── Assignment actions ───────────────────────────────────────────────────────
@@ -510,10 +751,17 @@ export async function createAssignmentAction(formData: FormData) {
   const estimatedTime = numberValue(formData, "estimatedTime") ?? 0;
   if (!moduleId || !title || !instructions) return;
   if (!Object.values(StudioAssignmentType).includes(assignmentType as StudioAssignmentType)) return;
-  await prisma.assignment.create({
-    data: { moduleId, title, assignmentType: assignmentType as StudioAssignmentType, instructions, maxScore, estimatedTime },
-  });
-  revalidatePath("/admin/assignments");
+
+  try {
+    const newAssignment = await prisma.assignment.create({
+      data: { moduleId, title, assignmentType: assignmentType as StudioAssignmentType, instructions, maxScore, estimatedTime },
+    });
+    await logActivity("CREATE", "Assignment", newAssignment.id, title);
+    revalidatePath("/admin/assignments");
+    revalidatePath("/admin/modules");
+  } catch (err) {
+    console.error("[createAssignmentAction]", err);
+  }
 }
 
 export async function updateAssignmentAction(formData: FormData) {
@@ -529,19 +777,31 @@ export async function updateAssignmentAction(formData: FormData) {
   if (!assignmentId || !title || !instructions) return;
   if (!Object.values(StudioAssignmentType).includes(assignmentType as StudioAssignmentType)) return;
   if (!Object.values(StudioContentStatus).includes(status as StudioContentStatus)) return;
-  await prisma.assignment.update({
-    where: { id: assignmentId },
-    data: { title, assignmentType: assignmentType as StudioAssignmentType, instructions, expectedOutput, maxScore, estimatedTime, status: status as StudioContentStatus },
-  });
-  revalidatePath("/admin/assignments");
+
+  try {
+    await prisma.assignment.update({
+      where: { id: assignmentId },
+      data: { title, assignmentType: assignmentType as StudioAssignmentType, instructions, expectedOutput, maxScore, estimatedTime, status: status as StudioContentStatus },
+    });
+    await logActivity("UPDATE", "Assignment", assignmentId, title);
+    revalidatePath("/admin/assignments");
+  } catch (err) {
+    console.error("[updateAssignmentAction]", err);
+  }
 }
 
 export async function deleteAssignmentAction(formData: FormData) {
   await requireAdminPermission("courses.write");
   const assignmentId = stringValue(formData, "assignmentId");
   if (!assignmentId) return;
-  await prisma.assignment.delete({ where: { id: assignmentId } });
-  revalidatePath("/admin/assignments");
+
+  try {
+    await prisma.assignment.delete({ where: { id: assignmentId } });
+    await logActivity("DELETE", "Assignment", assignmentId);
+    revalidatePath("/admin/assignments");
+  } catch (err) {
+    console.error("[deleteAssignmentAction]", err);
+  }
 }
 
 // ─── Simulation actions ───────────────────────────────────────────────────────
@@ -557,10 +817,17 @@ export async function createSimulationAction(formData: FormData) {
   const xpReward = numberValue(formData, "xpReward") ?? 0;
   if (!moduleId || !title || !scenario) return;
   if (!Object.values(StudioSimulationType).includes(simulationType as StudioSimulationType)) return;
-  await prisma.simulation.create({
-    data: { moduleId, title, simulationType: simulationType as StudioSimulationType, scenario, difficulty, estimatedTime, xpReward },
-  });
-  revalidatePath("/admin/simulations");
+
+  try {
+    const newSimulation = await prisma.simulation.create({
+      data: { moduleId, title, simulationType: simulationType as StudioSimulationType, scenario, difficulty, estimatedTime, xpReward },
+    });
+    await logActivity("CREATE", "Simulation", newSimulation.id, title);
+    revalidatePath("/admin/simulations");
+    revalidatePath("/admin/modules");
+  } catch (err) {
+    console.error("[createSimulationAction]", err);
+  }
 }
 
 export async function updateSimulationAction(formData: FormData) {
@@ -576,19 +843,31 @@ export async function updateSimulationAction(formData: FormData) {
   if (!simulationId || !title || !scenario) return;
   if (!Object.values(StudioSimulationType).includes(simulationType as StudioSimulationType)) return;
   if (!Object.values(StudioContentStatus).includes(status as StudioContentStatus)) return;
-  await prisma.simulation.update({
-    where: { id: simulationId },
-    data: { title, simulationType: simulationType as StudioSimulationType, scenario, difficulty, estimatedTime, xpReward, status: status as StudioContentStatus },
-  });
-  revalidatePath("/admin/simulations");
+
+  try {
+    await prisma.simulation.update({
+      where: { id: simulationId },
+      data: { title, simulationType: simulationType as StudioSimulationType, scenario, difficulty, estimatedTime, xpReward, status: status as StudioContentStatus },
+    });
+    await logActivity("UPDATE", "Simulation", simulationId, title);
+    revalidatePath("/admin/simulations");
+  } catch (err) {
+    console.error("[updateSimulationAction]", err);
+  }
 }
 
 export async function deleteSimulationAction(formData: FormData) {
   await requireAdminPermission("courses.write");
   const simulationId = stringValue(formData, "simulationId");
   if (!simulationId) return;
-  await prisma.simulation.delete({ where: { id: simulationId } });
-  revalidatePath("/admin/simulations");
+
+  try {
+    await prisma.simulation.delete({ where: { id: simulationId } });
+    await logActivity("DELETE", "Simulation", simulationId);
+    revalidatePath("/admin/simulations");
+  } catch (err) {
+    console.error("[deleteSimulationAction]", err);
+  }
 }
 
 // ─── Case study actions ───────────────────────────────────────────────────────
@@ -601,10 +880,17 @@ export async function createCaseAction(formData: FormData) {
   const problemStatement = stringValue(formData, "problemStatement");
   const difficulty = stringValue(formData, "difficulty") || "MEDIUM";
   if (!moduleId || !title || !problemStatement) return;
-  await prisma.caseStudy.create({
-    data: { moduleId, title, summary, problemStatement, difficulty },
-  });
-  revalidatePath("/admin/cases");
+
+  try {
+    const newCase = await prisma.caseStudy.create({
+      data: { moduleId, title, summary, problemStatement, difficulty },
+    });
+    await logActivity("CREATE", "CaseStudy", newCase.id, title);
+    revalidatePath("/admin/cases");
+    revalidatePath("/admin/modules");
+  } catch (err) {
+    console.error("[createCaseAction]", err);
+  }
 }
 
 export async function updateCaseAction(formData: FormData) {
@@ -619,19 +905,31 @@ export async function updateCaseAction(formData: FormData) {
   const status = stringValue(formData, "status");
   if (!caseId || !title || !problemStatement) return;
   if (!Object.values(StudioContentStatus).includes(status as StudioContentStatus)) return;
-  await prisma.caseStudy.update({
-    where: { id: caseId },
-    data: { title, summary, problemStatement, expectedApproach, outcome, difficulty, status: status as StudioContentStatus },
-  });
-  revalidatePath("/admin/cases");
+
+  try {
+    await prisma.caseStudy.update({
+      where: { id: caseId },
+      data: { title, summary, problemStatement, expectedApproach, outcome, difficulty, status: status as StudioContentStatus },
+    });
+    await logActivity("UPDATE", "CaseStudy", caseId, title);
+    revalidatePath("/admin/cases");
+  } catch (err) {
+    console.error("[updateCaseAction]", err);
+  }
 }
 
 export async function deleteCaseAction(formData: FormData) {
   await requireAdminPermission("courses.write");
   const caseId = stringValue(formData, "caseId");
   if (!caseId) return;
-  await prisma.caseStudy.delete({ where: { id: caseId } });
-  revalidatePath("/admin/cases");
+
+  try {
+    await prisma.caseStudy.delete({ where: { id: caseId } });
+    await logActivity("DELETE", "CaseStudy", caseId);
+    revalidatePath("/admin/cases");
+  } catch (err) {
+    console.error("[deleteCaseAction]", err);
+  }
 }
 
 // ─── Media actions ────────────────────────────────────────────────────────────
@@ -640,8 +938,14 @@ export async function deleteMediaAction(formData: FormData) {
   await requireAdminPermission("media.manage");
   const mediaId = stringValue(formData, "mediaId");
   if (!mediaId) return;
-  await prisma.mediaAsset.delete({ where: { id: mediaId } });
-  revalidatePath("/admin/media");
+
+  try {
+    await prisma.mediaAsset.delete({ where: { id: mediaId } });
+    await logActivity("DELETE", "MediaAsset", mediaId);
+    revalidatePath("/admin/media");
+  } catch (err) {
+    console.error("[deleteMediaAction]", err);
+  }
 }
 
 export async function createMediaAction(formData: FormData) {
@@ -652,10 +956,16 @@ export async function createMediaAction(formData: FormData) {
   const sizeKb = numberValue(formData, "sizeKb") ?? 0;
   const uploadedBy = stringValue(formData, "uploadedBy");
   if (!name || !url) return;
-  await prisma.mediaAsset.create({
-    data: { name, type, url, sizeKb, uploadedBy },
-  });
-  revalidatePath("/admin/media");
+
+  try {
+    const newMedia = await prisma.mediaAsset.create({
+      data: { name, type, url, sizeKb, uploadedBy },
+    });
+    await logActivity("CREATE", "MediaAsset", newMedia.id, name);
+    revalidatePath("/admin/media");
+  } catch (err) {
+    console.error("[createMediaAction]", err);
+  }
 }
 
 // ─── Template actions ─────────────────────────────────────────────────────────
@@ -666,18 +976,30 @@ export async function createTemplateAction(formData: FormData) {
   const description = stringValue(formData, "description");
   const category = stringValue(formData, "category");
   if (!title || !description || !category) return;
-  await prisma.courseTemplate.create({
-    data: { title, description, category },
-  });
-  revalidatePath("/admin/templates");
+
+  try {
+    const newTemplate = await prisma.courseTemplate.create({
+      data: { title, description, category },
+    });
+    await logActivity("CREATE", "CourseTemplate", newTemplate.id, title);
+    revalidatePath("/admin/templates");
+  } catch (err) {
+    console.error("[createTemplateAction]", err);
+  }
 }
 
 export async function deleteTemplateAction(formData: FormData) {
   await requireAdminPermission("templates.manage");
   const templateId = stringValue(formData, "templateId");
   if (!templateId) return;
-  await prisma.courseTemplate.delete({ where: { id: templateId } });
-  revalidatePath("/admin/templates");
+
+  try {
+    await prisma.courseTemplate.delete({ where: { id: templateId } });
+    await logActivity("DELETE", "CourseTemplate", templateId);
+    revalidatePath("/admin/templates");
+  } catch (err) {
+    console.error("[deleteTemplateAction]", err);
+  }
 }
 
 // ─── Certificate ──────────────────────────────────────────────────────────────
@@ -692,14 +1014,18 @@ export async function updateCertificateAction(formData: FormData) {
     return;
   }
 
-  await prisma.certificate.update({
-    where: { id: certificateId },
-    data: {
-      certificateUrl,
-    },
-  });
+  try {
+    await prisma.certificate.update({
+      where: { id: certificateId },
+      data: {
+        certificateUrl,
+      },
+    });
 
-  revalidatePath("/admin/certificates");
+    revalidatePath("/admin/certificates");
+  } catch (err) {
+    console.error("[updateCertificateAction]", err);
+  }
 }
 
 // ─── Settings actions ─────────────────────────────────────────────────────────
@@ -721,7 +1047,12 @@ export async function saveAdminSettingsAction(formData: FormData) {
       settings[key] = String(value);
     }
   }
-  const { writeAdminSettings } = await import("@/lib/admin-settings");
-  writeAdminSettings(settings);
-  revalidatePath("/admin/settings");
+
+  try {
+    const { writeAdminSettings } = await import("@/lib/admin-settings");
+    writeAdminSettings(settings);
+    revalidatePath("/admin/settings");
+  } catch (err) {
+    console.error("[saveAdminSettingsAction]", err);
+  }
 }

@@ -19,6 +19,12 @@ enum TrackCategory {
   DA
 }
 
+enum TrackStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
 enum LessonType {
   TEXT
   VIDEO
@@ -48,6 +54,7 @@ model User {
   onboardingProfile  OnboardingProfile?
   careerGoals        CareerGoal[]
   missionSubmissions MissionSubmission[]
+  peerReviewsGiven   PeerReview[]         @relation("ReviewsGiven")
   learningPlans      LearningPlan[]
   notes              UserNote[]
   bookmarks          UserBookmark[]
@@ -59,15 +66,25 @@ model User {
 }
 
 model Track {
-  id           String        @id @default(cuid())
-  slug         String        @unique
-  title        String
-  description  String
-  icon         String
-  color        String
-  category     TrackCategory
-  modules      Module[]
-  certificates Certificate[]
+  id               String        @id @default(cuid())
+  slug             String        @unique
+  title            String
+  description      String
+  icon             String
+  color            String
+  category         TrackCategory
+  status           TrackStatus   @default(DRAFT)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  estimatedWeeks   Int?
+  skills           String[]
+  learningOutcomes String[]
+  careerImpact     String?
+  modules          Module[]
+  certificates     Certificate[]
+
+  @@index([category])
+  @@index([status])
 }
 
 model Module {
@@ -621,8 +638,27 @@ model MissionSubmission {
   reviewedAt  DateTime?
   mission     LearningMission @relation(fields: [missionId], references: [id], onDelete: Cascade)
   user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  peerReviews PeerReview[]
 
   @@index([userId, missionId])
+}
+
+model PeerReview {
+  id             String   @id @default(cuid())
+  submissionId   String
+  reviewerId     String
+  score          Int
+  feedback       String   @db.Text
+  criteriaScores Json     @default("{}")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  submission MissionSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  reviewer   User              @relation("ReviewsGiven", fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@unique([submissionId, reviewerId])
+  @@index([submissionId])
+  @@index([reviewerId])
 }
 
 model WeeklyQuest {

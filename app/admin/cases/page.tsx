@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { StudioContentStatus } from "@prisma/client";
 
 import { DeleteCaseButton } from "@/components/admin/cases/delete-case-button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -25,10 +26,36 @@ const DIFFICULTY_BADGE: Record<string, string> = {
   HARD: "border-rose-500/30 bg-rose-500/10 text-rose-400",
 };
 
-export default async function AdminCasesPage() {
+const STATUS_OPTIONS: StudioContentStatus[] = ["DRAFT", "IN_REVIEW", "PUBLISHED", "ARCHIVED"];
+
+type AdminCasesPageProps = {
+  searchParams?: {
+    q?: string | string[];
+    status?: string | string[];
+  };
+};
+
+function paramValue(value: string | string[] | undefined) {
+  if (Array.isArray(value)) return value[0] ?? "";
+  return value ?? "";
+}
+
+export default async function AdminCasesPage({ searchParams }: AdminCasesPageProps) {
   await requireAdminPermission("courses.read");
 
+  const query = paramValue(searchParams?.q);
+  const statusFilter = paramValue(searchParams?.status);
+  const validStatus = STATUS_OPTIONS.includes(statusFilter as StudioContentStatus)
+    ? (statusFilter as StudioContentStatus)
+    : undefined;
+
   const cases = await prisma.caseStudy.findMany({
+    where: {
+      ...(query
+        ? { title: { contains: query, mode: "insensitive" } }
+        : {}),
+      ...(validStatus ? { status: validStatus } : {}),
+    },
     orderBy: [
       { module: { course: { title: "asc" } } },
       { createdAt: "desc" },
@@ -60,15 +87,52 @@ export default async function AdminCasesPage() {
         actionHref="/admin/cases/new"
       />
 
+      {/* ── Filter ────────────────────────────────────────────────── */}
+      <section className="surface-elevated p-5">
+        <form className="grid gap-3 md:grid-cols-[1fr_200px_auto]">
+          <input
+            type="text"
+            name="q"
+            defaultValue={query}
+            placeholder="Search cases…"
+            className="input-base"
+          />
+          <select name="status" defaultValue={statusFilter} className="select-base">
+            <option value="">All statuses</option>
+            {STATUS_OPTIONS.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          <div className="flex gap-2">
+            <button type="submit" className="btn-secondary">
+              Apply
+            </button>
+            {(query || statusFilter) && (
+              <a href="/admin/cases" className="btn-secondary text-muted-foreground">
+                Reset
+              </a>
+            )}
+          </div>
+        </form>
+      </section>
+
+      {/* ── Table ─────────────────────────────────────────────────── */}
       <section className="surface-elevated space-y-3 p-5">
         <p className="text-xs text-muted-foreground">
           {cases.length} case{cases.length !== 1 ? "s" : ""}
+          {query && ` matching "${query}"`}
         </p>
 
         {cases.length === 0 ? (
           <EmptyState
             title="No cases found"
-            description="No case studies have been created yet."
+            description={
+              query || statusFilter
+                ? "No cases match your filters."
+                : "No case studies have been created yet."
+            }
             actionLabel="New case"
             actionHref="/admin/cases/new"
             size="sm"

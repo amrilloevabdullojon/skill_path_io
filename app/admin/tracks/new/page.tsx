@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { TrackCategory } from "@prisma/client";
+import { TrackCategory, TrackStatus } from "@prisma/client";
 
 import { createTrackAction } from "@/app/admin/actions";
 import { SubmitModuleButton } from "@/components/admin/modules/submit-module-button";
@@ -13,7 +13,11 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default async function NewTrackPage() {
+type NewTrackPageProps = {
+  searchParams?: { error?: string };
+};
+
+export default async function NewTrackPage({ searchParams }: NewTrackPageProps) {
   await requireAdminPermission("courses.write");
 
   async function handleCreate(formData: FormData) {
@@ -27,6 +31,17 @@ export default async function NewTrackPage() {
       <PageHeader kicker="Content" title="New Track" description="Create a new learning track." />
 
       <section className="surface-elevated p-6">
+        {searchParams?.error === "slug_taken" && (
+          <div className="mb-5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-400">
+            A track with this slug already exists. Please choose a different slug.
+          </div>
+        )}
+        {searchParams?.error === "invalid_slug" && (
+          <div className="mb-5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-400">
+            Slug must contain only lowercase letters, numbers, and hyphens (e.g. &quot;qa-fundamentals&quot;).
+          </div>
+        )}
+
         <form action={handleCreate} className="max-w-lg space-y-5">
           {/* Slug */}
           <div className="space-y-1.5">
@@ -89,6 +104,16 @@ export default async function NewTrackPage() {
             </div>
           </div>
 
+          {/* Status */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Status</label>
+            <select name="status" defaultValue={TrackStatus.DRAFT} className="select-base">
+              <option value={TrackStatus.DRAFT}>Draft</option>
+              <option value={TrackStatus.PUBLISHED}>Published</option>
+              <option value={TrackStatus.ARCHIVED}>Archived</option>
+            </select>
+          </div>
+
           {/* Color */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Color *</label>
@@ -114,6 +139,56 @@ export default async function NewTrackPage() {
               />
             </div>
             <p className="text-xs text-muted-foreground">Hex color used in badges and charts.</p>
+          </div>
+
+          {/* Estimated Weeks */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Estimated Weeks</label>
+            <input
+              name="estimatedWeeks"
+              type="number"
+              min={1}
+              max={52}
+              placeholder="e.g. 8"
+              className="input-base"
+            />
+            <p className="text-xs text-muted-foreground">Optional. How many weeks to complete this track (1–52).</p>
+          </div>
+
+          {/* Skills */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Skills</label>
+            <textarea
+              name="skills_raw"
+              rows={4}
+              placeholder={"SQL\nPython\nData Analysis"}
+              className="input-base resize-y font-mono text-sm"
+            />
+            <p className="text-xs text-muted-foreground">One skill per line.</p>
+          </div>
+
+          {/* Learning Outcomes */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Learning Outcomes</label>
+            <textarea
+              name="outcomes_raw"
+              rows={4}
+              placeholder={"Understand testing fundamentals\nWrite test cases\nUse bug tracking tools"}
+              className="input-base resize-y text-sm"
+            />
+            <p className="text-xs text-muted-foreground">One outcome per line.</p>
+          </div>
+
+          {/* Career Impact */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-foreground">Career Impact</label>
+            <textarea
+              name="careerImpact"
+              rows={2}
+              maxLength={500}
+              placeholder="Describe how this track impacts career growth…"
+              className="input-base resize-none text-sm"
+            />
           </div>
 
           {/* Actions */}

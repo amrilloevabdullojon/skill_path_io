@@ -2,12 +2,13 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { LessonType, ProgressStatus, TrackCategory } from "@prisma/client";
 import { ChevronLeft, ChevronRight, CircleCheckBig, Clock3, Flag, Layers3, Lock, Sparkles, Trophy } from "lucide-react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getLocale } from "next-intl/server";
 
 import { MentorChatWidget } from "@/components/mentor/mentor-chat-widget";
 import { AIExerciseReview } from "@/components/simulation/ai-exercise-review";
 import { LessonBlockRenderer } from "@/components/tracks/lesson-block-renderer";
+import { LearningFlowTree } from "@/components/tracks/learning-flow-tree";
 import { MarkModuleCompleteButton } from "@/components/tracks/mark-module-complete-button";
 import { QuickSaveBookmarkButton } from "@/components/tracks/quick-save-bookmark-button";
 import { authOptions } from "@/lib/auth";
@@ -21,8 +22,8 @@ import { buildLessonBlocks, buildLessonRecommendations } from "@/lib/tracks/less
 import {
   LearningPathState,
   buildTrackProgression,
+  getTrackCareerOutcome,
   parseModuleContent,
-  trackCareerOutcome,
 } from "@/lib/tracks/progression";
 import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
@@ -66,26 +67,26 @@ const moduleStateView: Record<
   }
 > = {
   locked: {
-    label: "Locked",
+    label: "Заблокирован",
     badge: "border-border bg-card/85 text-muted-foreground",
     dot: "bg-border",
     panel: "border-border/80 bg-card/65",
   },
   available: {
-    label: "Available",
-    badge: "border-amber-400/35 bg-amber-500/15 text-amber-200",
+    label: "Доступен",
+    badge: "border-amber-300 bg-amber-100 text-amber-700",
     dot: "bg-amber-300",
     panel: "border-amber-400/25 bg-amber-500/7",
   },
   in_progress: {
-    label: "In progress",
-    badge: "border-sky-400/35 bg-sky-500/15 text-sky-200",
+    label: "В процессе",
+    badge: "border-sky-300 bg-sky-100 text-sky-700",
     dot: "bg-sky-400",
     panel: "border-sky-400/25 bg-sky-500/7",
   },
   completed: {
-    label: "Completed",
-    badge: "border-emerald-400/35 bg-emerald-500/15 text-emerald-200",
+    label: "Завершён",
+    badge: "border-emerald-300 bg-emerald-100 text-emerald-700",
     dot: "bg-emerald-400",
     panel: "border-emerald-400/25 bg-emerald-500/7",
   },
@@ -93,15 +94,15 @@ const moduleStateView: Record<
 
 const statusView = {
   [ProgressStatus.NOT_STARTED]: {
-    label: "Not started",
+    label: "Не начат",
     badge: "bg-card text-muted-foreground",
   },
   [ProgressStatus.IN_PROGRESS]: {
-    label: "In progress",
+    label: "В процессе",
     badge: "bg-sky-500/20 text-sky-300",
   },
   [ProgressStatus.COMPLETED]: {
-    label: "Completed",
+    label: "Завершён",
     badge: "bg-emerald-500/20 text-emerald-300",
   },
 } as const;
@@ -130,12 +131,12 @@ function timelineLessonState(state: LearningPathState, lessonIndex: number, tota
 
 function lessonTypeLabel(type: string) {
   if (type === LessonType.VIDEO || type === "VIDEO") {
-    return "Video lesson";
+    return "Видео-урок";
   }
   if (type === LessonType.TASK || type === "TASK") {
-    return "Practice lesson";
+    return "Практический урок";
   }
-  return "Text lesson";
+  return "Текстовый урок";
 }
 
 function toTrackCategory(value: string) {
@@ -146,17 +147,17 @@ function toTrackCategory(value: string) {
 }
 
 function timelineKindLabel(kind: TimelineNode["kind"]) {
-  if (kind === "lesson") return "Lesson";
-  if (kind === "mini_challenge") return "Mini challenge";
-  if (kind === "quiz") return "Quiz";
-  if (kind === "simulation") return "Simulation";
-  return "Final challenge";
+  if (kind === "lesson") return "Урок";
+  if (kind === "mini_challenge") return "Мини-задание";
+  if (kind === "quiz") return "Тест";
+  if (kind === "simulation") return "Симуляция";
+  return "Финальное задание";
 }
 
 function formatMinutes(minutes: number) {
-  if (minutes < 60) return `${minutes} min`;
+  if (minutes < 60) return `${minutes} мин`;
   const hours = Math.round((minutes / 60) * 10) / 10;
-  return `${hours}h`;
+  return `${hours}ч`;
 }
 
 export default async function ModulePage({ params }: ModulePageProps) {
@@ -209,6 +210,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
       content: moduleItem.content,
       lessonsCount: moduleItem.lessons.length,
       quizCount: moduleItem.quiz ? 1 : 0,
+      simulationCount: moduleItem.simulations.length,
     })),
     userProgress: progressRecords.map((progress) => ({
       moduleId: progress.moduleId,
@@ -224,6 +226,16 @@ export default async function ModulePage({ params }: ModulePageProps) {
   const currentStatus = progressByModuleId.get(currentModule.id)?.status ?? ProgressStatus.NOT_STARTED;
   const completedCount = progression.completedCount;
   const progressPercent = progression.overallProgressPercent;
+
+  // Sequential unlock enforcement: if the module is locked, redirect the learner
+  if (currentModule.order > 1) {
+    if (!session) {
+      redirect(`/auth/signin?callbackUrl=/tracks/${params.trackId}/modules/${params.moduleId}`);
+    }
+    if (currentState === "locked") {
+      redirect(`/tracks/${params.trackId}?locked=true`);
+    }
+  }
 
   const previousModule = currentModuleIndex > 0 ? track.modules[currentModuleIndex - 1] : null;
   const nextModule = currentModuleIndex < track.modules.length - 1 ? track.modules[currentModuleIndex + 1] : null;
@@ -340,13 +352,13 @@ export default async function ModulePage({ params }: ModulePageProps) {
     .slice(0, 2000);
 
   const navLinks = [
-    { id: "module-overview", label: "Module overview" },
-    { id: "lessons-timeline", label: "Lessons timeline" },
-    { id: "lesson-content", label: "Lesson blocks" },
-    { id: "practical-task", label: "Practical task" },
-    ...(currentModule.quiz ? [{ id: "module-quiz", label: "Quiz" }] : []),
-    ...(currentModuleCard.simulationCount > 0 ? [{ id: "module-simulation", label: "Simulation" }] : []),
-    { id: "recommendations", label: "Recommendations" },
+    { id: "module-overview", label: "Обзор модуля" },
+    { id: "lessons-timeline", label: "Путь обучения" },
+    { id: "lesson-content", label: "Содержание урока" },
+    { id: "practical-task", label: "Практическое задание" },
+    ...(currentModule.quiz ? [{ id: "module-quiz", label: "Тест" }] : []),
+    ...(currentModuleCard.simulationCount > 0 ? [{ id: "module-simulation", label: "Симуляция" }] : []),
+    { id: "recommendations", label: "Рекомендации" },
   ];
 
   return (
@@ -354,20 +366,20 @@ export default async function ModulePage({ params }: ModulePageProps) {
       <section className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)] sm:gap-6">
         <aside className="surface-elevated space-y-6 p-4 text-foreground sm:p-5 xl:sticky xl:top-20 xl:h-[calc(100vh-6rem)] xl:overflow-y-auto">
           <div className="space-y-2">
-            <p className="kicker">Track progress</p>
+            <p className="kicker">Прогресс</p>
             <h2 className="text-lg font-semibold">{track.title}</h2>
             <p className="text-sm text-muted-foreground">
-              {completedCount}/{track.modules.length} modules completed
+              {completedCount}/{track.modules.length} модулей завершено
             </p>
             <div className="progress-track h-2">
               <div className="h-full rounded-full bg-sky-400 transition-all duration-500" style={{ width: `${progressPercent}%` }} />
             </div>
-            <p className="text-xs text-muted-foreground">{progressPercent}% overall</p>
-            {isDemoUser && user ? <p className="text-xs text-muted-foreground">Demo user: {user.email}</p> : null}
+            <p className="text-xs text-muted-foreground">{progressPercent}% выполнено</p>
+            {isDemoUser && user ? <p className="text-xs text-muted-foreground">Демо: {user.email}</p> : null}
           </div>
 
           <div className="space-y-2">
-            <p className="kicker">Modules</p>
+            <p className="kicker">Модули</p>
             <div className="space-y-2">
               {progression.modules.map((moduleItem) => {
                 const stateStyle = moduleStateView[moduleItem.state];
@@ -402,26 +414,8 @@ export default async function ModulePage({ params }: ModulePageProps) {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <p className="kicker">Lesson checkpoints</p>
-            <div className="space-y-1.5 rounded-2xl border border-border bg-card/55 p-2">
-              {timelineNodes.map((node) => {
-                const style = moduleStateView[node.state];
-                return (
-                  <div key={node.id} className="rounded-xl border border-border/70 bg-card/70 px-2.5 py-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="text-xs font-medium text-foreground">{node.title}</p>
-                      <span className={cn("mt-0.5 h-2 w-2 rounded-full", style.dot)} />
-                    </div>
-                    <p className="mt-1 text-[11px] text-muted-foreground">{timelineKindLabel(node.kind)}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
           <nav className="space-y-2">
-            <p className="kicker">Lesson navigation</p>
+            <p className="kicker">Навигация</p>
             <div className="space-y-1 rounded-2xl border border-border bg-card/55 p-2">
               {navLinks.map((item) => (
                 <a key={item.id} href={`#${item.id}`} className="nav-link block">
@@ -440,7 +434,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
                 { label: currentModule.title },
               ]}
             />
-            <p className="kicker">Module</p>
+            <p className="kicker">Модуль</p>
             <div className="space-y-2">
               <h1 className="break-words text-2xl font-semibold tracking-tight sm:text-3xl">{currentModule.title}</h1>
               <p className="text-sm text-muted-foreground">{currentModule.description}</p>
@@ -456,7 +450,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
               </span>
               <span className="chip-neutral inline-flex items-center gap-1 px-2.5 py-1">
                 <Flag className="h-3.5 w-3.5" />
-                {currentModule.lessons.length} lessons
+                {currentModule.lessons.length} уроков
               </span>
               <span className="chip-neutral inline-flex items-center gap-1 px-2.5 py-1">
                 <Sparkles className="h-3.5 w-3.5" />+{currentModuleCard.xpReward} XP
@@ -474,16 +468,16 @@ export default async function ModulePage({ params }: ModulePageProps) {
                 type="module"
               />
               <Link href="/notes" className="btn-secondary px-3 py-2 text-xs">
-                Open notes
+                Открыть заметки
               </Link>
             </div>
           </header>
 
           <section id="module-overview" className="surface-elevated space-y-4 p-5">
-            <h2 className="section-title">Module overview</h2>
+            <h2 className="section-title">Обзор модуля</h2>
             <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
               <article className="surface-subtle space-y-3 p-4">
-                <h3 className="text-base font-semibold text-foreground">Learning objectives</h3>
+                <h3 className="text-base font-semibold text-foreground">Цели обучения</h3>
                 <p className="text-sm text-muted-foreground">{parsedContent.overview || currentModule.description}</p>
                 <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
                   {(parsedContent.objectives.length > 0 ? parsedContent.objectives : parsedContent.outcomes).map((item) => (
@@ -492,19 +486,22 @@ export default async function ModulePage({ params }: ModulePageProps) {
                 </ul>
               </article>
               <article className={cn("surface-subtle space-y-3 p-4", moduleStateView[currentState].panel)}>
-                <h3 className="text-base font-semibold text-foreground">Progression rewards</h3>
+                <h3 className="text-base font-semibold text-foreground">Награды прогресса</h3>
                 <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">Lesson XP: +{currentModuleCard.lessonXpReward}</p>
-                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">Quiz XP: +{currentModuleCard.quizXpReward}</p>
-                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">Simulation XP: +{currentModuleCard.simulationXpReward}</p>
-                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">Difficulty: {currentModuleCard.difficulty}</p>
+                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">XP за урок: +{currentModuleCard.lessonXpReward}</p>
+                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">XP за тест: +{currentModuleCard.quizXpReward}</p>
+                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">XP за симуляцию: +{currentModuleCard.simulationXpReward}</p>
+                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">Сложность: {currentModuleCard.difficulty}</p>
                 </div>
-                <p className="text-xs text-muted-foreground">{trackCareerOutcome(trackCategory)}</p>
+                <p className="text-xs text-muted-foreground">{getTrackCareerOutcome(
+                  trackCategory,
+                  track.careerImpact ?? undefined,
+                )}</p>
               </article>
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-base font-semibold text-foreground">What you will learn</h3>
+              <h3 className="text-base font-semibold text-foreground">Чему вы научитесь</h3>
               <div className="flex flex-wrap gap-2">
                 {(parsedContent.whatYouWillLearn.length > 0 ? parsedContent.whatYouWillLearn : currentModuleCard.outcomes).map((item) => (
                   <span key={item} className="skill-tag px-2.5 py-1 text-xs">
@@ -517,59 +514,22 @@ export default async function ModulePage({ params }: ModulePageProps) {
 
           <section id="lessons-timeline" className="surface-elevated space-y-4 p-5">
             <div className="flex items-center justify-between">
-              <h2 className="section-title">Lessons timeline</h2>
-              <span className="text-xs text-muted-foreground">Learning path</span>
+              <h2 className="section-title">Путь обучения</h2>
+              <span className="text-xs text-muted-foreground">Учебный путь</span>
             </div>
 
-            <div className="space-y-3">
-              {timelineNodes.map((node, index) => {
-                const style = moduleStateView[node.state];
-                return (
-                  <div key={node.id} className="space-y-2">
-                    <article className={cn("surface-subtle p-4", style.panel)}>
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div className="space-y-1">
-                          <p className="module-order-label tracking-[0.16em]">{timelineKindLabel(node.kind)}</p>
-                          <p className="text-sm font-semibold text-foreground">{node.title}</p>
-                          <p className="text-xs text-muted-foreground">{node.description}</p>
-                        </div>
-                        <span className={cn("inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold", style.badge)}>
-                          {style.label}
-                        </span>
-                      </div>
-                      {node.href ? (
-                        <Link
-                          href={node.state === "locked" ? "#" : node.href}
-                          className={cn(
-                            "mt-3 btn-secondary inline-flex items-center gap-2 px-3 py-1.5 text-xs",
-                            node.state === "locked" && "pointer-events-none opacity-60",
-                          )}
-                        >
-                          Open
-                          {node.state === "locked" ? <Lock className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
-                        </Link>
-                      ) : null}
-                    </article>
-                    {index < timelineNodes.length - 1 ? (
-                      <div className="flex justify-center">
-                        <ChevronRight className="h-4 w-4 rotate-90 text-muted-foreground" />
-                      </div>
-                    ) : null}
-                  </div>
-                );
-              })}
-            </div>
+            <LearningFlowTree nodes={timelineNodes} />
           </section>
 
           <section id="lesson-content" className="surface-elevated space-y-4 p-5">
-            <h2 className="section-title">Lesson content</h2>
+            <h2 className="section-title">Содержание урока</h2>
             <LessonBlockRenderer blocks={lessonBlocks} />
           </section>
 
           <section id="practical-task" className="space-y-4 rounded-2xl border border-emerald-500/28 bg-emerald-500/8 p-4 sm:p-5">
-            <h2 className="text-xl font-semibold text-emerald-200">Practical task</h2>
+            <h2 className="text-xl font-semibold text-emerald-200">Практическое задание</h2>
             <p className="text-sm text-emerald-50/90">
-              {taskLesson?.body ?? "Complete the practical task for this module and prepare a short summary of your work."}
+              {taskLesson?.body ?? "Выполните практическое задание модуля и подготовьте краткое описание результатов."}
             </p>
             <ul className="list-disc space-y-1 pl-5 text-sm text-emerald-100/90">
               {resources.map((resource) => (
@@ -577,7 +537,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
               ))}
             </ul>
             <p className="rounded-xl border border-emerald-400/35 bg-emerald-500/12 px-3 py-2 text-sm text-emerald-100">
-              <span className="font-semibold">Final challenge:</span> {parsedContent.finalChallenge}
+              <span className="font-semibold">Финальное задание:</span> {parsedContent.finalChallenge}
             </p>
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               <form action={markModuleAsCompleted} className="w-full sm:w-auto">
@@ -587,7 +547,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
               </form>
               {currentModule.quiz ? (
                 <Link href={`/tracks/${track.slug}/modules/${currentModule.id}/quiz`} id="module-quiz" className="btn-secondary inline-flex w-full items-center justify-center sm:w-auto">
-                  Go to quiz
+                  Пройти тест
                 </Link>
               ) : null}
             </div>
@@ -598,7 +558,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
           </section>
 
           <section id="recommendations" className="surface-elevated space-y-4 p-5">
-            <h2 className="section-title">After lesson recommendations</h2>
+            <h2 className="section-title">Рекомендации после урока</h2>
             <div className="grid gap-3 md:grid-cols-3">
               {recommendations.map((item) => (
                 <article key={item.id} className="surface-subtle space-y-2 p-4">
@@ -625,7 +585,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
           </section>
 
           <section className="surface-elevated space-y-4 p-5">
-            <h2 className="section-title">AI remediation suggestions</h2>
+            <h2 className="section-title">Рекомендации ИИ</h2>
             <div className="space-y-2">
               {remediationSuggestions.map((item) => (
                 <article key={item.id} className="surface-subtle space-y-1 p-3">
@@ -643,7 +603,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
               className="btn-secondary inline-flex w-full items-center gap-2 text-left sm:w-auto sm:text-center"
             >
               <ChevronLeft className="h-4 w-4" />
-              {previousModule ? "Back: previous module" : "Back to track"}
+              {previousModule ? "Назад: предыдущий модуль" : "К треку"}
             </Link>
 
             <Link
@@ -656,7 +616,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
               }
               className="btn-primary inline-flex w-full items-center gap-2 text-left sm:w-auto sm:text-center"
             >
-              {nextModule ? "Next: following module" : currentModule.quiz ? "Next: go to quiz" : "Next: back to track"}
+              {nextModule ? "Далее: следующий модуль" : currentModule.quiz ? "Далее: к тесту" : "К треку"}
               <ChevronRight className="h-4 w-4" />
             </Link>
           </nav>
@@ -665,10 +625,10 @@ export default async function ModulePage({ params }: ModulePageProps) {
             <section className="surface-elevated space-y-4 p-5">
               <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/35 bg-amber-500/12 px-3 py-1 text-xs text-amber-200">
                 <Trophy className="h-4 w-4" />
-                Track completion unlocked
+                Трек завершён!
               </div>
               <p className="text-sm text-muted-foreground">
-                Congratulations. You finished all modules in this track and unlocked progression rewards.
+                Поздравляем! Вы завершили все модули трека и получили награды за прогресс.
               </p>
             </section>
           ) : null}

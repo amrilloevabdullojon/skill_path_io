@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { TrackCategory } from "@prisma/client";
+import type { TrackCategory, TrackStatus } from "@prisma/client";
 
 import { updateTrackAction } from "@/app/admin/actions";
 import { SaveRowButton } from "@/components/admin/save-row-button";
 import { DeleteTrackButton } from "@/components/admin/tracks/delete-track-button";
+import { PublishGuardForm } from "@/components/admin/tracks/publish-guard-form";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
@@ -19,6 +20,7 @@ type TracksAdminPageProps = {
   searchParams?: {
     q?: string | string[];
     category?: string | string[];
+    status?: string | string[];
   };
 };
 
@@ -33,13 +35,28 @@ const TRACK_BADGE: Record<TrackCategory, string> = {
   DA: "track-badge-da",
 };
 
+const STATUS_BADGE: Record<TrackStatus, string> = {
+  DRAFT: "inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide border-slate-500/40 bg-slate-500/10 text-slate-400",
+  PUBLISHED: "inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide border-emerald-500/40 bg-emerald-500/10 text-emerald-400",
+  ARCHIVED: "inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide border-red-500/40 bg-red-500/10 text-red-400",
+};
+
 export default async function TracksAdminPage({ searchParams }: TracksAdminPageProps) {
   await requireAdminPermission("courses.read");
 
   const query = paramValue(searchParams?.q);
   const categoryParam = paramValue(searchParams?.category);
-  const categoryFilter = Object.values(TrackCategory).includes(categoryParam as TrackCategory)
+  const statusParam = paramValue(searchParams?.status);
+
+  const VALID_CATEGORIES = ["QA", "BA", "DA"] as const;
+  const VALID_STATUSES = ["DRAFT", "PUBLISHED", "ARCHIVED"] as const;
+
+  const categoryFilter = (VALID_CATEGORIES as readonly string[]).includes(categoryParam)
     ? (categoryParam as TrackCategory)
+    : "ALL";
+
+  const statusFilter = (VALID_STATUSES as readonly string[]).includes(statusParam)
+    ? (statusParam as TrackStatus)
     : "ALL";
 
   const tracks = await prisma.track.findMany({
@@ -54,6 +71,7 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
           }
         : {}),
       ...(categoryFilter !== "ALL" ? { category: categoryFilter } : {}),
+      ...(statusFilter !== "ALL" ? { status: statusFilter as TrackStatus } : {}),
     },
     orderBy: { title: "asc" },
     select: {
@@ -63,6 +81,9 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
       description: true,
       color: true,
       category: true,
+      status: true,
+      createdAt: true,
+      skills: true,
       _count: { select: { modules: true, certificates: true } },
     },
   });
@@ -79,7 +100,7 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
 
       {/* ── Filter ────────────────────────────────────────────────── */}
       <section className="surface-elevated p-5">
-        <form className="grid gap-3 md:grid-cols-[1fr_180px_auto]">
+        <form className="grid gap-3 md:grid-cols-[1fr_180px_180px_auto]">
           <input
             type="text"
             name="q"
@@ -89,9 +110,15 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
           />
           <select name="category" defaultValue={categoryFilter} className="select-base">
             <option value="ALL">All categories</option>
-            <option value={TrackCategory.QA}>QA</option>
-            <option value={TrackCategory.BA}>BA</option>
-            <option value={TrackCategory.DA}>DA</option>
+            <option value="QA">QA</option>
+            <option value="BA">BA</option>
+            <option value="DA">DA</option>
+          </select>
+          <select name="status" defaultValue={statusFilter} className="select-base">
+            <option value="ALL">All statuses</option>
+            <option value="DRAFT">Draft</option>
+            <option value="PUBLISHED">Published</option>
+            <option value="ARCHIVED">Archived</option>
           </select>
           <button type="submit" className="btn-secondary">
             Apply
@@ -105,30 +132,33 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
           {tracks.length} track{tracks.length !== 1 ? "s" : ""}
           {query ? ` matching "${query}"` : ""}
           {categoryFilter !== "ALL" ? ` · category: ${categoryFilter}` : ""}
+          {statusFilter !== "ALL" ? ` · status: ${statusFilter}` : ""}
         </p>
 
         {tracks.length === 0 ? (
           <EmptyState
             title="No tracks found"
             description={
-              query || categoryFilter !== "ALL"
-                ? "Try changing the search query or category filter."
+              query || categoryFilter !== "ALL" || statusFilter !== "ALL"
+                ? "Try changing the search query or filters."
                 : "No tracks have been created yet."
             }
             size="sm"
           />
         ) : (
           <div className="table-shell">
-            <table className="table-base min-w-[1160px]">
+            <table className="table-base min-w-[1360px]">
               <thead className="table-head">
                 <tr>
                   <th className="px-3 py-3 text-left">Category</th>
+                  <th className="px-3 py-3 text-left">Status</th>
                   <th className="px-3 py-3 text-left">Slug</th>
                   <th className="px-3 py-3 text-left">Title</th>
                   <th className="px-3 py-3 text-left">Description</th>
                   <th className="px-3 py-3 text-left">Color</th>
                   <th className="px-3 py-3 text-left">Modules</th>
                   <th className="px-3 py-3 text-left">Certs</th>
+                  <th className="px-3 py-3 text-left">Created</th>
                   <th className="px-3 py-3 text-left">Save</th>
                   <th className="px-3 py-3 text-left">Del</th>
                 </tr>
@@ -136,7 +166,7 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
               <tbody>
                 {tracks.map((track) => (
                   <tr key={track.id} className="table-row align-top">
-                    {/* Category badge (read-only display) + editable select */}
+                    {/* Category badge + editable select */}
                     <td className="px-3 py-2">
                       <span
                         className={`inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${TRACK_BADGE[track.category]}`}
@@ -150,9 +180,28 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
                           defaultValue={track.category}
                           className="select-base h-8 px-1.5 py-0.5 text-xs"
                         >
-                          <option value={TrackCategory.QA}>QA</option>
-                          <option value={TrackCategory.BA}>BA</option>
-                          <option value={TrackCategory.DA}>DA</option>
+                          <option value="QA">QA</option>
+                          <option value="BA">BA</option>
+                          <option value="DA">DA</option>
+                        </select>
+                      </div>
+                    </td>
+
+                    {/* Status badge + editable select */}
+                    <td className="px-3 py-2">
+                      <span className={STATUS_BADGE[track.status]}>
+                        {track.status}
+                      </span>
+                      <div className="mt-1.5">
+                        <select
+                          form={`track-edit-${track.id}`}
+                          name="status"
+                          defaultValue={track.status}
+                          className="select-base h-8 px-1.5 py-0.5 text-xs"
+                        >
+                          <option value="DRAFT">Draft</option>
+                          <option value="PUBLISHED">Published</option>
+                          <option value="ARCHIVED">Archived</option>
                         </select>
                       </div>
                     </td>
@@ -160,6 +209,13 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
                     {/* Slug (read-only) */}
                     <td className="px-3 py-2 font-mono text-xs text-muted-foreground">
                       {track.slug}
+                      {track.skills.length > 0 && (
+                        <div className="mt-1">
+                          <span className="inline-flex items-center rounded-full border border-sky-500/30 bg-sky-500/10 px-1.5 py-0.5 text-[10px] text-sky-400">
+                            {track.skills.length} skill{track.skills.length !== 1 ? "s" : ""}
+                          </span>
+                        </div>
+                      )}
                     </td>
 
                     {/* Title */}
@@ -221,12 +277,26 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
                       </Link>
                     </td>
 
+                    {/* Created date */}
+                    <td className="px-3 py-2 text-xs text-muted-foreground">
+                      {track.createdAt.toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </td>
+
                     {/* Save */}
                     <td className="px-3 py-2">
-                      <form id={`track-edit-${track.id}`} action={updateTrackAction}>
+                      <PublishGuardForm
+                        id={`track-edit-${track.id}`}
+                        trackTitle={track.title}
+                        currentStatus={track.status}
+                        action={updateTrackAction}
+                      >
                         <input type="hidden" name="trackId" value={track.id} />
                         <SaveRowButton />
-                      </form>
+                      </PublishGuardForm>
                     </td>
 
                     {/* Delete */}

@@ -9,6 +9,7 @@ type ModuleProgressLike = {
   content: unknown;
   lessonsCount: number;
   quizCount: number;
+  simulationCount?: number;
 };
 
 type UserProgressLike = {
@@ -165,10 +166,10 @@ export function parseModuleContent(content: unknown, category: TrackCategory, mo
 }
 
 function stateLabel(state: LearningPathState) {
-  if (state === "completed") return "Completed";
-  if (state === "in_progress") return "In progress";
-  if (state === "available") return "Available";
-  return "Locked";
+  if (state === "completed") return "Завершён";
+  if (state === "in_progress") return "В процессе";
+  if (state === "available") return "Доступен";
+  return "Заблокирован";
 }
 
 function progressionPercent(status: ProgressStatus, score: number | null, isUnlocked: boolean) {
@@ -234,7 +235,10 @@ export function buildTrackProgression(params: {
     const moduleItem = modules[index];
     const progress = progressByModuleId.get(moduleItem.id);
     const parsedContent = parseModuleContent(moduleItem.content, category, moduleItem.title, moduleItem.order);
-    const simulationCount = simulationCountByOrder(moduleItem.order, totalModules);
+    const simulationCount =
+      moduleItem.simulationCount !== undefined
+        ? moduleItem.simulationCount
+        : simulationCountByOrder(moduleItem.order, totalModules);
     const lessonXp = moduleItem.lessonsCount * 20;
     const quizXp = moduleItem.quizCount * 50;
     const simulationXp = simulationCount * 100;
@@ -296,7 +300,7 @@ export function buildTrackProgression(params: {
       progressPercent,
       state,
       stateLabel: stateLabel(state),
-      unlockRequirement: state === "locked" ? `Complete previous quiz or earn ${requiredXp} XP` : null,
+      unlockRequirement: state === "locked" ? `Завершите предыдущий тест или наберите ${requiredXp} XP` : null,
       outcomes: parsedContent.outcomes,
       objectives: parsedContent.objectives,
       skills: parsedContent.skills,
@@ -361,27 +365,34 @@ export function buildTrackSkillRadar(params: {
   ];
 }
 
-export function trackCareerOutcome(category: TrackCategory) {
+export function getTrackCareerOutcome(category: TrackCategory, customCareerOutcome?: string): string {
+  if (customCareerOutcome) return customCareerOutcome;
   if (category === TrackCategory.QA) {
-    return "Career outcome: Junior QA -> QA Engineer -> QA Automation Engineer.";
+    return "Карьерный путь: Junior QA → QA Engineer → QA Automation Engineer.";
   }
   if (category === TrackCategory.BA) {
-    return "Career outcome: Junior BA -> Product Analyst -> Business Analyst.";
+    return "Карьерный путь: Junior BA → Product Analyst → Business Analyst.";
   }
-  return "Career outcome: Junior Data Analyst -> Product Analyst -> Senior Data Analyst.";
+  return "Карьерный путь: Junior Data Analyst → Product Analyst → Senior Data Analyst.";
+}
+
+/** @deprecated Use getTrackCareerOutcome() instead */
+export function trackCareerOutcome(category: TrackCategory): string {
+  return getTrackCareerOutcome(category);
 }
 
 export function trackNextSuggestion(category: TrackCategory) {
   if (category === TrackCategory.QA) {
-    return "Next suggested track: Business Analyst";
+    return "Следующий рекомендуемый трек: Business Analyst";
   }
   if (category === TrackCategory.BA) {
-    return "Next suggested track: Data Analyst";
+    return "Следующий рекомендуемый трек: Data Analyst";
   }
-  return "Next suggested track: QA Engineer";
+  return "Следующий рекомендуемый трек: QA Engineer";
 }
 
-export function trackWhatYouLearn(category: TrackCategory) {
+export function getTrackLearningOutcomes(category: TrackCategory, customOutcomes?: string[]): string[] {
+  if (customOutcomes && customOutcomes.length > 0) return customOutcomes;
   if (category === TrackCategory.QA) {
     return [
       "Test strategy and test case design",
@@ -401,4 +412,9 @@ export function trackWhatYouLearn(category: TrackCategory) {
     "Product analytics and experimentation basics",
     "Dashboard storytelling for business decisions",
   ];
+}
+
+/** @deprecated Use getTrackLearningOutcomes() instead */
+export function trackWhatYouLearn(category: TrackCategory): string[] {
+  return getTrackLearningOutcomes(category);
 }

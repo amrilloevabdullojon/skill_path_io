@@ -18,25 +18,53 @@ const TRACK_BADGE: Record<string, string> = {
   DA: "border-violet-500/30 bg-violet-500/10 text-violet-400",
 };
 
-export default async function AdminQuizzesPage() {
+type AdminQuizzesPageProps = {
+  searchParams?: {
+    q?: string | string[];
+    moduleId?: string | string[];
+  };
+};
+
+function paramValue(value: string | string[] | undefined) {
+  if (Array.isArray(value)) return value[0] ?? "";
+  return value ?? "";
+}
+
+export default async function AdminQuizzesPage({ searchParams }: AdminQuizzesPageProps) {
   await requireAdminPermission("courses.read");
 
-  const quizzes = await prisma.quiz.findMany({
-    orderBy: [{ module: { track: { title: "asc" } } }, { module: { order: "asc" } }],
-    select: {
-      id: true,
-      title: true,
-      passingScore: true,
-      module: {
-        select: {
-          id: true,
-          title: true,
-          track: { select: { title: true, category: true } },
-        },
+  const query = paramValue(searchParams?.q);
+  const moduleIdFilter = paramValue(searchParams?.moduleId);
+
+  const [modules, quizzes] = await prisma.$transaction([
+    prisma.module.findMany({
+      where: { quiz: { isNot: null } },
+      orderBy: { title: "asc" },
+      select: { id: true, title: true },
+    }),
+    prisma.quiz.findMany({
+      where: {
+        ...(query
+          ? { title: { contains: query, mode: "insensitive" } }
+          : {}),
+        ...(moduleIdFilter ? { moduleId: moduleIdFilter } : {}),
       },
-      _count: { select: { questions: true } },
-    },
-  });
+      orderBy: [{ module: { track: { title: "asc" } } }, { module: { order: "asc" } }],
+      select: {
+        id: true,
+        title: true,
+        passingScore: true,
+        module: {
+          select: {
+            id: true,
+            title: true,
+            track: { select: { title: true, category: true } },
+          },
+        },
+        _count: { select: { questions: true } },
+      },
+    }),
+  ]);
 
   return (
     <section className="page-shell">
@@ -48,15 +76,52 @@ export default async function AdminQuizzesPage() {
         actionHref="/admin/quizzes/new"
       />
 
+      {/* ── Filter ────────────────────────────────────────────────── */}
+      <section className="surface-elevated p-5">
+        <form className="grid gap-3 md:grid-cols-[1fr_260px_auto]">
+          <input
+            type="text"
+            name="q"
+            defaultValue={query}
+            placeholder="Search quizzes…"
+            className="input-base"
+          />
+          <select name="moduleId" defaultValue={moduleIdFilter} className="select-base">
+            <option value="">All modules</option>
+            {modules.map((mod) => (
+              <option key={mod.id} value={mod.id}>
+                {mod.title}
+              </option>
+            ))}
+          </select>
+          <div className="flex gap-2">
+            <button type="submit" className="btn-secondary">
+              Apply
+            </button>
+            {(query || moduleIdFilter) && (
+              <a href="/admin/quizzes" className="btn-secondary text-muted-foreground">
+                Reset
+              </a>
+            )}
+          </div>
+        </form>
+      </section>
+
+      {/* ── Table ─────────────────────────────────────────────────── */}
       <section className="surface-elevated space-y-3 p-5">
         <p className="text-xs text-muted-foreground">
           {quizzes.length} quiz{quizzes.length !== 1 ? "zes" : ""}
+          {query && ` matching "${query}"`}
         </p>
 
         {quizzes.length === 0 ? (
           <EmptyState
             title="No quizzes found"
-            description="No quizzes have been created yet."
+            description={
+              query || moduleIdFilter
+                ? "No quizzes match your filters."
+                : "No quizzes have been created yet."
+            }
             actionLabel="New quiz"
             actionHref="/admin/quizzes/new"
             size="sm"
