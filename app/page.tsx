@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -20,10 +21,8 @@ import { LandingHeader } from "@/components/landing/landing-header";
 import { LandingHeroPreview } from "@/components/landing/landing-hero-preview";
 import { LandingSkillRadarDemo } from "@/components/landing/landing-skill-radar-demo";
 import { SectionReveal } from "@/components/landing/section-reveal";
+import { TracksSection, MissionsSection } from "@/components/landing/catalog-section";
 import type { Metadata } from "next";
-
-import { resolveRuntimeCatalog } from "@/lib/learning/runtime-content";
-import { mapRuntimeCatalogToMissions } from "@/lib/missions/runtime-missions";
 
 export const revalidate = 3600;
 
@@ -91,95 +90,6 @@ const howItWorks = [
   },
 ];
 
-const fallbackTracks = [
-  {
-    href: "/tracks/business-analyst",
-    slug: "business-analyst",
-    category: "BA",
-    title: "Business Analyst",
-    accent: "border-orange-400/30 bg-orange-500/10",
-    iconColor: "text-orange-300",
-    dot: "bg-orange-400",
-    duration: "10 weeks",
-    modules: 18,
-    missions: 14,
-    skills: ["User Stories", "Stakeholders", "Requirements"],
-    description: "Build strong discovery and requirement skills for product teams.",
-  },
-  {
-    href: "/tracks/data-analyst",
-    slug: "data-analyst",
-    category: "DA",
-    title: "Data Analyst",
-    accent: "border-violet-400/30 bg-violet-500/10",
-    iconColor: "text-violet-300",
-    dot: "bg-violet-400",
-    duration: "12 weeks",
-    modules: 20,
-    missions: 16,
-    skills: ["SQL", "Dashboards", "Metrics"],
-    description: "Learn analytics fundamentals, BI thinking, and data storytelling.",
-  },
-  {
-    href: "/tracks/qa-engineer",
-    slug: "qa-engineer",
-    category: "QA",
-    title: "QA Engineer",
-    accent: "border-emerald-400/30 bg-emerald-500/10",
-    iconColor: "text-emerald-300",
-    dot: "bg-emerald-400",
-    duration: "10 weeks",
-    modules: 17,
-    missions: 15,
-    skills: ["Testing", "API", "Bug Reports"],
-    description: "Master functional testing, API validation, and quality workflows.",
-  },
-  {
-    href: "/tracks",
-    slug: "product-manager",
-    category: "PRODUCT",
-    title: "Product Manager",
-    accent: "border-sky-400/30 bg-sky-500/10",
-    iconColor: "text-sky-300",
-    dot: "bg-sky-400",
-    duration: "8 weeks",
-    modules: 14,
-    missions: 12,
-    skills: ["Prioritization", "Discovery", "Execution"],
-    description: "Understand product strategy and execution with practical exercises.",
-  },
-];
-
-const fallbackMissions = [
-  {
-    title: "API Bug Investigation",
-    scenario: "Release candidate returns inconsistent status codes under edge conditions.",
-    xp: 140,
-    status: "In progress",
-    category: "QA",
-    accent: "border-emerald-400/25 bg-emerald-500/8",
-    dot: "bg-emerald-400",
-  },
-  {
-    title: "Stakeholder Request to User Story",
-    scenario: "Convert a vague request into clear acceptance criteria and testable scope.",
-    xp: 120,
-    status: "Available",
-    category: "BA",
-    accent: "border-orange-400/25 bg-orange-500/8",
-    dot: "bg-orange-400",
-  },
-  {
-    title: "Retention Dataset Deep Dive",
-    scenario: "Analyze churn signals and propose 3 high-impact product actions.",
-    xp: 180,
-    status: "Locked",
-    category: "DA",
-    accent: "border-violet-400/25 bg-violet-500/8",
-    dot: "bg-violet-400",
-  },
-];
-
 const roadmapStages = [
   { title: "Beginner", description: "Set target role and baseline skills.", unlock: "Personal onboarding profile" },
   { title: "Foundations", description: "Build core concepts across track modules.", unlock: "First core badge" },
@@ -224,90 +134,76 @@ const pricingPlans = [
   },
 ];
 
-function accentByCategory(category: string) {
-  if (category === "QA") return "border-emerald-400/30 bg-emerald-500/10";
-  if (category === "BA") return "border-orange-400/30 bg-orange-500/10";
-  if (category === "DA") return "border-violet-400/30 bg-violet-500/10";
-  return "border-sky-400/30 bg-sky-500/10";
+// ─── Skeletons ────────────────────────────────────────────────────────────────
+function TracksSkeleton() {
+  return (
+    <section id="tracks" className="space-y-8">
+      <div className="flex items-end justify-between gap-4">
+        <div className="space-y-2">
+          <div className="h-3.5 w-24 animate-pulse rounded bg-muted" />
+          <div className="h-7 w-64 animate-pulse rounded bg-muted" />
+        </div>
+      </div>
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex animate-pulse flex-col gap-4 rounded-2xl border border-border/50 p-5"
+          >
+            <div className="space-y-1.5">
+              <div className="h-3 w-12 rounded bg-muted" />
+              <div className="h-5 w-36 rounded bg-muted" />
+            </div>
+            <div className="h-10 rounded bg-muted" />
+            <div className="grid grid-cols-3 gap-2">
+              {[0, 1, 2].map((j) => (
+                <div key={j} className="h-14 rounded bg-muted" />
+              ))}
+            </div>
+            <div className="flex gap-1.5">
+              <div className="h-5 w-16 rounded bg-muted" />
+              <div className="h-5 w-14 rounded bg-muted" />
+              <div className="h-5 w-12 rounded bg-muted" />
+            </div>
+            <div className="h-9 rounded bg-muted" />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
-function dotByCategory(category: string) {
-  if (category === "QA") return "bg-emerald-400";
-  if (category === "BA") return "bg-orange-400";
-  if (category === "DA") return "bg-violet-400";
-  return "bg-sky-400";
+function MissionsSkeleton() {
+  return (
+    <section id="missions" className="space-y-8">
+      <div className="space-y-2">
+        <div className="h-3.5 w-32 animate-pulse rounded bg-muted" />
+        <div className="h-7 w-80 animate-pulse rounded bg-muted" />
+      </div>
+      <div className="grid gap-5 md:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex animate-pulse flex-col gap-4 rounded-2xl border border-border/50 p-5"
+          >
+            <div className="space-y-2">
+              <div className="h-3 w-8 rounded bg-muted" />
+              <div className="h-5 w-48 rounded bg-muted" />
+              <div className="h-8 rounded bg-muted" />
+            </div>
+            <div className="flex justify-between">
+              <div className="h-6 w-20 rounded bg-muted" />
+              <div className="h-6 w-24 rounded bg-muted" />
+            </div>
+            <div className="h-9 rounded bg-muted" />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
-function iconColorByCategory(category: string) {
-  if (category === "QA") return "text-emerald-300";
-  if (category === "BA") return "text-orange-300";
-  if (category === "DA") return "text-violet-300";
-  return "text-sky-300";
-}
-
-function skillHintsByCategory(category: string) {
-  if (category === "QA") return ["Testing", "API", "Bug Reports"];
-  if (category === "BA") return ["User Stories", "Stakeholders", "Requirements"];
-  if (category === "DA") return ["SQL", "Dashboards", "Metrics"];
-  return ["Product Sense", "Prioritization", "Communication"];
-}
-
-function normalizeMissionStatus(status: string) {
-  if (status === "in_progress") return "In progress";
-  if (status === "locked") return "Locked";
-  return "Available";
-}
-
-function missionAccentByCategory(category: string) {
-  if (category === "QA") return "border-emerald-400/25 bg-emerald-500/8";
-  if (category === "BA") return "border-orange-400/25 bg-orange-500/8";
-  if (category === "DA") return "border-violet-400/25 bg-violet-500/8";
-  return "border-sky-400/25 bg-sky-500/8";
-}
-
-function missionStatusColor(status: string) {
-  if (status === "In progress" || status === "in_progress")
-    return "border-sky-400/30 bg-sky-500/10 text-sky-300";
-  if (status === "locked")
-    return "border-border/60 bg-card/50 text-muted-foreground";
-  return "border-emerald-400/30 bg-emerald-500/10 text-emerald-300";
-}
-
-export default async function HomePage() {
-  const catalog = await resolveRuntimeCatalog({ includeCourseEntities: true });
-
-  const dynamicTracks = catalog.courses
-    .filter((course) => course.category === "QA" || course.category === "BA" || course.category === "DA" || course.category === "PRODUCT")
-    .slice(0, 4)
-    .map((course) => ({
-      href: `/tracks/${course.slug}`,
-      slug: course.slug,
-      category: course.category,
-      title: course.title,
-      accent: accentByCategory(course.category),
-      iconColor: iconColorByCategory(course.category),
-      dot: dotByCategory(course.category),
-      duration: `${Math.max(4, Math.round(course.estimatedDuration / 300))} weeks`,
-      modules: course.modules.length,
-      missions: course.modules.reduce((sum, moduleItem) => sum + moduleItem.missions.length, 0) || course.modules.length,
-      skills: course.tags.slice(0, 3).length > 0 ? course.tags.slice(0, 3) : skillHintsByCategory(course.category),
-      description: course.shortDescription || course.description,
-    }));
-
-  const tracks = dynamicTracks.length > 0 ? dynamicTracks : fallbackTracks;
-
-  const dynamicMissionCards = mapRuntimeCatalogToMissions(catalog).slice(0, 3).map((mission) => ({
-    title: mission.title,
-    scenario: mission.scenario,
-    xp: mission.xpReward,
-    status: normalizeMissionStatus(mission.status),
-    category: "QA",
-    accent: missionAccentByCategory("QA"),
-    dot: "bg-sky-400",
-  }));
-
-  const missions = dynamicMissionCards.length > 0 ? dynamicMissionCards : fallbackMissions;
-
+export default function HomePage() {
   return (
     <div className="relative min-h-screen overflow-x-clip">
       <LandingAmbientBackground />

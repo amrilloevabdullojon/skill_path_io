@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { NextResponse } from "next/server";
 
-import { AppError, Errors, withErrorHandler, apiOk, apiError as _apiError } from "../error-handler";
+import { AppError, Errors, withErrorHandler, apiOk } from "../error-handler";
 
 describe("AppError", () => {
   it("creates error with correct properties", () => {

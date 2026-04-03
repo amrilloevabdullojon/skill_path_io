@@ -114,7 +114,14 @@
       "Bash(/opt/homebrew/bin/node node_modules/.bin/next lint --max-warnings 0)",
       "Bash(/opt/homebrew/bin/node node_modules/.bin/next lint)",
       "Bash(/Users/panda/.nvm/versions/node/v22.13.1/bin/npm run:*)",
-      "Bash(/opt/homebrew/bin/npm run:*)"
+      "Bash(/opt/homebrew/bin/npm run:*)",
+      "Bash(ls /usr/local/bin/node*)",
+      "Bash(/opt/homebrew/Cellar/node@20/20.20.2/bin/node /opt/homebrew/lib/node_modules/npm/bin/npm-cli.js run lint)",
+      "Bash(/opt/homebrew/Cellar/node@20/20.20.2/bin/node /Users/panda/Documents/GitHub/skill_path_io/node_modules/.bin/next lint)",
+      "Bash(/opt/homebrew/Cellar/node@20/20.20.2/bin/node node_modules/typescript/bin/tsc --noEmit)",
+      "Bash(/opt/homebrew/Cellar/node@20/20.20.2/bin/node node_modules/.bin/vitest run)",
+      "Bash(/opt/homebrew/Cellar/node@20/20.20.2/bin/node node_modules/.bin/npm install next-themes)",
+      "Bash(/opt/homebrew/Cellar/node@20/20.20.2/bin/node /opt/homebrew/lib/node_modules/npm/bin/npm-cli.js install next-themes)"
     ]
   }
 }
