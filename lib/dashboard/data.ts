@@ -23,6 +23,9 @@ import {
   buildSkillTreePreview,
   overallSkillLevelFromRadar,
 } from "@/lib/dashboard/skills-data";
+import { getServerEnv } from "@/lib/config/env";
+import { MAX_LEADERBOARD_USERS } from "@/lib/config/limits";
+import { isDemoModeEnabled } from "@/lib/config/runtime-mode";
 import { resolveRuntimeCatalog } from "@/lib/learning/content-resolver";
 import { buildJobMatches } from "@/lib/matching/jobs";
 import { getOnboardingProfileFromCookie } from "@/lib/personalization/profile-storage";
@@ -339,13 +342,16 @@ function formatDateKey(date: Date) {
 }
 
 async function resolveDashboardUser(preferredEmail?: string | null) {
-  const candidates = [preferredEmail, process.env.DEMO_USER_EMAIL, "student@skillpath.local", "admin@skillpath.local"];
+  // Build candidate list from authenticated session email first, then the
+  // configured demo email (only when demo mode is explicitly enabled).
+  // Hardcoded fallback addresses are intentionally removed: in production a
+  // missing session must return null rather than serve another user's data.
+  const demoEmail = isDemoModeEnabled() ? getServerEnv().demoUserEmail : null;
+  const candidates = [preferredEmail, demoEmail].filter(
+    (e): e is string => typeof e === "string" && e.length > 0,
+  );
 
   for (const email of candidates) {
-    if (!email) {
-      continue;
-    }
-
     const user = await prisma.user.findUnique({
       where: { email },
       include: userInclude,
@@ -356,10 +362,17 @@ async function resolveDashboardUser(preferredEmail?: string | null) {
     }
   }
 
-  return prisma.user.findFirst({
-    orderBy: { createdAt: "asc" },
-    include: userInclude,
-  });
+  // Last resort: first registered user — only safe in single-tenant demo mode.
+  // In production this path is unreachable because preferredEmail is always
+  // populated from the authenticated session.
+  if (isDemoModeEnabled()) {
+    return prisma.user.findFirst({
+      orderBy: { createdAt: "asc" },
+      include: userInclude,
+    });
+  }
+
+  return null;
 }
 
 type TrackSummary = {
@@ -475,6 +488,10 @@ export async function getDashboardData(params: {
     resolveDashboardUser(preferredEmail),
     resolveRuntimeCatalog({ includeCourseEntities: true }),
     prisma.user.findMany({
+      // Cap leaderboard to avoid full-table scans as the user base grows.
+      // Top-N ranking is sufficient for motivational display purposes.
+      take: MAX_LEADERBOARD_USERS,
+      orderBy: { certificates: { _count: "desc" } },
       select: {
         id: true,
         name: true,

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { PermissionRoleType, UserRole } from "@prisma/client";
 
 import { authOptions } from "@/lib/auth";
+import { AppError } from "@/lib/api/error-handler";
 import { hasAdminPermission, resolveAdminRole } from "@/lib/permissions/admin-permissions";
 import { prisma } from "@/lib/prisma";
 import { AdminPermission, AdminRole } from "@/types/admin/permissions";
@@ -81,7 +82,8 @@ export async function requireAdminAction() {
   const admin = await getAdminContext();
 
   if (!admin) {
-    throw new Error("FORBIDDEN");
+    // Use structured AppError so error.tsx receives a meaningful message.
+    throw new AppError("FORBIDDEN", "Access denied — admin session required", 403);
   }
 
   return admin;
@@ -90,7 +92,7 @@ export async function requireAdminAction() {
 export async function requireAdminPermission(permission: AdminPermission) {
   const admin = await requireAdminAction();
   if (!hasAdminPermission(admin.adminRole, permission)) {
-    throw new Error("FORBIDDEN_PERMISSION");
+    throw new AppError("FORBIDDEN", `Insufficient permissions: ${permission}`, 403);
   }
   return admin;
 }

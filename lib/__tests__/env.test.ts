@@ -89,6 +89,8 @@ describe("validateEnv", () => {
 
   it("accepts ENABLE_DEMO_MODE as 'true'", () => {
     process.env.ENABLE_DEMO_MODE = "true";
+    process.env.DEMO_USER_EMAIL = "demo@example.com";
+    process.env.DEMO_USER_PASSWORD = "demo-password";
     expect(() => validateEnv()).not.toThrow();
   });
 

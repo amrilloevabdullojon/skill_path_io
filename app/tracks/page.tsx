@@ -42,7 +42,7 @@ export default async function TracksPage() {
     .map(toRuntimeTrackCardData);
 
   // Build progress map for the signed-in user (skip for guests)
-  let progressByModuleId: Record<string, boolean> = {};
+  const progressByModuleId: Record<string, boolean> = {};
 
   const session = await getServerSession(authOptions);
   if (session?.user?.email) {

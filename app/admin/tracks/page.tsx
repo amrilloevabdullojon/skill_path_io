@@ -9,7 +9,7 @@ import { PublishGuardForm } from "@/components/admin/tracks/publish-guard-form";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
-import { prisma } from "@/lib/prisma";
+import { getTrackListData } from "@/lib/admin/tracks/queries";
 
 export const metadata: Metadata = {
   title: "Tracks — Admin",
@@ -48,44 +48,10 @@ export default async function TracksAdminPage({ searchParams }: TracksAdminPageP
   const categoryParam = paramValue(searchParams?.category);
   const statusParam = paramValue(searchParams?.status);
 
-  const VALID_CATEGORIES = ["QA", "BA", "DA"] as const;
-  const VALID_STATUSES = ["DRAFT", "PUBLISHED", "ARCHIVED"] as const;
-
-  const categoryFilter = (VALID_CATEGORIES as readonly string[]).includes(categoryParam)
-    ? (categoryParam as TrackCategory)
-    : "ALL";
-
-  const statusFilter = (VALID_STATUSES as readonly string[]).includes(statusParam)
-    ? (statusParam as TrackStatus)
-    : "ALL";
-
-  const tracks = await prisma.track.findMany({
-    where: {
-      ...(query
-        ? {
-            OR: [
-              { title: { contains: query, mode: "insensitive" } },
-              { slug: { contains: query, mode: "insensitive" } },
-              { description: { contains: query, mode: "insensitive" } },
-            ],
-          }
-        : {}),
-      ...(categoryFilter !== "ALL" ? { category: categoryFilter } : {}),
-      ...(statusFilter !== "ALL" ? { status: statusFilter as TrackStatus } : {}),
-    },
-    orderBy: { title: "asc" },
-    select: {
-      id: true,
-      slug: true,
-      title: true,
-      description: true,
-      color: true,
-      category: true,
-      status: true,
-      createdAt: true,
-      skills: true,
-      _count: { select: { modules: true, certificates: true } },
-    },
+  const { tracks, categoryFilter, statusFilter } = await getTrackListData({
+    query,
+    category: categoryParam,
+    status: statusParam,
   });
 
   return (

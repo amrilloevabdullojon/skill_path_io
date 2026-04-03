@@ -50,12 +50,13 @@ export function getClientIp(request: Request): string {
  * Named callAnthropic for backward compatibility with existing callers.
  */
 export async function callAnthropic(opts: AiCallOptions): Promise<AiResult> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  const { geminiApiKey, geminiModel } = getServerEnv();
+  if (!geminiApiKey) {
     return { ok: false, status: 500, error: "AI service is not configured" };
   }
 
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const apiKey = geminiApiKey;
+  const model = geminiModel;
   const maxTokens = opts.maxTokens ?? 2048;
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 

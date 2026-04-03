@@ -12,9 +12,9 @@ export function buildAdaptiveSuggestions(signal: AdaptiveSignal): AdaptiveSugges
   if (signal.quizAccuracy < 75) {
     suggestions.push({
       id: "adaptive-remedial-quiz",
-      title: "Reinforce weak quiz topics",
-      reason: `Quiz accuracy is ${signal.quizAccuracy}%.`,
-      action: "Review key lesson blocks and retake the weakest quiz module.",
+      title: "Укрепить слабые темы теста",
+      reason: `Точность в тестах: ${signal.quizAccuracy}%.`,
+      action: "Повторите ключевые блоки урока и пересдайте слабый тест.",
       priority: priority(signal.quizAccuracy),
       href: "/review",
       type: "remedial",
@@ -24,9 +24,9 @@ export function buildAdaptiveSuggestions(signal: AdaptiveSignal): AdaptiveSugges
   if (signal.simulationPerformance < 70) {
     suggestions.push({
       id: "adaptive-practice-sim",
-      title: "Practice real-work simulation",
-      reason: `Simulation performance is ${signal.simulationPerformance}%.`,
-      action: "Complete one focused simulation with AI feedback.",
+      title: "Отработать реальную симуляцию",
+      reason: `Результат симуляции: ${signal.simulationPerformance}%.`,
+      action: "Пройдите одну сфокусированную симуляцию с обратной связью от ИИ.",
       priority: priority(signal.simulationPerformance),
       href: "/missions",
       type: "practice",
@@ -36,9 +36,9 @@ export function buildAdaptiveSuggestions(signal: AdaptiveSignal): AdaptiveSugges
   if (signal.skippedLessons >= 2) {
     suggestions.push({
       id: "adaptive-review-skipped",
-      title: "Recover skipped lessons",
-      reason: `${signal.skippedLessons} lessons were skipped recently.`,
-      action: "Use speed review cards and complete a short recap quiz.",
+      title: "Наверстать пропущенные уроки",
+      reason: `${signal.skippedLessons} уроков было пропущено недавно.`,
+      action: "Используйте карточки быстрого повторения и пройдите короткий обзорный тест.",
       priority: "High",
       href: "/review",
       type: "review",
@@ -48,9 +48,9 @@ export function buildAdaptiveSuggestions(signal: AdaptiveSignal): AdaptiveSugges
   if (signal.quizAccuracy >= 82 && signal.simulationPerformance >= 78) {
     suggestions.push({
       id: "adaptive-accelerate",
-      title: "Acceleration path unlocked",
-      reason: "Strong outcomes in quizzes and simulations.",
-      action: "Skip optional recap and move to challenge mission.",
+      title: "Путь ускорения разблокирован",
+      reason: "Отличные результаты в тестах и симуляциях.",
+      action: "Пропустите необязательное повторение и переходите к испытанию.",
       priority: "Low",
       href: "/missions",
       type: "acceleration",
@@ -60,9 +60,9 @@ export function buildAdaptiveSuggestions(signal: AdaptiveSignal): AdaptiveSugges
   if (suggestions.length === 0) {
     suggestions.push({
       id: "adaptive-keep-pace",
-      title: "Maintain learning velocity",
-      reason: "Performance is stable across modules.",
-      action: "Continue next module and keep weekly review habit.",
+      title: "Поддерживать темп обучения",
+      reason: "Результаты стабильны по всем модулям.",
+      action: "Продолжайте следующий модуль и сохраняйте привычку еженедельного повторения.",
       priority: "Medium",
       href: "/planner",
       type: "practice",
@@ -75,9 +75,9 @@ export function buildAdaptiveSuggestions(signal: AdaptiveSignal): AdaptiveSugges
 export function buildRecoveryPlan(signal: AdaptiveSignal) {
   const focus = signal.frequentMistakes.slice(0, 3);
   return [
-    `Review lesson on: ${focus[0] ?? "core concept"}`,
-    "Redo the related quiz and target 80%+",
-    "Complete one practical mission in the same topic",
-    "Open AI mentor and request simplified explanation",
+    `Повторить урок по теме: ${focus[0] ?? "ключевая концепция"}`,
+    "Пересдать связанный тест, целевой балл — 80%+",
+    "Пройти одно практическое задание по той же теме",
+    "Открыть ИИ-ментора и попросить упрощённое объяснение",
   ];
 }

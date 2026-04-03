@@ -6,7 +6,7 @@ import { createQuizAction } from "@/app/admin/actions";
 import { SubmitModuleButton } from "@/components/admin/modules/submit-module-button";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
-import { prisma } from "@/lib/prisma";
+import { getModulesWithoutQuiz } from "@/lib/admin/quizzes/queries";
 
 export const metadata: Metadata = {
   title: "New Quiz — Admin",
@@ -17,15 +17,7 @@ export default async function NewQuizPage() {
   await requireAdminPermission("courses.write");
 
   // Only modules without an existing quiz
-  const modules = await prisma.module.findMany({
-    where: { quiz: null },
-    orderBy: [{ track: { title: "asc" } }, { order: "asc" }],
-    select: {
-      id: true,
-      title: true,
-      track: { select: { title: true } },
-    },
-  });
+  const modules = await getModulesWithoutQuiz();
 
   async function handleCreate(formData: FormData) {
     "use server";

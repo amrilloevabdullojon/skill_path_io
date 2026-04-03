@@ -1,11 +1,13 @@
 "use client";
 
+import type { ActionResult } from "@/lib/admin/action-result";
+
 interface PublishGuardFormProps {
   id: string;
   children: React.ReactNode;
   trackTitle: string;
   currentStatus: string;
-  action: (fd: FormData) => Promise<void>;
+  action: (fd: FormData) => Promise<ActionResult>;
 }
 
 export function PublishGuardForm({

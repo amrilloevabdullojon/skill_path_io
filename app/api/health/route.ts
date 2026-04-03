@@ -18,7 +18,6 @@ interface HealthResponse {
 }
 
 export async function GET(): Promise<NextResponse<HealthResponse>> {
-  const start = Date.now();
   let dbStatus: HealthStatus = "ok";
   let dbLatencyMs: number | undefined;
   let dbError: string | undefined;
@@ -29,7 +28,10 @@ export async function GET(): Promise<NextResponse<HealthResponse>> {
     dbLatencyMs = Date.now() - dbStart;
   } catch (err) {
     dbStatus = "error";
-    dbError = err instanceof Error ? err.message : "Unknown database error";
+    // Do not expose the raw error message — it may contain connection strings,
+    // schema names, or Postgres version details useful to an attacker.
+    dbError = "Database check failed";
+    void err; // suppress unused-variable lint warning
   }
 
   const overallStatus: HealthStatus = dbStatus === "error" ? "error" : "ok";

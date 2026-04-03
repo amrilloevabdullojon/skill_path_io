@@ -5,7 +5,7 @@ import { DeleteQuizButton } from "@/components/admin/quizzes/delete-quiz-button"
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
-import { prisma } from "@/lib/prisma";
+import { getQuizListData } from "@/lib/admin/quizzes/queries";
 
 export const metadata: Metadata = {
   title: "Quizzes — Admin",
@@ -36,35 +36,7 @@ export default async function AdminQuizzesPage({ searchParams }: AdminQuizzesPag
   const query = paramValue(searchParams?.q);
   const moduleIdFilter = paramValue(searchParams?.moduleId);
 
-  const [modules, quizzes] = await prisma.$transaction([
-    prisma.module.findMany({
-      where: { quiz: { isNot: null } },
-      orderBy: { title: "asc" },
-      select: { id: true, title: true },
-    }),
-    prisma.quiz.findMany({
-      where: {
-        ...(query
-          ? { title: { contains: query, mode: "insensitive" } }
-          : {}),
-        ...(moduleIdFilter ? { moduleId: moduleIdFilter } : {}),
-      },
-      orderBy: [{ module: { track: { title: "asc" } } }, { module: { order: "asc" } }],
-      select: {
-        id: true,
-        title: true,
-        passingScore: true,
-        module: {
-          select: {
-            id: true,
-            title: true,
-            track: { select: { title: true, category: true } },
-          },
-        },
-        _count: { select: { questions: true } },
-      },
-    }),
-  ]);
+  const [modules, quizzes] = await getQuizListData({ query, moduleId: moduleIdFilter });
 
   return (
     <section className="page-shell">

@@ -31,7 +31,7 @@ export function AskAiHintButton({ question }: AskAiHintButtonProps) {
       className="btn-secondary inline-flex items-center gap-2"
     >
       {justSent ? <Sparkles className="h-4 w-4 text-sky-300" /> : <Bot className="h-4 w-4 text-sky-300" />}
-      {justSent ? "AI mentor opened" : "Ask AI about this topic"}
+      {justSent ? "ИИ открыт" : "Спросить ИИ-ментора"}
     </button>
   );
 }

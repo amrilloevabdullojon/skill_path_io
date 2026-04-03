@@ -1,0 +1,25 @@
+# Build artifacts
+.next
+out
+
+# Dependencies (re-installed inside Docker)
+node_modules
+
+# Local env files — NEVER bake secrets into the image
+.env
+.env.local
+.env.*.local
+
+# Development / CI artifacts
+coverage
+*.log
+.DS_Store
+
+# Editor
+.vscode
+.idea
+*.swp
+
+# Git
+.git
+.gitignore

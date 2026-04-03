@@ -1,14 +1,17 @@
 import "server-only";
 
-import { prisma } from "@/lib/prisma";
-import { tracksSeed } from "@/lib/data/tracks";
+import { unstable_cache } from "next/cache";
+
+import { CACHE_TTL_CATALOG_S } from "@/lib/config/limits";
 import { isDemoModeEnabled } from "@/lib/config/runtime-mode";
+import { tracksSeed } from "@/lib/data/tracks";
 import {
   adaptPrismaCourseToRuntimeCourse,
   adaptPrismaTrackToRuntimeCourse,
   adaptSeedTrackToRuntimeCourse,
 } from "@/lib/learning/content-adapters";
 import { RuntimeCatalog, RuntimeCourse } from "@/lib/learning/content-types";
+import { prisma } from "@/lib/prisma";
 
 type ResolverOptions = {
   includeDraftCourses?: boolean;
@@ -61,10 +64,14 @@ function fallbackSeedCatalog(): RuntimeCatalog {
   };
 }
 
-export async function resolveRuntimeCatalog(options: ResolverOptions = {}): Promise<RuntimeCatalog> {
-  const includeDraftCourses = Boolean(options.includeDraftCourses);
-  const includeCourseEntities = Boolean(options.includeCourseEntities);
-
+/**
+ * Fetch the full catalog from the DB.
+ * Split out so it can be wrapped by unstable_cache independently per variant.
+ */
+async function fetchCatalog(
+  includeDraftCourses: boolean,
+  includeCourseEntities: boolean,
+): Promise<RuntimeCatalog> {
   try {
     const [tracks, courses] = await Promise.all([
       prisma.track.findMany({
@@ -88,10 +95,7 @@ export async function resolveRuntimeCatalog(options: ResolverOptions = {}): Prom
       if (isDemoModeEnabled()) {
         return fallbackSeedCatalog();
       }
-      return {
-        source: "prisma-track",
-        courses: [],
-      };
+      return { source: "prisma-track", courses: [] };
     }
 
     return {
@@ -102,11 +106,32 @@ export async function resolveRuntimeCatalog(options: ResolverOptions = {}): Prom
     if (isDemoModeEnabled()) {
       return fallbackSeedCatalog();
     }
-    return {
-      source: "prisma-track",
-      courses: [],
-    };
+    return { source: "prisma-track", courses: [] };
   }
+}
+
+/**
+ * Cached variants keyed by the two boolean flags that affect the query.
+ *
+ * unstable_cache deduplicates identical calls within the same request AND
+ * across requests within the revalidate window (CACHE_TTL_CATALOG_S seconds).
+ *
+ * Cache invalidation:
+ *   - Automatic: TTL expires (CACHE_TTL_CATALOG_S seconds).
+ *   - Manual:    call `revalidateTag("catalog")` from server actions that
+ *                mutate tracks, modules, or courses.
+ */
+const getCatalog = unstable_cache(
+  fetchCatalog,
+  ["runtime-catalog"],
+  { revalidate: CACHE_TTL_CATALOG_S, tags: ["catalog"] },
+);
+
+export async function resolveRuntimeCatalog(options: ResolverOptions = {}): Promise<RuntimeCatalog> {
+  const includeDraftCourses = Boolean(options.includeDraftCourses);
+  const includeCourseEntities = Boolean(options.includeCourseEntities);
+
+  return getCatalog(includeDraftCourses, includeCourseEntities);
 }
 
 export async function resolveRuntimeCourseBySlug(

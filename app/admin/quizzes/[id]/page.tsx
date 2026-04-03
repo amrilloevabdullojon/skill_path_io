@@ -10,7 +10,7 @@ import { QuestionForm } from "@/components/admin/quizzes/question-form";
 import { SaveRowButton } from "@/components/admin/save-row-button";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
-import { prisma } from "@/lib/prisma";
+import { getQuizDetail } from "@/lib/admin/quizzes/queries";
 
 export const metadata: Metadata = {
   title: "Edit Quiz — Admin",
@@ -25,19 +25,7 @@ const TYPE_BADGE: Record<QuestionType, string> = {
 export default async function EditQuizPage({ params }: { params: { id: string } }) {
   await requireAdminPermission("courses.write");
 
-  const quiz = await prisma.quiz.findUnique({
-    where: { id: params.id },
-    include: {
-      module: {
-        select: {
-          id: true,
-          title: true,
-          track: { select: { title: true } },
-        },
-      },
-      questions: { orderBy: { id: "asc" } },
-    },
-  });
+  const quiz = await getQuizDetail(params.id);
 
   if (!quiz) notFound();
 

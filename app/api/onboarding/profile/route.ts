@@ -34,7 +34,10 @@ export const POST = withErrorHandler(async (request: Request) => {
 
   const response = NextResponse.json({ ok: true, profile });
   response.cookies.set(ONBOARDING_COOKIE_KEY, JSON.stringify(profile), {
-    httpOnly: false,
+    // httpOnly: true prevents client-side JS from reading this cookie,
+    // mitigating XSS-based session data theft. The profile is read via the
+    // GET /api/onboarding/profile endpoint, not directly from the cookie.
+    httpOnly: true,
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 30,
     path: "/",

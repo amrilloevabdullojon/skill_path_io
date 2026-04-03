@@ -8,7 +8,7 @@ import { SubmitModuleButton } from "@/components/admin/modules/submit-module-but
 import { DeleteLessonButton } from "@/components/admin/lessons/delete-lesson-button";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
-import { prisma } from "@/lib/prisma";
+import { getLessonDetail } from "@/lib/admin/lessons/queries";
 
 export const metadata: Metadata = {
   title: "Edit Lesson — Admin",
@@ -24,19 +24,7 @@ const TYPE_BADGE: Record<LessonType, string> = {
 export default async function EditLessonPage({ params }: { params: { id: string } }) {
   await requireAdminPermission("courses.write");
 
-  const lesson = await prisma.lesson.findUnique({
-    where: { id: params.id },
-    include: {
-      module: {
-        select: {
-          id: true,
-          title: true,
-          order: true,
-          track: { select: { title: true, category: true } },
-        },
-      },
-    },
-  });
+  const lesson = await getLessonDetail(params.id);
 
   if (!lesson) notFound();
 

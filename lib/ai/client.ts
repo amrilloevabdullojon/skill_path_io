@@ -1,3 +1,7 @@
+import "server-only";
+
+import { getServerEnv } from "@/lib/config/env";
+
 type AiCompletionInput = {
   systemPrompt: string;
   userPrompt: string;
@@ -14,8 +18,6 @@ type GeminiResponse = {
   }>;
 };
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-
 export async function requestAiCompletion({
   systemPrompt,
   userPrompt,
@@ -23,11 +25,11 @@ export async function requestAiCompletion({
   temperature = 0.4,
   maxTokens = 2048,
 }: AiCompletionInput): Promise<string> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return fallback;
+  const { geminiApiKey, geminiModel } = getServerEnv();
+  if (!geminiApiKey) return fallback;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`;
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

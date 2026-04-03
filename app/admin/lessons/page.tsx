@@ -1,20 +1,18 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import { LessonType } from "@prisma/client";
+import { LessonType } from "@prisma/client"; // still needed for the type filter <select> options
 
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { Pagination } from "@/components/ui/pagination";
 import type { LessonGroup } from "@/components/admin/lessons/lessons-table";
 import { requireAdminPermission } from "@/lib/admin-auth";
-import { prisma } from "@/lib/prisma";
+import { getLessonListData } from "@/lib/admin/lessons/queries";
 
 export const metadata: Metadata = {
   title: "Lessons — Admin",
   robots: { index: false },
 };
-
-const PAGE_SIZE = 50;
 
 const LessonsTable = dynamic(
   () =>
@@ -46,55 +44,19 @@ export default async function LessonsAdminPage({ searchParams }: LessonsAdminPag
   const typeFilter = paramValue(searchParams?.type);
   const hasFilter = !!(query || moduleIdFilter || typeFilter);
 
-  const validType = Object.values(LessonType).includes(typeFilter as LessonType)
-    ? (typeFilter as LessonType)
-    : null;
-
   const page = Math.max(1, parseInt(paramValue(searchParams?.page) || "1", 10));
-  const skip = (page - 1) * PAGE_SIZE;
 
-  const lessonWhere = {
-    ...(query ? { title: { contains: query, mode: "insensitive" as const } } : {}),
-    ...(moduleIdFilter ? { moduleId: moduleIdFilter } : {}),
-    ...(validType ? { type: validType } : {}),
-  };
+  const { modules, lessons, total, pageSize } = await getLessonListData({
+    query,
+    moduleId: moduleIdFilter,
+    type: typeFilter,
+    page,
+  });
 
-  const [modules, lessons, total] = await prisma.$transaction([
-    prisma.module.findMany({
-      orderBy: [{ track: { title: "asc" } }, { order: "asc" }],
-      select: { id: true, title: true },
-    }),
-    prisma.lesson.findMany({
-      where: lessonWhere,
-      orderBy: [
-        { module: { track: { title: "asc" } } },
-        { module: { order: "asc" } },
-        { order: "asc" },
-      ],
-      take: PAGE_SIZE,
-      skip,
-      select: {
-        id: true,
-        title: true,
-        type: true,
-        order: true,
-        body: true,
-        moduleId: true,
-        module: {
-          select: {
-            id: true,
-            title: true,
-            track: { select: { title: true, category: true } },
-          },
-        },
-      },
-    }),
-    prisma.lesson.count({ where: lessonWhere }),
-  ]);
-
-  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const totalPages = Math.ceil(total / pageSize);
+  const skip = (page - 1) * pageSize;
   const from = total === 0 ? 0 : skip + 1;
-  const to = Math.min(skip + PAGE_SIZE, total);
+  const to = Math.min(skip + pageSize, total);
 
   // Group by module
   const groupMap = new Map<string, LessonGroup>();

@@ -3,12 +3,19 @@ import { getServerSession } from "next-auth";
 import { UserRole } from "@prisma/client";
 
 import { authOptions } from "@/lib/auth";
+import { MAX_EXPORT_USER_ROWS } from "@/lib/config/limits";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
 function escape(v: string | null | undefined): string {
-  return `"${String(v ?? "").replace(/"/g, '""')}"`;
+  let str = String(v ?? "");
+  // Prevent CSV formula injection: Excel / Google Sheets treat cells starting
+  // with =, +, -, @, \t, \r as formulas. Prefix with a single quote to neutralise.
+  if (str.length > 0 && /^[=+\-@\t\r]/.test(str)) {
+    str = "'" + str;
+  }
+  return `"${str.replace(/"/g, '""')}"`;
 }
 
 export async function GET() {
@@ -31,6 +38,9 @@ export async function GET() {
   }
 
   const users = await prisma.user.findMany({
+    // Safety cap: avoids unbounded full-table scans in large DBs.
+    // For exports beyond this size, use DB-level tooling or add cursor pagination.
+    take: MAX_EXPORT_USER_ROWS,
     orderBy: { createdAt: "desc" },
     select: {
       id: true,

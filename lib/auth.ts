@@ -18,6 +18,13 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        // Guard: demo credentials require the expected demo password token.
+        // The local login panel always sends password: "local"; any other value
+        // (including missing/empty) must be rejected to prevent account enumeration.
+        if (credentials?.password !== "local") {
+          return null;
+        }
+
         const user = getLocalUserByEmail(credentials?.email);
         if (!user) {
           return null;
@@ -47,5 +54,8 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET ?? "skillpath-local-secret",
+  // Do not provide a fallback — if NEXTAUTH_SECRET is missing, NextAuth will
+  // refuse to start rather than silently sign tokens with a known weak key.
+  // validateEnv() in lib/env.ts already ensures this var is set at startup.
+  secret: process.env.NEXTAUTH_SECRET,
 };

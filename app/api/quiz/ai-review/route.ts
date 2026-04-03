@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
 
 import { runUnifiedReview } from "@/lib/ai";
+import { authOptions } from "@/lib/auth";
 
 type RequestBody = {
   question?: string;
@@ -12,6 +14,11 @@ type RequestBody = {
 
 // Backward-compatible endpoint. Preferred endpoint: /api/ai/review
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
   const body = (await request.json()) as RequestBody;
   const result = await runUnifiedReview({
     reviewType: "QUIZ",

@@ -94,21 +94,21 @@ export default async function QuizPage({ params }: QuizPageProps) {
           items={[
             { label: track.title, href: `/tracks/${track.slug}` },
             { label: moduleItem.title, href: `/tracks/${track.slug}/modules/${moduleItem.id}` },
-            { label: "Quiz" },
+            { label: "Тест" },
           ]}
         />
-        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Interactive quiz</p>
+        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Интерактивный тест</p>
         <h1 className="break-words text-2xl font-semibold sm:text-3xl">{moduleItem.quiz.title}</h1>
         <p className="flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
-          <span className="break-words">Track: {track.title}</span>
+          <span className="break-words">Трек: {track.title}</span>
           <span className="hidden px-1 text-muted-foreground sm:inline">|</span>
-          <span className="break-words">Module: {moduleItem.title}</span>
+          <span className="break-words">Модуль: {moduleItem.title}</span>
           <span className="hidden px-1 text-muted-foreground sm:inline">|</span>
-          <span>Passing score: {moduleItem.quiz.passingScore}%</span>
+          <span>Проходной балл: {moduleItem.quiz.passingScore}%</span>
         </p>
         {progress && progress.score !== null && (
           <p className="text-xs text-muted-foreground">
-            Previous score: {progress.score}% {progress.status === "COMPLETED" ? "(module completed)" : ""}
+            Предыдущий результат: {progress.score}% {progress.status === "COMPLETED" ? "(модуль завершён)" : ""}
           </p>
         )}
       </header>
@@ -128,7 +128,7 @@ export default async function QuizPage({ params }: QuizPageProps) {
           href={`/tracks/${track.slug}/modules/${moduleItem.id}`}
           className="btn-secondary inline-flex w-full justify-center sm:w-auto"
         >
-          Back to module
+          К модулю
         </Link>
       </div>
     </section>

@@ -9,7 +9,7 @@ import { TrackSkillsEditor } from "@/components/admin/tracks/track-skills-editor
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
-import { prisma } from "@/lib/prisma";
+import { getTrackDetail } from "@/lib/admin/tracks/queries";
 
 export const metadata: Metadata = {
   title: "Edit Track — Admin",
@@ -30,51 +30,10 @@ type Props = { params: { id: string } };
 export default async function TrackDetailPage({ params }: Props) {
   await requireAdminPermission("courses.write");
 
-  const rawTrack = await prisma.track.findUnique({
-    where: { id: params.id },
-    include: {
-      modules: {
-        orderBy: { order: "asc" },
-        select: {
-          id: true,
-          title: true,
-          order: true,
-          duration: true,
-          _count: { select: { lessons: true } },
-        },
-      },
-      certificates: { select: { id: true } },
-      _count: { select: { modules: true, certificates: true } },
-    },
-  });
+  const result = await getTrackDetail(params.id);
+  if (!result) notFound();
 
-  if (!rawTrack) notFound();
-  const track = rawTrack;
-
-  // Learner stats
-  const moduleIds = track.modules.map((m) => m.id);
-
-  const enrolledCount =
-    moduleIds.length > 0
-      ? await prisma.userProgress
-          .groupBy({ by: ["userId"], where: { moduleId: { in: moduleIds } } })
-          .then((r) => r.length)
-      : 0;
-
-  const completedCount =
-    moduleIds.length > 0
-      ? await prisma.userProgress
-          .groupBy({
-            by: ["userId"],
-            where: {
-              moduleId: { in: moduleIds },
-              completedAt: { not: null },
-            },
-            having: { userId: { _count: { equals: moduleIds.length } } },
-          })
-          .then((r) => r.length)
-          .catch(() => 0)
-      : 0;
+  const { track, enrolledCount, completedCount } = result;
 
   return (
     <section className="page-shell">

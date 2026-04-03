@@ -11,6 +11,7 @@ export function QuestionForm({ quizId }: { quizId: string }) {
   const [options, setOptions] = useState(["", "", "", ""]);
   const [correct, setCorrect] = useState<Set<string>>(new Set());
   const [pending, startTransition] = useTransition();
+  const [actionError, setActionError] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   function addOption() {
@@ -55,8 +56,13 @@ export function QuestionForm({ quizId }: { quizId: string }) {
     filledOptions.forEach((o) => formData.append("option", o));
     Array.from(correct).forEach((c) => formData.append("correct", c));
 
-    startTransition(() => {
-      createQuestionAction(formData);
+    startTransition(async () => {
+      const result = await createQuestionAction(formData);
+      if (!result.ok) {
+        setActionError(result.error);
+        return;
+      }
+      setActionError(null);
       // Reset form
       (form.elements.namedItem("text") as HTMLTextAreaElement).value = "";
       setOptions(["", "", "", ""]);
@@ -163,6 +169,12 @@ export function QuestionForm({ quizId }: { quizId: string }) {
       {correct.size === 0 && options.some((o) => o.trim()) && (
         <p className="text-xs text-amber-400">
           Click an option letter to mark it as the correct answer.
+        </p>
+      )}
+
+      {actionError && (
+        <p role="alert" className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-400">
+          {actionError}
         </p>
       )}
 

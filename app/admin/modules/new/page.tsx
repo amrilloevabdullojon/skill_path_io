@@ -7,7 +7,7 @@ import { createModuleAction } from "@/app/admin/actions";
 import { SubmitModuleButton } from "@/components/admin/modules/submit-module-button";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
-import { prisma } from "@/lib/prisma";
+import { getTracksForSelect } from "@/lib/admin/modules/queries";
 
 export const metadata: Metadata = {
   title: "New Module — Admin",
@@ -18,10 +18,7 @@ export default async function NewModulePage() {
   await requireAdminPermission("courses.write");
   const t = await getTranslations("admin.modules");
 
-  const tracks = await prisma.track.findMany({
-    orderBy: { title: "asc" },
-    select: { id: true, title: true, category: true },
-  });
+  const tracks = await getTracksForSelect();
 
   async function handleCreate(formData: FormData) {
     "use server";

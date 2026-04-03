@@ -114,11 +114,11 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "callout" || block.type === "important_concept") {
           return (
             <BlockCard key={block.id} title={block.title} className="border-amber-400/25 bg-amber-500/8">
-              <p className="inline-flex items-center gap-2 text-sm font-medium text-amber-700">
+              <p className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 dark:text-amber-400">
                 <Lightbulb className="h-4 w-4" />
                 Важная концепция
               </p>
-              <p className="text-sm text-amber-800">{block.content}</p>
+              <p className="text-sm text-amber-800 dark:text-amber-300">{block.content}</p>
             </BlockCard>
           );
         }
@@ -176,14 +176,22 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         }
 
         if (block.type === "divider") {
-          return <hr key={block.id} className="border-border" />;
+          return (
+            <div key={block.id} className="flex items-center gap-3 py-2">
+              <div className="h-px flex-1 bg-border/40" />
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/40">
+                следующий урок
+              </span>
+              <div className="h-px flex-1 bg-border/40" />
+            </div>
+          );
         }
 
         if (block.type === "key_idea") {
           return (
             <BlockCard key={block.id} title={block.title} className="border-sky-400/25 bg-sky-500/8">
-              <p className="text-sm text-sky-800">{block.content}</p>
-              <AskAiHintButton question={`Explain this key idea in simple words: ${block.content || ""}`} />
+              <p className="text-sm text-sky-700 dark:text-sky-300">{block.content}</p>
+              <AskAiHintButton question={`Объясни эту ключевую идею простыми словами: ${block.content || ""}`} />
             </BlockCard>
           );
         }
@@ -191,7 +199,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "common_mistakes") {
           return (
             <BlockCard key={block.id} title={block.title} className="border-rose-400/25 bg-rose-500/8">
-              <ul className="list-disc space-y-1 pl-5 text-sm text-rose-700">
+              <ul className="list-disc space-y-1 pl-5 text-sm text-rose-700 dark:text-rose-400">
                 {(block.items || []).map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -203,7 +211,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "real_world_example") {
           return (
             <BlockCard key={block.id} title={block.title} className="border-violet-400/25 bg-violet-500/8">
-              <p className="text-sm text-violet-700">{block.content}</p>
+              <p className="text-sm text-violet-700 dark:text-violet-400">{block.content}</p>
             </BlockCard>
           );
         }
@@ -217,7 +225,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
           const isCorrect = state.submitted && state.selectedIndex === qc.correctIndex;
           return (
             <BlockCard key={block.id} title={block.title || "Быстрая проверка"} className="border-emerald-400/25 bg-emerald-500/8">
-              <p className="text-sm font-medium text-emerald-800">{qc.question}</p>
+              <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">{qc.question}</p>
               <div className="space-y-2">
                 {qc.options.map((option, index) => (
                   <label key={option} className="quiz-option-default flex items-start gap-2 rounded-xl p-2 text-sm text-foreground">
@@ -251,7 +259,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                 Проверить ответ
               </button>
               {state.submitted ? (
-                <div className={`rounded-xl border px-3 py-2 text-sm ${isCorrect ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-amber-300 bg-amber-50 text-amber-700"}`}>
+                <div className={`rounded-xl border px-3 py-2 text-sm ${isCorrect ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "border-amber-400/40 bg-amber-500/10 text-amber-700 dark:text-amber-300"}`}>
                   <p className="inline-flex items-center gap-2">
                     {isCorrect ? <CheckCircle2 className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
                     {isCorrect ? "Верно!" : "Не совсем верно"}
@@ -268,7 +276,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
           const submitted = challengeSubmitted[block.id] ?? false;
           return (
             <BlockCard key={block.id} title={block.title || "Мини-задание"} className="border-cyan-400/25 bg-cyan-500/8">
-              <p className="text-sm text-cyan-800">{block.challengePrompt}</p>
+              <p className="text-sm text-cyan-700 dark:text-cyan-300">{block.challengePrompt}</p>
               <textarea
                 value={draft}
                 onChange={(event) =>
@@ -297,12 +305,12 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                 <AskAiHintButton question={`Give me a hint for this challenge: ${block.challengePrompt || ""}`} />
               </div>
               {submitted ? (
-                <p className="inline-flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+                <p className="inline-flex items-center gap-2 rounded-xl border border-emerald-400/40 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-300">
                   <Sparkles className="h-4 w-4" />
                   Отлично! Следующий шаг: проверь ответ через тест или симуляцию модуля.
                 </p>
               ) : block.challengeHint ? (
-                <p className="text-xs text-cyan-600">Подсказка: {block.challengeHint}</p>
+                <p className="text-xs text-cyan-600 dark:text-cyan-400">Подсказка: {block.challengeHint}</p>
               ) : null}
             </BlockCard>
           );

@@ -30,13 +30,6 @@ const aiTools: Array<{ value: AdminAiTool; label: string }> = [
   { value: "generate_tags", label: "Generate tags" },
 ];
 
-function toStatus(value: string): CourseStatus {
-  if (value === "IN_REVIEW" || value === "PUBLISHED" || value === "ARCHIVED") {
-    return value;
-  }
-  return "DRAFT";
-}
-
 function parseCsv(value: string) {
   return value
     .split(",")

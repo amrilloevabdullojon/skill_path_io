@@ -1,8 +1,15 @@
+import { getServerSession } from "next-auth";
+
 import { apiOk, Errors, withErrorHandler } from "@/lib/api/error-handler";
+import { authOptions } from "@/lib/auth";
+import { MAX_KNOWLEDGE_GRAPH_EDGES } from "@/lib/config/limits";
 import { prisma } from "@/lib/prisma";
 
 export const GET = withErrorHandler(async () => {
   const edges = await prisma.knowledgeEdge.findMany({
+    // Cap prevents full-table scans. The graph renderer cannot meaningfully
+    // display more than MAX_KNOWLEDGE_GRAPH_EDGES edges anyway.
+    take: MAX_KNOWLEDGE_GRAPH_EDGES,
     select: {
       id: true,
       fromNodeId: true,
@@ -17,6 +24,12 @@ export const GET = withErrorHandler(async () => {
 });
 
 export const POST = withErrorHandler(async (request: Request) => {
+  // Write access requires an authenticated session to prevent graph poisoning.
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    throw Errors.unauthorized();
+  }
+
   const body = (await request.json()) as {
     fromNodeId?: string;
     toNodeId?: string;

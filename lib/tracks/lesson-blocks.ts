@@ -63,33 +63,33 @@ function makeId(prefix: string, index: number) {
 
 function trackExample(category: TrackCategory) {
   if (category === TrackCategory.QA) {
-    return "How Netflix teams validate API contracts to avoid production regressions.";
+    return "Как команды Netflix проверяют API-контракты, чтобы избежать регрессий в продакшне.";
   }
   if (category === TrackCategory.BA) {
-    return "How Amazon analysts use user stories and acceptance criteria in cross-team planning.";
+    return "Как аналитики Amazon используют user stories и критерии приёмки в кросс-командном планировании.";
   }
-  return "How Spotify analysts use SQL and dashboards to track engagement and retention.";
+  return "Как аналитики Spotify используют SQL и дашборды для отслеживания вовлечённости и удержания.";
 }
 
 function commonMistakes(category: TrackCategory) {
   if (category === TrackCategory.QA) {
     return [
-      "Testing only happy-path scenarios",
-      "Writing bug reports without reproducible steps",
-      "Skipping regression checks before release",
+      "Тестировать только happy-path сценарии",
+      "Писать баг-репорты без шагов воспроизведения",
+      "Пропускать регрессионные проверки перед релизом",
     ];
   }
   if (category === TrackCategory.BA) {
     return [
-      "Vague user stories without acceptance criteria",
-      "No validation with stakeholders",
-      "Mixing solution details into business requirements",
+      "Расплывчатые user stories без критериев приёмки",
+      "Отсутствие валидации со стейкхолдерами",
+      "Смешение деталей решения с бизнес-требованиями",
     ];
   }
   return [
-    "Using wrong aggregation granularity",
-    "Ignoring null values and outliers",
-    "Presenting metrics without business context",
+    "Неправильная гранулярность агрегации",
+    "Игнорирование null-значений и выбросов",
+    "Презентация метрик без бизнес-контекста",
   ];
 }
 
@@ -186,6 +186,11 @@ export function buildLessonBlocks(params: {
   const lessonBlocks = [...lessons]
     .sort((a, b) => a.order - b.order)
     .flatMap((lesson, index): LessonBlock[] => ([
+      // Visual separator between lessons (not before the first one)
+      ...(index > 0 ? [{
+        id: makeId("lesson-divider", index + 10),
+        type: "divider" as const,
+      }] : []),
       {
         id: makeId("lesson-heading", index + 20),
         type: "heading",
@@ -331,20 +336,20 @@ export function buildLessonRecommendations(params: {
   return [
     {
       id: "next-lesson",
-      title: params.hasNextLesson ? `Next lesson: ${params.nextLessonTitle}` : "Review current lesson",
+      title: params.hasNextLesson ? `Следующий урок: ${params.nextLessonTitle}` : "Повторить текущий урок",
       description: params.hasNextLesson
-        ? "Continue momentum with the next timeline step."
-        : "Reinforce key concepts before moving forward.",
+        ? "Продолжайте обучение — следующий шаг пути уже доступен."
+        : "Закрепите ключевые концепции перед переходом дальше.",
     },
     {
       id: "recommended-module",
-      title: params.nextModuleTitle ? `Recommended module: ${params.nextModuleTitle}` : "Recommended module: finish current track",
-      description: "Keep progression consistent and unlock new skills.",
+      title: params.nextModuleTitle ? `Рекомендованный модуль: ${params.nextModuleTitle}` : "Завершить текущий трек",
+      description: "Сохраняйте темп и открывайте новые навыки.",
     },
     {
       id: "suggested-practice",
-      title: "Suggested practice",
-      description: "Complete quick check, pass quiz, and run simulation for maximum XP.",
+      title: "Практика",
+      description: "Пройдите быструю проверку, сдайте тест и запустите симуляцию для максимума XP.",
     },
   ];
 }

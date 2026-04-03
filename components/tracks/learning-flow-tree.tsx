@@ -34,35 +34,35 @@ const KIND_ICON = {
 
 const STATE_CONFIG = {
   locked: {
-    iconBg: "bg-slate-100 border-slate-200",
-    iconColor: "text-slate-400",
-    cardBg: "bg-slate-50 border-slate-200",
-    titleColor: "text-slate-500",
-    lineColor: "bg-slate-200/60",
+    iconBg: "bg-muted/20 border-border/40",
+    iconColor: "text-muted-foreground/50",
+    cardBg: "bg-muted/8 border-border/30 opacity-60",
+    titleColor: "text-muted-foreground/60",
+    lineColor: "bg-border/25",
     overlay: true,
   },
   available: {
-    iconBg: "bg-white border-slate-300 shadow-sm shadow-slate-200",
-    iconColor: "text-slate-500",
-    cardBg: "bg-white border-slate-200 hover:border-sky-300 hover:shadow-md",
+    iconBg: "bg-card border-border shadow-sm",
+    iconColor: "text-muted-foreground",
+    cardBg: "bg-card border-border hover:border-sky-400/40 hover:shadow-md transition-shadow",
     titleColor: "text-foreground",
-    lineColor: "bg-slate-200",
+    lineColor: "bg-border/40",
     overlay: false,
   },
   in_progress: {
-    iconBg: "bg-sky-100 border-sky-400",
-    iconColor: "text-sky-600",
-    cardBg: "bg-sky-50 border-sky-200 ring-1 ring-sky-100",
-    titleColor: "text-sky-700",
-    lineColor: "bg-gradient-to-b from-sky-400/50 to-slate-200",
+    iconBg: "bg-sky-500/15 border-sky-400",
+    iconColor: "text-sky-500",
+    cardBg: "bg-sky-500/8 border-sky-400/30 ring-1 ring-sky-400/15",
+    titleColor: "text-sky-700 dark:text-sky-400",
+    lineColor: "bg-gradient-to-b from-sky-400/50 to-border/20",
     overlay: false,
   },
   completed: {
-    iconBg: "bg-emerald-100 border-emerald-400",
-    iconColor: "text-emerald-600",
-    cardBg: "bg-emerald-50 border-emerald-200",
-    titleColor: "text-emerald-700",
-    lineColor: "bg-emerald-300/50",
+    iconBg: "bg-emerald-500/15 border-emerald-400",
+    iconColor: "text-emerald-500",
+    cardBg: "bg-emerald-500/8 border-emerald-400/30",
+    titleColor: "text-emerald-700 dark:text-emerald-400",
+    lineColor: "bg-emerald-400/30",
     overlay: false,
   },
 };
@@ -92,10 +92,10 @@ export function LearningFlowTree({ nodes }: { nodes: TimelineNode[] }) {
         const config = isFinalChallenge
           ? {
               ...baseConfig,
-              cardBg: "border-amber-400/40 bg-amber-50",
-              titleColor: "text-amber-700",
-              iconBg: "bg-amber-100 border-amber-400",
-              iconColor: "text-amber-600",
+              cardBg: "border-amber-400/40 bg-amber-500/8",
+              titleColor: "text-amber-700 dark:text-amber-400",
+              iconBg: "bg-amber-500/15 border-amber-400",
+              iconColor: "text-amber-500",
             }
           : baseConfig;
 
@@ -118,9 +118,9 @@ export function LearningFlowTree({ nodes }: { nodes: TimelineNode[] }) {
                 className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 ${config.iconBg} transition-all duration-300`}
               >
                 {node.state === "completed" ? (
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
                 ) : node.state === "locked" ? (
-                  <Lock className="h-4 w-4 text-slate-400" />
+                  <Lock className="h-4 w-4 text-muted-foreground/50" />
                 ) : node.state === "in_progress" ? (
                   <>
                     <Icon className={`h-4 w-4 ${config.iconColor}`} />
@@ -212,12 +212,12 @@ function NodeCardContent({
         </span>
 
         {node.state === "in_progress" && (
-          <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-medium text-sky-700">
+          <span className="rounded-full border border-sky-400/30 bg-sky-500/10 px-2 py-0.5 text-[10px] font-medium text-sky-600 dark:text-sky-300">
             В процессе
           </span>
         )}
         {node.state === "completed" && (
-          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+          <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-300">
             ✓ Выполнено
           </span>
         )}

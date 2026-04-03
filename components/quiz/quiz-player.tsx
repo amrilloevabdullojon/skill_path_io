@@ -92,7 +92,7 @@ export function QuizPlayer({
       if (e.key === "ArrowRight" || e.key === "Enter") {
         if (document.activeElement?.tagName === "INPUT") return;
         if (hasSelection && !isPending) {
-          isLastQuestion ? void handleSubmitQuiz() : goNext();
+          if (isLastQuestion) { void handleSubmitQuiz(); } else { goNext(); }
         }
         return;
       }
@@ -106,6 +106,7 @@ export function QuizPlayer({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     result,
     currentQuestion,
@@ -137,7 +138,7 @@ export function QuizPlayer({
       });
 
       if (!submitResult.ok) {
-        setSubmitError(submitResult.message ?? "Failed to submit the quiz.");
+        setSubmitError(submitResult.message ?? "Не удалось отправить тест.");
         return;
       }
 
@@ -148,7 +149,7 @@ export function QuizPlayer({
   if (totalQuestions === 0) {
     return (
       <div className="state-panel">
-        <p className="text-sm text-muted-foreground">No questions found for this quiz.</p>
+        <p className="text-sm text-muted-foreground">Вопросы для этого теста не найдены.</p>
       </div>
     );
   }
@@ -160,7 +161,7 @@ export function QuizPlayer({
           <div className="surface-subtle rounded-2xl p-4 text-foreground sm:p-6" aria-live="polite" aria-atomic="true">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Quiz result</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Результат теста</p>
                 <h2 className="mt-2 break-words text-2xl font-semibold">{quizTitle}</h2>
               </div>
               <div
@@ -169,37 +170,37 @@ export function QuizPlayer({
                 }`}
               >
                 {result.passed ? <CheckCircle2 className="h-4 w-4" aria-hidden="true" /> : <XCircle className="h-4 w-4" aria-hidden="true" />}
-                {result.passed ? "Passed" : "Not passed"}
+                {result.passed ? "Сдан" : "Не сдан"}
               </div>
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
               <div className="surface-subtle rounded-xl p-4">
-                <p className="text-xs text-muted-foreground">Score</p>
+                <p className="text-xs text-muted-foreground">Результат</p>
                 <p className="text-2xl font-semibold">{result.score}%</p>
               </div>
               <div className="surface-subtle rounded-xl p-4">
-                <p className="text-xs text-muted-foreground">Correct answers</p>
+                <p className="text-xs text-muted-foreground">Правильных ответов</p>
                 <p className="text-2xl font-semibold">
                   {result.correctAnswers}/{result.totalQuestions}
                 </p>
               </div>
               <div className="surface-subtle rounded-xl p-4">
-                <p className="text-xs text-muted-foreground">Passing score</p>
+                <p className="text-xs text-muted-foreground">Проходной балл</p>
                 <p className="text-2xl font-semibold">{result.passingScore}%</p>
               </div>
             </div>
 
             <div className="mt-5 space-y-2 text-sm text-muted-foreground">
               {result.passed ? (
-                <p>Your module progress has been updated.</p>
+                <p>Прогресс по модулю обновлён.</p>
               ) : (
-                <p>Retake the quiz to reach at least {passingScore}% and complete this module.</p>
+                <p>Пересдайте тест, чтобы набрать не менее {passingScore}% и завершить модуль.</p>
               )}
               {result.trackCompleted && (
-                <p className="inline-flex flex-wrap items-center gap-2 rounded-lg bg-amber-500/10 px-3 py-2 text-amber-200">
+                <p className="inline-flex flex-wrap items-center gap-2 rounded-lg bg-amber-500/10 px-3 py-2 text-amber-500 dark:text-amber-200">
                   <Trophy className="h-4 w-4" />
-                  Track completed{result.certificateIssued ? ", certificate created." : ", certificate already exists."}
+                  Трек завершён{result.certificateIssued ? ", сертификат выдан." : ", сертификат уже существует."}
                 </p>
               )}
             </div>
@@ -214,13 +215,13 @@ export function QuizPlayer({
                 className="inline-flex w-full items-center gap-2 sm:w-auto"
               >
                 <RefreshCw className="h-4 w-4" />
-                Try again
+                Попробовать снова
               </Button>
               <Link
                 href={`/tracks/${trackSlug}/modules/${moduleId}`}
                 className="btn-secondary inline-flex w-full items-center justify-center gap-2 sm:w-auto"
               >
-                Back to module
+                К модулю
               </Link>
             </div>
           </div>
@@ -236,11 +237,11 @@ export function QuizPlayer({
       <div className="surface-subtle rounded-2xl p-4 sm:p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Quiz</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Тест</p>
             <h2 className="mt-1 break-words text-xl font-semibold text-foreground">{quizTitle}</h2>
           </div>
           <div className="text-sm text-muted-foreground">
-            Question {currentIndex + 1} of {totalQuestions}
+            Вопрос {currentIndex + 1} из {totalQuestions}
           </div>
         </div>
 
@@ -250,7 +251,7 @@ export function QuizPlayer({
           aria-valuenow={currentIndex + 1}
           aria-valuemin={1}
           aria-valuemax={totalQuestions}
-          aria-label={`Question ${currentIndex + 1} of ${totalQuestions}`}
+          aria-label={`Вопрос ${currentIndex + 1} из ${totalQuestions}`}
         >
           <motion.div
             className="h-full rounded-full bg-sky-400"
@@ -260,7 +261,7 @@ export function QuizPlayer({
           />
         </div>
         <p className="mt-2 text-[11px] text-muted-foreground/60">
-          Press <kbd className="rounded border border-border px-1 font-mono">1</kbd>–<kbd className="rounded border border-border px-1 font-mono">{Math.min(currentQuestion?.options.length ?? 4, 9)}</kbd> to select · <kbd className="rounded border border-border px-1 font-mono">→</kbd> next · <kbd className="rounded border border-border px-1 font-mono">←</kbd> back
+          Нажмите <kbd className="rounded border border-border px-1 font-mono">1</kbd>–<kbd className="rounded border border-border px-1 font-mono">{Math.min(currentQuestion?.options.length ?? 4, 9)}</kbd> для выбора · <kbd className="rounded border border-border px-1 font-mono">→</kbd> далее · <kbd className="rounded border border-border px-1 font-mono">←</kbd> назад
         </p>
       </div>
 
@@ -272,7 +273,7 @@ export function QuizPlayer({
         >
           <header className="space-y-2">
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              {currentQuestion.type === "SINGLE" ? "Single choice" : "Multiple choice"}
+              {currentQuestion.type === "SINGLE" ? "Один вариант" : "Несколько вариантов"}
             </p>
             <h3 className="break-words text-lg font-semibold leading-snug sm:text-xl">{currentQuestion.text}</h3>
           </header>
@@ -325,7 +326,7 @@ export function QuizPlayer({
           className="inline-flex w-full items-center gap-2 sm:w-auto"
         >
           <ArrowLeft className="h-4 w-4" />
-          Previous
+          Назад
         </Button>
 
         {!isLastQuestion ? (
@@ -335,7 +336,7 @@ export function QuizPlayer({
             disabled={!hasSelection || isPending}
             className="inline-flex w-full items-center justify-center gap-2 bg-sky-500 text-sky-950 hover:bg-sky-400 sm:w-auto"
           >
-            Next
+            Далее
             <ArrowRight className="h-4 w-4" />
           </Button>
         ) : (
@@ -345,7 +346,7 @@ export function QuizPlayer({
             disabled={!hasSelection || isPending}
             className="inline-flex w-full items-center justify-center gap-2 bg-emerald-500 text-emerald-950 hover:bg-emerald-400 sm:w-auto"
           >
-            {isPending ? "Checking..." : "Finish quiz"}
+            {isPending ? "Проверяю..." : "Завершить тест"}
             <CheckCircle2 className="h-4 w-4" />
           </Button>
         )}

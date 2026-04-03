@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 import { authOptions } from "@/lib/auth";
+import { getServerEnv } from "@/lib/config/env";
 import { applyRateLimit } from "@/lib/server/rate-limit";
 import { parseAdminAiRequest } from "@/lib/validation/admin-ai";
 import { AdminAiRequest, AdminAiResponse, AdminAiTool } from "@/types/admin/ai";
@@ -128,12 +129,11 @@ export async function POST(request: Request) {
   }
 
   const ip = getIp(request);
-  const maxReq = Number(process.env.ADMIN_AI_RATE_LIMIT_MAX_REQUESTS);
-  const windowMsRaw = Number(process.env.ADMIN_AI_RATE_LIMIT_WINDOW_MS);
+  const env = getServerEnv();
   const rateLimit = applyRateLimit({
     key: `admin-ai:${ip}`,
-    maxRequests: Number.isFinite(maxReq) && maxReq > 0 ? Math.floor(maxReq) : 30,
-    windowMs: Number.isFinite(windowMsRaw) && windowMsRaw > 0 ? Math.floor(windowMsRaw) : 60_000,
+    maxRequests: env.adminAiRateLimitMaxRequests,
+    windowMs: env.adminAiRateLimitWindowMs,
   });
 
   if (!rateLimit.allowed) {

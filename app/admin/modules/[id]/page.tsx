@@ -9,7 +9,7 @@ import { DuplicateModuleButton } from "@/components/admin/modules/duplicate-modu
 import { SubmitModuleButton } from "@/components/admin/modules/submit-module-button";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
-import { prisma } from "@/lib/prisma";
+import { getModuleDetail } from "@/lib/admin/modules/queries";
 
 export const metadata: Metadata = {
   title: "Edit Module — Admin",
@@ -22,24 +22,7 @@ export default async function ModuleDetailPage({ params }: Props) {
   await requireAdminPermission("courses.write");
   const t = await getTranslations("admin.modules");
 
-  const mod = await prisma.module.findUnique({
-    where: { id: params.id },
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      order: true,
-      duration: true,
-      trackId: true,
-      track: { select: { id: true, title: true, slug: true, category: true } },
-      quiz: { select: { id: true, title: true, passingScore: true } },
-      lessons: {
-        orderBy: { order: "asc" },
-        select: { id: true, title: true, order: true, type: true },
-      },
-      _count: { select: { lessons: true, userProgresses: true } },
-    },
-  });
+  const mod = await getModuleDetail(params.id);
 
   if (!mod) notFound();
 

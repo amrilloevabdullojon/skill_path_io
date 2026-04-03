@@ -57,7 +57,7 @@ export function AIQuizReview({ wrongAnswers, lessonContext }: AIQuizReviewProps)
         },
       }));
     } catch (error) {
-      setErrorText(error instanceof Error ? error.message : "Could not build AI review.");
+      setErrorText(error instanceof Error ? error.message : "Не удалось выполнить ИИ-анализ.");
     } finally {
       setIsLoadingId(null);
     }
@@ -66,7 +66,7 @@ export function AIQuizReview({ wrongAnswers, lessonContext }: AIQuizReviewProps)
   if (wrongAnswers.length === 0) {
     return (
       <section className="surface-subtle p-4">
-        <p className="text-sm text-emerald-300">Perfect run. No incorrect answers for AI review.</p>
+        <p className="text-sm text-emerald-600 dark:text-emerald-300">Отличный результат! Нет ошибок для разбора ИИ.</p>
       </section>
     );
   }
@@ -74,9 +74,9 @@ export function AIQuizReview({ wrongAnswers, lessonContext }: AIQuizReviewProps)
   return (
     <section className="surface-subtle space-y-4 p-4 sm:p-5">
       <header className="space-y-1">
-        <p className="kicker">AI Error Review</p>
-        <h3 className="section-heading">Understand mistakes and fix gaps</h3>
-        <p className="text-sm text-muted-foreground">AI explains why the answer is wrong and what to do next.</p>
+        <p className="kicker">ИИ-разбор ошибок</p>
+        <h3 className="section-heading">Разбор ошибок и устранение пробелов</h3>
+        <p className="text-sm text-muted-foreground">ИИ объясняет, почему ответ неверный, и что делать дальше.</p>
       </header>
 
       <div className="space-y-3">
@@ -90,13 +90,13 @@ export function AIQuizReview({ wrongAnswers, lessonContext }: AIQuizReviewProps)
                 Q{index + 1}. {item.question}
               </p>
               <div className="mt-2 space-y-1 text-xs">
-                <p className="inline-flex items-center gap-2 text-rose-200">
+                <p className="inline-flex items-center gap-2 text-rose-600 dark:text-rose-300">
                   <AlertCircle className="h-4 w-4" />
-                  Your answer: {item.userAnswers.join(", ") || "No answer"}
+                  Ваш ответ: {item.userAnswers.join(", ") || "Нет ответа"}
                 </p>
-                <p className="inline-flex items-center gap-2 text-emerald-200">
+                <p className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-300">
                   <CheckCircle2 className="h-4 w-4" />
-                  Correct answer: {item.correctAnswers.join(", ")}
+                  Правильный ответ: {item.correctAnswers.join(", ")}
                 </p>
               </div>
 
@@ -108,7 +108,7 @@ export function AIQuizReview({ wrongAnswers, lessonContext }: AIQuizReviewProps)
                   className="btn-secondary mt-3 inline-flex items-center gap-2 px-3 py-2 disabled:opacity-60"
                 >
                   {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lightbulb className="h-4 w-4" />}
-                  {isLoading ? "Analyzing..." : "Generate AI explanation"}
+                  {isLoading ? "Анализирую..." : "Разобрать с ИИ"}
                 </button>
               )}
 
@@ -120,8 +120,8 @@ export function AIQuizReview({ wrongAnswers, lessonContext }: AIQuizReviewProps)
                       <li key={tip}>{tip}</li>
                     ))}
                   </ul>
-                  <p className="text-xs text-sky-200">
-                    Recommendation: {review.recommendations.join(" ")}
+                  <p className="text-xs text-sky-700 dark:text-sky-300">
+                    Рекомендация: {review.recommendations.join(" ")}
                   </p>
                 </div>
               )}

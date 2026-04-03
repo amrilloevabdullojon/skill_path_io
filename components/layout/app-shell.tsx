@@ -415,9 +415,9 @@ export function AppShell({ children }: AppShellProps) {
 
           {isFocusLearningMode ? (
             <div className="focus-mode-banner">
-              <p>Focus learning mode enabled</p>
+              <p>Режим фокусного обучения</p>
               <Link href="/dashboard" className="btn-secondary h-8 px-3 py-1 text-xs">
-                Exit focus mode
+                Выйти
               </Link>
             </div>
           ) : null}

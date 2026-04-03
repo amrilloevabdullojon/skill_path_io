@@ -62,10 +62,7 @@ export async function GET() {
       }
 
       // Poll at interval and close after max duration
-      let pollCount = 0;
       const interval = setInterval(async () => {
-        pollCount++;
-
         // Close connection after max duration
         if (Date.now() - startTime >= MAX_DURATION_MS) {
           clearInterval(interval);

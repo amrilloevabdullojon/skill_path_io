@@ -2,6 +2,7 @@ import "server-only";
 
 import { TrackCategory } from "@prisma/client";
 
+import { MAX_MARKETPLACE_APPLICATIONS } from "@/lib/config/limits";
 import { prisma } from "@/lib/prisma";
 import { CandidateProfile, MarketplaceRole, RoleApplication } from "@/types/saas";
 
@@ -97,6 +98,12 @@ export function submitRoleApplication(input: {
   };
 
   localApplications.unshift(created);
+
+  // Prevent unbounded memory growth: evict oldest entries beyond the cap.
+  if (localApplications.length > MAX_MARKETPLACE_APPLICATIONS) {
+    localApplications.splice(MAX_MARKETPLACE_APPLICATIONS);
+  }
+
   return created;
 }
 

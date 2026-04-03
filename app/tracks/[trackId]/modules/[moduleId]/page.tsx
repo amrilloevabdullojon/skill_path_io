@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { LessonType, ProgressStatus, TrackCategory } from "@prisma/client";
-import { ChevronLeft, ChevronRight, CircleCheckBig, Clock3, Flag, Layers3, Lock, Sparkles, Trophy } from "lucide-react";
+import { ChevronLeft, ChevronRight, CircleCheckBig, Clock3, Flag, Layers3, Sparkles, Trophy } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { getLocale } from "next-intl/server";
 
@@ -10,7 +10,10 @@ import { AIExerciseReview } from "@/components/simulation/ai-exercise-review";
 import { LessonBlockRenderer } from "@/components/tracks/lesson-block-renderer";
 import { LearningFlowTree } from "@/components/tracks/learning-flow-tree";
 import { MarkModuleCompleteButton } from "@/components/tracks/mark-module-complete-button";
+import { ModuleReadingProgress } from "@/components/tracks/module-reading-progress";
+import { ModuleSidebarNav } from "@/components/tracks/module-sidebar-nav";
 import { QuickSaveBookmarkButton } from "@/components/tracks/quick-save-bookmark-button";
+import { TrackStickyProgress } from "@/components/tracks/track-sticky-progress";
 import { authOptions } from "@/lib/auth";
 import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
 import { resolveLearningUser } from "@/lib/learning-user";
@@ -28,6 +31,7 @@ import {
 import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { cn } from "@/lib/utils";
+import { BackToTopButton } from "@/components/tracks/back-to-top-button";
 import { markModuleAsCompleted } from "./actions";
 
 export async function generateMetadata({ params }: ModulePageProps): Promise<Metadata> {
@@ -68,42 +72,42 @@ const moduleStateView: Record<
 > = {
   locked: {
     label: "Заблокирован",
-    badge: "border-border bg-card/85 text-muted-foreground",
+    badge: "border-border/40 bg-muted/10 text-muted-foreground",
     dot: "bg-border",
     panel: "border-border/80 bg-card/65",
   },
   available: {
     label: "Доступен",
-    badge: "border-amber-300 bg-amber-100 text-amber-700",
-    dot: "bg-amber-300",
-    panel: "border-amber-400/25 bg-amber-500/7",
+    badge: "border-amber-400/40 bg-amber-500/10 text-amber-300",
+    dot: "bg-amber-400",
+    panel: "border-amber-400/25 bg-amber-500/8",
   },
   in_progress: {
     label: "В процессе",
-    badge: "border-sky-300 bg-sky-100 text-sky-700",
+    badge: "border-sky-400/40 bg-sky-500/10 text-sky-300",
     dot: "bg-sky-400",
-    panel: "border-sky-400/25 bg-sky-500/7",
+    panel: "border-sky-400/25 bg-sky-500/8",
   },
   completed: {
     label: "Завершён",
-    badge: "border-emerald-300 bg-emerald-100 text-emerald-700",
+    badge: "border-emerald-400/40 bg-emerald-500/10 text-emerald-300",
     dot: "bg-emerald-400",
-    panel: "border-emerald-400/25 bg-emerald-500/7",
+    panel: "border-emerald-400/25 bg-emerald-500/8",
   },
 };
 
 const statusView = {
   [ProgressStatus.NOT_STARTED]: {
     label: "Не начат",
-    badge: "bg-card text-muted-foreground",
+    badge: "border border-border/40 bg-muted/10 text-muted-foreground",
   },
   [ProgressStatus.IN_PROGRESS]: {
     label: "В процессе",
-    badge: "bg-sky-500/20 text-sky-300",
+    badge: "border border-sky-400/30 bg-sky-500/10 text-sky-300",
   },
   [ProgressStatus.COMPLETED]: {
     label: "Завершён",
-    badge: "bg-emerald-500/20 text-emerald-300",
+    badge: "border border-emerald-400/30 bg-emerald-500/10 text-emerald-300",
   },
 } as const;
 
@@ -144,14 +148,6 @@ function toTrackCategory(value: string) {
     return value;
   }
   return TrackCategory.QA;
-}
-
-function timelineKindLabel(kind: TimelineNode["kind"]) {
-  if (kind === "lesson") return "Урок";
-  if (kind === "mini_challenge") return "Мини-задание";
-  if (kind === "quiz") return "Тест";
-  if (kind === "simulation") return "Симуляция";
-  return "Финальное задание";
 }
 
 function formatMinutes(minutes: number) {
@@ -248,7 +244,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
     null;
 
   const parsedContent = parseModuleContent(currentModule.content, trackCategory, currentModule.title, currentModule.order);
-  const resources = parsedContent.resources.length > 0 ? parsedContent.resources : ["Read module notes", "Complete practical task", "Review quiz result"];
+  const resources = parsedContent.resources.length > 0 ? parsedContent.resources : ["Изучить материалы модуля", "Выполнить практическое задание", "Повторить результаты теста"];
 
   const lessonBlocks = buildLessonBlocks({
     category: trackCategory,
@@ -305,8 +301,8 @@ export default async function ModulePage({ params }: ModulePageProps) {
     {
       id: `mini-${currentModule.id}`,
       kind: "mini_challenge" as const,
-      title: "Mini challenge",
-      description: "Short practical checkpoint inside lesson blocks",
+      title: "Мини-задание",
+      description: "Практическая контрольная точка внутри урока",
       state: miniChallengeState,
     },
     ...(currentModule.quiz
@@ -315,7 +311,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
             id: `quiz-${currentModule.quiz.id}`,
             kind: "quiz" as const,
             title: currentModule.quiz.title,
-            description: `Passing score ${currentModule.quiz.passingScore}%`,
+            description: `Проходной балл: ${currentModule.quiz.passingScore}%`,
             state: quizState,
             href: `/tracks/${track.slug}/modules/${currentModule.id}/quiz`,
           },
@@ -326,8 +322,8 @@ export default async function ModulePage({ params }: ModulePageProps) {
           {
             id: `simulation-${currentModule.id}`,
             kind: "simulation" as const,
-            title: "Module simulation",
-            description: "Practice real-world workflow for this topic",
+            title: "Симуляция модуля",
+            description: "Отработка реального рабочего процесса по теме",
             state: simulationState,
           },
         ]
@@ -335,7 +331,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
     {
       id: `final-${currentModule.id}`,
       kind: "final_challenge" as const,
-      title: "Final challenge",
+      title: "Финальное задание",
       description: parsedContent.finalChallenge,
       state: finalChallengeState,
     },
@@ -361,8 +357,24 @@ export default async function ModulePage({ params }: ModulePageProps) {
     { id: "recommendations", label: "Рекомендации" },
   ];
 
+  const stickyCtaHref =
+    currentStatus === ProgressStatus.COMPLETED && nextModule
+      ? `/tracks/${track.slug}/modules/${nextModule.id}`
+      : "#practical-task";
+  const stickyCtaLabel =
+    currentStatus === ProgressStatus.COMPLETED && nextModule ? "Следующий" : "Завершить";
+
   return (
     <>
+      <ModuleReadingProgress />
+      <TrackStickyProgress
+        progressPercent={progressPercent}
+        completedCount={completedCount}
+        totalModules={track.modules.length}
+        ctaHref={stickyCtaHref}
+        ctaLabel={stickyCtaLabel}
+        accentProgress="bg-gradient-to-r from-sky-400 to-violet-500"
+      />
       <section className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)] sm:gap-6">
         <aside className="surface-elevated space-y-6 p-4 text-foreground sm:p-5 xl:sticky xl:top-20 xl:h-[calc(100vh-6rem)] xl:overflow-y-auto">
           <div className="space-y-2">
@@ -397,7 +409,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-xs text-muted-foreground">Module {moduleItem.order}</p>
+                        <p className="text-xs text-muted-foreground">Модуль {moduleItem.order}</p>
                         <p className="break-words text-sm font-medium text-foreground">{moduleItem.title}</p>
                       </div>
                       <span className={cn("mt-0.5 h-2.5 w-2.5 rounded-full", stateStyle.dot)} />
@@ -416,14 +428,26 @@ export default async function ModulePage({ params }: ModulePageProps) {
 
           <nav className="space-y-2">
             <p className="kicker">Навигация</p>
-            <div className="space-y-1 rounded-2xl border border-border bg-card/55 p-2">
-              {navLinks.map((item) => (
-                <a key={item.id} href={`#${item.id}`} className="nav-link block">
-                  {item.label}
-                </a>
-              ))}
-            </div>
+            <ModuleSidebarNav links={navLinks} />
           </nav>
+
+          {/* Quick-access complete button */}
+          <div className="space-y-2">
+            <p className="kicker">Действие</p>
+            <form action={markModuleAsCompleted}>
+              <input type="hidden" name="trackSlug" value={track.slug} />
+              <input type="hidden" name="moduleId" value={currentModule.id} />
+              <MarkModuleCompleteButton isCompleted={currentStatus === ProgressStatus.COMPLETED} />
+            </form>
+            {currentModule.quiz && (
+              <Link
+                href={`/tracks/${track.slug}/modules/${currentModule.id}/quiz`}
+                className="btn-secondary mt-1 inline-flex w-full items-center justify-center gap-1.5 text-sm"
+              >
+                Пройти тест
+              </Link>
+            )}
+          </div>
         </aside>
 
         <div className="space-y-6">
@@ -442,7 +466,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
             <div className="flex flex-wrap gap-2 text-xs">
               <span className="chip-neutral inline-flex items-center gap-1 px-2.5 py-1">
                 <Layers3 className="h-3.5 w-3.5" />
-                Module {currentModule.order}/{track.modules.length}
+                Модуль {currentModule.order}/{track.modules.length}
               </span>
               <span className="chip-neutral inline-flex items-center gap-1 px-2.5 py-1">
                 <Clock3 className="h-3.5 w-3.5" />
@@ -513,11 +537,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
           </section>
 
           <section id="lessons-timeline" className="surface-elevated space-y-4 p-5">
-            <div className="flex items-center justify-between">
-              <h2 className="section-title">Путь обучения</h2>
-              <span className="text-xs text-muted-foreground">Учебный путь</span>
-            </div>
-
+            <h2 className="section-title">Путь обучения</h2>
             <LearningFlowTree nodes={timelineNodes} />
           </section>
 
@@ -526,17 +546,17 @@ export default async function ModulePage({ params }: ModulePageProps) {
             <LessonBlockRenderer blocks={lessonBlocks} />
           </section>
 
-          <section id="practical-task" className="space-y-4 rounded-2xl border border-emerald-500/28 bg-emerald-500/8 p-4 sm:p-5">
-            <h2 className="text-xl font-semibold text-emerald-200">Практическое задание</h2>
-            <p className="text-sm text-emerald-50/90">
+          <section id="practical-task" className="space-y-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/8 p-4 sm:p-5">
+            <h2 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300">Практическое задание</h2>
+            <p className="text-sm text-emerald-900/80 dark:text-emerald-100/80">
               {taskLesson?.body ?? "Выполните практическое задание модуля и подготовьте краткое описание результатов."}
             </p>
-            <ul className="list-disc space-y-1 pl-5 text-sm text-emerald-100/90">
+            <ul className="list-disc space-y-1 pl-5 text-sm text-emerald-800/80 dark:text-emerald-100/80">
               {resources.map((resource) => (
                 <li key={resource}>{resource}</li>
               ))}
             </ul>
-            <p className="rounded-xl border border-emerald-400/35 bg-emerald-500/12 px-3 py-2 text-sm text-emerald-100">
+            <p className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-800 dark:text-emerald-200">
               <span className="font-semibold">Финальное задание:</span> {parsedContent.finalChallenge}
             </p>
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
@@ -557,43 +577,54 @@ export default async function ModulePage({ params }: ModulePageProps) {
             <AIExerciseReview moduleTitle={currentModule.title} trackTitle={track.title} />
           </section>
 
-          <section id="recommendations" className="surface-elevated space-y-4 p-5">
-            <h2 className="section-title">Рекомендации после урока</h2>
-            <div className="grid gap-3 md:grid-cols-3">
-              {recommendations.map((item) => (
-                <article key={item.id} className="surface-subtle space-y-2 p-4">
-                  <p className="text-sm font-semibold text-foreground">{item.title}</p>
-                  <p className="text-xs leading-6 text-muted-foreground">{item.description}</p>
-                </article>
-              ))}
+          <section id="recommendations" className="surface-elevated space-y-5 p-5">
+            <h2 className="section-title">Рекомендации</h2>
+
+            {/* Post-lesson recommendations */}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">После урока</p>
+              <div className="grid gap-3 md:grid-cols-3">
+                {recommendations.map((item) => (
+                  <article key={item.id} className="surface-subtle space-y-2 p-4">
+                    <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                    <p className="text-xs leading-6 text-muted-foreground">{item.description}</p>
+                  </article>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
+
+            {/* AI adaptive suggestions */}
+            {remediationSuggestions.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">ИИ-адаптация</p>
+                <div className="grid gap-2 md:grid-cols-3">
+                  {remediationSuggestions.map((item) => (
+                    <article key={item.id} className="surface-subtle space-y-1 rounded-xl border border-border/40 p-3">
+                      <p className="text-sm font-semibold text-foreground">{item.title}</p>
+                      <p className="text-xs text-muted-foreground">{item.reason}</p>
+                      <p className="text-xs text-muted-foreground/70">{item.action}</p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Navigation actions */}
+            <div className="flex flex-wrap gap-2 pt-1">
               {nextLesson ? (
                 <a href="#lesson-content" className="btn-secondary">
-                  Continue lesson
+                  Продолжить урок
                 </a>
               ) : null}
               {nextModule ? (
-                <Link href={`/tracks/${track.slug}/modules/${nextModule.id}`} className="btn-secondary">
-                  Open next module
+                <Link href={`/tracks/${track.slug}/modules/${nextModule.id}`} className="btn-primary inline-flex items-center gap-1.5">
+                  Следующий модуль
+                  <ChevronRight className="h-4 w-4" />
                 </Link>
               ) : null}
               <Link href={`/tracks/${track.slug}`} className="btn-secondary">
-                Back to track map
+                К карте трека
               </Link>
-            </div>
-          </section>
-
-          <section className="surface-elevated space-y-4 p-5">
-            <h2 className="section-title">Рекомендации ИИ</h2>
-            <div className="space-y-2">
-              {remediationSuggestions.map((item) => (
-                <article key={item.id} className="surface-subtle space-y-1 p-3">
-                  <p className="text-sm font-semibold text-foreground">{item.title}</p>
-                  <p className="text-xs text-muted-foreground">{item.reason}</p>
-                  <p className="text-xs text-muted-foreground">{item.action}</p>
-                </article>
-              ))}
             </div>
           </section>
 
@@ -635,6 +666,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
         </div>
       </section>
 
+      <BackToTopButton />
       <MentorChatWidget
         trackSlug={track.slug}
         moduleId={currentModule.id}

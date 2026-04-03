@@ -7,7 +7,7 @@ import { createLessonAction } from "@/app/admin/actions";
 import { SubmitModuleButton } from "@/components/admin/modules/submit-module-button";
 import { PageHeader } from "@/components/ui/page-header";
 import { requireAdminPermission } from "@/lib/admin-auth";
-import { prisma } from "@/lib/prisma";
+import { getModulesForSelect } from "@/lib/admin/lessons/queries";
 
 export const metadata: Metadata = {
   title: "New Lesson — Admin",
@@ -17,16 +17,7 @@ export const metadata: Metadata = {
 export default async function NewLessonPage() {
   await requireAdminPermission("courses.write");
 
-  const modules = await prisma.module.findMany({
-    orderBy: [{ track: { title: "asc" } }, { order: "asc" }],
-    select: {
-      id: true,
-      title: true,
-      order: true,
-      track: { select: { title: true } },
-      _count: { select: { lessons: true } },
-    },
-  });
+  const modules = await getModulesForSelect();
 
   async function handleCreate(formData: FormData) {
     "use server";

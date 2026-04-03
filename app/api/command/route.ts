@@ -77,14 +77,11 @@ export async function GET() {
       missions: runtimeMissions,
       jobs: runtimeJobs,
     });
-  } catch {
+  } catch (err) {
+    console.error("[GET /api/command]", err);
     return NextResponse.json(
-      {
-        tracks: [],
-        missions: [],
-        jobs: [],
-      },
-      { status: 200 },
+      { error: "Failed to load catalog data" },
+      { status: 500 },
     );
   }
 }

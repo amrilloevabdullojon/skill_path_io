@@ -1,6 +1,13 @@
 "use client";
 
-import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip } from "recharts";
+import {
+  PolarAngleAxis,
+  PolarGrid,
+  Radar,
+  RadarChart,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 
 type SkillRadarPoint = {
   skill: string;
@@ -11,7 +18,11 @@ type SkillRadarChartProps = {
   data: SkillRadarPoint[];
 };
 
-function RadarAngleTick(props: { x?: number; y?: number; payload?: { value?: string } }) {
+function RadarAngleTick(props: {
+  x?: number;
+  y?: number;
+  payload?: { value?: string };
+}) {
   const x = props.x ?? 0;
   const y = props.y ?? 0;
   const label = props.payload?.value ?? "";
@@ -19,7 +30,10 @@ function RadarAngleTick(props: { x?: number; y?: number; payload?: { value?: str
 
   const lines =
     words.length > 1
-      ? [words.slice(0, Math.ceil(words.length / 2)).join(" "), words.slice(Math.ceil(words.length / 2)).join(" ")]
+      ? [
+          words.slice(0, Math.ceil(words.length / 2)).join(" "),
+          words.slice(Math.ceil(words.length / 2)).join(" "),
+        ]
       : label.length > 12
         ? [label.slice(0, 12), label.slice(12)]
         : [label];
@@ -37,33 +51,52 @@ function RadarAngleTick(props: { x?: number; y?: number; payload?: { value?: str
 
 export function SkillRadarChart({ data }: SkillRadarChartProps) {
   return (
-    <div className="content-card h-[20rem] w-full min-w-0 rounded-2xl p-2 sm:h-[22rem] sm:p-3">
-      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={240}>
-        <RadarChart data={data} margin={{ top: 24, right: 30, bottom: 20, left: 30 }}>
-          <defs>
-            <linearGradient id="skillRadarFill" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.36} />
-              <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.18} />
-            </linearGradient>
-          </defs>
-          <PolarGrid stroke="#334155" strokeOpacity={0.7} />
-          <PolarAngleAxis
-            dataKey="skill"
-            tickLine={false}
-            axisLine={false}
-            tick={<RadarAngleTick />}
-          />
-          <Tooltip
-            contentStyle={{
-              borderRadius: "0.85rem",
-              border: "1px solid #334155",
-              backgroundColor: "#020617",
-              color: "#e2e8f0",
-            }}
-          />
-          <Radar dataKey="value" stroke="#7dd3fc" strokeWidth={2} fill="url(#skillRadarFill)" />
-        </RadarChart>
-      </ResponsiveContainer>
+    <div className="space-y-3">
+      <div className="content-card h-[20rem] w-full min-w-0 rounded-2xl p-2 sm:h-[22rem] sm:p-3">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={240}>
+          <RadarChart data={data} margin={{ top: 24, right: 30, bottom: 20, left: 30 }}>
+            <defs>
+              <linearGradient id="skillRadarFill" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.36} />
+                <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.18} />
+              </linearGradient>
+            </defs>
+            <PolarGrid stroke="#334155" strokeOpacity={0.7} />
+            <PolarAngleAxis
+              dataKey="skill"
+              tickLine={false}
+              axisLine={false}
+              tick={<RadarAngleTick />}
+            />
+            <Tooltip
+              contentStyle={{
+                borderRadius: "0.85rem",
+                border: "1px solid #334155",
+                backgroundColor: "#020617",
+                color: "#e2e8f0",
+              }}
+            />
+            <Radar
+              dataKey="value"
+              stroke="#7dd3fc"
+              strokeWidth={2}
+              fill="url(#skillRadarFill)"
+            />
+          </RadarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-2.5 w-2.5 rounded-full bg-gradient-to-br from-sky-400 to-violet-500 opacity-70" />
+          Текущий уровень навыков
+        </span>
+        <span className="text-muted-foreground/40">•</span>
+        <span className="text-muted-foreground/60">
+          Растёт по мере завершения модулей
+        </span>
+      </div>
     </div>
   );
 }

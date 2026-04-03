@@ -1,22 +1,35 @@
+/**
+ * SaaS usage metering ledger.
+ *
+ * Architecture: thin adapter interface — the same swap-ready pattern as
+ * rate-limit.ts.  Changing the storage backend requires only replacing
+ * `usageLedgerAdapter` below; call sites are untouched.
+ *
+ *   Current default → InMemoryUsageLedgerAdapter   (single-process, dev/MVP)
+ *   Drop-in upgrade → RedisUsageLedgerAdapter       (distributed, persistent)
+ *
+ * To plug in Redis:
+ *   1. Create RedisUsageLedgerAdapter implementing UsageLedgerAdapter.
+ *   2. Replace `usageLedgerAdapter` below with the Redis instance.
+ *   3. No call-site changes required.
+ */
+
+import {
+  MAX_USAGE_LEDGER_ENTRIES,
+  USAGE_LEDGER_CLEANUP_BATCH,
+} from "@/lib/config/limits";
 import { MeterUsageCheck, UsageLimit, UsageMeter, UsageSnapshot, UsageWindow } from "@/types/saas";
 
-type UsageBucket = {
-  count: number;
-  touchedAt: number;
-};
+// ─── Adapter interface ────────────────────────────────────────────────────────
 
-declare global {
-  // eslint-disable-next-line no-var
-  var skillPathUsageLedger: Map<string, UsageBucket> | undefined;
+export interface UsageLedgerAdapter {
+  increment(userId: string, meter: UsageMeter, window: UsageWindow, amount?: number): void;
+  getCount(userId: string, meter: UsageMeter, window: UsageWindow): number;
 }
 
-const ledger = global.skillPathUsageLedger ?? new Map<string, UsageBucket>();
+// ─── Window-key helpers (shared logic, not storage-specific) ─────────────────
 
-if (!global.skillPathUsageLedger) {
-  global.skillPathUsageLedger = ledger;
-}
-
-function windowKey(window: UsageWindow, now = new Date()) {
+function windowKey(window: UsageWindow, now = new Date()): string {
   if (window === "DAILY") {
     return now.toISOString().slice(0, 10);
   }
@@ -28,45 +41,89 @@ function windowKey(window: UsageWindow, now = new Date()) {
     return copy.toISOString().slice(0, 10);
   }
 
+  // MONTHLY
   return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
-function bucketId(userId: string, meter: UsageMeter, window: UsageWindow, now = new Date()) {
+function bucketId(userId: string, meter: UsageMeter, window: UsageWindow, now = new Date()): string {
   return `${userId}:${meter}:${window}:${windowKey(window, now)}`;
 }
 
-function cleanup(maxEntries = 5000) {
-  if (ledger.size < maxEntries) {
-    return;
+// ─── In-memory adapter (default) ─────────────────────────────────────────────
+
+type UsageBucket = {
+  count: number;
+  touchedAt: number;
+};
+
+declare global {
+  // eslint-disable-next-line no-var
+  var skillPathUsageLedger: Map<string, UsageBucket> | undefined;
+}
+
+class InMemoryUsageLedgerAdapter implements UsageLedgerAdapter {
+  private readonly ledger: Map<string, UsageBucket>;
+
+  constructor() {
+    if (!global.skillPathUsageLedger) {
+      global.skillPathUsageLedger = new Map<string, UsageBucket>();
+    }
+    this.ledger = global.skillPathUsageLedger;
   }
 
-  const oldest = [...ledger.entries()].sort((a, b) => a[1].touchedAt - b[1].touchedAt).slice(0, 1000);
-  for (const [key] of oldest) {
-    ledger.delete(key);
+  private cleanup(): void {
+    if (this.ledger.size < MAX_USAGE_LEDGER_ENTRIES) {
+      return;
+    }
+
+    // Evict the oldest USAGE_LEDGER_CLEANUP_BATCH entries by touchedAt.
+    const oldest = [...this.ledger.entries()]
+      .sort((a, b) => a[1].touchedAt - b[1].touchedAt)
+      .slice(0, USAGE_LEDGER_CLEANUP_BATCH);
+
+    for (const [key] of oldest) {
+      this.ledger.delete(key);
+    }
+  }
+
+  increment(userId: string, meter: UsageMeter, window: UsageWindow, amount = 1): void {
+    this.cleanup();
+    const key = bucketId(userId, meter, window);
+    const current = this.ledger.get(key);
+
+    if (!current) {
+      this.ledger.set(key, { count: Math.max(amount, 0), touchedAt: Date.now() });
+      return;
+    }
+
+    current.count += Math.max(amount, 0);
+    current.touchedAt = Date.now();
+    this.ledger.set(key, current);
+  }
+
+  getCount(userId: string, meter: UsageMeter, window: UsageWindow): number {
+    const key = bucketId(userId, meter, window);
+    return this.ledger.get(key)?.count ?? 0;
   }
 }
 
-export function incrementUsage(userId: string, meter: UsageMeter, window: UsageWindow, amount = 1) {
-  cleanup();
-  const key = bucketId(userId, meter, window);
-  const current = ledger.get(key);
+// ─── Active adapter (swap here to change backend) ────────────────────────────
 
-  if (!current) {
-    ledger.set(key, {
-      count: Math.max(amount, 0),
-      touchedAt: Date.now(),
-    });
-    return;
-  }
+/**
+ * The active usage-ledger backend.
+ * Replace with a Redis adapter to persist counters across restarts and
+ * share state between horizontally-scaled Node processes.
+ */
+export const usageLedgerAdapter: UsageLedgerAdapter = new InMemoryUsageLedgerAdapter();
 
-  current.count += Math.max(amount, 0);
-  current.touchedAt = Date.now();
-  ledger.set(key, current);
+// ─── Public API (unchanged signatures) ───────────────────────────────────────
+
+export function incrementUsage(userId: string, meter: UsageMeter, window: UsageWindow, amount = 1): void {
+  usageLedgerAdapter.increment(userId, meter, window, amount);
 }
 
-export function getUsageCount(userId: string, meter: UsageMeter, window: UsageWindow) {
-  const key = bucketId(userId, meter, window);
-  return ledger.get(key)?.count ?? 0;
+export function getUsageCount(userId: string, meter: UsageMeter, window: UsageWindow): number {
+  return usageLedgerAdapter.getCount(userId, meter, window);
 }
 
 export function getUsageSnapshot(userId: string, meters: UsageMeter[], window: UsageWindow): UsageSnapshot {

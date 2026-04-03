@@ -1,4 +1,4 @@
-import { Activity, Award, BookOpenCheck, CheckCircle2, Medal, Sparkles, Timer } from "lucide-react";
+import { Award, BookOpenCheck, CheckCircle2, Medal, Sparkles, Timer } from "lucide-react";
 
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
 import { EmptyState } from "@/components/ui/empty-state";

@@ -1,4 +1,7 @@
+import { getServerSession } from "next-auth";
+
 import { Errors, apiOk, withErrorHandler } from "@/lib/api/error-handler";
+import { authOptions } from "@/lib/auth";
 import { reviewUserStoryLocally } from "@/features/simulations/ba-simulation";
 
 type Body = {
@@ -9,6 +12,11 @@ type Body = {
 };
 
 export const POST = withErrorHandler(async (request: Request) => {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    throw Errors.unauthorized();
+  }
+
   const body = (await request.json()) as Body;
 
   if (

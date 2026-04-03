@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import type { TrackGroup } from "@/components/admin/modules/modules-table";
 import { requireAdminPermission } from "@/lib/admin-auth";
-import { prisma } from "@/lib/prisma";
+import { getModuleListData } from "@/lib/admin/modules/queries";
 
 const ModulesTable = dynamic(
   () =>
@@ -40,37 +40,7 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
   const query = paramValue(searchParams?.q);
   const trackIdFilter = paramValue(searchParams?.trackId);
 
-  const [tracks, modules] = await prisma.$transaction([
-    prisma.track.findMany({
-      orderBy: { title: "asc" },
-      select: { id: true, title: true },
-    }),
-    prisma.module.findMany({
-      where: {
-        ...(query
-          ? {
-              OR: [
-                { title: { contains: query, mode: "insensitive" } },
-                { description: { contains: query, mode: "insensitive" } },
-              ],
-            }
-          : {}),
-        ...(trackIdFilter ? { trackId: trackIdFilter } : {}),
-      },
-      orderBy: [{ track: { title: "asc" } }, { order: "asc" }],
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        order: true,
-        duration: true,
-        trackId: true,
-        track: { select: { title: true, slug: true, category: true } },
-        quiz: { select: { id: true } },
-        _count: { select: { lessons: true } },
-      },
-    }),
-  ]);
+  const [tracks, modules] = await getModuleListData({ query, trackId: trackIdFilter });
 
   const activeTrackLabel = trackIdFilter
     ? (tracks.find((track) => track.id === trackIdFilter)?.title ?? t("list.selectedTrack"))
