@@ -245,11 +245,11 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
   const completed = Object.keys(answers).length === scenario.steps.length;
 
   return (
-    <section id="scenario-lab" className="surface-elevated overflow-hidden border border-emerald-400/25 bg-card/40 backdrop-blur-md">
+    <section id="scenario-lab" className="surface-elevated overflow-hidden border border-emerald-500/25 bg-card/60 backdrop-blur-md">
       <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_280px]">
         <div className="space-y-5 p-5 sm:p-6">
           <div className="space-y-3">
-            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-200">
+            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/35 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-300">
               <SearchCheck className="h-4 w-4" />
               QA симулятор
             </span>
@@ -267,7 +267,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
               const selected = step.choices.find((choice) => choice.id === selectedId);
 
               return (
-                <article key={step.id} className="rounded-2xl border border-border/50 bg-slate-950/25 p-4">
+                <article key={step.id} className="rounded-2xl border border-border/60 bg-background/35 p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <h3 className="text-base font-semibold text-foreground">{step.title}</h3>
@@ -287,9 +287,9 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
                           onClick={() => setAnswers((current) => ({ ...current, [step.id]: choice.id }))}
                           className={cn(
                             "rounded-xl border px-3 py-2.5 text-left text-sm transition-all",
-                            isSelected && choice.correct && "border-emerald-300/45 bg-emerald-400/10 text-emerald-100",
-                            isSelected && !choice.correct && "border-amber-300/35 bg-amber-400/10 text-amber-100",
-                            !isSelected && "border-border/50 bg-card/35 text-muted-foreground hover:border-emerald-300/30 hover:text-foreground",
+                            isSelected && choice.correct && "border-emerald-500/45 bg-emerald-500/10 text-foreground ring-1 ring-emerald-500/20",
+                            isSelected && !choice.correct && "border-amber-500/45 bg-amber-500/10 text-foreground ring-1 ring-amber-500/20",
+                            !isSelected && "border-border/60 bg-card/50 text-muted-foreground hover:border-emerald-500/35 hover:bg-card/70 hover:text-foreground",
                           )}
                         >
                           {choice.label}
@@ -299,7 +299,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
                   </div>
 
                   {selected ? (
-                    <p className="mt-3 rounded-xl border border-border/50 bg-background/35 px-3 py-2 text-sm leading-relaxed text-muted-foreground">
+                    <p className="mt-3 rounded-xl border border-border/60 bg-card/50 px-3 py-2 text-sm leading-relaxed text-muted-foreground">
                       {selected.feedback}
                     </p>
                   ) : null}
@@ -309,7 +309,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
           </div>
         </div>
 
-        <aside className="border-t border-border/50 bg-slate-950/25 p-5 lg:border-l lg:border-t-0">
+        <aside className="border-t border-border/60 bg-background/30 p-5 lg:border-l lg:border-t-0">
           <div className="sticky top-24 space-y-5">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Результат</p>
@@ -319,12 +319,12 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
               </p>
             </div>
 
-            <div className="rounded-2xl border border-emerald-300/20 bg-emerald-400/10 p-4">
-              <p className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-100">
+            <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/10 p-4">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
                 <ClipboardCheck className="h-4 w-4" />
                 Артефакт
               </p>
-              <ul className="mt-3 space-y-2 text-sm text-emerald-100/75">
+              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 {scenario.artifact.map((item) => (
                   <li key={item}>{item}</li>
                 ))}

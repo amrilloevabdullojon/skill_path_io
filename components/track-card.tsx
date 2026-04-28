@@ -15,9 +15,9 @@ const CATEGORY_GRADIENTS: Record<string, string> = {
 };
 
 const CATEGORY_BORDER: Record<string, string> = {
-  QA: "border-emerald-200 dark:border-emerald-500/20",
-  BA: "border-orange-200 dark:border-orange-500/20",
-  DA: "border-violet-200 dark:border-violet-500/20",
+  QA: "border-emerald-500/25",
+  BA: "border-orange-500/25",
+  DA: "border-violet-500/25",
 };
 
 const CATEGORY_ACCENT_TEXT: Record<string, string> = {
@@ -54,8 +54,8 @@ export function TrackCard({ track }: TrackCardProps) {
   const card = (
       <article
         className={cn(
-          "group relative overflow-hidden rounded-2xl border bg-card/40 backdrop-blur-md transition-all duration-300",
-          comingSoon ? "opacity-75" : "hover:-translate-y-1 hover:bg-card/60 hover:shadow-xl",
+          "group relative overflow-hidden rounded-2xl border bg-card/60 backdrop-blur-md transition-all duration-300",
+          comingSoon ? "opacity-75" : "hover:-translate-y-1 hover:bg-card/80 hover:shadow-xl",
           !comingSoon && category === "QA" ? "hover:shadow-[0_8px_30px_rgba(16,185,129,0.15)]" : "",
           !comingSoon && category === "BA" ? "hover:shadow-[0_8px_30px_rgba(249,115,22,0.15)]" : "",
           !comingSoon && category === "DA" ? "hover:shadow-[0_8px_30px_rgba(139,92,246,0.15)]" : "",
@@ -83,7 +83,7 @@ export function TrackCard({ track }: TrackCardProps) {
             </span>
 
             {comingSoon ? (
-              <span className="inline-flex items-center gap-1 rounded-full border border-border/50 bg-muted/20 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+              <span className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-muted/30 px-2.5 py-1 text-xs font-medium text-muted-foreground">
                 <LockKeyhole className="h-3 w-3" />
                 Coming soon
               </span>
@@ -100,7 +100,7 @@ export function TrackCard({ track }: TrackCardProps) {
           </div>
 
           {/* Title */}
-          <h3 className="text-lg font-bold leading-snug text-foreground group-hover:text-indigo-300 transition-colors">
+          <h3 className={cn("text-lg font-bold leading-snug text-foreground transition-colors", !comingSoon && "group-hover:text-indigo-300")}>
             {track.title}
           </h3>
 
@@ -161,7 +161,7 @@ export function TrackCard({ track }: TrackCardProps) {
           <div
             className={cn(
               "inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300",
-              "bg-foreground/5 border border-border/50",
+              "border border-border/60 bg-muted/25",
               comingSoon ? "text-muted-foreground" : "text-foreground",
               !comingSoon && category === "QA" ? "group-hover:bg-emerald-500/10 group-hover:border-emerald-500/40 group-hover:text-emerald-400" : "",
               !comingSoon && category === "BA" ? "group-hover:bg-orange-500/10 group-hover:border-orange-500/40 group-hover:text-orange-400" : "",

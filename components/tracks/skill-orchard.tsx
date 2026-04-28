@@ -44,24 +44,24 @@ function ripenessLabel(percent: number, state: LearningPathState) {
 
 function fruitClass(percent: number, state: LearningPathState, isQuiz: boolean) {
   if (state === "locked") {
-    return "border-slate-600/40 bg-slate-700/30 text-slate-400 shadow-none";
+    return "border-border/50 bg-muted/30 text-muted-foreground shadow-none";
   }
   if (percent >= 100 && isQuiz) {
-    return "border-amber-300/70 bg-amber-300 text-slate-950 shadow-[0_0_22px_rgba(251,191,36,0.45)]";
+    return "border-amber-400/70 bg-amber-400 text-background shadow-[0_0_22px_rgba(251,191,36,0.35)]";
   }
   if (percent >= 100) {
     return "border-red-300/80 bg-red-500 text-white shadow-[0_0_22px_rgba(248,113,113,0.35)]";
   }
   if (percent >= 75) {
-    return "border-orange-300/70 bg-orange-400 text-slate-950 shadow-[0_0_18px_rgba(251,146,60,0.28)]";
+    return "border-orange-400/70 bg-orange-400 text-background shadow-[0_0_18px_rgba(251,146,60,0.24)]";
   }
   if (percent >= 45) {
-    return "border-lime-300/70 bg-lime-400 text-slate-950 shadow-[0_0_16px_rgba(163,230,53,0.22)]";
+    return "border-lime-400/70 bg-lime-400 text-background shadow-[0_0_16px_rgba(163,230,53,0.20)]";
   }
   if (percent > 0) {
     return "border-emerald-300/50 bg-emerald-500/70 text-white shadow-[0_0_14px_rgba(16,185,129,0.18)]";
   }
-  return "border-emerald-500/30 bg-emerald-950 text-emerald-200";
+  return "border-emerald-500/35 bg-emerald-500/10 text-emerald-300";
 }
 
 function moduleFruitPercents(module: OrchardModule) {
@@ -84,7 +84,7 @@ function stateCopy(state: LearningPathState) {
 
 function stateClass(state: LearningPathState) {
   if (state === "completed") return "border-red-300/35 bg-red-500/10 text-red-200";
-  if (state === "in_progress") return "border-lime-300/35 bg-lime-500/10 text-lime-200";
+  if (state === "in_progress") return "border-emerald-500/35 bg-emerald-500/10 text-emerald-300";
   if (state === "available") return "border-emerald-300/35 bg-emerald-500/10 text-emerald-200";
   return "border-border/30 bg-muted/10 text-muted-foreground";
 }
@@ -101,7 +101,7 @@ export function SkillOrchard({
   const activeModules = modules.filter((moduleItem) => moduleItem.state !== "locked").length;
 
   return (
-    <section className="surface-elevated relative isolate overflow-hidden border border-border/50 bg-card/40 p-5 backdrop-blur-md sm:p-6">
+    <section className="surface-elevated relative isolate overflow-hidden border border-border/60 bg-card/60 p-5 backdrop-blur-md sm:p-6">
       <div className={cn("pointer-events-none absolute left-[-160px] top-[-160px] h-[360px] w-[360px] rounded-full blur-[120px] opacity-[0.08] -z-10", accent.glow)} />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-emerald-950/12 to-transparent -z-10" />
 
@@ -146,7 +146,7 @@ export function SkillOrchard({
         <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> открыто</span>
         <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-orange-400" /> закрепляется</span>
         <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-red-500" /> усвоено</span>
-        <span className="inline-flex items-center gap-1.5"><span className="flex h-4 w-4 items-center justify-center rounded-full bg-amber-300 text-[9px] font-bold text-slate-950">Q</span> квиз</span>
+        <span className="inline-flex items-center gap-1.5"><span className="flex h-4 w-4 items-center justify-center rounded-full bg-amber-400 text-[9px] font-bold text-background">Q</span> квиз</span>
       </div>
 
       <div className="mt-5 grid gap-4">
@@ -164,8 +164,8 @@ export function SkillOrchard({
               className={cn(
                 "group relative overflow-hidden rounded-2xl border p-4 transition-all sm:p-5",
                 isLocked
-                  ? "border-border/25 bg-slate-900/25 opacity-75"
-                  : "border-emerald-400/18 bg-slate-950/30 hover:border-emerald-300/35 hover:bg-slate-950/45",
+                  ? "border-border/40 bg-muted/20 opacity-75"
+                  : "border-emerald-500/20 bg-background/30 hover:border-emerald-500/40 hover:bg-card/70",
                 isNext && "ring-1 ring-emerald-300/25",
               )}
             >
@@ -250,7 +250,7 @@ export function SkillOrchard({
                       {moduleItem.unlockRequirement ?? "Закрыто"}
                     </span>
                   ) : (
-                    <Link href={moduleItem.href} className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-300 transition-colors hover:text-emerald-100">
+                    <Link href={moduleItem.href} className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-300 transition-colors hover:text-foreground">
                       {moduleItem.state === "completed" ? "Повторить" : "Открыть"}
                       <ArrowRight className="h-4 w-4" />
                     </Link>
