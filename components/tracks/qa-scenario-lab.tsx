@@ -41,6 +41,8 @@ type ScenarioConfig = {
   title: string;
   intro: string;
   scene: {
+    roots: string;
+    trunk: string;
     product: string;
     pressure: string;
     userReport: string;
@@ -56,6 +58,8 @@ const SCENARIOS: Record<number, ScenarioConfig> = {
     title: "Первое расследование бага",
     intro: "Разберите проблему регистрации и соберите основу первого баг-репорта.",
     scene: {
+      roots: "Воспроизводимость, окружение, ожидаемый и фактический результат",
+      trunk: "От жалобы пользователя к баг-репорту",
       product: "Форма регистрации",
       pressure: "До демо инвесторам: 18 минут",
       userReport: "«Ввожу email и пароль, нажимаю Submit, но аккаунт не создаётся»",
@@ -100,6 +104,8 @@ const SCENARIOS: Record<number, ScenarioConfig> = {
     title: "Разбор требований перед тестом",
     intro: "Проверьте требования к скидке и выберите покрытие, которое ловит реальные риски.",
     scene: {
+      roots: "Проверяемость требований, границы, негативные сценарии",
+      trunk: "От мутного правила к тестируемому контракту",
       product: "Промо-скидка для постоянных клиентов",
       pressure: "Backend уже начал реализацию",
       userReport: "«Нужно показывать скидку постоянным клиентам»",
@@ -144,6 +150,8 @@ const SCENARIOS: Record<number, ScenarioConfig> = {
     title: "Проверка формы и UI-состояний",
     intro: "Протестируйте форму оплаты как пользователь, который может ошибиться, ждать и вернуться назад.",
     scene: {
+      roots: "Состояния UI, ошибки, мобильный контекст, повторные действия",
+      trunk: "От пользовательского тупика к устойчивому flow",
       product: "Оплата заказа",
       pressure: "Трафик с мобильных: 64%",
       userReport: "«После оплаты не понимаю, ждать мне или нажимать ещё раз»",
@@ -188,6 +196,8 @@ const SCENARIOS: Record<number, ScenarioConfig> = {
     title: "API-проверка профиля",
     intro: "Проверьте endpoint профиля и решите, какие ответы говорят о стабильном контракте.",
     scene: {
+      roots: "Статус, тело ответа, авторизация, стабильность полей",
+      trunk: "От HTTP 200 к настоящему API-контракту",
       product: "GET /profile",
       pressure: "Фронтенд уже зависит от контракта",
       userReport: "«Иногда профиль открывается пустым, но ошибок нет»",
@@ -232,6 +242,8 @@ const SCENARIOS: Record<number, ScenarioConfig> = {
     title: "Release readiness",
     intro: "Перед релизом выберите минимальный набор проверок и сформулируйте рекомендацию команде.",
     scene: {
+      roots: "Smoke, impact, affected users, release recommendation",
+      trunk: "От тревоги перед релизом к прозрачному решению",
       product: "Релиз-кандидат",
       pressure: "Окно релиза закрывается через 30 минут",
       userReport: "«Нужно понять, можно ли выпускать версию сегодня»",
@@ -311,11 +323,15 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/35 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-300">
                 <Radio className="h-4 w-4" />
-                QA смена
+                Древо жизни
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-3 py-1 text-xs text-muted-foreground">
                 <Timer className="h-4 w-4" />
                 {scenario.scene.pressure}
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-3 py-1 text-xs text-muted-foreground">
+                <Target className="h-4 w-4" />
+                {scenario.scene.product}
               </span>
             </div>
 
@@ -331,16 +347,17 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
               <div className="rounded-2xl border border-border/60 bg-card/50 p-4">
                 <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <Target className="h-4 w-4" />
-                  Объект
+                  Корни
                 </p>
-                <p className="mt-2 text-sm font-semibold text-foreground">{scenario.scene.product}</p>
+                <p className="mt-2 text-sm font-semibold text-foreground">{scenario.scene.roots}</p>
               </div>
               <div className="rounded-2xl border border-border/60 bg-card/50 p-4 md:col-span-2">
                 <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <Zap className="h-4 w-4" />
-                  Сигнал от пользователя
+                  Ствол сценария
                 </p>
-                <p className="mt-2 text-sm leading-relaxed text-foreground">{scenario.scene.userReport}</p>
+                <p className="mt-2 text-sm font-semibold text-foreground">{scenario.scene.trunk}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{scenario.scene.userReport}</p>
               </div>
             </div>
           </div>
@@ -350,7 +367,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
               <div>
                 <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <Gauge className="h-4 w-4" />
-                  Quality gate
+                  Кольца роста
                 </p>
                 <p className="mt-2 text-lg font-semibold text-foreground">{qualityGate}</p>
               </div>
@@ -371,7 +388,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
       <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-4 p-5 sm:p-6">
           <div className="rounded-2xl border border-border/60 bg-background/35 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Текущий фокус</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Текущая ветвь</p>
             <p className="mt-2 text-base font-semibold text-foreground">{currentStep.title}</p>
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{currentStep.prompt}</p>
           </div>
@@ -385,7 +402,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
                 <article key={step.id} className="overflow-hidden rounded-2xl border border-border/60 bg-card/45">
                   <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/50 bg-background/25 px-4 py-3">
                     <div className="min-w-0">
-                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Этап {stepIndex + 1}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Ветвь решения {stepIndex + 1}</p>
                       <h3 className="mt-1 text-base font-semibold text-foreground">{step.title.replace(/^\d+\.\s*/, "")}</h3>
                     </div>
                     {selected ? (
@@ -435,17 +452,17 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
         <aside className="border-t border-border/60 bg-background/30 p-5 xl:border-l xl:border-t-0">
           <div className="sticky top-24 space-y-5">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Собранный отчёт</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Плод модуля</p>
               <p className="mt-2 text-4xl font-semibold text-foreground">{score}/{scenario.steps.length}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {completed ? "Смена завершена. Проверьте итоговый артефакт и закрепите результат." : "Решения будут собираться в отчёт по мере выбора."}
+                {completed ? "Плод созрел. Проверьте артефакт и закрепите результат." : "Каждая ветвь решения питает итоговый артефакт."}
               </p>
             </div>
 
             <div className="rounded-2xl border border-border/60 bg-card/50 p-4">
               <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
                 <FileText className="h-4 w-4" />
-                Evidence log
+                Кольца решений
               </p>
               <div className="mt-3 space-y-3">
                 {selectedChoices.length > 0 ? selectedChoices.map(({ step, selected }) => (
@@ -455,7 +472,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
                   </div>
                 )) : (
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    Выберите первое решение, чтобы начать собирать доказательства.
+                    Выберите первое решение, чтобы на дереве появилось первое кольцо опыта.
                   </p>
                 )}
               </div>
@@ -464,7 +481,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
             <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/10 p-4">
               <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
                 <ClipboardCheck className="h-4 w-4" />
-                Артефакт
+                Созревший плод
               </p>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 {scenario.artifact.map((item) => (

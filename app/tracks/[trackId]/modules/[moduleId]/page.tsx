@@ -352,7 +352,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
   const showQaScenarioLab = trackCategory === TrackCategory.QA;
 
   const navLinks = [
-    { id: "module-overview", label: "Обзор модуля" },
+    { id: "module-overview", label: showQaScenarioLab ? "Корни модуля" : "Обзор модуля" },
     ...(showQaScenarioLab ? [{ id: "scenario-lab", label: "QA симулятор" }] : []),
     { id: "lessons-timeline", label: "Путь обучения" },
     { id: "lesson-content", label: "Содержание урока" },
@@ -507,10 +507,10 @@ export default async function ModulePage({ params }: ModulePageProps) {
           </header>
 
           <section id="module-overview" className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-5">
-            <h2 className="section-title">Обзор модуля</h2>
+            <h2 className="section-title">{showQaScenarioLab ? "Корни модуля" : "Обзор модуля"}</h2>
             <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
               <article className="surface-subtle space-y-3 p-4">
-                <h3 className="text-base font-semibold text-foreground">Цели обучения</h3>
+                <h3 className="text-base font-semibold text-foreground">{showQaScenarioLab ? "Питательные корни" : "Цели обучения"}</h3>
                 <p className="text-sm text-muted-foreground">{parsedContent.overview || currentModule.description}</p>
                 <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
                   {(parsedContent.objectives.length > 0 ? parsedContent.objectives : parsedContent.outcomes).map((item) => (
@@ -519,7 +519,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
                 </ul>
               </article>
               <article className={cn("surface-subtle space-y-3 p-4", moduleStateView[currentState].panel)}>
-                <h3 className="text-base font-semibold text-foreground">Награды прогресса</h3>
+                <h3 className="text-base font-semibold text-foreground">{showQaScenarioLab ? "Кольца роста" : "Награды прогресса"}</h3>
                 <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
                   <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">XP за урок: +{currentModuleCard.lessonXpReward}</p>
                   <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">XP за тест: +{currentModuleCard.quizXpReward}</p>
@@ -534,7 +534,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-base font-semibold text-foreground">Чему вы научитесь</h3>
+              <h3 className="text-base font-semibold text-foreground">{showQaScenarioLab ? "Какие ветви вырастут" : "Чему вы научитесь"}</h3>
               <div className="flex flex-wrap gap-2">
                 {(parsedContent.whatYouWillLearn.length > 0 ? parsedContent.whatYouWillLearn : currentModuleCard.outcomes).map((item) => (
                   <span key={item} className="skill-tag px-2.5 py-1 text-xs">

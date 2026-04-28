@@ -109,23 +109,23 @@ export function SkillOrchard({
         <div className="max-w-2xl">
           <div className="flex flex-wrap items-center gap-2">
             <span className={cn("rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide", accent.badge)}>
-              Дерево навыков
+              Древо жизни
             </span>
             <span className="rounded-full border border-border/50 bg-card/50 px-2.5 py-1 text-xs text-muted-foreground">
-              {categoryLabel} • {activeModules}/{modules.length} ветвей открыто
+              {categoryLabel} • {activeModules}/{modules.length} живых ветвей
             </span>
           </div>
           <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             {trackTitle}
           </h2>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
-            Каждая ветвь показывает модуль, уроки и квиз. Чем увереннее прохождение, тем спелее плод.
+            Корни дают базу, ствол ведёт через рабочие ситуации, ветви раскрывают решения, а плодом становится готовый артефакт.
           </p>
         </div>
 
-        <div className="w-full max-w-[220px] space-y-2">
+        <div className="w-full max-w-[260px] space-y-2">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">Общая спелость</span>
+            <span className="text-muted-foreground">Жизненная сила</span>
             <span className="font-semibold tabular-nums text-foreground">{progressPercent}%</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-muted/40">
@@ -143,10 +143,10 @@ export function SkillOrchard({
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-border/40 py-3 text-xs text-muted-foreground">
-        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> открыто</span>
-        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-orange-400" /> закрепляется</span>
-        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-red-500" /> усвоено</span>
-        <span className="inline-flex items-center gap-1.5"><span className="flex h-4 w-4 items-center justify-center rounded-full bg-amber-400 text-[9px] font-bold text-background">Q</span> квиз</span>
+        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> корни: открыто</span>
+        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-orange-400" /> ветвь: закрепляется</span>
+        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-red-500" /> плод: усвоено</span>
+        <span className="inline-flex items-center gap-1.5"><span className="flex h-4 w-4 items-center justify-center rounded-full bg-amber-400 text-[9px] font-bold text-background">Q</span> кольцо проверки</span>
       </div>
 
       <div className="mt-5 grid gap-4">
@@ -175,7 +175,7 @@ export function SkillOrchard({
                 <div className="min-w-0 space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      Ветвь {moduleItem.order}
+                      Живая ветвь {moduleItem.order}
                     </span>
                     <span className={cn("rounded-full border px-2 py-0.5 text-[10px] font-semibold", stateClass(moduleItem.state))}>
                       {stateCopy(moduleItem.state)}
@@ -183,7 +183,7 @@ export function SkillOrchard({
                     {isNext && (
                       <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/30 bg-emerald-400/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-200">
                         <PlayCircle className="h-3 w-3" />
-                        следующее
+                        растить сейчас
                       </span>
                     )}
                   </div>
@@ -202,8 +202,8 @@ export function SkillOrchard({
                       <Clock3 className="h-3.5 w-3.5" />
                       {moduleItem.durationMinutes} мин
                     </span>
-                    <span>{moduleItem.lessonsCount} урока</span>
-                    <span>{moduleItem.quizCount} квиз</span>
+                    <span>{moduleItem.lessonsCount} корня</span>
+                    <span>{moduleItem.quizCount} проверка</span>
                   </div>
                 </div>
 
@@ -218,7 +218,7 @@ export function SkillOrchard({
                           initial={{ scale: 0.75, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ delay: index * 0.05 + fruitIndex * 0.04 + 0.1, duration: 0.22 }}
-                          title={`${isQuiz ? "Квиз" : "Урок"}: ${ripenessLabel(fruitPercent, moduleItem.state)}`}
+                          title={`${isQuiz ? "Кольцо проверки" : "Корень"}: ${ripenessLabel(fruitPercent, moduleItem.state)}`}
                           className={cn(
                             "relative flex h-10 w-10 items-center justify-center rounded-full border text-[10px] font-bold transition-transform group-hover:-translate-y-0.5",
                             fruitClass(fruitPercent, moduleItem.state, isQuiz),
@@ -251,7 +251,7 @@ export function SkillOrchard({
                     </span>
                   ) : (
                     <Link href={moduleItem.href} className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-300 transition-colors hover:text-foreground">
-                      {moduleItem.state === "completed" ? "Повторить" : "Открыть"}
+                      {moduleItem.state === "completed" ? "Повторить" : "Растить ветвь"}
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                   )}
@@ -266,9 +266,9 @@ export function SkillOrchard({
         <div className="mt-4 rounded-2xl border border-amber-400/25 bg-amber-500/10 p-4">
           <p className="inline-flex items-center gap-2 text-sm font-semibold text-amber-200">
             <CheckCircle2 className="h-4 w-4" />
-            Сад созрел
+            Древо созрело
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">Все доступные ветви закрыты.</p>
+          <p className="mt-1 text-xs text-muted-foreground">Все доступные ветви дали результат.</p>
         </div>
       )}
     </section>
