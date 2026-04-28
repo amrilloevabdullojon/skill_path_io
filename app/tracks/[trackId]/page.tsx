@@ -44,6 +44,7 @@ import {
 } from "@/lib/tracks/progression";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { cn } from "@/lib/utils";
+import { SkillOrchard } from "@/components/tracks/skill-orchard";
 import { TrackModuleTree } from "@/components/tracks/track-module-tree";
 
 type TrackDetailsProps = {
@@ -461,6 +462,30 @@ export default async function TrackDetailsPage({
               )}
             </section>
           </div>
+
+          <SkillOrchard
+            trackTitle={track.title}
+            categoryLabel={categoryLabel(trackCategory)}
+            progressPercent={progression.overallProgressPercent}
+            accent={{
+              progress: accent.progress,
+              glow: accent.glow,
+              badge: accent.badge,
+            }}
+            modules={progression.modules.map((m) => ({
+              id: m.id,
+              order: m.order,
+              title: m.title,
+              shortDescription: m.shortDescription,
+              state: m.state,
+              progressPercent: m.progressPercent,
+              durationMinutes: m.durationMinutes,
+              lessonsCount: m.lessonsCount,
+              quizCount: m.quizCount,
+              href: `/tracks/${track.slug}/modules/${m.id}`,
+              unlockRequirement: m.unlockRequirement,
+            }))}
+          />
 
           {/* Module tree */}
           <section className="surface-elevated space-y-5 p-5 border border-border/50 bg-card/40 backdrop-blur-md relative isolate">
