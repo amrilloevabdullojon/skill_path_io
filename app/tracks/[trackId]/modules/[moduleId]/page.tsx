@@ -349,7 +349,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
   ]
     .join("\n\n")
     .slice(0, 2000);
-  const showQaScenarioLab = trackCategory === TrackCategory.QA && currentModule.order === 1;
+  const showQaScenarioLab = trackCategory === TrackCategory.QA;
 
   const navLinks = [
     { id: "module-overview", label: "Обзор модуля" },
@@ -548,6 +548,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
           {showQaScenarioLab ? (
             <QaScenarioLab
               moduleTitle={currentModule.title}
+              moduleOrder={currentModule.order}
               quizHref={currentModule.quiz ? `/tracks/${track.slug}/modules/${currentModule.id}/quiz` : null}
             />
           ) : null}
