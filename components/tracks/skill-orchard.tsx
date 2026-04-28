@@ -33,6 +33,14 @@ type SkillOrchardProps = {
   };
 };
 
+const TREE_NODE_LAYOUT = [
+  { x: 22, y: 42 },
+  { x: 38, y: 22 },
+  { x: 62, y: 24 },
+  { x: 78, y: 44 },
+  { x: 51, y: 61 },
+];
+
 function ripenessLabel(percent: number, state: LearningPathState) {
   if (state === "locked") return "Почка";
   if (percent >= 100) return "Спелое";
@@ -89,6 +97,22 @@ function stateClass(state: LearningPathState) {
   return "border-border/30 bg-muted/10 text-muted-foreground";
 }
 
+function treeFruitClass(moduleItem: OrchardModule, isNext: boolean) {
+  if (moduleItem.state === "locked") {
+    return "border-border/60 bg-muted/40 text-muted-foreground";
+  }
+  if (moduleItem.progressPercent >= 100) {
+    return "border-red-400/70 bg-red-500 text-white shadow-[0_0_26px_rgba(248,113,113,0.28)]";
+  }
+  if (isNext) {
+    return "border-emerald-300/80 bg-emerald-500 text-white shadow-[0_0_30px_rgba(16,185,129,0.30)]";
+  }
+  if (moduleItem.progressPercent > 0) {
+    return "border-orange-400/70 bg-orange-400 text-background shadow-[0_0_22px_rgba(251,146,60,0.22)]";
+  }
+  return "border-emerald-500/40 bg-emerald-500/12 text-emerald-300";
+}
+
 export function SkillOrchard({
   modules,
   trackTitle,
@@ -139,6 +163,96 @@ export function SkillOrchard({
           <p className="text-xs text-muted-foreground">
             {ripeModules} зрелых ветвей
           </p>
+        </div>
+      </div>
+
+      <div className="relative mt-6 overflow-hidden rounded-[28px] border border-emerald-500/20 bg-background/35 px-4 py-5 sm:px-6">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_260px] xl:items-center">
+          <div className="relative min-h-[360px] sm:min-h-[420px]">
+            <svg
+              viewBox="0 0 900 520"
+              role="img"
+              aria-label="Визуальная карта древа жизни"
+              className="absolute inset-0 h-full w-full text-emerald-500/50"
+              preserveAspectRatio="xMidYMid meet"
+            >
+              <path d="M450 446 C448 392 438 328 452 268 C462 224 462 176 450 122" fill="none" stroke="currentColor" strokeWidth="28" strokeLinecap="round" />
+              <path d="M450 256 C358 222 284 190 198 118" fill="none" stroke="currentColor" strokeWidth="14" strokeLinecap="round" />
+              <path d="M455 224 C514 166 568 120 668 88" fill="none" stroke="currentColor" strokeWidth="14" strokeLinecap="round" />
+              <path d="M456 302 C558 286 656 272 758 218" fill="none" stroke="currentColor" strokeWidth="12" strokeLinecap="round" />
+              <path d="M448 350 C390 384 330 412 244 420" fill="none" stroke="currentColor" strokeWidth="12" strokeLinecap="round" />
+              <path d="M449 445 C396 462 342 482 292 504" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
+              <path d="M454 446 C512 462 572 480 624 504" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
+              <path d="M450 448 C452 474 450 494 450 512" fill="none" stroke="currentColor" strokeWidth="8" strokeLinecap="round" />
+              <path d="M164 126 C245 42 384 24 486 62 C558 10 704 30 775 118 C844 203 814 322 724 366 C704 456 596 500 496 466 C420 516 280 486 240 392 C132 360 94 222 164 126Z" fill="currentColor" className="opacity-[0.08]" />
+              <path d="M158 390 C252 448 352 474 456 472 C562 470 664 440 746 384" fill="none" stroke="currentColor" strokeWidth="2" strokeDasharray="8 14" className="opacity-50" />
+            </svg>
+
+            {modules.slice(0, TREE_NODE_LAYOUT.length).map((moduleItem, index) => {
+              const position = TREE_NODE_LAYOUT[index];
+              const isLocked = moduleItem.state === "locked";
+              const isNext = nextModule?.id === moduleItem.id;
+
+              const fruit = (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.72, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  whileHover={!isLocked ? { scale: 1.08, y: -4 } : undefined}
+                  transition={{ delay: index * 0.08, duration: 0.36, ease: "easeOut" }}
+                  className={cn(
+                    "group absolute flex h-[82px] w-[82px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border-2 text-center transition-all sm:h-[96px] sm:w-[96px]",
+                    treeFruitClass(moduleItem, isNext),
+                    isNext && "ring-4 ring-emerald-500/15",
+                  )}
+                  style={{ left: `${position.x}%`, top: `${position.y}%` }}
+                >
+                  <span className="text-[10px] font-semibold uppercase tracking-wider opacity-80">Ветвь</span>
+                  <span className="text-lg font-bold tabular-nums sm:text-xl">{moduleItem.order}</span>
+                  <span className="mt-0.5 text-[10px] font-semibold tabular-nums opacity-80">{moduleItem.progressPercent}%</span>
+                  {moduleItem.progressPercent >= 100 ? (
+                    <span className="absolute -right-1 top-2 h-3 w-5 rotate-[-25deg] rounded-full bg-emerald-300/85" />
+                  ) : null}
+                </motion.div>
+              );
+
+              if (isLocked) {
+                return (
+                  <div key={moduleItem.id} title={moduleItem.unlockRequirement ?? moduleItem.title}>
+                    {fruit}
+                  </div>
+                );
+              }
+
+              return (
+                <Link key={moduleItem.id} href={moduleItem.href} title={moduleItem.title}>
+                  {fruit}
+                </Link>
+              );
+            })}
+
+            <div className="pointer-events-none absolute bottom-2 left-1/2 w-[min(460px,82%)] -translate-x-1/2 border-t border-emerald-500/25 pt-3 text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">корневая система</p>
+              <p className="mt-1 text-xs text-muted-foreground">понятия, практика, проверка, итоговый артефакт</p>
+            </div>
+          </div>
+
+          <div className="space-y-4 xl:border-l xl:border-border/50 xl:pl-5">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Сейчас растёт</p>
+              <p className="mt-2 text-lg font-semibold leading-snug text-foreground">
+                {nextModule?.title ?? "Все ветви созрели"}
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {nextModule?.shortDescription ?? "Древо уже собрало все доступные плоды трека."}
+              </p>
+            </div>
+            {nextModule ? (
+              <Link href={nextModule.href} className="btn-primary inline-flex w-full items-center justify-center gap-2">
+                Растить ветвь
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            ) : null}
+          </div>
         </div>
       </div>
 
