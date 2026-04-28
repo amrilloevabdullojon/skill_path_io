@@ -12,6 +12,7 @@ import { LearningFlowTree } from "@/components/tracks/learning-flow-tree";
 import { MarkModuleCompleteButton } from "@/components/tracks/mark-module-complete-button";
 import { ModuleReadingProgress } from "@/components/tracks/module-reading-progress";
 import { ModuleSidebarNav } from "@/components/tracks/module-sidebar-nav";
+import { QaScenarioLab } from "@/components/tracks/qa-scenario-lab";
 import { QuickSaveBookmarkButton } from "@/components/tracks/quick-save-bookmark-button";
 import { TrackStickyProgress } from "@/components/tracks/track-sticky-progress";
 import { authOptions } from "@/lib/auth";
@@ -348,9 +349,11 @@ export default async function ModulePage({ params }: ModulePageProps) {
   ]
     .join("\n\n")
     .slice(0, 2000);
+  const showQaScenarioLab = trackCategory === TrackCategory.QA && currentModule.order === 1;
 
   const navLinks = [
     { id: "module-overview", label: "Обзор модуля" },
+    ...(showQaScenarioLab ? [{ id: "scenario-lab", label: "QA симулятор" }] : []),
     { id: "lessons-timeline", label: "Путь обучения" },
     { id: "lesson-content", label: "Содержание урока" },
     { id: "practical-task", label: "Практическое задание" },
@@ -541,6 +544,13 @@ export default async function ModulePage({ params }: ModulePageProps) {
               </div>
             </div>
           </section>
+
+          {showQaScenarioLab ? (
+            <QaScenarioLab
+              moduleTitle={currentModule.title}
+              quizHref={currentModule.quiz ? `/tracks/${track.slug}/modules/${currentModule.id}/quiz` : null}
+            />
+          ) : null}
 
           <section id="lessons-timeline" className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-5">
             <h2 className="section-title">Путь обучения</h2>

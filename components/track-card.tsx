@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle, Clock3, Layers3 } from "lucide-react";
+import { ArrowRight, CheckCircle, Clock3, Layers3, LockKeyhole } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { RuntimeTrackCardData } from "@/lib/learning/runtime-content";
@@ -49,19 +49,19 @@ export function TrackCard({ track }: TrackCardProps) {
   const category = getCategoryKey(track.category, track.slug);
   const progress = track.progress;
   const icon = (track as RuntimeTrackCardData & { icon?: string }).icon ?? category;
+  const comingSoon = Boolean(track.comingSoon);
 
-  return (
-    <Link href={`/tracks/${track.slug}`} className="block h-full">
+  const card = (
       <article
         className={cn(
           "group relative overflow-hidden rounded-2xl border bg-card/40 backdrop-blur-md transition-all duration-300",
-          "hover:-translate-y-1 hover:shadow-xl hover:bg-card/60",
-          category === "QA" ? "hover:shadow-[0_8px_30px_rgba(16,185,129,0.15)]" : "",
-          category === "BA" ? "hover:shadow-[0_8px_30px_rgba(249,115,22,0.15)]" : "",
-          category === "DA" ? "hover:shadow-[0_8px_30px_rgba(139,92,246,0.15)]" : "",
+          comingSoon ? "opacity-75" : "hover:-translate-y-1 hover:bg-card/60 hover:shadow-xl",
+          !comingSoon && category === "QA" ? "hover:shadow-[0_8px_30px_rgba(16,185,129,0.15)]" : "",
+          !comingSoon && category === "BA" ? "hover:shadow-[0_8px_30px_rgba(249,115,22,0.15)]" : "",
+          !comingSoon && category === "DA" ? "hover:shadow-[0_8px_30px_rgba(139,92,246,0.15)]" : "",
           CATEGORY_BORDER[category] ?? "border-border/50 hover:border-border",
-          progress?.isStarted && progress.progressPercent < 100 ? "ring-1 ring-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.1)]" : "",
-          progress?.progressPercent === 100 ? "ring-1 ring-emerald-500/30" : "",
+          !comingSoon && progress?.isStarted && progress.progressPercent < 100 ? "ring-1 ring-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.1)]" : "",
+          !comingSoon && progress?.progressPercent === 100 ? "ring-1 ring-emerald-500/30" : "",
         )}
       >
         {/* Gradient header */}
@@ -82,7 +82,12 @@ export function TrackCard({ track }: TrackCardProps) {
               {icon}
             </span>
 
-            {progress?.progressPercent === 100 ? (
+            {comingSoon ? (
+              <span className="inline-flex items-center gap-1 rounded-full border border-border/50 bg-muted/20 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                <LockKeyhole className="h-3 w-3" />
+                Coming soon
+              </span>
+            ) : progress?.progressPercent === 100 ? (
               <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-400">
                 <CheckCircle className="h-3 w-3" />
                 Завершён
@@ -157,22 +162,37 @@ export function TrackCard({ track }: TrackCardProps) {
             className={cn(
               "inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300",
               "bg-foreground/5 border border-border/50",
-              category === "QA" ? "group-hover:bg-emerald-500/10 group-hover:border-emerald-500/40 group-hover:text-emerald-400" : "",
-              category === "BA" ? "group-hover:bg-orange-500/10 group-hover:border-orange-500/40 group-hover:text-orange-400" : "",
-              category === "DA" ? "group-hover:bg-violet-500/10 group-hover:border-violet-500/40 group-hover:text-violet-400" : "",
-              !["QA", "BA", "DA"].includes(category) ? "group-hover:bg-indigo-500/10 group-hover:border-indigo-500/40 group-hover:text-indigo-300" : "",
-              "text-foreground",
+              comingSoon ? "text-muted-foreground" : "text-foreground",
+              !comingSoon && category === "QA" ? "group-hover:bg-emerald-500/10 group-hover:border-emerald-500/40 group-hover:text-emerald-400" : "",
+              !comingSoon && category === "BA" ? "group-hover:bg-orange-500/10 group-hover:border-orange-500/40 group-hover:text-orange-400" : "",
+              !comingSoon && category === "DA" ? "group-hover:bg-violet-500/10 group-hover:border-violet-500/40 group-hover:text-violet-400" : "",
+              !comingSoon && !["QA", "BA", "DA"].includes(category) ? "group-hover:bg-indigo-500/10 group-hover:border-indigo-500/40 group-hover:text-indigo-300" : "",
             )}
           >
-            {progress?.progressPercent === 100
+            {comingSoon
+              ? "Скоро откроется"
+              : progress?.progressPercent === 100
               ? "Повторить материал"
               : progress?.isStarted
                 ? "Продолжить обучение"
                 : "Начать трек"}
-            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            {comingSoon ? <LockKeyhole className="h-4 w-4" /> : <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />}
           </div>
         </div>
       </article>
+  );
+
+  if (comingSoon) {
+    return (
+      <div className="block h-full cursor-not-allowed" aria-disabled="true">
+        {card}
+      </div>
+    );
+  }
+
+  return (
+    <Link href={`/tracks/${track.slug}`} className="block h-full">
+      {card}
     </Link>
   );
 }

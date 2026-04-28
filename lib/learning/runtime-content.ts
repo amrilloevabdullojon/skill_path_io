@@ -54,6 +54,7 @@ export type RuntimeTrackCardData = {
     order: number;
   }>;
   progress?: TrackProgress;
+  comingSoon?: boolean;
 };
 
 export function toRuntimeTrackCardData(course: RuntimeCourse): RuntimeTrackCardData {
@@ -69,6 +70,7 @@ export function toRuntimeTrackCardData(course: RuntimeCourse): RuntimeTrackCardD
     durationWeeks,
     category: course.category,
     source: course.source,
+    comingSoon: course.category !== "QA",
     modules: course.modules
       .sort((a, b) => a.order - b.order)
       .map((moduleItem) => ({
