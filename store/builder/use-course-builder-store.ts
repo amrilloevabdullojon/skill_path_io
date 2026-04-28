@@ -144,8 +144,8 @@ export const useCourseBuilderStore = create<StoreState>()(
             createdAt: now,
             updatedAt: now,
             publishedAt: null,
-            createdBy: "admin@skillpath.local",
-            updatedBy: "admin@skillpath.local",
+            createdBy: "admin@levio.local",
+            updatedBy: "admin@levio.local",
             version: 1,
             visibility: payload.visibility || "PUBLIC",
             difficulty: payload.difficulty || "MEDIUM",
@@ -155,7 +155,7 @@ export const useCourseBuilderStore = create<StoreState>()(
               enabled: true,
               certificateTitle: `${title} Certificate`,
               certificateTemplate: "modern-dark",
-              signatoryName: "SkillPath Academy",
+              signatoryName: "Levio",
               signatoryRole: "Head of Learning",
               logoUrl: "",
               certificateText: "Awarded for successful completion.",
@@ -172,7 +172,7 @@ export const useCourseBuilderStore = create<StoreState>()(
             {
               id: createId("version"),
               version: 1,
-              updatedBy: "admin@skillpath.local",
+              updatedBy: "admin@levio.local",
               updatedAt: now,
               changelogNote: "Course created",
               snapshot: {
@@ -218,7 +218,7 @@ export const useCourseBuilderStore = create<StoreState>()(
                 ...patch,
                 slug: patch.slug ? slugify(patch.slug) : entity.course.slug,
                 updatedAt: nowIso(),
-                updatedBy: "admin@skillpath.local",
+                updatedBy: "admin@levio.local",
               },
             }),
           ),
@@ -285,7 +285,7 @@ export const useCourseBuilderStore = create<StoreState>()(
             {
               id: createId("version"),
               version: 1,
-              updatedBy: "admin@skillpath.local",
+              updatedBy: "admin@levio.local",
               updatedAt: nowIso(),
               changelogNote: "Duplicated from another course",
               snapshot: {
@@ -1011,7 +1011,7 @@ export const useCourseBuilderStore = create<StoreState>()(
                     ...entity.course,
                     tags,
                     updatedAt: nowIso(),
-                    updatedBy: "admin@skillpath.local",
+                    updatedBy: "admin@levio.local",
                   },
                 }
               : entity,
@@ -1029,7 +1029,7 @@ export const useCourseBuilderStore = create<StoreState>()(
                 {
                   id: createId("version"),
                   version: nextVersion,
-                  updatedBy: "admin@skillpath.local",
+                  updatedBy: "admin@levio.local",
                   updatedAt: nowIso(),
                   changelogNote: note,
                   snapshot: {

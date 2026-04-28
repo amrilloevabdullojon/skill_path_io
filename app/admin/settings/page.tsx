@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { UserRole } from "@prisma/client";
+
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { readAdminSettings } from "@/lib/admin-settings";
 import { saveAdminSettingsAction } from "@/app/admin/actions";
@@ -104,8 +106,59 @@ export default async function AdminSettingsPage() {
               defaultValue={settings.defaultUserRole}
               className="select-base"
             >
-              <option value="STUDENT">Student</option>
-              <option value="ADMIN">Admin</option>
+              {Object.values(UserRole).map((role) => (
+                <option key={role} value={role}>{role}</option>
+              ))}
+            </select>
+          </label>
+        </section>
+
+        {/* ── Gamification & AI ── */}
+        <section className="surface-elevated space-y-4 p-6">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground">Gamification & AI</h2>
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold tracking-widest bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">NEW</span>
+          </div>
+
+          <label className="block space-y-1">
+            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              Core AI Services (Gemini Integration)
+            </span>
+            <select
+              name="aiEnabled"
+              defaultValue={String(settings.aiEnabled)}
+              className="select-base"
+            >
+              <option value="true">Enabled — Resume Scanner & Interviewer active</option>
+              <option value="false">Disabled — Service Unavailable (Saves API limits)</option>
+            </select>
+          </label>
+
+          <label className="block space-y-1">
+            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              Public AI Rate Limit (Per User / Minute)
+            </span>
+            <input
+              name="aiRateLimit"
+              type="number"
+              min={1}
+              max={100}
+              defaultValue={settings.aiRateLimit}
+              className="input-base"
+            />
+          </label>
+
+          <label className="block space-y-1">
+            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              Code Tinder Module
+            </span>
+            <select
+              name="codeTinderEnabled"
+              defaultValue={String(settings.codeTinderEnabled)}
+              className="select-base"
+            >
+              <option value="true">Enabled</option>
+              <option value="false">Disabled</option>
             </select>
           </label>
         </section>

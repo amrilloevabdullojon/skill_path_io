@@ -57,7 +57,7 @@ export function SettingsPanel({ entity, selected, canWrite, canPublish }: Settin
   const [customPrompt, setCustomPrompt] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [aiResult, setAiResult] = useState<string>("");
-  const [aiSource, setAiSource] = useState<"mock" | "anthropic" | null>(null);
+  const [aiSource, setAiSource] = useState<AdminAiResponse["source"] | null>(null);
 
   const moduleItem = selected.type === "module" ? entity.modules.find((item) => item.id === selected.id) : null;
   const lesson = selected.type === "lesson" ? entity.lessons.find((item) => item.id === selected.id) : null;
@@ -223,11 +223,11 @@ export function SettingsPanel({ entity, selected, canWrite, canPublish }: Settin
           <input className="input-base h-9" value={entity.course.seoTitle} onChange={(event) => updateCourse(entity.course.id, { seoTitle: event.target.value })} disabled={!canWrite} placeholder="SEO title" />
           <textarea className="textarea-base min-h-[76px]" value={entity.course.seoDescription} onChange={(event) => updateCourse(entity.course.id, { seoDescription: event.target.value })} disabled={!canWrite} placeholder="SEO description" />
           <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-muted-foreground">
-            <input type="checkbox" checked={entity.course.featured} onChange={(event) => updateCourse(entity.course.id, { featured: event.target.checked })} disabled={!canWrite} className="h-4 w-4 accent-sky-400" />
+            <input type="checkbox" checked={entity.course.featured} onChange={(event) => updateCourse(entity.course.id, { featured: event.target.checked })} disabled={!canWrite} className="h-4 w-4 accent-indigo-400" />
             Featured course
           </label>
           <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-muted-foreground">
-            <input type="checkbox" checked={entity.course.certificateConfig.enabled} onChange={(event) => updateCourse(entity.course.id, { certificateConfig: { ...entity.course.certificateConfig, enabled: event.target.checked } })} disabled={!canWrite} className="h-4 w-4 accent-sky-400" />
+            <input type="checkbox" checked={entity.course.certificateConfig.enabled} onChange={(event) => updateCourse(entity.course.id, { certificateConfig: { ...entity.course.certificateConfig, enabled: event.target.checked } })} disabled={!canWrite} className="h-4 w-4 accent-indigo-400" />
             Certificate enabled
           </label>
           <Link href={`/admin/courses/${entity.course.id}/preview`} className="btn-secondary inline-flex w-full items-center justify-center gap-2">
@@ -248,11 +248,11 @@ export function SettingsPanel({ entity, selected, canWrite, canPublish }: Settin
             placeholder="Prerequisite module ids"
           />
           <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-muted-foreground">
-            <input type="checkbox" checked={moduleItem.unlockRule.unlockAfterQuizPass} onChange={(event) => updateModule(moduleItem.id, { unlockRule: { ...moduleItem.unlockRule, unlockAfterQuizPass: event.target.checked } })} disabled={!canWrite} className="h-4 w-4 accent-sky-400" />
+            <input type="checkbox" checked={moduleItem.unlockRule.unlockAfterQuizPass} onChange={(event) => updateModule(moduleItem.id, { unlockRule: { ...moduleItem.unlockRule, unlockAfterQuizPass: event.target.checked } })} disabled={!canWrite} className="h-4 w-4 accent-indigo-400" />
             Unlock after quiz pass
           </label>
           <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-muted-foreground">
-            <input type="checkbox" checked={moduleItem.unlockRule.unlockAfterAssignmentCompletion} onChange={(event) => updateModule(moduleItem.id, { unlockRule: { ...moduleItem.unlockRule, unlockAfterAssignmentCompletion: event.target.checked } })} disabled={!canWrite} className="h-4 w-4 accent-sky-400" />
+            <input type="checkbox" checked={moduleItem.unlockRule.unlockAfterAssignmentCompletion} onChange={(event) => updateModule(moduleItem.id, { unlockRule: { ...moduleItem.unlockRule, unlockAfterAssignmentCompletion: event.target.checked } })} disabled={!canWrite} className="h-4 w-4 accent-indigo-400" />
             Unlock after assignment completion
           </label>
           <input

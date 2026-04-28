@@ -24,7 +24,7 @@ export function DuplicateModuleButton({ moduleId }: { moduleId: string }) {
       disabled={pending}
       onClick={handleDuplicate}
       title={t("duplicate")}
-      className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:border-sky-500/40 hover:bg-sky-500/10 hover:text-sky-300 disabled:cursor-not-allowed disabled:opacity-50"
+      className="inline-flex items-center gap-1 rounded-lg border border-border px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:border-indigo-500/40 hover:bg-indigo-500/10 hover:text-indigo-300 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {pending ? (
         <Loader2 className="h-3 w-3 animate-spin" />

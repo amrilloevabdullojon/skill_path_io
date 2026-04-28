@@ -103,7 +103,7 @@ export function QuestionForm({ quizId }: { quizId: string }) {
               }}
               className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                 type === t
-                  ? "border-sky-500/30 bg-sky-500/10 text-sky-400"
+                  ? "border-indigo-500/30 bg-indigo-500/10 text-indigo-400"
                   : "border-border text-muted-foreground hover:border-border/80 hover:text-foreground"
               }`}
             >

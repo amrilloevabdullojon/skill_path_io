@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { PermissionRoleType, UserRole } from "@prisma/client";
+import { PermissionRoleType } from "@prisma/client";
 
 import { authOptions } from "@/lib/auth";
 import { AppError } from "@/lib/api/error-handler";
@@ -26,24 +26,12 @@ function mapPermissionRoleToAdminRole(role: PermissionRoleType): AdminRole {
 export async function getAdminContext(): Promise<AdminContext | null> {
   const session = await getServerSession(authOptions);
   const sessionEmail = typeof session?.user?.email === "string" ? session.user.email : null;
-  if (!sessionEmail) {
+  
+  if (!sessionEmail || session?.user?.role !== "ADMIN") {
     return null;
   }
 
-  const user = await prisma.user.findUnique({
-    where: { email: sessionEmail },
-    select: {
-      email: true,
-      name: true,
-      role: true,
-    },
-  });
-
-  if (user?.role !== UserRole.ADMIN) {
-    return null;
-  }
-
-  let adminRole = resolveAdminRole(user.email);
+  let adminRole = resolveAdminRole(sessionEmail);
   try {
     const dbPermissionRole = await prisma.permissionRole.findUnique({
       where: { email: sessionEmail },
@@ -61,8 +49,8 @@ export async function getAdminContext(): Promise<AdminContext | null> {
   }
 
   return {
-    email: user.email,
-    name: user.name,
+    email: sessionEmail,
+    name: session.user.name ?? "Levio Admin",
     source: "session",
     adminRole,
   };

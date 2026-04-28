@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { UserRole } from "@prisma/client";
-
-import { authOptions } from "@/lib/auth";
+import { verifyAdminAccess } from "@/lib/auth/server-verify";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
@@ -18,22 +15,9 @@ function escape(v: string | null | undefined): string {
 }
 
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-  const email =
-    typeof session?.user?.email === "string" ? session.user.email : null;
-
-  if (!email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  // Verify the requesting user is an admin
-  const requestingUser = await prisma.user.findUnique({
-    where: { email },
-    select: { role: true },
-  });
-
-  if (requestingUser?.role !== UserRole.ADMIN) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  const authError = await verifyAdminAccess();
+  if (authError) {
+    return NextResponse.json({ error: authError.error }, { status: authError.status });
   }
 
   const { searchParams } = new URL(request.url);

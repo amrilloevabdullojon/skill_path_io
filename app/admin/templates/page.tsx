@@ -86,7 +86,7 @@ export default async function AdminTemplatesPage() {
               </thead>
               <tbody>
                 {templates.map((tpl) => {
-                  const tags = Array.isArray(tpl.tags) ? (tpl.tags as string[]) : [];
+                  const tags = tpl.tags;
                   const visibleTags = tags.slice(0, 3);
                   const extraCount = tags.length - visibleTags.length;
 

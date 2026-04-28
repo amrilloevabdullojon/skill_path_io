@@ -35,7 +35,7 @@ export function AdminSettingsPanel() {
               <input className="input-base" value={mentorRateLimit} onChange={(event) => setMentorRateLimit(event.target.value)} />
             </label>
             <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-muted-foreground">
-              <input type="checkbox" checked={autosave} onChange={(event) => setAutosave(event.target.checked)} className="h-4 w-4 accent-sky-400" />
+              <input type="checkbox" checked={autosave} onChange={(event) => setAutosave(event.target.checked)} className="h-4 w-4 accent-indigo-400" />
               Enable autosave indicator in lesson builder
             </label>
           </div>

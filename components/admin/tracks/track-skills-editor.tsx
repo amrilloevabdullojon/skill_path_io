@@ -91,7 +91,7 @@ export function TrackSkillsEditor({
         <button
           type="button"
           onClick={handleAdd}
-          className="btn-secondary mt-2 text-sm text-sky-400"
+          className="btn-secondary mt-2 text-sm text-indigo-400"
         >
           ＋ Add
         </button>

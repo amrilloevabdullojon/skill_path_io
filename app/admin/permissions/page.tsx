@@ -83,7 +83,7 @@ export default async function PermissionsPage() {
               </thead>
               <tbody>
                 {roles.map((role, idx) => {
-                  const permissions = Array.isArray(role.permissions) ? role.permissions as string[] : [];
+                  const permissions = role.permissions;
                   return (
                     <tr
                       key={role.id}
@@ -149,7 +149,7 @@ export default async function PermissionsPage() {
           {/* Mobile card list */}
           <div className="space-y-3 md:hidden">
             {roles.map((role) => {
-              const permissions = Array.isArray(role.permissions) ? role.permissions as string[] : [];
+              const permissions = role.permissions;
               return (
                 <article key={role.id} className="surface-subtle rounded-xl p-4 space-y-3">
                   <div className="flex items-center justify-between gap-2">

@@ -100,7 +100,7 @@ export function CourseEditorForm({ courseId }: CourseEditorFormProps) {
                 type="button"
                 onClick={() => setCourseStatus(courseId, item)}
                 className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${
-                  item === course.status ? "border-sky-400/45 bg-sky-500/15 text-sky-200" : "chip-neutral"
+                  item === course.status ? "border-indigo-400/45 bg-indigo-500/15 text-indigo-200" : "chip-neutral"
                 }`}
               >
                 {item}
