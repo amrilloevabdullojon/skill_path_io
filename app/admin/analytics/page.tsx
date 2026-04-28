@@ -36,11 +36,13 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
     quizzes,
     questions,
     certificates,
+    courseCertificates,
     completedProgress,
     inProgress,
     notStarted,
     trackRows,
     latestCertificates,
+    latestCourseCertificates,
     userGrowthRaw,
     completionRateRaw,
     missionSubmissionCount,
@@ -54,6 +56,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
       prisma.quiz.count(),
       prisma.question.count(),
       prisma.certificate.count(),
+      prisma.courseCertificate.count(),
       prisma.userProgress.count({ where: { status: ProgressStatus.COMPLETED } }),
       prisma.userProgress.count({ where: { status: ProgressStatus.IN_PROGRESS } }),
       prisma.userProgress.count({ where: { status: ProgressStatus.NOT_STARTED } }),
@@ -102,6 +105,25 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
             },
           },
           track: {
+            select: {
+              title: true,
+            },
+          },
+        },
+      }),
+      prisma.courseCertificate.findMany({
+        take: 20,
+        orderBy: { issuedAt: "desc" },
+        select: {
+          id: true,
+          issuedAt: true,
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          course: {
             select: {
               title: true,
             },
@@ -180,6 +202,24 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
     : 0;
   const missionAvg = missionAverageScore._avg.score ? Math.round(missionAverageScore._avg.score) : 0;
   const popularTracks = [...completionRows].sort((a, b) => b.started - a.started).slice(0, 10);
+  const latestCertificateRows = [
+    ...latestCertificates.map((certificate) => ({
+      id: `track-${certificate.id}`,
+      issuedAt: certificate.issuedAt,
+      user: certificate.user,
+      title: certificate.track.title,
+      type: "Track",
+    })),
+    ...latestCourseCertificates.map((certificate) => ({
+      id: `course-${certificate.id}`,
+      issuedAt: certificate.issuedAt,
+      user: certificate.user,
+      title: certificate.course.title,
+      type: "Course",
+    })),
+  ]
+    .sort((a, b) => b.issuedAt.getTime() - a.issuedAt.getTime())
+    .slice(0, 20);
 
   return (
     <section className="page-shell">
@@ -231,7 +271,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
         />
         <StudioKpiCard
           label="Certificates"
-          value={certificates}
+          value={certificates + courseCertificates}
           icon={<Award className="h-4 w-4" />}
           accent="rose"
         />
@@ -324,15 +364,20 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
               </tr>
             </thead>
             <tbody>
-              {latestCertificates.map((certificate) => (
+              {latestCertificateRows.map((certificate) => (
                 <tr key={certificate.id} className="table-row">
                   <td className="px-3 py-3 text-muted-foreground">{certificate.issuedAt.toLocaleString()}</td>
                   <td className="px-3 py-3">{certificate.user.name}</td>
                   <td className="px-3 py-3 text-muted-foreground">{certificate.user.email}</td>
-                  <td className="px-3 py-3">{certificate.track.title}</td>
+                  <td className="px-3 py-3">
+                    <span className="mr-2 rounded-md border border-border px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
+                      {certificate.type}
+                    </span>
+                    {certificate.title}
+                  </td>
                 </tr>
               ))}
-              {latestCertificates.length === 0 && (
+              {latestCertificateRows.length === 0 && (
                 <tr>
                   <td className="px-3 py-6 text-center text-muted-foreground" colSpan={4}>
                     No certificates yet.

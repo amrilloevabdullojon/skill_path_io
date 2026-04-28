@@ -1114,16 +1114,24 @@ export async function updateCertificateAction(formData: FormData): Promise<Actio
 
   const certificateId = stringValue(formData, "certificateId");
   const certificateUrl = stringValue(formData, "certificateUrl");
+  const certificateKind = stringValue(formData, "certificateKind") || "track";
 
   if (!certificateId || !certificateUrl) {
     return actionErr("certificateId and certificateUrl are required", "updateCertificateAction");
   }
 
   try {
-    await prisma.certificate.update({
-      where: { id: certificateId },
-      data: { certificateUrl },
-    });
+    if (certificateKind === "course") {
+      await prisma.courseCertificate.update({
+        where: { id: certificateId },
+        data: { certificateUrl },
+      });
+    } else {
+      await prisma.certificate.update({
+        where: { id: certificateId },
+        data: { certificateUrl },
+      });
+    }
 
     revalidatePath("/admin/certificates");
     return actionOk();
@@ -1144,14 +1152,21 @@ export async function saveAdminSettingsAction(formData: FormData): Promise<Actio
       key === "maintenanceMode" ||
       key === "allowRegistration" ||
       key === "requireEmailVerification" ||
-      key === "analyticsEnabled"
+      key === "analyticsEnabled" ||
+      key === "aiEnabled" ||
+      key === "codeTinderEnabled"
     ) {
       settings[key] = value === "true";
     } else if (key === "maxUploadSizeMb") {
       const parsed = Number(value);
-      // Reject out-of-range values instead of silently defaulting.
       if (!Number.isFinite(parsed) || parsed <= 0 || parsed > 500) {
         return actionErr("maxUploadSizeMb must be between 1 and 500", "saveAdminSettingsAction");
+      }
+      settings[key] = parsed;
+    } else if (key === "aiRateLimit") {
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed) || parsed < 0) {
+        return actionErr("aiRateLimit must be a positive number", "saveAdminSettingsAction");
       }
       settings[key] = parsed;
     } else {

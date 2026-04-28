@@ -18,6 +18,7 @@ const PAGE_SIZE = 25;
 type CertificatesAdminPageProps = {
   searchParams?: {
     q?: string | string[];
+    contentId?: string | string[];
     trackId?: string | string[];
     page?: string | string[];
   };
@@ -32,7 +33,13 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
   await requireAdminPermission("certificates.manage");
 
   const query = paramValue(searchParams?.q);
-  const trackIdFilter = paramValue(searchParams?.trackId);
+  const legacyTrackIdFilter = paramValue(searchParams?.trackId);
+  const contentIdFilter = paramValue(searchParams?.contentId) || (legacyTrackIdFilter ? `track:${legacyTrackIdFilter}` : "");
+  const [contentKind, rawContentId] = contentIdFilter.includes(":")
+    ? contentIdFilter.split(":", 2)
+    : ["track", contentIdFilter];
+  const trackIdFilter = contentKind === "track" ? rawContentId : "";
+  const courseIdFilter = contentKind === "course" ? rawContentId : "";
 
   const page = Math.max(1, parseInt(paramValue(searchParams?.page) || "1", 10));
   const skip = (page - 1) * PAGE_SIZE;
@@ -49,18 +56,22 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
         }
       : {}),
     ...(trackIdFilter ? { trackId: trackIdFilter } : {}),
+    ...(courseIdFilter ? { id: "__never__" } : {}),
   };
 
-  const [tracks, certificates, total] = await prisma.$transaction([
+  const [tracks, courses, trackCertificates, courseCertificates, trackTotal, courseTotal] = await prisma.$transaction([
     prisma.track.findMany({
+      orderBy: { title: "asc" },
+      select: { id: true, title: true },
+    }),
+    prisma.course.findMany({
       orderBy: { title: "asc" },
       select: { id: true, title: true },
     }),
     prisma.certificate.findMany({
       where: certWhere,
       orderBy: { issuedAt: "desc" },
-      take: PAGE_SIZE,
-      skip,
+      take: PAGE_SIZE + skip,
       select: {
         id: true,
         issuedAt: true,
@@ -69,15 +80,84 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
         track: { select: { title: true, category: true } },
       },
     }),
+    prisma.courseCertificate.findMany({
+      where: {
+        ...(query
+          ? {
+              OR: [
+                { certificateUrl: { contains: query, mode: "insensitive" as const } },
+                { user: { email: { contains: query, mode: "insensitive" as const } } },
+                { user: { name: { contains: query, mode: "insensitive" as const } } },
+                { course: { title: { contains: query, mode: "insensitive" as const } } },
+              ],
+            }
+          : {}),
+        ...(courseIdFilter ? { courseId: courseIdFilter } : {}),
+        ...(trackIdFilter ? { id: "__never__" } : {}),
+      },
+      orderBy: { issuedAt: "desc" },
+      take: PAGE_SIZE + skip,
+      select: {
+        id: true,
+        issuedAt: true,
+        certificateUrl: true,
+        user: { select: { name: true, email: true } },
+        course: { select: { title: true } },
+      },
+    }),
     prisma.certificate.count({ where: certWhere }),
+    prisma.courseCertificate.count({
+      where: {
+        ...(query
+          ? {
+              OR: [
+                { certificateUrl: { contains: query, mode: "insensitive" as const } },
+                { user: { email: { contains: query, mode: "insensitive" as const } } },
+                { user: { name: { contains: query, mode: "insensitive" as const } } },
+                { course: { title: { contains: query, mode: "insensitive" as const } } },
+              ],
+            }
+          : {}),
+        ...(courseIdFilter ? { courseId: courseIdFilter } : {}),
+        ...(trackIdFilter ? { id: "__never__" } : {}),
+      },
+    }),
   ]);
 
+  const certificates = [
+    ...trackCertificates.map((cert) => ({
+      id: cert.id,
+      kind: "track" as const,
+      issuedAt: cert.issuedAt,
+      certificateUrl: cert.certificateUrl,
+      user: cert.user,
+      contentTitle: cert.track.title,
+      contentType: "Track",
+    })),
+    ...courseCertificates.map((cert) => ({
+      id: cert.id,
+      kind: "course" as const,
+      issuedAt: cert.issuedAt,
+      certificateUrl: cert.certificateUrl,
+      user: cert.user,
+      contentTitle: cert.course.title,
+      contentType: "Course",
+    })),
+  ]
+    .sort((a, b) => b.issuedAt.getTime() - a.issuedAt.getTime())
+    .slice(skip, skip + PAGE_SIZE);
+
+  const total = trackTotal + courseTotal;
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const from = total === 0 ? 0 : skip + 1;
   const to = Math.min(skip + PAGE_SIZE, total);
 
-  const activeTrackLabel = trackIdFilter
-    ? (tracks.find((t) => t.id === trackIdFilter)?.title ?? "selected track")
+  const activeTrackLabel = contentIdFilter
+    ? (
+        contentKind === "course"
+          ? courses.find((course) => course.id === courseIdFilter)?.title
+          : tracks.find((track) => track.id === trackIdFilter)?.title
+      ) ?? "selected content"
     : null;
 
   return (
@@ -90,7 +170,7 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
 
       {/* ── Filter ────────────────────────────────────────────────── */}
       <section className="surface-elevated p-5">
-        <form className="grid gap-3 md:grid-cols-[1fr_240px_auto]">
+        <form className="grid gap-3 md:grid-cols-[1fr_260px_auto]">
           <input
             type="text"
             name="q"
@@ -98,11 +178,16 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
             placeholder="Search by user, track, or URL…"
             className="input-base"
           />
-          <select name="trackId" defaultValue={trackIdFilter} className="select-base">
-            <option value="">All tracks</option>
+          <select name="contentId" defaultValue={contentIdFilter} className="select-base">
+            <option value="">All tracks and courses</option>
             {tracks.map((track) => (
-              <option key={track.id} value={track.id}>
-                {track.title}
+              <option key={track.id} value={`track:${track.id}`}>
+                Track: {track.title}
+              </option>
+            ))}
+            {courses.map((course) => (
+              <option key={course.id} value={`course:${course.id}`}>
+                Course: {course.title}
               </option>
             ))}
           </select>
@@ -138,7 +223,7 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
                   <th className="px-3 py-3 text-left">Issued</th>
                   <th className="px-3 py-3 text-left">User</th>
                   <th className="px-3 py-3 text-left">Email</th>
-                  <th className="px-3 py-3 text-left">Track</th>
+                  <th className="px-3 py-3 text-left">Content</th>
                   <th className="px-3 py-3 text-left">Certificate URL</th>
                   <th className="px-3 py-3 text-left">Save</th>
                 </tr>
@@ -153,7 +238,12 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
                     <td className="px-3 py-2 font-mono text-xs text-muted-foreground">
                       {cert.user.email}
                     </td>
-                    <td className="px-3 py-2 text-sm text-muted-foreground">{cert.track.title}</td>
+                    <td className="px-3 py-2 text-sm text-muted-foreground">
+                      <span className="mr-2 rounded-md border border-border px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
+                        {cert.contentType}
+                      </span>
+                      {cert.contentTitle}
+                    </td>
                     <td className="px-3 py-2">
                       <div className="space-y-1.5">
                         <input
@@ -176,6 +266,7 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
                     <td className="px-3 py-2">
                       <form id={`cert-edit-${cert.id}`} action={updateCertificateAction}>
                         <input type="hidden" name="certificateId" value={cert.id} />
+                        <input type="hidden" name="certificateKind" value={cert.kind} />
                         <SaveRowButton />
                       </form>
                     </td>
@@ -192,7 +283,7 @@ export default async function CertificatesAdminPage({ searchParams }: Certificat
         page={page}
         totalPages={totalPages}
         basePath="/admin/certificates"
-        params={{ q: query || undefined, trackId: trackIdFilter || undefined }}
+        params={{ q: query || undefined, contentId: contentIdFilter || undefined }}
         itemLabel="certificates"
         from={from}
         to={to}
