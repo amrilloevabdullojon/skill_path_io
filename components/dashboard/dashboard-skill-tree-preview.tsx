@@ -19,24 +19,24 @@ export function DashboardSkillTreePreviewSection({ skillTree }: DashboardSkillTr
   return (
     <DashboardSection
       id="tree"
-      title="Skill Tree Preview"
-      description="Unlocked branches, locked nodes, and the next skill milestone."
-      actionLabel="Open full skill tree"
+      title="Дерево навыков"
+      description="Открытые ветки, заблокированные узлы и ближайший ориентир."
+      actionLabel="Открыть дерево навыков"
       actionHref="/career"
     >
       <div className="space-y-4">
         <div className="grid gap-2 sm:grid-cols-3">
           <div className="mini-stat-box p-3">
-            <p className="text-xs text-muted-foreground">Unlocked</p>
+            <p className="text-xs text-muted-foreground">Открыто</p>
             <p className="mt-1 text-lg font-semibold text-foreground">{skillTree.unlockedCount}</p>
           </div>
           <div className="mini-stat-box p-3">
-            <p className="text-xs text-muted-foreground">Total nodes</p>
+            <p className="text-xs text-muted-foreground">Всего узлов</p>
             <p className="mt-1 text-lg font-semibold text-foreground">{skillTree.totalCount}</p>
           </div>
           <div className="mini-stat-box p-3">
-            <p className="text-xs text-muted-foreground">Nearest unlock</p>
-            <p className="mt-1 truncate text-sm font-semibold text-foreground">{skillTree.nextUnlock ?? "All unlocked"}</p>
+            <p className="text-xs text-muted-foreground">Ближайшее открытие</p>
+            <p className="mt-1 truncate text-sm font-semibold text-foreground">{skillTree.nextUnlock ?? "Всё открыто"}</p>
           </div>
         </div>
 
@@ -74,7 +74,7 @@ export function DashboardSkillTreePreviewSection({ skillTree }: DashboardSkillTr
           href="/career"
           className="btn-secondary text-sm"
         >
-          Open full skill tree
+          Открыть дерево навыков
         </Link>
       </div>
     </DashboardSection>

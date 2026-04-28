@@ -10,7 +10,7 @@ type DashboardAiRecommendationsProps = {
 
 function recommendationIcon(tag: DashboardRecommendation["tag"]) {
   if (tag === "Quiz") {
-    return <BrainCircuit className="h-4 w-4 text-sky-300" />;
+    return <BrainCircuit className="h-4 w-4 text-indigo-300" />;
   }
   if (tag === "Simulation") {
     return <Sparkles className="h-4 w-4 text-violet-300" />;
@@ -49,7 +49,7 @@ export function DashboardAiRecommendationsSection({ recommendations }: Dashboard
 
             <Link
               href={item.href}
-              className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-sky-300 transition-colors hover:text-sky-200"
+              className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-indigo-300 transition-colors hover:text-indigo-200"
             >
               Open recommendation
               <ArrowUpRight className="h-3.5 w-3.5" />

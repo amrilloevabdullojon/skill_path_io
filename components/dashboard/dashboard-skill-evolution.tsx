@@ -30,8 +30,8 @@ export function DashboardSkillEvolutionSection({ weeklyProgress }: { weeklyProgr
   return (
     <DashboardSection
       id="skill-evolution"
-      title="Skill evolution"
-      description="Learning velocity and growth trend by week."
+      title="Динамика навыков"
+      description="Скорость обучения и тренд роста по неделям."
     >
       <div className="chart-surface h-[19rem] w-full min-w-0">
         <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220}>
@@ -42,13 +42,13 @@ export function DashboardSkillEvolutionSection({ weeklyProgress }: { weeklyProgr
             <Tooltip
               contentStyle={{
                 borderRadius: "0.75rem",
-                border: "1px solid #334155",
-                backgroundColor: "#020617",
-                color: "#E2E8F0",
+                border: "1px solid hsl(var(--border))",
+                backgroundColor: "hsl(var(--card))",
+                color: "hsl(var(--foreground))",
               }}
             />
-            <Line type="monotone" dataKey="progress" stroke="#38BDF8" strokeWidth={3} dot={false} name="Skill growth %" />
-            <Line type="monotone" dataKey="velocity" stroke="#34D399" strokeWidth={2} dot={false} name="Learning velocity" />
+            <Line type="monotone" dataKey="progress" stroke="#38BDF8" strokeWidth={3} dot={false} name="Рост навыков %" />
+            <Line type="monotone" dataKey="velocity" stroke="#34D399" strokeWidth={2} dot={false} name="Скорость обучения" />
           </LineChart>
         </ResponsiveContainer>
       </div>

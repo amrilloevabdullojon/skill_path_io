@@ -76,6 +76,10 @@ export function getLevelByXp(totalXp: number): LevelTier {
   return tier?.level ?? "Beginner";
 }
 
+export function getLevelIndex(level: LevelTier): number {
+  return LEVEL_THRESHOLDS.findIndex((t) => t.level === level) + 1;
+}
+
 export function getNextLevelTarget(totalXp: number) {
   const currentLevel = getLevelByXp(totalXp);
   const currentIndex = LEVEL_THRESHOLDS.findIndex((tier) => tier.level === currentLevel);

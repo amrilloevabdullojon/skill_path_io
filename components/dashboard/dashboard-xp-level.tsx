@@ -22,7 +22,7 @@ export function DashboardXpLevelSection({ xp, weeklyProgress }: DashboardXpLevel
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="kicker">Level progress</p>
-              <p className="mt-1 bg-gradient-to-r from-sky-400 to-violet-400 bg-clip-text text-3xl font-semibold tracking-tight text-transparent">
+              <p className="mt-1 bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-3xl font-semibold tracking-tight text-transparent">
                 {xp.totalXp} XP
               </p>
             </div>
@@ -31,33 +31,33 @@ export function DashboardXpLevelSection({ xp, weeklyProgress }: DashboardXpLevel
 
           <div>
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>To next level</span>
+              <span>До следующего уровня</span>
               <span>{xp.progressPercent}%</span>
             </div>
             <div className="progress-track mt-2 h-2">
-              <div className="progress-fill h-full rounded-full bg-sky-400" style={{ width: `${xp.progressPercent}%` }} />
+              <div className="progress-fill h-full rounded-full bg-indigo-400" style={{ width: `${xp.progressPercent}%` }} />
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              {xp.nextLevel ? `${xp.xpNeededForNext} XP to ${xp.nextLevel}` : "Maximum level reached"}
+              {xp.nextLevel ? `${xp.xpNeededForNext} XP до уровня ${xp.nextLevel}` : "Максимальный уровень достигнут"}
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-2 text-center text-xs sm:grid-cols-3">
             <div className="mini-stat-box p-2.5">
-              <p className="text-muted-foreground">Streak</p>
+              <p className="text-muted-foreground">Серия</p>
               <p className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-foreground">
                 <Flame className="h-3.5 w-3.5 text-orange-300" />
                 {xp.streak}
               </p>
             </div>
             <div className="mini-stat-box p-2.5">
-              <p className="text-muted-foreground">Badges</p>
+              <p className="text-muted-foreground">Значки</p>
               <p className="mt-1 text-sm font-semibold text-foreground">{xp.badgesCount}</p>
             </div>
             <div className="mini-stat-box p-2.5">
-              <p className="text-muted-foreground">Weekly XP</p>
+              <p className="text-muted-foreground">XP за неделю</p>
               <p className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-foreground">
-                <Trophy className="h-3.5 w-3.5 text-sky-300" />
+                <Trophy className="h-3.5 w-3.5 text-indigo-300" />
                 {xp.weeklyXp}
               </p>
             </div>
@@ -66,7 +66,7 @@ export function DashboardXpLevelSection({ xp, weeklyProgress }: DashboardXpLevel
           <div className="flex flex-wrap gap-1.5">
             {xp.badges.length === 0 ? (
               <span className="chip-neutral px-2.5 py-1 text-xs text-muted-foreground">
-                Complete a module to unlock first badge
+                Заверши модуль, чтобы получить первый значок
               </span>
             ) : (
               xp.badges.map((badge) => (
@@ -79,8 +79,8 @@ export function DashboardXpLevelSection({ xp, weeklyProgress }: DashboardXpLevel
         </div>
 
         <div className="content-card min-w-0 rounded-2xl p-4">
-          <p className="text-sm font-semibold text-foreground">Weekly completion trend</p>
-          <p className="mt-1 text-xs text-muted-foreground">Last 8 weeks of progress and finished modules</p>
+          <p className="text-sm font-semibold text-foreground">Прогресс за неделю</p>
+          <p className="mt-1 text-xs text-muted-foreground">Последние 8 недель: прогресс и завершённые модули</p>
           <div className="mt-4 min-w-0">
             <WeeklyProgressChart data={weeklyProgress} />
           </div>

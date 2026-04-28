@@ -24,7 +24,7 @@ export function DashboardJobMatchingPreviewSection({ jobs }: { jobs: JobPreview[
           </article>
         ))}
       </div>
-      <Link href="/jobs" className="inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200">
+      <Link href="/jobs" className="inline-flex items-center gap-1 text-xs text-indigo-300 hover:text-indigo-200">
         <Briefcase className="h-3.5 w-3.5" />
         Open jobs
         <ArrowUpRight className="h-3.5 w-3.5" />

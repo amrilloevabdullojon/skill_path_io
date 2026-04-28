@@ -1,9 +1,9 @@
 import { TrackTag } from "@/types/personalization";
 
 const profileTrackMap: Record<TrackTag, string> = {
-  QA: "qa-engineer",
-  BA: "business-analyst",
-  DA: "data-analyst",
+  QA: "QA Инженер",
+  BA: "Бизнес-Аналитик",
+  DA: "Data Аналитик",
 };
 
 export function starterTrackByProfession(profession: TrackTag) {
@@ -12,10 +12,10 @@ export function starterTrackByProfession(profession: TrackTag) {
 
 export function buildStarterRoadmap(profession: TrackTag) {
   if (profession === "QA") {
-    return ["QA Fundamentals", "Test Design", "API Testing", "Bug Tracker Simulation", "Final QA Challenge"];
+    return ["Основы тестирования", "Тест-дизайн", "API тестирование", "Симуляция баг-трекера", "Финальный вызов QA"];
   }
   if (profession === "BA") {
-    return ["BA Role", "Requirements Discovery", "User Story Lab", "Stakeholder Simulation", "Final BA Challenge"];
+    return ["Основы BA", "Сбор требований", "Создание User Story", "Симуляция встреч с заказчиком", "Финальный вызов BA"];
   }
-  return ["Analytics Basics", "SQL for Analysts", "Metrics Design", "Dataset Simulation", "Final DA Challenge"];
+  return ["Основы аналитики", "SQL для аналитиков", "Проектирование метрик", "Датасет Симуляция", "Финальный вызов DA"];
 }

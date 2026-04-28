@@ -48,11 +48,11 @@ export function WeeklyProgressChart({ data }: WeeklyProgressChartProps) {
             cursor={{ stroke: "#38BDF8", strokeOpacity: 0.2 }}
             contentStyle={{
               borderRadius: "0.75rem",
-              border: "1px solid #334155",
-              backgroundColor: "#020617",
-              color: "#E2E8F0",
+              border: "1px solid hsl(var(--border))",
+              backgroundColor: "hsl(var(--card))",
+              color: "hsl(var(--foreground))",
             }}
-            labelStyle={{ color: "#E2E8F0", fontWeight: 600 }}
+            labelStyle={{ color: "hsl(var(--foreground))", fontWeight: 600 }}
           />
           <Line
             yAxisId="progress"
@@ -72,7 +72,7 @@ export function WeeklyProgressChart({ data }: WeeklyProgressChartProps) {
             strokeWidth={2}
             strokeDasharray="5 5"
             dot={{ r: 3, fill: "#34D399" }}
-            name="Modules completed"
+            name="Завершено модулей"
           />
         </LineChart>
       </ResponsiveContainer>

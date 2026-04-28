@@ -1,4 +1,5 @@
 import { Award, BookOpenCheck, CheckCircle2, Medal, Sparkles, Timer } from "lucide-react";
+import { getTranslations, getLocale } from "next-intl/server";
 
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -8,18 +9,9 @@ type DashboardRecentActivityProps = {
   activity: DashboardActivityItem[];
 };
 
-function formatDateTime(date: Date) {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-}
-
 function activityIcon(item: DashboardActivityItem["kind"]) {
   if (item === "lesson") {
-    return <BookOpenCheck className="h-4 w-4 text-sky-300" />;
+    return <BookOpenCheck className="h-4 w-4 text-indigo-300" />;
   }
   if (item === "quiz") {
     return <CheckCircle2 className="h-4 w-4 text-emerald-300" />;
@@ -36,20 +28,32 @@ function activityIcon(item: DashboardActivityItem["kind"]) {
   return <Award className="h-4 w-4 text-orange-300" />;
 }
 
-export function DashboardRecentActivitySection({ activity }: DashboardRecentActivityProps) {
+export async function DashboardRecentActivitySection({ activity }: DashboardRecentActivityProps) {
+  const t = await getTranslations("dashboard.recentActivity");
+  const locale = await getLocale();
+
+  function formatDateTime(date: Date) {
+    return new Intl.DateTimeFormat(locale, {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  }
+
   return (
     <DashboardSection
       id="activity"
-      title="Recent Activity"
-      description="Timeline of lessons, quizzes, skill unlocks, badges, and milestones."
+      title={t("title")}
+      description={t("description")}
     >
       <div className="space-y-3">
         {activity.length === 0 ? (
           <EmptyState
             icon={BookOpenCheck}
-            title="No activity yet"
-            description="Open a module and complete a lesson — your timeline will appear here."
-            actionLabel="Browse tracks"
+            title={t("empty.title")}
+            description={t("empty.description")}
+            actionLabel={t("empty.action")}
             actionHref="/tracks"
             size="sm"
           />

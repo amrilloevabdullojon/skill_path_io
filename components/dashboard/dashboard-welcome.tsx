@@ -8,28 +8,28 @@ type DashboardWelcomeProps = {
 const STEPS = [
   {
     icon: Target,
-    title: "Choose a track",
-    description: "Pick QA, BA, or DA to start your learning path.",
+    title: "Выбери трек",
+    description: "Выбери QA, BA или DA — и начни свой путь в обучении.",
     href: "/tracks",
-    cta: "Browse tracks",
-    color: "text-sky-400",
-    bg: "bg-sky-500/10 border-sky-500/25",
+    cta: "Смотреть треки",
+    color: "text-indigo-400",
+    bg: "bg-indigo-500/10 border-indigo-500/25",
   },
   {
     icon: BookOpen,
-    title: "Complete your first lesson",
-    description: "Each lesson takes 10–20 minutes and builds real skills.",
+    title: "Пройди первый урок",
+    description: "Каждый урок занимает 10–20 минут и формирует реальные навыки.",
     href: "/tracks",
-    cta: "Start learning",
+    cta: "Начать обучение",
     color: "text-violet-400",
     bg: "bg-violet-500/10 border-violet-500/25",
   },
   {
     icon: Rocket,
-    title: "Set up your profile",
-    description: "Showcase your progress and connect with the community.",
+    title: "Настрой профиль",
+    description: "Покажи прогресс и познакомься с сообществом.",
     href: "/profile/me",
-    cta: "Edit profile",
+    cta: "Изменить профиль",
     color: "text-emerald-400",
     bg: "bg-emerald-500/10 border-emerald-500/25",
   },
@@ -37,15 +37,14 @@ const STEPS = [
 
 export function DashboardWelcome({ name }: DashboardWelcomeProps) {
   return (
-    <section className="surface-elevated premium-glow space-y-6 p-6 sm:p-8">
+    <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-[24px] premium-glow space-y-6 p-6 sm:p-8">
       <div className="space-y-1">
-        <p className="kicker">Getting started</p>
+        <p className="kicker">Начало работы</p>
         <h1 className="section-title">
-          Welcome{name ? `, ${name}` : ""}! 👋
+          Добро пожаловать{name ? `, ${name}` : ""}! 👋
         </h1>
         <p className="body-text max-w-xl">
-          SkillPath Academy helps you build job-ready skills in QA, Business Analysis, and Data
-          Analytics. Here&apos;s how to get started:
+          Levio помогает прокачать востребованные навыки в QA, бизнес-анализе и аналитике данных. Вот с чего начать:
         </p>
       </div>
 

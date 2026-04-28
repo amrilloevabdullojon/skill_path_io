@@ -14,9 +14,9 @@ export function DashboardAdaptivePathSection({ suggestions }: { suggestions: Ada
   return (
     <DashboardSection
       id="adaptive"
-      title="Adaptive Path"
-      description="Personalized next steps based on quiz mistakes, pace, and simulation outcomes."
-      actionLabel="Open analytics"
+      title="Адаптивный путь"
+      description="Персонализированные следующие шаги на основе ошибок в квизах, темпа и итогов симуляций."
+      actionLabel="Открыть аналитику"
       actionHref="/analytics"
     >
       <div className="space-y-2">
@@ -32,9 +32,9 @@ export function DashboardAdaptivePathSection({ suggestions }: { suggestions: Ada
               </span>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">{item.action}</p>
-            <Link href={item.href} className="mt-2 inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200">
+            <Link href={item.href} className="mt-2 inline-flex items-center gap-1 text-xs text-indigo-300 hover:text-indigo-200">
               <Compass className="h-3.5 w-3.5" />
-              Follow suggestion
+              Следовать рекомендации
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </article>
@@ -43,7 +43,7 @@ export function DashboardAdaptivePathSection({ suggestions }: { suggestions: Ada
 
       <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
         <Flame className="h-3.5 w-3.5 text-amber-300" />
-        Adaptive engine can switch to acceleration path when consistency improves.
+        Адаптивный движок переключается на ускоренный путь при повышении стабильности.
       </p>
     </DashboardSection>
   );

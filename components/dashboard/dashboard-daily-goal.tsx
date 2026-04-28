@@ -20,14 +20,14 @@ export function DashboardDailyGoalSection({ goal }: DashboardDailyGoalProps) {
   return (
     <DashboardSection
       id="daily-goal"
-      title="Daily learning goal"
-      description="Stay consistent with compact daily milestones."
+      title="Цель на день"
+      description="Ежедневные задания для постоянного прогресса."
     >
       <article className="surface-subtle surface-panel-hover space-y-3 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
-            <Target className="h-4 w-4 text-sky-300" />
-            {goal.targetLessons} lessons today
+            <Target className="h-4 w-4 text-indigo-300" />
+            {goal.targetLessons} урока сегодня
           </p>
           <span
             className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
@@ -37,10 +37,10 @@ export function DashboardDailyGoalSection({ goal }: DashboardDailyGoalProps) {
             }`}
           >
             {isCompleted ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}
-            {isCompleted ? "Completed" : "In progress"}
+            {isCompleted ? "Выполнено" : "В процессе"}
           </span>
         </div>
-        <ProgressBar value={lessonsPercent} label={`${goal.completedLessons}/${goal.targetLessons} completed`} />
+        <ProgressBar value={lessonsPercent} label={`${goal.completedLessons}/${goal.targetLessons} выполнено`} />
         <ProgressBar
           value={xpPercent}
           fillClassName="bg-emerald-400"
@@ -48,9 +48,9 @@ export function DashboardDailyGoalSection({ goal }: DashboardDailyGoalProps) {
         />
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
           <p className="text-muted-foreground">
-            Reward: <span className="font-semibold text-emerald-200">+{goal.targetXp} XP</span>
+            Награда: <span className="font-semibold text-emerald-200">+{goal.targetXp} XP</span>
           </p>
-          <p className="text-muted-foreground">{Math.max(0, goal.targetLessons - goal.completedLessons)} lessons remaining</p>
+          <p className="text-muted-foreground">Осталось {Math.max(0, goal.targetLessons - goal.completedLessons)} урока</p>
         </div>
       </article>
     </DashboardSection>

@@ -12,29 +12,29 @@ export function DashboardCareerPreviewSection({ career }: DashboardCareerPreview
   return (
     <DashboardSection
       id="career"
-      title="Career Roadmap Preview"
-      description="Your current stage, progress to next stage, and missing skills to prioritize."
-      actionLabel="Open career roadmap"
+      title="Карьерный план"
+      description="Текущий этап, прогресс до следующего и навыки для приоритетной прокачки."
+      actionLabel="Открыть карьерный план"
       actionHref="/career"
     >
       <div className="space-y-4">
         <div className="mini-stat-box rounded-2xl p-4">
           <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
-            <Briefcase className="h-4 w-4 text-sky-300" />
-            {career.currentStage} stage
+            <Briefcase className="h-4 w-4 text-indigo-300" />
+            Этап: {career.currentStage}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            {career.nextStage ? `Target: ${career.nextStage}` : "Senior stage reached"}
+            {career.nextStage ? `Цель: ${career.nextStage}` : "Достигнут уровень Senior"}
           </p>
 
           <div className="mt-3">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Progress to next stage</span>
+              <span>Прогресс до следующего этапа</span>
               <span>{career.progressToNextStage}%</span>
             </div>
             <div className="progress-track mt-2 h-2">
               <div
-                className="h-full rounded-full bg-sky-400 transition-all duration-500"
+                className="h-full rounded-full bg-indigo-400 transition-all duration-500"
                 style={{ width: `${career.progressToNextStage}%` }}
               />
             </div>
@@ -42,11 +42,11 @@ export function DashboardCareerPreviewSection({ career }: DashboardCareerPreview
         </div>
 
         <div className="content-card p-4">
-          <p className="data-label">Missing skills</p>
+          <p className="data-label">Недостающие навыки</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {career.missingSkills.length === 0 ? (
               <span className="skill-tag px-3 py-1 text-xs">
-                Skills are balanced
+                Навыки сбалансированы
               </span>
             ) : (
               career.missingSkills.map((skill) => (
@@ -60,9 +60,9 @@ export function DashboardCareerPreviewSection({ career }: DashboardCareerPreview
 
         <Link
           href="/career"
-          className="inline-flex items-center gap-1 text-sm font-semibold text-sky-300 transition-colors hover:text-sky-200"
+          className="inline-flex items-center gap-1 text-sm font-semibold text-indigo-300 transition-colors hover:text-indigo-200"
         >
-          Open full roadmap
+          Открыть полный план
           <ArrowUpRight className="h-4 w-4" />
         </Link>
       </div>
