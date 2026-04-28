@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import { ProgressStatus, QuestionType } from "@prisma/client";
 
 import { authOptions } from "@/lib/auth";
+import { getCachedAiQuizQuestions } from "@/lib/ai/quiz-generator";
 import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
 import {
   findRuntimeModuleProgress,
@@ -20,6 +21,13 @@ type QuizAttemptPayload = {
   trackSlug: string;
   moduleId: string;
   quizId: string;
+  aiGeneratedQuestions?: Array<{
+    id: string;
+    text: string;
+    type: "SINGLE" | "MULTI";
+    options: Array<{ id: string; text: string }>;
+    correctAnswer: string[];
+  }>;
   answers: Record<string, string[]>;
 };
 
@@ -98,6 +106,58 @@ function parseQuestionOptions(options: unknown) {
     .filter((item): item is { id: string; text: string } => Boolean(item));
 }
 
+function normalizeAiGeneratedQuestions(value: QuizAttemptPayload["aiGeneratedQuestions"]) {
+  if (!Array.isArray(value)) {
+    return null;
+  }
+
+  const questions = value.slice(0, 8).map((question) => {
+    if (!question || typeof question !== "object") {
+      return null;
+    }
+
+    const text = typeof question.text === "string" ? question.text.trim() : "";
+    const type = question.type === "MULTI" ? "MULTI" : "SINGLE";
+    const options = Array.isArray(question.options)
+      ? question.options
+        .slice(0, 5)
+        .map((option) => ({
+          id: typeof option.id === "string" ? option.id.trim() : "",
+          text: typeof option.text === "string" ? option.text.trim() : "",
+        }))
+        .filter((option) => option.id && option.text)
+      : [];
+    const optionIds = new Set(options.map((option) => option.id));
+    const correctAnswer = normalizeAnswerList(question.correctAnswer).filter((answer) => optionIds.has(answer));
+
+    if (!text || options.length < 2 || correctAnswer.length === 0) {
+      return null;
+    }
+
+    return {
+      id: typeof question.id === "string" && question.id.trim() ? question.id.trim() : text,
+      text,
+      type,
+      options,
+      correctAnswer: type === "SINGLE" ? [correctAnswer[0]!] : correctAnswer,
+    };
+  });
+
+  const validQuestions = questions.filter((question): question is NonNullable<typeof question> => Boolean(question));
+  return validQuestions.length > 0 ? validQuestions : null;
+}
+
+function haveSameQuestionIds(
+  submittedQuestions: ReturnType<typeof normalizeAiGeneratedQuestions>,
+  cachedQuestions: Array<{ id: string }>,
+) {
+  if (!submittedQuestions || submittedQuestions.length !== cachedQuestions.length) {
+    return false;
+  }
+
+  return submittedQuestions.every((question, index) => question.id === cachedQuestions[index]?.id);
+}
+
 export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<QuizAttemptResult> {
   if (!payload.trackSlug || !payload.moduleId || !payload.quizId) {
     return {
@@ -157,7 +217,32 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
     };
   }
 
-  const totalQuestions = quiz.questions.length;
+  const aiGeneratedQuestions = normalizeAiGeneratedQuestions(payload.aiGeneratedQuestions);
+  const cachedAiQuestions = aiGeneratedQuestions
+    ? getCachedAiQuizQuestions({
+        trackTitle: overriddenTrack.title,
+        moduleItem,
+        locale,
+      })
+    : null;
+
+  if (aiGeneratedQuestions && !haveSameQuestionIds(aiGeneratedQuestions, cachedAiQuestions ?? [])) {
+    return {
+      ok: false,
+      score: 0,
+      passed: false,
+      passingScore: quiz.passingScore,
+      totalQuestions: 0,
+      correctAnswers: 0,
+      certificateIssued: false,
+      trackCompleted: false,
+      wrongAnswers: [],
+      message: "AI quiz expired. Reload the quiz and try again.",
+    };
+  }
+
+  const quizQuestions = cachedAiQuestions ?? quiz.questions;
+  const totalQuestions = quizQuestions.length;
   if (totalQuestions === 0) {
     return {
       ok: false,
@@ -174,7 +259,7 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
   }
 
   let correctAnswers = 0;
-  const questionsForScoring = quiz.questions.map((question) => ({
+  const questionsForScoring = quizQuestions.map((question) => ({
     id: question.id,
     text: question.text,
     type: question.type,

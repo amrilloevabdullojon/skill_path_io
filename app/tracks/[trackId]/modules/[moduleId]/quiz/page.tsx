@@ -7,6 +7,7 @@ import { getLocale } from "next-intl/server";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { QuizPlayer } from "@/components/quiz/quiz-player";
 import { authOptions } from "@/lib/auth";
+import { generateAiQuizQuestions } from "@/lib/ai/quiz-generator";
 import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
 import { findRuntimeModuleProgressById } from "@/lib/learning/progress";
 import { resolveLearningUser } from "@/lib/learning-user";
@@ -68,13 +69,25 @@ export default async function QuizPage({ params }: QuizPageProps) {
       })
     : null;
 
-  const questions: QuizQuestionView[] = moduleItem.quiz.questions.map((question) => ({
+  const fallbackQuestions: QuizQuestionView[] = moduleItem.quiz.questions.map((question) => ({
     id: question.id,
     text: question.text,
     type: question.type === "MULTI" ? "MULTI" : "SINGLE",
     options: question.options,
     correctAnswer: question.correctAnswer,
   }));
+  const normalizedLocale = normalizeLearningLocale(localeValue);
+  const generatedQuiz = track.category === "QA"
+    ? await generateAiQuizQuestions({
+        trackTitle: track.title,
+        moduleItem,
+        locale: normalizedLocale,
+        fallbackQuestions,
+      })
+    : { questions: fallbackQuestions, source: "fallback" as const };
+  const questions = generatedQuiz.questions;
+  const quizId = generatedQuiz.source === "ai" ? `${moduleItem.quiz.id}:ai` : moduleItem.quiz.id;
+  const quizTitle = generatedQuiz.source === "ai" ? `${moduleItem.quiz.title} · AI` : moduleItem.quiz.title;
 
   const lessonContext = [
     moduleItem.title,
@@ -113,10 +126,12 @@ export default async function QuizPage({ params }: QuizPageProps) {
       <QuizPlayer
         trackSlug={track.slug}
         moduleId={moduleItem.id}
-        quizId={moduleItem.quiz.id}
-        quizTitle={moduleItem.quiz.title}
+        quizId={quizId}
+        canonicalQuizId={moduleItem.quiz.id}
+        quizTitle={quizTitle}
         passingScore={moduleItem.quiz.passingScore}
         questions={questions}
+        generatedByAi={generatedQuiz.source === "ai"}
         lessonContext={lessonContext}
       />
 

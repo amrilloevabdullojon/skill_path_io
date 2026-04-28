@@ -14,9 +14,11 @@ type QuizPlayerProps = {
   trackSlug: string;
   moduleId: string;
   quizId: string;
+  canonicalQuizId?: string;
   quizTitle: string;
   passingScore: number;
   questions: QuizQuestion[];
+  generatedByAi?: boolean;
   lessonContext: string;
 };
 
@@ -31,9 +33,11 @@ export function QuizPlayer({
   trackSlug,
   moduleId,
   quizId,
+  canonicalQuizId,
   quizTitle,
   passingScore,
   questions,
+  generatedByAi = false,
   lessonContext,
 }: QuizPlayerProps) {
   const [isPending, startTransition] = useTransition();
@@ -133,7 +137,8 @@ export function QuizPlayer({
       const submitResult: QuizResult = await submitQuizAttempt({
         trackSlug,
         moduleId,
-        quizId,
+        quizId: canonicalQuizId ?? quizId,
+        aiGeneratedQuestions: generatedByAi ? questions : undefined,
         answers: answerPayload,
       });
 
@@ -238,7 +243,14 @@ export function QuizPlayer({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Тест</p>
-            <h2 className="mt-1 break-words text-xl font-semibold text-foreground">{quizTitle}</h2>
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <h2 className="break-words text-xl font-semibold text-foreground">{quizTitle}</h2>
+              {generatedByAi ? (
+                <span className="rounded-full border border-emerald-500/35 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-300">
+                  AI-generated
+                </span>
+              ) : null}
+            </div>
           </div>
           <div className="text-sm text-muted-foreground">
             Вопрос {currentIndex + 1} из {totalQuestions}
