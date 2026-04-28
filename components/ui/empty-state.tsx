@@ -27,8 +27,9 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <section
+      aria-live="polite"
       className={cn(
-        "state-panel flex flex-col items-center",
+        "state-panel flex flex-col items-center animate-in fade-in zoom-in-95 duration-500 ease-out",
         size === "sm" && "py-6",
         size === "md" && "py-10",
         size === "lg" && "py-16",

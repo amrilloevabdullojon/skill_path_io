@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 const config: Config = {
   darkMode: ["class"],
@@ -58,6 +59,40 @@ const config: Config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        /* Phase 6: semantic accent palette (supports opacity modifier) */
+        "accent-primary": {
+          DEFAULT: "hsl(var(--accent-primary) / <alpha-value>)",
+          fg: "hsl(var(--accent-primary-fg) / <alpha-value>)",
+        },
+        "accent-success": {
+          DEFAULT: "hsl(var(--accent-success) / <alpha-value>)",
+          fg: "hsl(var(--accent-success-fg) / <alpha-value>)",
+        },
+        "accent-warning": {
+          DEFAULT: "hsl(var(--accent-warning) / <alpha-value>)",
+          fg: "hsl(var(--accent-warning-fg) / <alpha-value>)",
+        },
+        "accent-danger": {
+          DEFAULT: "hsl(var(--accent-danger) / <alpha-value>)",
+          fg: "hsl(var(--accent-danger-fg) / <alpha-value>)",
+        },
+        "accent-info": {
+          DEFAULT: "hsl(var(--accent-info) / <alpha-value>)",
+          fg: "hsl(var(--accent-info-fg) / <alpha-value>)",
+        },
+        /* Phase 6: 2-level surface hierarchy */
+        "surface-raised": {
+          DEFAULT: "hsl(var(--surface-raised) / <alpha-value>)",
+          border: "hsl(var(--surface-raised-border) / <alpha-value>)",
+        },
+      },
+      fontSize: {
+        /* Phase 6: 5-size typography scale */
+        display: ["2.75rem", { lineHeight: "1.05", letterSpacing: "-0.02em", fontWeight: "800" }],
+        "heading-1": ["2rem", { lineHeight: "1.1", letterSpacing: "-0.015em", fontWeight: "700" }],
+        "heading-2": ["1.375rem", { lineHeight: "1.25", letterSpacing: "-0.01em", fontWeight: "600" }],
+        body: ["0.9375rem", { lineHeight: "1.6" }],
+        caption: ["0.75rem", { lineHeight: "1.4", letterSpacing: "0.02em" }],
       },
       fontFamily: {
         sans: ["var(--font-manrope)", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
@@ -85,7 +120,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 };
 
 export default config;

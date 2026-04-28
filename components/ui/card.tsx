@@ -10,7 +10,7 @@ const cardVariants = cva("text-card-foreground", {
       hero: "surface-elevated premium-glow",
       module: "surface-subtle surface-panel-hover",
       lesson: "surface-subtle surface-panel-hover",
-      mission: "surface-panel surface-panel-hover border-sky-500/25",
+      mission: "surface-panel surface-panel-hover border-indigo-500/25",
       analytics: "surface-elevated",
     },
   },

@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1100" width="900" height="1100">
+  <rect width="900" height="1100" fill="#f8fafc"/>
+
+  <!-- Header -->
+  <rect width="900" height="72" fill="#0f172a"/>
+  <text x="36" y="46" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="22" font-weight="700" fill="white">Brand Concepts — Global Launch</text>
+  <text x="720" y="46" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" fill="#94a3b8">2026 · SkillPath Rebranding</text>
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- CONCEPT 1: TRAXO -->
+  <!-- ─────────────────────────────────────── -->
+  <rect x="20" y="92" width="860" height="290" rx="16" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="44" y="130" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#94a3b8" letter-spacing="3">CONCEPT 01</text>
+
+  <!-- Traxo Logo inline -->
+  <defs>
+    <linearGradient id="t1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <filter id="ts">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#0ea5e9" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <rect x="44" y="142" width="96" height="96" rx="22" fill="url(#t1)" filter="url(#ts)"/>
+  <line x1="58" y1="224" x2="98" y2="186" stroke="white" stroke-width="5.5" stroke-linecap="round" opacity="0.5"/>
+  <line x1="68" y1="232" x2="116" y2="186" stroke="white" stroke-width="7.5" stroke-linecap="round"/>
+  <line x1="80" y1="236" x2="116" y2="202" stroke="white" stroke-width="5.5" stroke-linecap="round" opacity="0.5"/>
+  <polygon points="116,172 128,188 104,188" fill="white"/>
+
+  <text x="158" y="208" font-family="-apple-system, sans-serif" font-size="58" font-weight="800" fill="#0f172a" letter-spacing="-2">traxo</text>
+  <text x="161" y="228" font-family="-apple-system, sans-serif" font-size="11" font-weight="500" fill="#0ea5e9" letter-spacing="3.5">CAREER TRACKS THAT WORK</text>
+
+  <!-- Traxo colors -->
+  <text x="44" y="272" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#64748b" letter-spacing="2">PALETTE</text>
+  <rect x="44" y="282" width="60" height="30" rx="8" fill="#0ea5e9"/>
+  <text x="74" y="327" font-family="-apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">#0ea5e9</text>
+  <rect x="116" y="282" width="60" height="30" rx="8" fill="#06b6d4"/>
+  <text x="146" y="327" font-family="-apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">#06b6d4</text>
+  <rect x="188" y="282" width="60" height="30" rx="8" fill="#0f172a"/>
+  <text x="218" y="327" font-family="-apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">#0f172a</text>
+  <rect x="260" y="282" width="60" height="30" rx="8" fill="#f0f9ff" stroke="#e0f2fe" stroke-width="1"/>
+  <text x="290" y="327" font-family="-apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">#f0f9ff</text>
+
+  <!-- Traxo description -->
+  <text x="460" y="155" font-family="-apple-system, sans-serif" font-size="26" font-weight="700" fill="#0f172a">Traxo</text>
+  <text x="460" y="178" font-family="-apple-system, sans-serif" font-size="13" fill="#475569">Track + Go — прямо, глобально, технично</text>
+  <text x="460" y="208" font-family="-apple-system, sans-serif" font-size="12" fill="#64748b">traxo.io · traxo.com · traxo.app</text>
+  <text x="460" y="238" font-family="-apple-system, sans-serif" font-size="12" fill="#64748b">Целевая аудитория: tech-специалисты 22-35 лет</text>
+  <text x="460" y="258" font-family="-apple-system, sans-serif" font-size="12" fill="#64748b">Рынки: US, EU, SEA, MENA</text>
+  <text x="460" y="288" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#0ea5e9">Настроение: чистый · быстрый · уверенный</text>
+  <rect x="458" y="145" width="3" height="155" rx="2" fill="#0ea5e9" opacity="0.3"/>
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- CONCEPT 2: LEVIO -->
+  <!-- ─────────────────────────────────────── -->
+  <rect x="20" y="402" width="860" height="290" rx="16" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="44" y="440" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#94a3b8" letter-spacing="3">CONCEPT 02  ★ РЕКОМЕНДУЕТСЯ</text>
+
+  <defs>
+    <linearGradient id="l1" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient id="l2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4338ca"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <filter id="ls">
+      <feDropShadow dx="0" dy="5" stdDeviation="10" flood-color="#6366f1" flood-opacity="0.4"/>
+    </filter>
+    <filter id="sg">
+      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#fbbf24" flood-opacity="0.9"/>
+    </filter>
+  </defs>
+  <rect x="44" y="452" width="96" height="96" rx="22" fill="url(#l1)" filter="url(#ls)"/>
+  <rect x="56" y="518" width="13" height="20" rx="3" fill="white" opacity="0.4"/>
+  <rect x="74" y="504" width="13" height="34" rx="3" fill="white" opacity="0.6"/>
+  <rect x="92" y="490" width="13" height="48" rx="3" fill="white" opacity="0.8"/>
+  <rect x="110" y="472" width="13" height="66" rx="3" fill="white"/>
+  <g filter="url(#sg)">
+    <polygon points="116.5,460 119,467 127,467 121,471 123,479 116.5,475 110,479 112,471 106,467 114,467" fill="#fbbf24"/>
+  </g>
+
+  <text x="158" y="520" font-family="-apple-system, sans-serif" font-size="58" font-weight="800" fill="url(#l2)" letter-spacing="-2">levio</text>
+  <text x="161" y="540" font-family="-apple-system, sans-serif" font-size="11" font-weight="500" fill="#6366f1" letter-spacing="3.5">LEVEL UP YOUR CAREER</text>
+
+  <!-- Levio colors -->
+  <text x="44" y="580" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#64748b" letter-spacing="2">PALETTE</text>
+  <rect x="44" y="590" width="60" height="30" rx="8" fill="#6366f1"/>
+  <text x="74" y="635" font-family="-apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">#6366f1</text>
+  <rect x="116" y="590" width="60" height="30" rx="8" fill="#a855f7"/>
+  <text x="146" y="635" font-family="-apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">#a855f7</text>
+  <rect x="188" y="590" width="60" height="30" rx="8" fill="#fbbf24"/>
+  <text x="218" y="635" font-family="-apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">#fbbf24</text>
+  <rect x="260" y="590" width="60" height="30" rx="8" fill="#1e1b4b"/>
+  <text x="290" y="635" font-family="-apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">#1e1b4b</text>
+
+  <!-- Levio description -->
+  <text x="460" y="465" font-family="-apple-system, sans-serif" font-size="26" font-weight="700" fill="#1e1b4b">Levio</text>
+  <text x="460" y="488" font-family="-apple-system, sans-serif" font-size="13" fill="#475569">Level + -io — геймификация × карьера</text>
+  <text x="460" y="518" font-family="-apple-system, sans-serif" font-size="12" fill="#64748b">levio.io · getlevio.com · levio.app</text>
+  <text x="460" y="548" font-family="-apple-system, sans-serif" font-size="12" fill="#64748b">Целевая аудитория: молодые spec. 20-32 года</text>
+  <text x="460" y="568" font-family="-apple-system, sans-serif" font-size="12" fill="#64748b">Рынки: US, EU, LatAm, India, CIS</text>
+  <text x="460" y="598" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#6366f1">Настроение: энергичный · геймовый · вдохновляющий</text>
+  <rect x="458" y="455" width="3" height="155" rx="2" fill="#6366f1" opacity="0.3"/>
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- CONCEPT 3: ARCEVO -->
+  <!-- ─────────────────────────────────────── -->
+  <rect x="20" y="712" width="860" height="290" rx="16" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="44" y="750" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#94a3b8" letter-spacing="3">CONCEPT 03  · PREMIUM</text>
+
+  <defs>
+    <linearGradient id="a1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f766e"/>
+      <stop offset="100%" stop-color="#0d9488"/>
+    </linearGradient>
+    <linearGradient id="a2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+    <linearGradient id="a3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#134e4a"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+    <filter id="as">
+      <feDropShadow dx="0" dy="5" stdDeviation="9" flood-color="#0d9488" flood-opacity="0.35"/>
+    </filter>
+    <filter id="ag">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#f59e0b" flood-opacity="0.7"/>
+    </filter>
+  </defs>
+  <rect x="44" y="762" width="96" height="96" rx="22" fill="url(#a1)" filter="url(#as)"/>
+  <path d="M 58 844 Q 92 782 130 768" stroke="white" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <circle cx="58" cy="844" r="5" fill="white" opacity="0.5"/>
+  <circle cx="94" cy="802" r="5" fill="white" opacity="0.75"/>
+  <g filter="url(#ag)">
+    <circle cx="130" cy="768" r="9" fill="url(#a2)"/>
+    <circle cx="130" cy="768" r="4.5" fill="white"/>
+  </g>
+  <path d="M 130 768 Q 136 758 140 754" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="3 3" opacity="0.4"/>
+
+  <text x="158" y="832" font-family="-apple-system, sans-serif" font-size="58" font-weight="800" fill="url(#a3)" letter-spacing="-2">arcevo</text>
+  <rect x="158" y="836" width="118" height="3.5" rx="2" fill="url(#a2)" opacity="0.85"/>
+  <text x="161" y="856" font-family="-apple-system, sans-serif" font-size="11" font-weight="500" fill="#0d9488" letter-spacing="3.5">EVOLVE · ASCEND · ARRIVE</text>
+
+  <!-- Arcevo colors -->
+  <text x="44" y="895" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#64748b" letter-spacing="2">PALETTE</text>
+  <rect x="44" y="905" width="60" height="30" rx="8" fill="#0d9488"/>
+  <text x="74" y="950" font-family="-apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">#0d9488</text>
+  <rect x="116" y="905" width="60" height="30" rx="8" fill="#f59e0b"/>
+  <text x="146" y="950" font-family="-apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">#f59e0b</text>
+  <rect x="188" y="905" width="60" height="30" rx="8" fill="#134e4a"/>
+  <text x="218" y="950" font-family="-apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">#134e4a</text>
+  <rect x="260" y="905" width="60" height="30" rx="8" fill="#fffbeb" stroke="#fef3c7" stroke-width="1"/>
+  <text x="290" y="950" font-family="-apple-system, sans-serif" font-size="10" fill="#64748b" text-anchor="middle">#fffbeb</text>
+
+  <!-- Arcevo description -->
+  <text x="460" y="775" font-family="-apple-system, sans-serif" font-size="26" font-weight="700" fill="#134e4a">Arcevo</text>
+  <text x="460" y="798" font-family="-apple-system, sans-serif" font-size="13" fill="#475569">Arc + Evolve — карьерная дуга роста</text>
+  <text x="460" y="828" font-family="-apple-system, sans-serif" font-size="12" fill="#64748b">arcevo.com · arcevo.io · arcevo.app</text>
+  <text x="460" y="858" font-family="-apple-system, sans-serif" font-size="12" fill="#64748b">Целевая аудитория: spec. 25-40, enterprise B2B</text>
+  <text x="460" y="878" font-family="-apple-system, sans-serif" font-size="12" fill="#64748b">Рынки: US, UK, DACH, Nordics, GCC</text>
+  <text x="460" y="908" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#0d9488">Настроение: премиальный · элегантный · зрелый</text>
+  <rect x="458" y="765" width="3" height="155" rx="2" fill="#0d9488" opacity="0.3"/>
+
+  <!-- Footer -->
+  <rect x="0" y="1062" width="900" height="38" fill="#f1f5f9"/>
+  <text x="36" y="1086" font-family="-apple-system, sans-serif" font-size="11" fill="#94a3b8">brand/  ·  traxo-logo.svg  ·  levio-logo.svg  ·  arcevo-logo.svg</text>
+  <text x="720" y="1086" font-family="-apple-system, sans-serif" font-size="11" fill="#94a3b8">ver. 1.0</text>
+</svg>

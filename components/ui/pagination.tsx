@@ -108,7 +108,7 @@ export function Pagination({
               className={cn(
                 "inline-flex h-8 min-w-[2rem] items-center justify-center rounded-lg px-2 text-xs font-medium border border-transparent transition-colors",
                 w === page
-                  ? "bg-sky-500/20 border-sky-500/40 text-sky-300"
+                  ? "bg-indigo-500/20 border-indigo-500/40 text-indigo-300"
                   : "btn-secondary",
               )}
             >

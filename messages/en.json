@@ -27,11 +27,12 @@
     "comingSoon": "Coming soon"
   },
   "meta": {
-    "title": "SkillPath Academy",
+    "title": "Levio",
     "description": "Learning platform for QA engineers, business analysts, and data analysts.",
-    "titleTemplate": "{page} — SkillPath Academy"
+    "titleTemplate": "{page} — Levio"
   },
   "nav": {
+    "menu": "Menu",
     "overview": "Overview",
     "tracks": "Tracks",
     "missions": "Missions",
@@ -45,6 +46,9 @@
     "jobs": "Jobs",
     "marketplace": "Marketplace",
     "portfolio": "Portfolio",
+    "resumeScanner": "Resume Scanner",
+    "interviewPreview": "AI Interview",
+    "peerReview": "Code Tinder",
     "interview": "Interview",
     "review": "Review",
     "publicProfile": "Public profile",
@@ -64,8 +68,17 @@
     "community": "Community",
     "quickTip": "Quick tip",
     "quickTipText": "Press Cmd/Ctrl + K to search lessons, missions, jobs, and admin entities.",
+    "quickTipDismiss": "Got it",
+    "focusMode": "Focus learning mode",
+    "exitFocusMode": "Exit",
+    "logout": "Logout",
+    "login": "Login",
+    "dashboard": "Dashboard",
+    "adminPanel": "Admin Panel",
     "quickActions": "Quick actions",
     "openCommandPalette": "Open command palette",
+    "searchPlaceholder": "Search modules, missions, jobs… (Cmd/Ctrl + K)",
+    "cmdK": "Cmd + K",
     "notifications": "Notifications",
     "openNavigation": "Open navigation",
     "home": "Home",
@@ -85,7 +98,7 @@
       "badge": "Build real-world skills",
       "title": "Launch your tech career with {highlight} and AI mentoring",
       "titleHighlight": "modules, missions,",
-      "description": "SkillPath Academy combines practical learning, progression systems, and career guidance in one premium workspace.",
+      "description": "Levio combines practical learning, progression systems, and career guidance in one premium workspace.",
       "ctaStart": "Start learning",
       "ctaExplore": "Explore tracks",
       "ctaDemo": "Try demo"
@@ -204,7 +217,7 @@
     "aiMentor": {
       "kicker": "AI mentor onboarding",
       "title": "Personalised guidance from day one",
-      "description": "Tell SkillPath your target role and weekly time. AI mentor builds a practical path and adapts it as you progress.",
+      "description": "Tell Levio your target role and weekly time. AI mentor builds a practical path and adapts it as you progress.",
       "cta": "Ask AI mentor",
       "chat": [
         { "role": "user", "text": "I want to become a QA engineer." },
@@ -282,7 +295,7 @@
         "pricing": "Pricing",
         "contact": "Contact"
       },
-      "copyright": "SkillPath Academy. Local edition.",
+      "copyright": "Levio. Local edition.",
       "status": "All systems operational"
     }
   },
@@ -299,7 +312,7 @@
     "noAccount": "Don't have an account?",
     "haveAccount": "Already have an account?",
     "guest": {
-      "badge": "SkillPath Academy",
+      "badge": "Levio",
       "title": "Learn faster. Practice smarter. Get job ready.",
       "description": "Local demo access for role-based learning flows with premium UI, AI guidance, and mission-based progression.",
       "trackProgression": {
@@ -341,7 +354,7 @@
       "stats": {
         "totalXp": "Total XP",
         "streak": "Streak",
-        "streakUnit": "days",
+        "streakUnit": "{days, plural, one {# day} other {# days}}",
         "skillLevel": "Skill level",
         "eta": "Track ETA"
       },
@@ -359,12 +372,261 @@
         "demo": "Demo"
       }
     },
+    "tabs": {
+      "overview": "Overview",
+      "skills": "Skills",
+      "career": "Career"
+    },
     "progressSnapshot": {
       "title": "Progress snapshot",
       "totalCompletion": "Total completion",
       "modulesDone": "Modules done",
       "learningStreak": "Learning streak",
+      "streakUnit": "{days, plural, one {# day} other {# days}}",
       "estCompletion": "Est. completion"
+    },
+    "insights": {
+      "title": "Learning insights",
+      "yourRank": "Your rank",
+      "weeklyXp": "Weekly XP",
+      "learningVelocity": "Learning velocity",
+      "velocityThisWeek": "{velocity}% this week",
+      "openLeaderboard": "Open leaderboard",
+      "achievements": "Achievements",
+      "skillProgress": "Skill progress",
+      "strongest": "Strongest",
+      "weakest": "Weakest",
+      "nextFocus": "Next focus"
+    },
+    "upcomingActions": {
+      "title": "Suggested Next Actions",
+      "description": "Actionable tasks to keep your learning velocity high this week.",
+      "difficulty": "Difficulty",
+      "time": "Time",
+      "skillImpact": "Skill impact",
+      "start": "Start"
+    },
+    "weeklyQuests": {
+      "title": "Weekly Quests",
+      "description": "Short challenges for consistency, XP rewards, and streak retention.",
+      "openMissions": "Open missions",
+      "progress": "{done}/{goal} completed",
+      "completedStatus": "Completed",
+      "progressIncrement": "Progress +1"
+    },
+    "currentTracks": {
+      "title": "Current Learning Tracks",
+      "description": "Live progress, next module, and completion estimates for your active pathways.",
+      "openAllTracks": "Open all tracks",
+      "modules": "{done}/{total} modules",
+      "nextModule": "Next module",
+      "done": "Done",
+      "estCompletion": "Est. completion",
+      "skillsGained": "Skills gained",
+      "careerImpact": "Career impact",
+      "startHere": "Start here",
+      "continue": "Continue"
+    },
+    "data": {
+      "quests": {
+        "lessons": { "title": "Complete 3 lessons", "description": "Finish at least 3 lesson units this week." },
+        "quiz": { "title": "Pass 1 quiz 80%+", "description": "Achieve at least 80% on one module quiz." },
+        "mission": { "title": "Submit 1 mission", "description": "Complete one practical mission this week." },
+        "streak": { "title": "Maintain 5-day streak", "description": "Log learning activity 5 days in a row." }
+      },
+      "actions": {
+        "continueModule": "Continue current module",
+        "continueModuleFallback": "Return to your active track and keep momentum.",
+        "redoQuiz": "Redo low-score quiz",
+        "takeNextQuiz": "Take the next quiz",
+        "redoQuizDescription": "{module}: improve score from {score}%",
+        "takeNextQuizFallback": "Strengthen retention with a short assessment.",
+        "simulation": "Complete one simulation",
+        "simulationDescription": "Practice real workflow and earn additional XP.",
+        "simulationImpact": "Real-work problem solving",
+        "skillUnlock": "Unlock next skill node",
+        "skillUnlockDescription": "Next target: {target}",
+        "skillUnlockFallback": "All current nodes unlocked. Maintain consistency.",
+        "skillUnlockImpactFallback": "Skill tree depth",
+        "interview": "Review interview feedback",
+        "interviewDescription": "Run one mock interview to validate communication and domain knowledge.",
+        "interviewImpact": "Communication and confidence",
+        "impactBA": "Requirement clarity",
+        "impactDA": "Analytics confidence",
+        "impactQA": "Testing execution",
+        "impactRetention": "Knowledge retention"
+      },
+      "achievements": {
+        "modulesCompleted": "Modules completed",
+        "modulesHint": "of {total}",
+        "quizzesPassed": "Quizzes passed",
+        "quizzesHint": "70%+ score",
+        "certificates": "Certificates",
+        "certificatesHint": "track completions",
+        "bestScore": "Best quiz score",
+        "bestScoreHint": "highest result",
+        "missionXp": "Mission XP",
+        "missionXpHint": "of {total}"
+      },
+      "activity": {
+        "completedModule": "Completed module {title}",
+        "completedModuleSub": "{track} — lesson pack completed",
+        "passedQuiz": "Passed quiz for {title}",
+        "passedQuizScore": "Score {score}%",
+        "certificateEarned": "Certificate earned",
+        "certificateCompleted": "{track} completed",
+        "skillUnlockTitle": "Unlocked new skill nodes",
+        "skillUnlockSub": "{unlocked}/{total} skills opened",
+        "badgeEarned": "New badge earned",
+        "simulationTitle": "Simulation milestone reached",
+        "simulationSub": "{count} simulation tasks completed"
+      },
+      "stats": {
+        "completedLessons": "Lessons completed",
+        "completedLessonsHelper": "{count} modules done",
+        "activeTracks": "Active tracks",
+        "activeTracksHelper": "{count} available",
+        "totalXp": "Total XP",
+        "totalXpHelper": "{xp} XP this week",
+        "quizAccuracy": "Quiz accuracy",
+        "quizAccuracyHelper": "{count} quizzes passed",
+        "streak": "Streak",
+        "streakValue": "{days, plural, one {# day} other {# days}}",
+        "streakHelper": "Consistency of learning",
+        "simulations": "Simulations",
+        "simulationsHelper": "Estimate from completed modules"
+      },
+      "notifications": {
+        "missionTitle": "New mission unlocked",
+        "summaryTitle": "Weekly learning summary",
+        "summaryBody": "{completed} weekly quests completed with {xp} XP.",
+        "recommendationTitle": "AI recommendation",
+        "jobTitle": "Job opportunity matched",
+        "achievementTitle": "Achievement unlocked"
+      },
+      "weeklyReport": {
+        "headline": "Weekly AI Learning Report",
+        "summary": "This week you improved {skill} by {growth}%. You completed {missions} missions.",
+        "highlightReadiness": "Readiness score is currently {score}.",
+        "highlightStrongest": "Your strongest skill this week: {skill}.",
+        "highlightMissions": "Mission delivery count: {missions}."
+      }
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "description": "Timeline of lessons, quizzes, skill unlocks, badges, and milestones.",
+      "empty": {
+        "title": "No activity yet",
+        "description": "Open a module and complete a lesson — your timeline will appear here.",
+        "action": "Browse tracks"
+      }
+    },
+    "planner": {
+      "title": "Planner Preview",
+      "description": "Weekly pace and realistic completion forecast.",
+      "currentPlan": "Current plan",
+      "workloadLabel": "Workload",
+      "forecastDateLabel": "Forecast date",
+      "weeklyPaceLabel": "Weekly pace",
+      "confidenceLabel": "Confidence",
+      "planActive": "Plan status: active",
+      "openPlanner": "Open planner",
+      "paceIntense": "5 focused sessions / week",
+      "paceBalanced": "3–4 focused sessions / week",
+      "paceLight": "2–3 focused sessions / week",
+      "confidenceIntense": "High confidence",
+      "confidenceBalanced": "On track",
+      "confidenceLight": "Steady pace",
+      "workloadIntense": "Intense",
+      "workloadBalanced": "Balanced",
+      "workloadLight": "Light"
+    },
+    "interviewPractice": {
+      "title": "Interview practice",
+      "description": "Simulate role interviews and get structured AI feedback.",
+      "startAction": "Start interview",
+      "trainerTitle": "Mock interview trainer",
+      "trainerDescription": "Practice QA, BA, and DA interview questions, evaluate weak zones, and get next modules.",
+      "sessionDuration": "10–15 min session",
+      "aiFeedback": "Instant AI feedback",
+      "openButton": "Open interview trainer"
+    },
+    "statsGrid": {
+      "keyMetrics": "Key metrics",
+      "learningProgress": "Learning progress",
+      "completedLessons": { "label": "Lessons completed", "helper": "Total successfully passed" },
+      "activeTracks": { "label": "Active tracks", "helper": "Currently studying" },
+      "totalXp": { "label": "XP earned", "helper": "Experience points" },
+      "quizAccuracy": { "label": "Quiz accuracy", "helper": "Average score" },
+      "weeklyStreak": { "label": "Learning streak", "helper": "Days in a row" },
+      "simulations": { "label": "Simulations", "helper": "AI scenarios completed" }
+    },
+    "smartPlan": {
+      "label": "Smart daily plan",
+      "todayTask": "{name}, your task for today:",
+      "allDone": "All done for today! 🎉",
+      "allDoneDesc": "Great work. You can rest or review completed material.",
+      "startButton": "Start now",
+      "eta": "This will take about {eta}."
+    },
+    "sections": {
+      "focus": {
+        "title": "Learning focus",
+        "description": "Your current tracks and next logical steps"
+      },
+      "gamification": {
+        "title": "Gamification & Stats",
+        "description": "Your achievements, XP, and daily goals"
+      },
+      "practice": {
+        "title": "Tasks & Practice",
+        "description": "Weekly quests, missions, and planner",
+        "locked": "Unlocks at Explorer level (500 XP)",
+        "unlockHint": "Earn 500 XP to unlock this section"
+      },
+      "advanced": {
+        "title": "Advanced",
+        "description": "Analytics, AI reports, and activity history",
+        "locked": "Unlocks at Professional level (1200 XP)",
+        "unlockHint": "Earn 1200 XP to unlock this section"
+      }
+    },
+    "weeklyReport": {
+      "nextFocus": "Next focus:"
+    },
+    "subscription": {
+      "title": "Subscription",
+      "manage": "Manage",
+      "plan": "Plan: {name}",
+      "unlimited": "Unlimited",
+      "meters": {
+        "aiMentorRequests": "AI mentor",
+        "missionSubmissions": "Mission submissions",
+        "interviewSessions": "Interviews",
+        "jobApplications": "Job applications"
+      }
+    },
+    "skillsTab": {
+      "recommendations": {
+        "title": "Recommendations",
+        "openAnalytics": "Advanced analytics",
+        "open": "Open"
+      },
+      "achievements": {
+        "title": "Achievements",
+        "unlocked": "Unlocked",
+        "locked": "Locked"
+      }
+    },
+    "careerTab": {
+      "marketplace": {
+        "title": "Public profile and marketplace",
+        "openButton": "Open hiring marketplace",
+        "profileUrl": "Public profile URL: {url}",
+        "matchPercent": "Match: {percent}%",
+        "missingSkills": "Missing: {skills}",
+        "noMissingSkills": "None"
+      }
     },
     "empty": {
       "title": "Dashboard data is empty",
@@ -512,5 +774,48 @@
     "en": "English",
     "ru": "Русский",
     "current": "Current language"
+  },
+  "missionsPage": {
+    "board": {
+      "kicker": "Mission-Based Learning",
+      "title": "Scenario missions with real work context",
+      "description": "Learn by solving concrete work situations with AI-backed evaluation and recovery hints.",
+      "upgrade": {
+        "message": "Free plan has mission limits. Upgrade to Pro for unlimited missions.",
+        "button": "Upgrade to Pro"
+      },
+      "empty": {
+        "title": "No missions available",
+        "description": "Missions are tailored to your learning track. Complete more lessons to unlock them.",
+        "action": "Go to tracks"
+      },
+      "objective": "Mission objective",
+      "submission": "Mission submission",
+      "submissionPlaceholder": "Write your mission result, decisions, and final output...",
+      "submitButton": "Evaluate with AI",
+      "result": "Result: {verdict} ({score}%)",
+      "strengths": "Strengths",
+      "improvements": "Improvements",
+      "recoveryPlan": "Recovery plan",
+      "addToPortfolio": "Add to portfolio",
+      "savedPortfolio": "Saved. Open /portfolio",
+      "difficulty": {
+        "Easy": "Easy",
+        "Medium": "Medium",
+        "Hard": "Hard"
+      },
+      "chatGreeting": "I'm playing the role: {role}. Hello! Write to me in chat to start working through the task.",
+      "chatPlaceholder": "Write your reply to the stakeholder… (Enter to send)",
+      "submitChat": "Submit dialogue for evaluation",
+      "tooShort": "You've written too little for evaluation. Keep chatting with the stakeholder!",
+      "chatError": "Failed to get AI response.",
+      "retryError": "Communication error with AI.",
+      "missionBriefing": "Mission briefing",
+      "yourGoal": "YOUR GOAL",
+      "availableMissions": "AVAILABLE MISSIONS",
+      "analysisResult": "Dialogue analysed: {verdict} ({score}%)",
+      "savePortfolio": "Save to portfolio",
+      "retryMission": "Retry"
+    }
   }
 }

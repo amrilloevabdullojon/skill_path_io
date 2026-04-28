@@ -11,6 +11,7 @@ type DropdownItem = {
   onSelect?: () => void;
   href?: string;
   destructive?: boolean;
+  icon?: React.ReactNode;
 };
 
 type DropdownProps = {
@@ -120,7 +121,10 @@ export function Dropdown({ trigger, items, align = "right", className }: Dropdow
                 if (item.href) {
                   return (
                     <a key={item.id} href={item.href} className={itemClassName} onClick={() => setOpen(false)}>
-                      {item.label}
+                      <span className="flex items-center gap-2 w-full">
+                        {item.icon}
+                        {item.label}
+                      </span>
                     </a>
                   );
                 }
@@ -135,7 +139,10 @@ export function Dropdown({ trigger, items, align = "right", className }: Dropdow
                       setOpen(false);
                     }}
                   >
-                    {item.label}
+                    <span className="flex items-center gap-2 w-full">
+                      {item.icon}
+                      {item.label}
+                    </span>
                   </button>
                 );
               })}

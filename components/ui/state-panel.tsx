@@ -9,7 +9,7 @@ type StatePanelProps = {
 
 function iconByVariant(variant: NonNullable<StatePanelProps["variant"]>) {
   if (variant === "loading") {
-    return <Loader2 className="h-4 w-4 animate-spin text-sky-300" />;
+    return <Loader2 className="h-4 w-4 animate-spin text-indigo-300" />;
   }
   if (variant === "error") {
     return <AlertTriangle className="h-4 w-4 text-rose-300" />;
@@ -23,7 +23,7 @@ export function StatePanel({ title, description, variant = "empty", className }:
     variant === "error"
       ? "border-rose-500/30 bg-rose-500/10 text-rose-100"
       : variant === "loading"
-        ? "border-sky-500/30 bg-sky-500/10 text-sky-100"
+        ? "border-indigo-500/30 bg-indigo-500/10 text-indigo-100"
         : "border-border bg-card/65 text-foreground";
 
   return (
