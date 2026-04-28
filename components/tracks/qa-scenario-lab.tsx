@@ -2,7 +2,18 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, ClipboardCheck, SearchCheck, ShieldAlert } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  ClipboardCheck,
+  FileText,
+  Gauge,
+  Radio,
+  ShieldAlert,
+  Target,
+  Timer,
+  Zap,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -29,6 +40,12 @@ type QaScenarioLabProps = {
 type ScenarioConfig = {
   title: string;
   intro: string;
+  scene: {
+    product: string;
+    pressure: string;
+    userReport: string;
+    winCondition: string;
+  };
   artifact: string[];
   rule: string;
   steps: ScenarioStep[];
@@ -38,6 +55,12 @@ const SCENARIOS: Record<number, ScenarioConfig> = {
   1: {
     title: "Первое расследование бага",
     intro: "Разберите проблему регистрации и соберите основу первого баг-репорта.",
+    scene: {
+      product: "Форма регистрации",
+      pressure: "До демо инвесторам: 18 минут",
+      userReport: "«Ввожу email и пароль, нажимаю Submit, но аккаунт не создаётся»",
+      winCondition: "Передать разработчику воспроизводимый баг с понятным риском.",
+    },
     artifact: ["Шаги воспроизведения", "Severity и продуктовый риск", "Заголовок баг-репорта"],
     rule: "Хороший тестировщик не просто находит ошибку. Он снижает неопределённость для команды.",
     steps: [
@@ -76,6 +99,12 @@ const SCENARIOS: Record<number, ScenarioConfig> = {
   2: {
     title: "Разбор требований перед тестом",
     intro: "Проверьте требования к скидке и выберите покрытие, которое ловит реальные риски.",
+    scene: {
+      product: "Промо-скидка для постоянных клиентов",
+      pressure: "Backend уже начал реализацию",
+      userReport: "«Нужно показывать скидку постоянным клиентам»",
+      winCondition: "Превратить расплывчатое требование в проверяемые условия.",
+    },
     artifact: ["Список неясностей", "Позитивный и негативный сценарий", "Граница для проверки"],
     rule: "Если требование нельзя проверить, его нужно уточнить до разработки или релиза.",
     steps: [
@@ -114,6 +143,12 @@ const SCENARIOS: Record<number, ScenarioConfig> = {
   3: {
     title: "Проверка формы и UI-состояний",
     intro: "Протестируйте форму оплаты как пользователь, который может ошибиться, ждать и вернуться назад.",
+    scene: {
+      product: "Оплата заказа",
+      pressure: "Трафик с мобильных: 64%",
+      userReport: "«После оплаты не понимаю, ждать мне или нажимать ещё раз»",
+      winCondition: "Найти состояния, которые мешают пользователю завершить оплату.",
+    },
     artifact: ["UI чеклист", "Состояния ошибки и загрузки", "Адаптивная проверка"],
     rule: "UI-тестирование - это не пиксели ради пикселей. Это проверка понятности, доступности и устойчивости сценария.",
     steps: [
@@ -152,6 +187,12 @@ const SCENARIOS: Record<number, ScenarioConfig> = {
   4: {
     title: "API-проверка профиля",
     intro: "Проверьте endpoint профиля и решите, какие ответы говорят о стабильном контракте.",
+    scene: {
+      product: "GET /profile",
+      pressure: "Фронтенд уже зависит от контракта",
+      userReport: "«Иногда профиль открывается пустым, но ошибок нет»",
+      winCondition: "Отделить успешный HTTP-ответ от реально корректного API-контракта.",
+    },
     artifact: ["Набор API-кейсов", "Ожидаемые статусы", "Короткий вывод по рискам"],
     rule: "API-тест без ожиданий - это просто запрос. QA заранее фиксирует статус, тело ответа и негативные условия.",
     steps: [
@@ -190,6 +231,12 @@ const SCENARIOS: Record<number, ScenarioConfig> = {
   5: {
     title: "Release readiness",
     intro: "Перед релизом выберите минимальный набор проверок и сформулируйте рекомендацию команде.",
+    scene: {
+      product: "Релиз-кандидат",
+      pressure: "Окно релиза закрывается через 30 минут",
+      userReport: "«Нужно понять, можно ли выпускать версию сегодня»",
+      winCondition: "Дать команде решение по релизу через факты, покрытие и открытые риски.",
+    },
     artifact: ["Smoke checklist", "Открытые риски", "Release recommendation"],
     rule: "QA не говорит «релизить» или «не релизить» на эмоциях. Он показывает риск и качество покрытия.",
     steps: [
@@ -243,40 +290,116 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
   }, [answers, scenario.steps]);
 
   const completed = Object.keys(answers).length === scenario.steps.length;
+  const confidence = Math.round((score / scenario.steps.length) * 100);
+  const selectedChoices = scenario.steps
+    .map((step) => {
+      const selected = step.choices.find((choice) => choice.id === answers[step.id]);
+      return selected ? { step, selected } : null;
+    })
+    .filter(Boolean) as Array<{ step: ScenarioStep; selected: ScenarioChoice }>;
+  const currentStep = scenario.steps.find((step) => !answers[step.id]) ?? scenario.steps[scenario.steps.length - 1];
+  const qualityGate =
+    !completed ? "Соберите решения по всем этапам" :
+    confidence >= 80 ? "Готово к передаче команде" :
+    "Нужно пересмотреть рискованные решения";
 
   return (
     <section id="scenario-lab" className="surface-elevated overflow-hidden border border-emerald-500/25 bg-card/60 backdrop-blur-md">
-      <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <div className="space-y-5 p-5 sm:p-6">
-          <div className="space-y-3">
-            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/35 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-300">
-              <SearchCheck className="h-4 w-4" />
-              QA симулятор
-            </span>
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">{scenario.title}</h2>
+      <div className="border-b border-border/60 bg-background/25 p-5 sm:p-6">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/35 bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-300">
+                <Radio className="h-4 w-4" />
+                QA смена
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-3 py-1 text-xs text-muted-foreground">
+                <Timer className="h-4 w-4" />
+                {scenario.scene.pressure}
+              </span>
+            </div>
+
+            <div className="max-w-3xl">
+              <p className="text-sm font-medium text-emerald-300">{moduleTitle}</p>
+              <h2 className="mt-1 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{scenario.title}</h2>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                {moduleTitle}: {scenario.intro}
+                {scenario.intro}
               </p>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-3">
+              <div className="rounded-2xl border border-border/60 bg-card/50 p-4">
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <Target className="h-4 w-4" />
+                  Объект
+                </p>
+                <p className="mt-2 text-sm font-semibold text-foreground">{scenario.scene.product}</p>
+              </div>
+              <div className="rounded-2xl border border-border/60 bg-card/50 p-4 md:col-span-2">
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <Zap className="h-4 w-4" />
+                  Сигнал от пользователя
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-foreground">{scenario.scene.userReport}</p>
+              </div>
             </div>
           </div>
 
+          <div className="rounded-3xl border border-border/60 bg-card/55 p-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <Gauge className="h-4 w-4" />
+                  Quality gate
+                </p>
+                <p className="mt-2 text-lg font-semibold text-foreground">{qualityGate}</p>
+              </div>
+              <span className="rounded-full border border-emerald-500/35 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-300">
+                {confidence}%
+              </span>
+            </div>
+            <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted/40">
+              <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-sky-400 transition-all duration-500" style={{ width: `${confidence}%` }} />
+            </div>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              {scenario.scene.winCondition}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="space-y-4 p-5 sm:p-6">
+          <div className="rounded-2xl border border-border/60 bg-background/35 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Текущий фокус</p>
+            <p className="mt-2 text-base font-semibold text-foreground">{currentStep.title}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{currentStep.prompt}</p>
+          </div>
+
           <div className="grid gap-4">
-            {scenario.steps.map((step) => {
+            {scenario.steps.map((step, stepIndex) => {
               const selectedId = answers[step.id];
               const selected = step.choices.find((choice) => choice.id === selectedId);
 
               return (
-                <article key={step.id} className="rounded-2xl border border-border/60 bg-background/35 p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
+                <article key={step.id} className="overflow-hidden rounded-2xl border border-border/60 bg-card/45">
+                  <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/50 bg-background/25 px-4 py-3">
                     <div className="min-w-0">
-                      <h3 className="text-base font-semibold text-foreground">{step.title}</h3>
-                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{step.prompt}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Этап {stepIndex + 1}</p>
+                      <h3 className="mt-1 text-base font-semibold text-foreground">{step.title.replace(/^\d+\.\s*/, "")}</h3>
                     </div>
-                    {selected?.correct ? <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-300" /> : null}
+                    {selected ? (
+                      <span className={cn(
+                        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold",
+                        selected.correct ? "border-emerald-500/35 bg-emerald-500/10 text-emerald-300" : "border-amber-500/35 bg-amber-500/10 text-amber-300",
+                      )}>
+                        {selected.correct ? <CheckCircle2 className="h-3.5 w-3.5" /> : <ShieldAlert className="h-3.5 w-3.5" />}
+                        {selected.correct ? "надёжно" : "риск"}
+                      </span>
+                    ) : null}
                   </div>
 
-                  <div className="mt-4 grid gap-2">
+                  <div className="grid gap-2 p-4">
                     {step.choices.map((choice) => {
                       const isSelected = selectedId === choice.id;
 
@@ -299,9 +422,9 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
                   </div>
 
                   {selected ? (
-                    <p className="mt-3 rounded-xl border border-border/60 bg-card/50 px-3 py-2 text-sm leading-relaxed text-muted-foreground">
-                      {selected.feedback}
-                    </p>
+                    <div className="border-t border-border/50 bg-background/20 px-4 py-3">
+                      <p className="text-sm leading-relaxed text-muted-foreground">{selected.feedback}</p>
+                    </div>
                   ) : null}
                 </article>
               );
@@ -309,14 +432,33 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
           </div>
         </div>
 
-        <aside className="border-t border-border/60 bg-background/30 p-5 lg:border-l lg:border-t-0">
+        <aside className="border-t border-border/60 bg-background/30 p-5 xl:border-l xl:border-t-0">
           <div className="sticky top-24 space-y-5">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Результат</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Собранный отчёт</p>
               <p className="mt-2 text-4xl font-semibold text-foreground">{score}/{scenario.steps.length}</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {completed ? "Сценарий завершён. Теперь закрепите результат в задании или тесте." : "Ответьте на три рабочих вопроса."}
+                {completed ? "Смена завершена. Проверьте итоговый артефакт и закрепите результат." : "Решения будут собираться в отчёт по мере выбора."}
               </p>
+            </div>
+
+            <div className="rounded-2xl border border-border/60 bg-card/50 p-4">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                <FileText className="h-4 w-4" />
+                Evidence log
+              </p>
+              <div className="mt-3 space-y-3">
+                {selectedChoices.length > 0 ? selectedChoices.map(({ step, selected }) => (
+                  <div key={step.id} className="rounded-xl border border-border/50 bg-background/30 p-3">
+                    <p className="text-xs font-semibold text-foreground">{step.title}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{selected.label}</p>
+                  </div>
+                )) : (
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Выберите первое решение, чтобы начать собирать доказательства.
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/10 p-4">
