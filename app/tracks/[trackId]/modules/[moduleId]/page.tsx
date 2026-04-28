@@ -241,11 +241,6 @@ export default async function ModulePage({ params }: ModulePageProps) {
 
   const primaryLesson = currentModule.lessons[0] ?? null;
   const nextLesson = currentModule.lessons[1] ?? null;
-  const taskLesson =
-    currentModule.lessons.find((lesson) => lesson.lessonType === LessonType.TASK || lesson.lessonType === "TASK") ??
-    currentModule.lessons[currentModule.lessons.length - 1] ??
-    null;
-
   const parsedContent = parseModuleContent(currentModule.content, trackCategory, currentModule.title, currentModule.order);
   const resources = parsedContent.resources.length > 0 ? parsedContent.resources : ["Изучить материалы модуля", "Выполнить практическое задание", "Повторить результаты теста"];
 
@@ -355,7 +350,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
     { id: "module-overview", label: showQaScenarioLab ? "Корни модуля" : "Обзор модуля" },
     ...(showQaScenarioLab ? [{ id: "scenario-lab", label: "QA симулятор" }] : []),
     { id: "lessons-timeline", label: "Путь обучения" },
-    { id: "lesson-content", label: "Содержание урока" },
+    { id: "lesson-content", label: "Уроки модуля" },
     { id: "practical-task", label: "Практическое задание" },
     ...(currentModule.quiz ? [{ id: "module-quiz", label: "Тест" }] : []),
     ...(currentModuleCard.simulationCount > 0 ? [{ id: "module-simulation", label: "Симуляция" }] : []),
@@ -559,14 +554,19 @@ export default async function ModulePage({ params }: ModulePageProps) {
           </section>
 
           <section id="lesson-content" className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-5">
-            <h2 className="section-title">Содержание урока</h2>
+            <div className="space-y-1">
+              <h2 className="section-title">Уроки модуля</h2>
+              <p className="text-sm text-muted-foreground">
+                Каждый урок оформлен как отдельная рабочая смена: сначала цель, затем материал, затем артефакт для портфолио.
+              </p>
+            </div>
             <LessonBlockRenderer blocks={lessonBlocks} />
           </section>
 
           <section id="practical-task" className="space-y-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md p-4 sm:p-5">
             <h2 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300">Практическое задание</h2>
             <p className="text-sm text-emerald-900/80 dark:text-emerald-100/80">
-              {taskLesson?.body ?? "Выполните практическое задание модуля и подготовьте краткое описание результатов."}
+              Соберите итоговый рабочий артефакт по модулю. Используйте заметки из уроков выше: миссию, чекпоинты и evidence.
             </p>
             <ul className="list-disc space-y-1 pl-5 text-sm text-emerald-800/80 dark:text-emerald-100/80">
               {resources.map((resource) => (

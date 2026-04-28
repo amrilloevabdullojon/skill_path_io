@@ -99,8 +99,10 @@ describe("content overrides", () => {
       ],
     });
 
-    const lessonHeadings = blocks.filter((block) => block.type === "heading" && block.title?.includes("Lesson"));
-    expect(lessonHeadings).toHaveLength(3);
+    const lessonPanels = blocks.filter((block) => block.type === "lesson_panel");
+    expect(lessonPanels).toHaveLength(3);
+    expect(lessonPanels[0]?.lesson?.artifact).toBe("QA intake note or risk list");
+    expect(lessonPanels[0]?.content).toBe("Body one");
     expect(blocks.some((block) => block.type === "callout" && block.title === "10-minute mission")).toBe(true);
     expect(blocks.some((block) => block.type === "list" && block.title === "Beginner step-by-step plan")).toBe(true);
     expect(blocks.some((block) => block.type === "code_block")).toBe(false);

@@ -3,7 +3,18 @@
 import { useMemo, useState, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
-import { AlertTriangle, CheckCircle2, Lightbulb, PlayCircle, Quote, Sparkles } from "lucide-react";
+import {
+  AlertTriangle,
+  BookOpenCheck,
+  CheckCircle2,
+  ClipboardCheck,
+  FileText,
+  Lightbulb,
+  PlayCircle,
+  Quote,
+  Sparkles,
+  Target,
+} from "lucide-react";
 
 import { AskAiHintButton } from "@/components/tracks/ask-ai-hint-button";
 import { LessonBlock } from "@/lib/tracks/lesson-blocks";
@@ -40,10 +51,104 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
   const [challengeSubmitted, setChallengeSubmitted] = useState<Record<string, boolean>>({});
 
   const orderedBlocks = useMemo(() => blocks, [blocks]);
+  const lessonPanels = useMemo(() => orderedBlocks.filter((block) => block.type === "lesson_panel" && block.lesson), [orderedBlocks]);
 
   return (
     <div className="space-y-4">
+      {lessonPanels.length > 1 ? (
+        <nav className="sticky top-16 z-20 -mx-1 overflow-x-auto rounded-2xl border border-border/40 bg-background/85 p-2 shadow-lg shadow-black/5 backdrop-blur-xl">
+          <div className="flex min-w-max items-center gap-2">
+            {lessonPanels.map((block) => (
+              <a
+                key={block.id}
+                href={`#${block.id}`}
+                className="inline-flex items-center gap-2 rounded-xl border border-border/40 bg-card/55 px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-emerald-400/40 hover:bg-emerald-500/10 hover:text-foreground"
+              >
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-[11px] text-emerald-500">
+                  {block.lesson?.order}
+                </span>
+                <span className="max-w-[11rem] truncate">{block.lesson?.title}</span>
+              </a>
+            ))}
+          </div>
+        </nav>
+      ) : null}
+
       {orderedBlocks.map((block) => {
+        if (block.type === "lesson_panel") {
+          const lesson = block.lesson;
+          if (!lesson) {
+            return null;
+          }
+
+          return (
+            <article
+              key={block.id}
+              id={block.id}
+              className="scroll-mt-28 overflow-hidden rounded-[28px] border border-emerald-500/25 bg-card/35 shadow-xl shadow-black/5 backdrop-blur-md"
+            >
+              <header className="relative isolate overflow-hidden border-b border-border/40 bg-emerald-500/8 p-4 sm:p-6">
+                <div className="absolute right-[-5rem] top-[-6rem] h-48 w-48 rounded-full bg-emerald-500/15 blur-3xl" />
+                <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-300">
+                        <BookOpenCheck className="h-3.5 w-3.5" />
+                        Урок {lesson.order} из {lesson.total}
+                      </span>
+                      <span className="rounded-full border border-border/50 bg-card/65 px-3 py-1 text-xs text-muted-foreground">
+                        Рабочая смена
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600/80 dark:text-emerald-300/80">
+                        {lesson.focus}
+                      </p>
+                      <h3 className="mt-2 break-words text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                        {lesson.title}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2 lg:w-[26rem]">
+                    <div className="rounded-2xl border border-border/40 bg-background/45 p-3">
+                      <p className="inline-flex items-center gap-1.5 font-semibold text-foreground">
+                        <Target className="h-3.5 w-3.5 text-emerald-500" />
+                        Миссия
+                      </p>
+                      <p className="mt-1 leading-5">{lesson.mission}</p>
+                    </div>
+                    <div className="rounded-2xl border border-border/40 bg-background/45 p-3">
+                      <p className="inline-flex items-center gap-1.5 font-semibold text-foreground">
+                        <FileText className="h-3.5 w-3.5 text-emerald-500" />
+                        Что сдаёте
+                      </p>
+                      <p className="mt-1 leading-5">{lesson.artifact}</p>
+                    </div>
+                  </div>
+                </div>
+              </header>
+
+              <div className="grid gap-5 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
+                <article className="markdown-content min-w-0">
+                  <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{block.content || ""}</ReactMarkdown>
+                </article>
+
+                <aside className="space-y-3 lg:sticky lg:top-32 lg:self-start">
+                  <div className="rounded-2xl border border-border/40 bg-background/45 p-4">
+                    <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                      <ClipboardCheck className="h-4 w-4 text-emerald-500" />
+                      Чекпоинт
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{lesson.checkpoint}</p>
+                  </div>
+                  <AskAiHintButton question={`Помоги пройти урок "${lesson.title}" через простой рабочий пример. Фокус: ${lesson.focus}.`} />
+                </aside>
+              </div>
+            </article>
+          );
+        }
+
         if (block.type === "heading") {
           return (
             <BlockCard key={block.id} className="border-indigo-500/30 bg-indigo-500/10 backdrop-blur-md ring-1 ring-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.1)]">
