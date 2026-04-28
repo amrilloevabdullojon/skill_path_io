@@ -19,7 +19,7 @@ export function ModuleReadingProgress() {
   return (
     <div className="fixed inset-x-0 top-0 z-[60] h-[3px] bg-transparent pointer-events-none">
       <div
-        className="h-full bg-gradient-to-r from-sky-400 via-blue-500 to-violet-500 transition-[width] duration-100"
+        className="h-full bg-gradient-to-r from-indigo-400 via-blue-500 to-violet-500 transition-[width] duration-100"
         style={{ width: `${progress}%` }}
       />
     </div>

@@ -6,8 +6,8 @@ import { buildSpeedReviewCards } from "@/features/review/speed-review";
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Speed Review — SkillPath Academy",
-  description: "Review your saved bookmarks and notes in rapid flashcard mode.",
+  title: "Быстрая проверка — Levio",
+  description: "Повторяйте сохраненные закладки и заметки в режиме быстрых флеш-карточек.",
   robots: { index: false },
 };
 import { prisma } from "@/lib/prisma";
@@ -62,7 +62,7 @@ export default async function ReviewPage() {
     title: row.title,
     content: row.content,
     track: mapTrack(row.moduleRef),
-    lessonRef: row.lessonRef || row.moduleRef || "General note",
+    lessonRef: row.lessonRef || row.moduleRef || "Общая заметка",
     createdAt: row.createdAt.toISOString(),
   }));
   const bookmarks: UserBookmark[] = bookmarkRows.map((row) => ({
@@ -75,7 +75,11 @@ export default async function ReviewPage() {
   const cards = buildSpeedReviewCards(notes, bookmarks);
 
   return (
-    <section className="page-shell">
+    <section className="page-shell relative isolate overflow-hidden">
+      {/* Background Neon Orbs */}
+      <div className="absolute top-[5%] right-[10%] w-[400px] h-[400px] rounded-full bg-violet-500/15 blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute bottom-[10%] left-[5%] w-[500px] h-[500px] rounded-full bg-sky-500/10 blur-[130px] pointer-events-none -z-10" />
+      
       <SpeedReviewMode cards={cards} />
     </section>
   );

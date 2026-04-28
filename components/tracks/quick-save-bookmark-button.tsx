@@ -61,7 +61,7 @@ export function QuickSaveBookmarkButton({
       disabled={isSaving}
       className="btn-secondary inline-flex items-center gap-2 px-3 py-2 text-xs"
     >
-      {saved ? <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-300" /> : <BookmarkPlus className="h-4 w-4 text-sky-500 dark:text-sky-300" />}
+      {saved ? <Check className="h-4 w-4 text-emerald-500 dark:text-emerald-300" /> : <BookmarkPlus className="h-4 w-4 text-indigo-500 dark:text-indigo-300" />}
       {saved ? "Сохранено" : isSaving ? "Сохранение..." : "Сохранить"}
     </button>
   );

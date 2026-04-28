@@ -47,61 +47,63 @@ export function BaSimulationForm() {
   }
 
   return (
-    <section className="surface-elevated space-y-5 p-5 sm:p-6">
+    <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-6 p-5 sm:p-7 relative isolate overflow-hidden rounded-[24px]">
+      <div className="absolute top-[-50px] right-[-50px] w-[300px] h-[300px] rounded-full bg-indigo-500/10 blur-[100px] pointer-events-none -z-10" />
       <header className="space-y-2">
-        <p className="kicker">BA Simulation</p>
-        <h1 className="text-2xl font-semibold text-foreground">User Story + Acceptance Criteria</h1>
-        <p className="text-sm text-muted-foreground">
-          Build a realistic story and get AI review on quality and completeness.
+        <p className="kicker text-indigo-400">Симуляция BA</p>
+        <h1 className="text-2xl font-bold text-foreground">User Story + Acceptance Criteria</h1>
+        <p className="text-sm text-foreground/70">
+          Составьте реалистичную историю пользователя и получите ревью качества от ИИ.
         </p>
       </header>
 
-      <div className="grid gap-3 md:grid-cols-3">
-        <input value={actor} onChange={(event) => setActor(event.target.value)} className="input-base" placeholder="As a..." />
-        <input value={action} onChange={(event) => setAction(event.target.value)} className="input-base" placeholder="I want to..." />
-        <input value={value} onChange={(event) => setValue(event.target.value)} className="input-base" placeholder="So that..." />
+      <div className="grid gap-4 md:grid-cols-3">
+        <input value={actor} onChange={(event) => setActor(event.target.value)} className="input-base bg-card/60 backdrop-blur-sm border-border/40 focus:border-indigo-500/50 focus:ring-indigo-500/20" placeholder="Как... (As a...)" />
+        <input value={action} onChange={(event) => setAction(event.target.value)} className="input-base bg-card/60 backdrop-blur-sm border-border/40 focus:border-indigo-500/50 focus:ring-indigo-500/20" placeholder="Я хочу... (I want to...)" />
+        <input value={value} onChange={(event) => setValue(event.target.value)} className="input-base bg-card/60 backdrop-blur-sm border-border/40 focus:border-indigo-500/50 focus:ring-indigo-500/20" placeholder="Чтобы... (So that...)" />
       </div>
 
       <textarea
         value={acceptanceCriteria}
         onChange={(event) => setAcceptanceCriteria(event.target.value)}
-        className="textarea-base min-h-[160px]"
-        placeholder="Acceptance criteria (Given/When/Then)..."
+        className="textarea-base min-h-[160px] bg-card/60 backdrop-blur-sm border-border/40 focus:border-indigo-500/50 focus:ring-indigo-500/20"
+        placeholder="Критерии приемки (Given/When/Then)..."
       />
 
       <button
         type="button"
         onClick={submitStory}
         disabled={isLoading}
-        className="btn-primary inline-flex items-center gap-2 disabled:opacity-60"
+        className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-60 bg-indigo-500 hover:bg-indigo-400 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_25px_rgba(99,102,241,0.5)] border-indigo-400 font-semibold"
       >
-        <ClipboardCheck className="h-4 w-4" />
-        {isLoading ? "Reviewing..." : "Review story"}
+        <ClipboardCheck className="h-5 w-5" />
+        {isLoading ? "Анализирую..." : "Проверить User Story"}
       </button>
 
       {review && (
-        <article className="surface-subtle space-y-3 p-4">
-          <p className="text-sm font-semibold text-foreground">Score: {review.score}/100</p>
-          <div className="grid gap-3 md:grid-cols-3">
-            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-100">
-              <p className="font-semibold uppercase tracking-wide text-emerald-200">Strengths</p>
-              <ul className="mt-2 list-disc space-y-1 pl-4">
+        <article className="surface-subtle border border-indigo-500/30 bg-card/50 backdrop-blur-md space-y-4 p-5 rounded-2xl relative isolate overflow-hidden mt-6">
+          <div className="absolute top-[-50px] left-[-50px] w-[200px] h-[200px] rounded-full bg-indigo-500/10 blur-[80px] pointer-events-none -z-10" />
+          <p className="text-lg font-bold text-foreground">Оценка качества: <span className="text-indigo-400">{review.score}/100</span></p>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md p-4 text-xs text-emerald-100 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+              <p className="font-semibold uppercase tracking-wide text-emerald-300">Сильные стороны</p>
+              <ul className="mt-2 list-disc space-y-1.5 pl-4">
                 {review.strengths.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-100">
-              <p className="font-semibold uppercase tracking-wide text-rose-200">Gaps</p>
-              <ul className="mt-2 list-disc space-y-1 pl-4">
+            <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 backdrop-blur-md p-4 text-xs text-rose-100 shadow-[0_0_15px_rgba(244,63,94,0.1)]">
+              <p className="font-semibold uppercase tracking-wide text-rose-300">Пробелы / Ошибки</p>
+              <ul className="mt-2 list-disc space-y-1.5 pl-4">
                 {review.gaps.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-xl border border-sky-500/30 bg-sky-500/10 p-3 text-xs text-sky-100">
-              <p className="font-semibold uppercase tracking-wide text-sky-200">Recommendations</p>
-              <ul className="mt-2 list-disc space-y-1 pl-4">
+            <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 backdrop-blur-md p-4 text-xs text-indigo-100 shadow-[0_0_15px_rgba(99,102,241,0.1)]">
+              <p className="font-semibold uppercase tracking-wide text-indigo-300">Рекомендации</p>
+              <ul className="mt-2 list-disc space-y-1.5 pl-4">
                 {review.recommendations.map((item) => (
                   <li key={item}>{item}</li>
                 ))}

@@ -40,23 +40,23 @@ type TrackModuleTreeProps = {
 
 const STATE_CIRCLE: Record<LearningPathState, string> = {
   completed: "bg-emerald-500/20 border-emerald-400",
-  in_progress: "bg-sky-500/20 border-sky-400",
+  in_progress: "bg-indigo-500/20 border-indigo-400",
   available: "bg-card border-border",
   locked: "bg-muted/20 border-border/30",
 };
 
 const STATE_CARD: Record<LearningPathState, string> = {
-  completed: "bg-emerald-500/8 border-emerald-400/20 opacity-80",
+  completed: "bg-emerald-500/10 border border-emerald-400/20 opacity-90 backdrop-blur-md",
   in_progress:
-    "bg-sky-500/10 border border-sky-400/30 border-l-2 border-l-sky-400 ring-1 ring-sky-400/15 shadow-[0_0_24px_-8px_rgba(56,189,248,0.18)]",
+    "bg-indigo-500/15 border border-indigo-400/30 border-l-2 border-l-indigo-400 ring-1 ring-indigo-400/25 shadow-[0_0_24px_-4px_rgba(99,102,241,0.25)] backdrop-blur-md",
   available:
-    "bg-card border-border hover:border-sky-400/40 hover:bg-sky-500/5 transition-colors",
-  locked: "bg-muted/8 border-border/30",
+    "bg-card/40 backdrop-blur-md border border-border/50 hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:shadow-[0_4px_20px_-8px_rgba(99,102,241,0.2)] transition-all",
+  locked: "bg-muted/10 border-border/30 backdrop-blur-sm",
 };
 
 const STATE_LINE: Record<LearningPathState, string> = {
   completed: "bg-emerald-400/35",
-  in_progress: "bg-gradient-to-b from-sky-400/50 to-border/20",
+  in_progress: "bg-gradient-to-b from-indigo-400/50 to-border/20",
   available: "bg-border/25",
   locked: "bg-border/12",
 };
@@ -77,7 +77,7 @@ function difficultyClass(d: string): string {
 
 const STATE_BADGE: Record<LearningPathState, string> = {
   completed: "border-emerald-400/30 bg-emerald-500/10 text-emerald-400",
-  in_progress: "border-sky-400/40 bg-sky-500/10 text-sky-400",
+  in_progress: "border-indigo-400/40 bg-indigo-500/10 text-indigo-400",
   available: "border-amber-400/40 bg-amber-500/10 text-amber-400",
   locked: "border-border/30 bg-muted/15 text-muted-foreground/50",
 };
@@ -103,8 +103,8 @@ function NumberCircle({
         <Lock className="h-4 w-4 text-muted-foreground/50" />
       ) : state === "in_progress" ? (
         <>
-          <span className="text-sm font-bold text-sky-400">{order}</span>
-          <span className="absolute inset-[-5px] animate-ping rounded-full bg-sky-400/20" />
+          <span className="text-sm font-bold text-indigo-400">{order}</span>
+          <span className="absolute inset-[-5px] animate-ping rounded-full bg-indigo-400/20" />
         </>
       ) : (
         <span className="text-sm font-bold text-foreground/60">{order}</span>
@@ -138,8 +138,8 @@ function ActionButton({
     state === "completed"
       ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
       : state === "in_progress"
-        ? "border-sky-400/40 bg-sky-500/10 text-sky-400 hover:bg-sky-500/20"
-        : "border-border bg-card text-foreground hover:bg-sky-500/10 hover:border-sky-400/40 hover:text-sky-400";
+        ? "border-indigo-400/40 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"
+        : "border-border bg-card text-foreground hover:bg-indigo-500/10 hover:border-indigo-400/40 hover:text-indigo-400";
 
   return (
     <Link
@@ -158,7 +158,7 @@ function ActionButton({
 /** Compact card for locked modules — minimal footprint */
 function LockedModuleCard({ node }: { node: TrackModuleNode }) {
   return (
-    <div className="rounded-xl border border-border/25 bg-muted/8 px-4 py-3 opacity-45">
+    <div className="rounded-xl border border-border/30 bg-muted/10 backdrop-blur-sm px-4 py-3 opacity-60">
       <div className="flex items-center gap-3">
         <Lock className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
         <div className="min-w-0 flex-1">

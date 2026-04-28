@@ -9,7 +9,7 @@ import { submitPeerReviewAction } from "../actions";
 import { CriteriaSliders } from "./criteria-sliders";
 
 export const metadata: Metadata = {
-  title: "Write Review — SkillPath Academy",
+  title: "Write Review — Levio",
   description: "Submit your peer review for a mission submission.",
 };
 

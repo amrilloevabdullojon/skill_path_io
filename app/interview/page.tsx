@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { MockInterviewPanel } from "@/components/interview/mock-interview-panel";
 
 export const metadata: Metadata = {
-  title: "Mock Interview — SkillPath Academy",
+  title: "Mock Interview — Levio",
   description: "Practice job interview scenarios with AI feedback tailored to your QA, BA, or DA track.",
 };
 

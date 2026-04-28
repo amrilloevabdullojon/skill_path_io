@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { BugReportSimulation } from "@/components/simulation/bug-report-simulation";
 
 export const metadata: Metadata = {
-  title: "Bug Tracker Simulation — SkillPath Academy",
-  description: "QA simulation: practice writing clear, reproducible bug reports in a realistic tracker.",
+  title: "Симулятор Баг-трекера — Levio",
+  description: "QA симуляция: практикуйтесь в написании понятных и воспроизводимых баг-репортов в реалистичном баг-трекере.",
 };
 
 export default function BugTrackerSimulationPage() {

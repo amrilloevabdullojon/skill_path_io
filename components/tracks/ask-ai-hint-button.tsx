@@ -30,7 +30,7 @@ export function AskAiHintButton({ question }: AskAiHintButtonProps) {
       onClick={handleAskMentor}
       className="btn-secondary inline-flex items-center gap-2"
     >
-      {justSent ? <Sparkles className="h-4 w-4 text-sky-300" /> : <Bot className="h-4 w-4 text-sky-300" />}
+      {justSent ? <Sparkles className="h-4 w-4 text-indigo-300" /> : <Bot className="h-4 w-4 text-indigo-300" />}
       {justSent ? "ИИ открыт" : "Спросить ИИ-ментора"}
     </button>
   );

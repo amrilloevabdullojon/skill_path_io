@@ -122,7 +122,7 @@ export async function evaluateInterview(track: InterviewTrack, answers: Intervie
   const fallback = localEvaluateInterview(track, answers);
 
   const systemPrompt =
-    "Ты интервьюер SkillPath Academy. Оцени ответы студента и верни только JSON без markdown.";
+    "Ты интервьюер Levio. Оцени ответы студента и верни только JSON без markdown.";
   const userPrompt = [
     "Формат JSON:",
     '{"score":0-100,"level":"Junior|Junior+|Middle","strengths":["..."],"weaknesses":["..."],"recommendations":["..."],"summary":"..."}',

@@ -192,7 +192,7 @@ export function MentorChatWidget({
       <motion.button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 z-[70] group flex items-center gap-2.5 rounded-2xl bg-gradient-to-r from-sky-500 to-violet-600 px-4 py-3 text-white shadow-xl shadow-sky-500/25 hover:shadow-sky-500/40 transition-shadow sm:bottom-6 sm:right-6"
+        className="fixed bottom-4 right-4 z-[70] group flex items-center gap-2.5 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-3 text-white shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow sm:bottom-6 sm:right-6"
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.97 }}
       >
@@ -215,11 +215,11 @@ export function MentorChatWidget({
             {/* Header */}
             <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
               {/* Animated gradient avatar */}
-              <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-violet-600 shadow-lg shadow-sky-500/20">
+              <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/20">
                 <Bot className="h-5 w-5 text-white" />
                 {/* Pulse ring when loading */}
                 {isLoading && (
-                  <span className="absolute inset-0 animate-ping rounded-xl bg-sky-400/40" />
+                  <span className="absolute inset-0 animate-ping rounded-xl bg-indigo-400/40" />
                 )}
               </div>
               <div className="min-w-0 flex-1">
@@ -248,8 +248,8 @@ export function MentorChatWidget({
                 if (!isAssistant) {
                   return (
                     <div key={message.id} className="flex justify-end px-4">
-                      <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-sky-600/30 border border-sky-500/40 px-3.5 py-2.5 shadow-sm">
-                        <p className="text-[11px] font-medium uppercase tracking-wide text-sky-400 mb-1">ВЫ</p>
+                      <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-indigo-600/30 border border-indigo-500/40 px-3.5 py-2.5 shadow-sm">
+                        <p className="text-[11px] font-medium uppercase tracking-wide text-indigo-400 mb-1">ВЫ</p>
                         <p className="text-[13px] text-slate-100 leading-[1.5]">{message.content}</p>
                       </div>
                     </div>
@@ -257,7 +257,7 @@ export function MentorChatWidget({
                 }
                 return (
                   <div key={message.id} className="flex items-start gap-2 px-4">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-sky-500 to-violet-600 mt-0.5">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 mt-0.5">
                       <Bot className="h-3.5 w-3.5 text-white" />
                     </div>
                     <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-slate-800 border border-white/[0.06] px-3.5 py-2.5 shadow-sm">
@@ -273,13 +273,13 @@ export function MentorChatWidget({
               {/* Typing indicator */}
               {isLoading && (
                 <div className="flex items-start gap-2 px-4 py-2">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-sky-500 to-violet-600">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600">
                     <Bot className="h-3.5 w-3.5 text-white" />
                   </div>
                   <div className="flex items-center gap-1 rounded-2xl rounded-tl-sm bg-slate-800/80 px-3 py-2.5">
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-sky-400 [animation-delay:0ms]" />
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-sky-400 [animation-delay:150ms]" />
-                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-sky-400 [animation-delay:300ms]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-400 [animation-delay:0ms]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-400 [animation-delay:150ms]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-400 [animation-delay:300ms]" />
                   </div>
                 </div>
               )}
@@ -300,7 +300,7 @@ export function MentorChatWidget({
                         setInput(chip);
                         textareaRef.current?.focus();
                       }}
-                      className="rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-[12px] text-sky-400 transition-colors hover:bg-sky-500/20"
+                      className="rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-[12px] text-indigo-400 transition-colors hover:bg-indigo-500/20"
                     >
                       {chip}
                     </button>
@@ -319,7 +319,7 @@ export function MentorChatWidget({
             {/* Input area */}
             <div className="border-t border-white/10 p-3">
               <form onSubmit={handleSubmit}>
-                <div className="flex items-end gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 focus-within:border-sky-500/50 focus-within:bg-sky-500/5 transition-colors">
+                <div className="flex items-end gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 focus-within:border-indigo-500/50 focus-within:bg-indigo-500/5 transition-colors">
                   <textarea
                     ref={textareaRef}
                     value={input}
@@ -334,7 +334,7 @@ export function MentorChatWidget({
                     type="button"
                     onClick={handleSend}
                     disabled={!input.trim() || isLoading}
-                    className="shrink-0 flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500 text-white transition-all hover:bg-sky-400 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="shrink-0 flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-white transition-all hover:bg-indigo-400 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Send className="h-4 w-4" />
                   </button>

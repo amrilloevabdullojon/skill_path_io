@@ -42,7 +42,7 @@ export function ModuleSidebarNav({ links }: { links: NavLink[] }) {
           className={cn(
             "block rounded-lg px-3 py-1.5 text-sm transition-all duration-150",
             activeId === item.id
-              ? "bg-sky-500/15 font-medium text-sky-400"
+              ? "bg-indigo-500/15 font-medium text-indigo-400"
               : "text-muted-foreground hover:bg-muted/20 hover:text-foreground",
           )}
         >

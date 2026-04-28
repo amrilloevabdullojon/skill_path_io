@@ -254,7 +254,7 @@ export function QuizPlayer({
           aria-label={`Вопрос ${currentIndex + 1} из ${totalQuestions}`}
         >
           <motion.div
-            className="h-full rounded-full bg-sky-400"
+            className="h-full rounded-full bg-indigo-400"
             initial={false}
             animate={{ width: `${progressPercent}%` }}
             transition={{ duration: 0.25, ease: "easeOut" }}
@@ -290,7 +290,7 @@ export function QuizPlayer({
                   whileTap={{ scale: 0.995 }}
                 className={`flex w-full cursor-pointer items-start gap-3 rounded-xl border p-3 transition-colors ${
                   checked
-                    ? "border-sky-400/70 bg-sky-400/10"
+                    ? "border-indigo-400/70 bg-indigo-400/10"
                     : "quiz-option-default"
                 }`}
               >
@@ -301,7 +301,7 @@ export function QuizPlayer({
                     onChange={(event) =>
                       selectOption(currentQuestion.id, currentQuestion.type, option.id, event.target.checked)
                     }
-                    className="mt-1 h-4 w-4 accent-sky-400"
+                    className="mt-1 h-4 w-4 accent-indigo-400"
                   />
                   <span className="break-words text-sm leading-6 text-foreground">{option.text}</span>
                 </motion.label>
@@ -334,7 +334,7 @@ export function QuizPlayer({
             type="button"
             onClick={goNext}
             disabled={!hasSelection || isPending}
-            className="inline-flex w-full items-center justify-center gap-2 bg-sky-500 text-sky-950 hover:bg-sky-400 sm:w-auto"
+            className="inline-flex w-full items-center justify-center gap-2 bg-indigo-500 text-indigo-950 hover:bg-indigo-400 sm:w-auto"
           >
             Далее
             <ArrowRight className="h-4 w-4" />

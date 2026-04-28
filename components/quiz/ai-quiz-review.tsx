@@ -120,7 +120,7 @@ export function AIQuizReview({ wrongAnswers, lessonContext }: AIQuizReviewProps)
                       <li key={tip}>{tip}</li>
                     ))}
                   </ul>
-                  <p className="text-xs text-sky-700 dark:text-sky-300">
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300">
                     Рекомендация: {review.recommendations.join(" ")}
                   </p>
                 </div>

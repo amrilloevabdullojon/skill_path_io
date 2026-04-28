@@ -9,7 +9,7 @@ export async function setLocale(locale: string): Promise<void> {
   if (!(SUPPORTED_LOCALES as readonly string[]).includes(locale)) return;
 
   const cookieStore = await cookies();
-  cookieStore.set("skillpath-locale", locale as Locale, {
+  cookieStore.set("levio-locale", locale as Locale, {
     path: "/",
     maxAge: 60 * 60 * 24 * 365,
     sameSite: "lax",

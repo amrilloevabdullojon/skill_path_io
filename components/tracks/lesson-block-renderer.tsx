@@ -27,8 +27,8 @@ function BlockCard({
   className?: string;
 }) {
   return (
-    <section className={`surface-subtle space-y-3 p-4 sm:p-5 ${className ?? ""}`}>
-      {title ? <h3 className="section-heading">{title}</h3> : null}
+    <section className={`surface-subtle space-y-3 p-4 sm:p-5 border border-border/20 bg-card/40 backdrop-blur-md rounded-2xl shadow-sm ${className ?? ""}`}>
+      {title ? <h3 className="section-heading text-foreground">{title}</h3> : null}
       {children}
     </section>
   );
@@ -46,10 +46,10 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
       {orderedBlocks.map((block) => {
         if (block.type === "heading") {
           return (
-            <BlockCard key={block.id} className="border-sky-400/20 bg-sky-500/5">
-              <p className="kicker">Заголовок урока</p>
-              <h2 className="text-2xl font-semibold text-foreground">{block.title || block.content}</h2>
-              {block.content ? <p className="text-sm text-muted-foreground">{block.content}</p> : null}
+            <BlockCard key={block.id} className="border-indigo-500/30 bg-indigo-500/10 backdrop-blur-md ring-1 ring-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.1)]">
+              <p className="kicker text-indigo-400">Заголовок урока</p>
+              <h2 className="text-2xl font-semibold text-foreground tracking-tight">{block.title || block.content}</h2>
+              {block.content ? <p className="text-sm text-muted-foreground/80">{block.content}</p> : null}
             </BlockCard>
           );
         }
@@ -113,12 +113,12 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
 
         if (block.type === "callout" || block.type === "important_concept") {
           return (
-            <BlockCard key={block.id} title={block.title} className="border-amber-400/25 bg-amber-500/8">
-              <p className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 dark:text-amber-400">
+            <BlockCard key={block.id} title={block.title} className="border-amber-500/30 bg-amber-500/10 backdrop-blur-md shadow-[0_0_15px_rgba(245,158,11,0.05)]">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-amber-500">
                 <Lightbulb className="h-4 w-4" />
                 Важная концепция
               </p>
-              <p className="text-sm text-amber-800 dark:text-amber-300">{block.content}</p>
+              <p className="text-sm text-foreground/80">{block.content}</p>
             </BlockCard>
           );
         }
@@ -126,7 +126,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "code_block") {
           return (
             <BlockCard key={block.id} title={block.title}>
-              <pre className="overflow-x-auto rounded-xl border border-border/90 bg-background p-4 text-sm text-muted-foreground">
+              <pre className="overflow-x-auto rounded-xl border border-border/40 bg-black/40 backdrop-blur-lg p-4 text-sm text-slate-300 shadow-inner">
                 <code>{block.code?.value || ""}</code>
               </pre>
             </BlockCard>
@@ -167,8 +167,8 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "quote") {
           return (
             <BlockCard key={block.id}>
-              <blockquote className="data-pill inline-flex items-start gap-2 rounded-xl px-3 py-2 text-sm">
-                <Quote className="mt-0.5 h-4 w-4 text-sky-500" />
+              <blockquote className="data-pill inline-flex items-start gap-2 rounded-xl px-4 py-3 text-sm border border-indigo-500/20 bg-indigo-500/5 backdrop-blur-sm">
+                <Quote className="mt-0.5 h-4 w-4 text-indigo-500" />
                 <span>{block.content}</span>
               </blockquote>
             </BlockCard>
@@ -189,8 +189,8 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
 
         if (block.type === "key_idea") {
           return (
-            <BlockCard key={block.id} title={block.title} className="border-sky-400/25 bg-sky-500/8">
-              <p className="text-sm text-sky-700 dark:text-sky-300">{block.content}</p>
+            <BlockCard key={block.id} title={block.title} className="border-indigo-500/30 bg-indigo-500/10 backdrop-blur-md">
+              <p className="text-sm text-foreground/80">{block.content}</p>
               <AskAiHintButton question={`Объясни эту ключевую идею простыми словами: ${block.content || ""}`} />
             </BlockCard>
           );
@@ -198,8 +198,8 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
 
         if (block.type === "common_mistakes") {
           return (
-            <BlockCard key={block.id} title={block.title} className="border-rose-400/25 bg-rose-500/8">
-              <ul className="list-disc space-y-1 pl-5 text-sm text-rose-700 dark:text-rose-400">
+            <BlockCard key={block.id} title={block.title} className="border-rose-500/30 bg-rose-500/10 backdrop-blur-md">
+              <ul className="list-disc space-y-1 pl-5 text-sm text-foreground/80">
                 {(block.items || []).map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -210,8 +210,8 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
 
         if (block.type === "real_world_example") {
           return (
-            <BlockCard key={block.id} title={block.title} className="border-violet-400/25 bg-violet-500/8">
-              <p className="text-sm text-violet-700 dark:text-violet-400">{block.content}</p>
+            <BlockCard key={block.id} title={block.title} className="border-violet-500/30 bg-violet-500/10 backdrop-blur-md">
+              <p className="text-sm text-foreground/80">{block.content}</p>
             </BlockCard>
           );
         }
@@ -224,11 +224,11 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
           }
           const isCorrect = state.submitted && state.selectedIndex === qc.correctIndex;
           return (
-            <BlockCard key={block.id} title={block.title || "Быстрая проверка"} className="border-emerald-400/25 bg-emerald-500/8">
-              <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">{qc.question}</p>
+            <BlockCard key={block.id} title={block.title || "Быстрая проверка"} className="border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md">
+              <p className="text-sm font-semibold text-emerald-500">{qc.question}</p>
               <div className="space-y-2">
                 {qc.options.map((option, index) => (
-                  <label key={option} className="quiz-option-default flex items-start gap-2 rounded-xl p-2 text-sm text-foreground">
+                  <label key={option} className="quiz-option-default flex items-start gap-2 rounded-xl border border-border/30 bg-card/60 backdrop-blur-sm p-3 text-sm text-foreground hover:bg-card/80 transition-colors">
                     <input
                       type="radio"
                       name={block.id}
@@ -275,8 +275,8 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
           const draft = challengeDrafts[block.id] ?? "";
           const submitted = challengeSubmitted[block.id] ?? false;
           return (
-            <BlockCard key={block.id} title={block.title || "Мини-задание"} className="border-cyan-400/25 bg-cyan-500/8">
-              <p className="text-sm text-cyan-700 dark:text-cyan-300">{block.challengePrompt}</p>
+            <BlockCard key={block.id} title={block.title || "Мини-задание"} className="border-cyan-500/30 bg-cyan-500/10 backdrop-blur-md">
+              <p className="text-sm font-medium text-cyan-500">{block.challengePrompt}</p>
               <textarea
                 value={draft}
                 onChange={(event) =>
@@ -318,7 +318,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
 
         if (block.type === "summary") {
           return (
-            <BlockCard key={block.id} title={block.title} className="border-border/60 bg-card/70">
+            <BlockCard key={block.id} title={block.title} className="border-border/50 bg-card/40 backdrop-blur-md">
               {block.content ? <p className="text-sm text-foreground">{block.content}</p> : null}
               {(block.items || []).length > 0 ? (
                 <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
@@ -328,7 +328,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                 </ul>
               ) : null}
               <p className="data-pill inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs">
-                <PlayCircle className="h-4 w-4 text-sky-500" />
+                <PlayCircle className="h-4 w-4 text-indigo-500" />
                 Рекомендуемый следующий шаг: пройди тест и продолжи путь обучения.
               </p>
             </BlockCard>
