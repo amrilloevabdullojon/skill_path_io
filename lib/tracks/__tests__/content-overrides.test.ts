@@ -101,6 +101,9 @@ describe("content overrides", () => {
 
     const lessonHeadings = blocks.filter((block) => block.type === "heading" && block.title?.includes("Lesson"));
     expect(lessonHeadings).toHaveLength(3);
+    expect(blocks.some((block) => block.type === "callout" && block.title === "10-minute mission")).toBe(true);
+    expect(blocks.some((block) => block.type === "list" && block.title === "Beginner step-by-step plan")).toBe(true);
+    expect(blocks.some((block) => block.type === "code_block")).toBe(false);
     expect(blocks.some((block) => block.type === "list" && block.title === "Self-check questions")).toBe(true);
   });
 });

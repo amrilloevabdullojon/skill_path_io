@@ -93,6 +93,84 @@ function commonMistakes(category: TrackCategory) {
   ];
 }
 
+function missionBrief(category: TrackCategory, moduleTitle: string, locale: "en" | "ru") {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? `Вы junior QA на первом спринте. Команда дала вам небольшую фичу по теме "${moduleTitle}". Ваша цель - не выучить все термины сразу, а найти 3 риска, проверить 1 сценарий и понятно записать результат.`
+      : `You are a junior QA in your first sprint. The team gives you a small feature related to "${moduleTitle}". Your goal is not to memorize every term. Find 3 risks, test 1 scenario, and write down the result clearly.`;
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? `Вы junior BA на discovery-встрече. По теме "${moduleTitle}" нужно понять цель пользователя, задать 3 уточняющих вопроса и превратить ответ в проверяемое требование.`
+      : `You are a junior BA in a discovery session. For "${moduleTitle}", identify the user goal, ask 3 clarifying questions, and turn the answer into a testable requirement.`;
+  }
+  return locale === "ru"
+    ? `Вы junior data analyst. По теме "${moduleTitle}" нужно понять бизнес-вопрос, выбрать 1 метрику и объяснить вывод так, чтобы его понял неаналитик.`
+    : `You are a junior data analyst. For "${moduleTitle}", understand the business question, choose 1 metric, and explain the insight so a non-analyst can understand it.`;
+}
+
+function firstWin(category: TrackCategory, locale: "en" | "ru") {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? "Первый win: вы можете объяснить, что проверили, какой риск нашли и что команда должна сделать дальше."
+      : "First win: you can explain what you checked, what risk you found, and what the team should do next.";
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? "Первый win: вы превратили расплывчатую фразу стейкхолдера в понятное требование с acceptance criteria."
+      : "First win: you turned a vague stakeholder sentence into a clear requirement with acceptance criteria.";
+  }
+  return locale === "ru"
+    ? "Первый win: вы нашли простую закономерность в данных и связали её с бизнес-действием."
+    : "First win: you found a simple pattern in the data and connected it to a business action.";
+}
+
+function starterSteps(category: TrackCategory, locale: "en" | "ru") {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? [
+          "1. Прочитайте сценарий как пользователь, не как эксперт.",
+          "2. Найдите, где пользователь может ошибиться или застрять.",
+          "3. Проверьте один happy path и один плохой сценарий.",
+          "4. Запишите результат в формате: шаги -> ожидание -> факт -> риск.",
+        ]
+      : [
+          "1. Read the scenario like a user, not an expert.",
+          "2. Find where the user can fail or get stuck.",
+          "3. Check one happy path and one bad path.",
+          "4. Write the result as: steps -> expected -> actual -> risk.",
+        ];
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? [
+          "1. Назовите пользователя и его цель.",
+          "2. Найдите непонятные слова в требовании.",
+          "3. Задайте 3 вопроса стейкхолдеру.",
+          "4. Запишите критерии: когда задача считается готовой.",
+        ]
+      : [
+          "1. Name the user and their goal.",
+          "2. Find vague words in the requirement.",
+          "3. Ask 3 stakeholder questions.",
+          "4. Write the criteria for when the task is done.",
+        ];
+  }
+  return locale === "ru"
+    ? [
+        "1. Сформулируйте бизнес-вопрос простыми словами.",
+        "2. Выберите одну метрику, которая помогает ответить.",
+        "3. Проверьте данные на пропуски и странные значения.",
+        "4. Напишите вывод в формате: что увидел -> почему важно -> что сделать.",
+      ]
+    : [
+        "1. State the business question in plain language.",
+        "2. Pick one metric that helps answer it.",
+        "3. Check the data for missing and strange values.",
+        "4. Write the insight as: what I saw -> why it matters -> what to do.",
+      ];
+}
+
 function quickCheck(category: TrackCategory, locale: "en" | "ru"): LessonQuickCheck {
   if (category === TrackCategory.QA) {
     if (locale === "ru") {
@@ -181,7 +259,10 @@ export function buildLessonBlocks(params: {
     quickCheck: locale === "ru" ? "Быстрая проверка" : "Quick Check",
     miniChallenge: locale === "ru" ? "Мини-практика" : "Mini Challenge",
     summary: locale === "ru" ? "Итоги модуля" : "Module summary",
-    codePattern: locale === "ru" ? "Пример структуры" : "Structure example",
+    missionBrief: locale === "ru" ? "Миссия на 10 минут" : "10-minute mission",
+    firstWin: locale === "ru" ? "Первый быстрый результат" : "First quick win",
+    starterSteps: locale === "ru" ? "Пошаговый план для новичка" : "Beginner step-by-step plan",
+    notNeededYet: locale === "ru" ? "Что пока не нужно знать" : "What you do not need yet",
   };
   const lessonBlocks = [...lessons]
     .sort((a, b) => a.order - b.order)
@@ -219,21 +300,39 @@ export function buildLessonBlocks(params: {
       content: moduleOverview || moduleDescription,
     },
     {
-      id: makeId("markdown", 2),
+      id: makeId("mission-brief", 2),
+      type: "callout",
+      title: localized.missionBrief,
+      content: missionBrief(category, moduleTitle, locale),
+    },
+    {
+      id: makeId("first-win", 3),
+      type: "real_world_example",
+      title: localized.firstWin,
+      content: firstWin(category, locale),
+    },
+    {
+      id: makeId("starter-steps", 4),
+      type: "list",
+      title: localized.starterSteps,
+      items: starterSteps(category, locale),
+    },
+    {
+      id: makeId("markdown", 5),
       type: "markdown",
       title: localized.learningFocus,
       content: locale === "ru"
-        ? "### Подход\n- Понять идею\n- Разобрать сценарии\n- Подтвердить результат практикой"
-        : "### Approach\n- Understand the concept\n- Break down the scenarios\n- Confirm the result through practice",
+        ? "### Как проходить модуль\n- Не пытайтесь запомнить всё сразу\n- Делайте маленький артефакт после каждого урока\n- Если застряли, нажмите AI hint и попросите пример проще\n- В конце сравните свой ответ с квизом"
+        : "### How to move through this module\n- Do not try to memorize everything at once\n- Create one small artifact after each lesson\n- If you get stuck, use AI hint and ask for a simpler example\n- At the end, compare your answer with the quiz",
     },
     {
-      id: makeId("list", 3),
+      id: makeId("list", 6),
       type: "list",
       title: localized.whatYouWillLearn,
       items: listItems,
     },
     {
-      id: makeId("table", 4),
+      id: makeId("table", 7),
       type: "table",
       title: localized.conceptMap,
       table: {
@@ -254,21 +353,12 @@ export function buildLessonBlocks(params: {
       },
     },
     {
-      id: makeId("callout", 5),
+      id: makeId("callout", 8),
       type: "callout",
-      title: localized.importantConcept,
+      title: localized.notNeededYet,
       content: locale === "ru"
-        ? "Стройте воспроизводимый workflow: гипотеза -> действие -> проверка результата."
-        : "Build a reproducible workflow: hypothesis -> action -> validation.",
-    },
-    {
-      id: makeId("code", 6),
-      type: "code_block",
-      title: localized.codePattern,
-      code: {
-        language: "ts",
-        value: "const progress = completed / total;\nif (progress >= 1) unlockNextModule();",
-      },
+        ? "На этом этапе не нужно знать все инструменты, стандарты и исключения. Достаточно научиться видеть риск, задавать хороший вопрос и фиксировать результат понятно."
+        : "At this stage you do not need every tool, standard, and exception. It is enough to spot a risk, ask a good question, and document the result clearly.",
     },
     ...lessonBlocks,
     {
@@ -308,11 +398,11 @@ export function buildLessonBlocks(params: {
       type: "mini_challenge",
       title: localized.miniChallenge,
       challengePrompt: locale === "ru"
-        ? `Примените идею из модуля "${moduleTitle}" к реальной задаче и опишите короткий план действий.`
-        : `Apply the idea from "${moduleTitle}" to a realistic task and write a short action plan.`,
+        ? `Представьте, что вам дали маленькую задачу по теме "${moduleTitle}". Напишите 3 пункта: что проверите первым, какой риск ищете, как поймёте, что всё работает.`
+        : `Imagine you got a small task about "${moduleTitle}". Write 3 bullets: what you check first, what risk you look for, and how you know it works.`,
       challengeHint: locale === "ru"
-        ? "Используйте 3-5 пунктов: контекст, действие, ожидаемый результат."
-        : "Use 3-5 bullet points: context, action, expected result.",
+        ? "Держите ответ коротким. Формат: проверка -> риск -> ожидаемый результат."
+        : "Keep it short. Format: check -> risk -> expected result.",
     },
     {
       id: makeId("summary", 86),
@@ -320,8 +410,8 @@ export function buildLessonBlocks(params: {
       title: localized.summary,
       items: resourceItems,
       content: locale === "ru"
-        ? "У вас есть структурированный путь: понять концепт, пройти уроки, выполнить практику и закрепить материал проверкой."
-        : "You now have a structured path: understand the concept, work through the lessons, practice, and validate the result.",
+        ? "Главная цель модуля - не закрыть длинный текст, а сделать маленький рабочий артефакт: вопрос, проверку, баг-репорт, требование или вывод."
+        : "The main goal is not to finish a long text. It is to create one small work artifact: a question, check, bug report, requirement, or insight.",
     },
   ];
 
