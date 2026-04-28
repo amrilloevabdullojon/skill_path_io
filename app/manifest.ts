@@ -2,13 +2,13 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "SkillPath Academy",
-    short_name: "SkillPath",
+    name: "Levio",
+    short_name: "Levio",
     description: "Role-focused learning for QA engineers, business analysts, and data analysts.",
     start_url: "/dashboard",
     display: "standalone",
-    background_color: "#020617",
-    theme_color: "#0ea5e9",
+    background_color: "#0c0a1e",
+    theme_color: "#6366f1",
     orientation: "portrait-primary",
     icons: [
       {

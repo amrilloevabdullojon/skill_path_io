@@ -54,9 +54,3 @@ export const useUiStore = create<UiState>((set) => ({
       return { theme: next };
     }),
 }));
-
-export function initTheme() {
-  const theme = getInitialTheme();
-  document.documentElement.setAttribute("data-theme", theme);
-  return theme;
-}

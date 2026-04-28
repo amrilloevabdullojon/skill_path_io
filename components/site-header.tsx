@@ -47,7 +47,7 @@ export function SiteHeader() {
           className="max-w-[calc(100vw-145px)] truncate text-lg font-semibold tracking-tight text-foreground md:max-w-none"
         >
           <span className="site-header-logo-text">
-            SkillPath Academy
+            Levio
           </span>
         </Link>
 
