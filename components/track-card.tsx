@@ -9,15 +9,15 @@ type TrackCardProps = {
 };
 
 const CATEGORY_GRADIENTS: Record<string, string> = {
-  QA: "from-emerald-100/80 via-emerald-50/50 to-transparent",
-  BA: "from-orange-100/80 via-orange-50/50 to-transparent",
-  DA: "from-violet-100/80 via-violet-50/50 to-transparent",
+  QA: "from-emerald-500/15 via-emerald-500/5 to-transparent",
+  BA: "from-orange-500/15 via-orange-500/5 to-transparent",
+  DA: "from-violet-500/15 via-violet-500/5 to-transparent",
 };
 
 const CATEGORY_BORDER: Record<string, string> = {
-  QA: "border-emerald-200",
-  BA: "border-orange-200",
-  DA: "border-violet-200",
+  QA: "border-emerald-200 dark:border-emerald-500/20",
+  BA: "border-orange-200 dark:border-orange-500/20",
+  DA: "border-violet-200 dark:border-violet-500/20",
 };
 
 const CATEGORY_ACCENT_TEXT: Record<string, string> = {
@@ -54,11 +54,14 @@ export function TrackCard({ track }: TrackCardProps) {
     <Link href={`/tracks/${track.slug}`} className="block h-full">
       <article
         className={cn(
-          "group relative overflow-hidden rounded-2xl border bg-card transition-all duration-200",
-          "hover:shadow-lg hover:-translate-y-1",
-          CATEGORY_BORDER[category] ?? "border-border",
-          progress?.isStarted && progress.progressPercent < 100 ? "ring-1 ring-sky-500/25" : "",
-          progress?.progressPercent === 100 ? "ring-1 ring-emerald-500/25" : "",
+          "group relative overflow-hidden rounded-2xl border bg-card/40 backdrop-blur-md transition-all duration-300",
+          "hover:-translate-y-1 hover:shadow-xl hover:bg-card/60",
+          category === "QA" ? "hover:shadow-[0_8px_30px_rgba(16,185,129,0.15)]" : "",
+          category === "BA" ? "hover:shadow-[0_8px_30px_rgba(249,115,22,0.15)]" : "",
+          category === "DA" ? "hover:shadow-[0_8px_30px_rgba(139,92,246,0.15)]" : "",
+          CATEGORY_BORDER[category] ?? "border-border/50 hover:border-border",
+          progress?.isStarted && progress.progressPercent < 100 ? "ring-1 ring-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.1)]" : "",
+          progress?.progressPercent === 100 ? "ring-1 ring-emerald-500/30" : "",
         )}
       >
         {/* Gradient header */}
@@ -92,7 +95,7 @@ export function TrackCard({ track }: TrackCardProps) {
           </div>
 
           {/* Title */}
-          <h3 className="text-lg font-bold leading-snug text-foreground group-hover:text-sky-300 transition-colors">
+          <h3 className="text-lg font-bold leading-snug text-foreground group-hover:text-indigo-300 transition-colors">
             {track.title}
           </h3>
 
@@ -107,7 +110,7 @@ export function TrackCard({ track }: TrackCardProps) {
           </span>
         </div>
 
-        <div className="border-t border-slate-100/80" />
+        <div className="border-t border-border" />
 
         {/* Body */}
         <div className="px-5 pb-5 space-y-4">
@@ -141,7 +144,7 @@ export function TrackCard({ track }: TrackCardProps) {
                 <div
                   className={cn(
                     "h-full rounded-full transition-all duration-500",
-                    CATEGORY_PROGRESS_BAR[category] ?? "bg-sky-500",
+                    CATEGORY_PROGRESS_BAR[category] ?? "bg-indigo-500",
                   )}
                   style={{ width: `${progress.progressPercent}%` }}
                 />
@@ -152,8 +155,12 @@ export function TrackCard({ track }: TrackCardProps) {
           {/* CTA Button */}
           <div
             className={cn(
-              "inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200",
-              "bg-foreground/5 border border-border group-hover:bg-sky-500/10 group-hover:border-sky-500/40 group-hover:text-sky-300",
+              "inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300",
+              "bg-foreground/5 border border-border/50",
+              category === "QA" ? "group-hover:bg-emerald-500/10 group-hover:border-emerald-500/40 group-hover:text-emerald-400" : "",
+              category === "BA" ? "group-hover:bg-orange-500/10 group-hover:border-orange-500/40 group-hover:text-orange-400" : "",
+              category === "DA" ? "group-hover:bg-violet-500/10 group-hover:border-violet-500/40 group-hover:text-violet-400" : "",
+              !["QA", "BA", "DA"].includes(category) ? "group-hover:bg-indigo-500/10 group-hover:border-indigo-500/40 group-hover:text-indigo-300" : "",
               "text-foreground",
             )}
           >

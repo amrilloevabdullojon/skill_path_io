@@ -46,10 +46,10 @@ export function LandingHeader() {
         )}
       >
         <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-sky-400/30 bg-sky-500/15 text-sky-200">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-indigo-400/30 bg-indigo-500/15 text-indigo-200">
             <Sparkles className="h-3.5 w-3.5" />
           </span>
-          SkillPath Academy
+          Levio
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">

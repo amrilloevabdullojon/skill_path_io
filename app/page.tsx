@@ -24,13 +24,13 @@ import { SectionReveal } from "@/components/landing/section-reveal";
 import { TracksSection, MissionsSection } from "@/components/landing/catalog-section";
 import type { Metadata } from "next";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "SkillPath Academy — QA, BA & DA Career Tracks",
+  title: "Levio — QA, BA & DA Career Tracks",
   description: "Structured learning paths for QA Engineers, Business Analysts, and Data Analysts. Learn with missions, quizzes, and AI-powered feedback.",
   openGraph: {
-    title: "SkillPath Academy",
+    title: "Levio",
     description: "Role-focused career tracks for QA, BA, and DA professionals.",
     type: "website",
   },
@@ -39,29 +39,29 @@ export const metadata: Metadata = {
 const valueProps = [
   {
     icon: Target,
-    title: "Role-focused tracks",
-    description: "QA, BA, DA, and PM paths built around real job requirements.",
-    color: "text-sky-400",
-    bg: "bg-sky-500/10 border-sky-500/20",
+    title: "Профильные треки",
+    description: "Направления QA, BA, DA и PM, построенные вокруг реальных рабочих требований.",
+    color: "text-indigo-400",
+    bg: "bg-indigo-500/10 border-indigo-500/20",
   },
   {
     icon: Rocket,
-    title: "Real-world missions",
-    description: "Practice on scenarios that mirror actual product-team work.",
+    title: "Реальные миссии",
+    description: "Практика на сценариях, точно повторяющих работу в реальных продуктовых командах.",
     color: "text-violet-400",
     bg: "bg-violet-500/10 border-violet-500/20",
   },
   {
     icon: Bot,
-    title: "AI mentor guidance",
-    description: "Personalised path, review feedback, and interview prep.",
+    title: "Поддержка ИИ-ментора",
+    description: "Персонализированный путь, детальный фидбек и прокачка к собеседованиям.",
     color: "text-emerald-400",
     bg: "bg-emerald-500/10 border-emerald-500/20",
   },
   {
     icon: LineChart,
-    title: "Career readiness score",
-    description: "Track your progress toward job-ready with clear metrics.",
+    title: "Оценка готовности",
+    description: "Отслеживайте свой прогресс и готовность к офферу с помощью понятных метрик.",
     color: "text-amber-400",
     bg: "bg-amber-500/10 border-amber-500/20",
   },
@@ -70,66 +70,69 @@ const valueProps = [
 const howItWorks = [
   {
     icon: Compass,
-    title: "Choose a career track",
-    description: "Pick QA, BA, DA, or PM and get a clear roadmap with milestones.",
+    title: "Выберите свой трек",
+    description: "Определите свой путь: QA, BA, DA или PM, и получите четкую дорожную карту с целями.",
   },
   {
     icon: GraduationCap,
-    title: "Complete interactive modules",
-    description: "Learn through lessons, quizzes, mini challenges, and smart progress feedback.",
+    title: "Проходите модули",
+    description: "Обучайтесь через интерактивные уроки, квизы и челленджи с умной обратной связью.",
   },
   {
     icon: Rocket,
-    title: "Solve real-world missions",
-    description: "Practice in realistic scenarios that feel like actual product-team work.",
+    title: "Выполняйте ИИ-миссии",
+    description: "Решайте практические задачи в реалистичных симуляциях рабочих процессов.",
   },
   {
     icon: BriefcaseBusiness,
-    title: "Prepare for interviews",
-    description: "Get readiness insights, AI review, and role-focused mock interview support.",
+    title: "Готовьтесь к собеседованиям",
+    description: "Проходите мок-интервью с ИИ и получайте глубокую аналитику своих навыков.",
   },
 ];
 
 const roadmapStages = [
-  { title: "Beginner", description: "Set target role and baseline skills.", unlock: "Personal onboarding profile" },
-  { title: "Foundations", description: "Build core concepts across track modules.", unlock: "First core badge" },
-  { title: "Practice", description: "Complete quizzes and guided exercises.", unlock: "Track confidence score" },
-  { title: "Missions", description: "Solve realistic role-based scenarios.", unlock: "Real-work portfolio items" },
-  { title: "Interview Ready", description: "Run mock interviews and remediation.", unlock: "Interview readiness report" },
-  { title: "Job Ready", description: "Close remaining skill gaps and apply.", unlock: "Career action plan" },
+  { title: "Новичок", description: "Определение цели и оценка базовых навыков.", unlock: "Окно онбординга" },
+  { title: "Основы", description: "Изучение ключевых концепций в рамках выбранного трека.", unlock: "Первый бейдж" },
+  { title: "Практика", description: "Решение квизов и закрепление теории.", unlock: "Оценка уверенности навыков" },
+  { title: "Миссии", description: "Работа над реалистичными продуктовыми кейсами.", unlock: "Работы для портфолио" },
+  { title: "Готовность к интервью", description: "Проведение мок-интервью и закрытие пробелов.", unlock: "Отчет по навыкам" },
+  { title: "Оффер", description: "Финальная шлифовка и выход на рынок труда.", unlock: "Карьерный план" },
 ];
 
 const outcomes = [
-  "Write strong bug reports and acceptance criteria",
-  "Build SQL analyses and explain product metrics",
-  "Handle role-based scenarios before your first job",
-  "Prepare for interviews with AI mentor feedback",
+  "Писать качественные баг-репорты и критерии приемки",
+  "Строить SQL-запросы к БД и описывать метрики продукта",
+  "Справляться с рабочими кейсами еще до первого собеса",
+  "Уверенно проходить скрининги благодаря ИИ-ментору",
 ];
 
 const pricingPlans = [
   {
     name: "Starter",
-    price: "Free",
-    description: "Best for local demo and personal exploration.",
-    features: ["1 career track", "Core modules", "Basic quizzes", "Progress tracking"],
-    cta: "Get started",
+    price: "Бесплатно",
+    description: "Идеально для старта и ознакомления с платформой.",
+    features: ["1 карьерный трек", "Базовые модули", "Начальные квизы", "Трекинг прогресса"],
+    cta: "Начать обучение",
+    href: "/login",
     highlight: false,
   },
   {
     name: "Pro Learner",
     price: "$29",
-    period: "/ mo",
-    description: "Full access to tracks, missions, and AI guidance.",
-    features: ["All career tracks", "Real-world missions", "AI mentor feedback", "Interview prep", "Portfolio builder", "Priority support"],
-    cta: "Start Pro",
+    period: "/ мес",
+    description: "Полный доступ к миссиям, ИИ и симуляторам.",
+    features: ["Все карьерные треки", "Реальные ИИ-миссии", "Поддержка ИИ-ментора", "Собеседования", "Конструктор портфолио", "Приоритетная поддержка"],
+    cta: "Перейти на Pro",
+    href: "/login",
     highlight: true,
   },
   {
     name: "Team Academy",
-    price: "Custom",
-    description: "Builder workflows and analytics for cohorts.",
-    features: ["Unlimited members", "Admin studio", "Analytics dashboard", "Custom tracks", "Cohort progress", "Dedicated support"],
-    cta: "Contact us",
+    price: "Кастомно",
+    description: "Инструменты для обучения команд и когорт.",
+    features: ["Анлим сотрудников", "Панель админа", "B2B Дашборд", "Свои карьерные пути", "Групповая динамика", "Свой менеджер"],
+    cta: "Связаться с нами",
+    href: "mailto:hello@levio.app",
     highlight: false,
   },
 ];
@@ -217,30 +220,30 @@ export default function HomePage() {
           <SectionReveal>
             <section className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
               <div className="space-y-7">
-                <div className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-500/8 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-sky-300">
+                <div className="inline-flex items-center gap-2 rounded-full border border-indigo-400/30 bg-indigo-500/8 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-indigo-300">
                   <Sparkles className="h-3.5 w-3.5" />
-                  Build real-world skills
+                  Строим реальные навыки
                 </div>
                 <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-[3.5rem] lg:leading-[1.12]">
-                  Launch your tech career with{" "}
-                  <span className="bg-gradient-to-br from-sky-300 via-sky-200 to-violet-300 bg-clip-text text-transparent">
-                    modules, missions,
+                  Запусти свою IT-карьеру через{" "}
+                  <span className="bg-gradient-to-br from-indigo-300 via-violet-300 to-purple-300 bg-clip-text text-transparent">
+                    ИИ-миссии, модули,
                   </span>{" "}
-                  and AI mentoring
+                  и живую практику
                 </h1>
                 <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                  SkillPath Academy combines practical learning, progression systems, and career guidance in one premium workspace.
+                  Levio объединяет практическое обучение, карьерный трекинг и глубокую аналитику от ИИ-ментора в единую B2B EdTech базу.
                 </p>
                 <div className="flex flex-wrap items-center gap-3">
-                  <Link href="/login" className={cn(buttonVariants({ size: "lg" }), "gap-2")}>
-                    Start learning
+                  <Link href="/skill-test" className={cn(buttonVariants({ size: "lg" }), "gap-2 shadow-[0_4px_24px_rgba(99,102,241,0.30)]")}>
+                    Пройти ИИ аудит навыков
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                   <a href="#tracks" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
-                    Explore tracks
+                    Смотреть треки
                   </a>
                   <Link href="/login" className={cn(buttonVariants({ variant: "ghost", size: "lg" }), "text-muted-foreground")}>
-                    Try demo
+                    Войти
                   </Link>
                 </div>
               </div>
@@ -276,8 +279,8 @@ export default function HomePage() {
           <SectionReveal>
             <section className="space-y-8">
               <div className="section-header">
-                <p className="kicker">How it works</p>
-                <h2 className="section-title">Four steps to career readiness</h2>
+                <p className="kicker">Как это работает</p>
+                <h2 className="section-title">Четыре шага к вашей первой IT-роли</h2>
               </div>
               <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
                 {howItWorks.map((item, index) => {
@@ -287,7 +290,7 @@ export default function HomePage() {
                       <div className="mb-4 flex items-center gap-3">
                         <span className="step-number">{index + 1}</span>
                         <div className="h-px flex-1 bg-border" />
-                        <Icon className="h-4 w-4 text-sky-400" />
+                        <Icon className="h-4 w-4 text-indigo-400" />
                       </div>
                       <h3 className="text-base font-semibold text-foreground">{item.title}</h3>
                       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
@@ -299,103 +302,48 @@ export default function HomePage() {
           </SectionReveal>
 
           {/* ── Tracks ───────────────────────────────────── */}
-          <SectionReveal>
-            <section id="tracks" className="space-y-8">
-              <div className="flex items-end justify-between gap-4">
-                <div className="section-header">
-                  <p className="kicker">Career tracks</p>
-                  <h2 className="section-title">Choose your role-focused path</h2>
-                </div>
-                <Link href="/tracks" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "hidden shrink-0 sm:inline-flex")}>
-                  All tracks
-                </Link>
-              </div>
-              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                {tracks.map((track) => (
-                  <article
-                    key={track.title}
-                    className={cn("surface-panel-hover flex flex-col gap-4 rounded-2xl border p-5", track.accent)}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className={cn("h-2 w-2 rounded-full shrink-0", track.dot)} />
-                          <span className={cn("text-xs font-semibold uppercase tracking-[0.14em]", track.iconColor)}>
-                            {track.category}
-                          </span>
-                        </div>
-                        <h3 className="mt-1.5 text-base font-semibold text-foreground">{track.title}</h3>
-                      </div>
-                    </div>
-                    <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">{track.description}</p>
-                    <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="stat-card">
-                        <p className="stat-card-label">Duration</p>
-                        <p className="stat-card-value mt-1 text-sm">{track.duration}</p>
-                      </div>
-                      <div className="stat-card">
-                        <p className="stat-card-label">Modules</p>
-                        <p className="stat-card-value mt-1 text-sm">{track.modules}</p>
-                      </div>
-                      <div className="stat-card">
-                        <p className="stat-card-label">Missions</p>
-                        <p className="stat-card-value mt-1 text-sm">{track.missions}</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {track.skills.map((skill) => (
-                        <span key={skill} className="skill-tag px-2 py-0.5 text-xs">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                    <Link href={track.href} className={cn(buttonVariants({ variant: "outline", size: "sm" }), "mt-auto w-full")}>
-                      Explore track
-                    </Link>
-                  </article>
-                ))}
-              </div>
-            </section>
-          </SectionReveal>
+          <Suspense fallback={<TracksSkeleton />}>
+            <TracksSection />
+          </Suspense>
 
           {/* ── Product preview ──────────────────────────── */}
           <SectionReveal>
             <section className="surface-elevated space-y-6 p-5 sm:p-7">
               <div className="section-header">
-                <p className="kicker">Product preview</p>
-                <h2 className="section-title">A premium learning command center</h2>
+                <p className="kicker">Превью платформы</p>
+                <h2 className="section-title">Премиальный командный центр</h2>
               </div>
               <div className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
                 <div className="content-card rounded-2xl p-5">
                   <div className="grid gap-3 sm:grid-cols-3">
                     <div className="stat-card">
-                      <p className="stat-card-label">Total XP</p>
+                      <p className="stat-card-label">Опыт (XP)</p>
                       <p className="stat-card-value mt-1 text-xl">1,840</p>
                     </div>
                     <div className="stat-card">
-                      <p className="stat-card-label">Active track</p>
+                      <p className="stat-card-label">Активный трек</p>
                       <p className="stat-card-value mt-1 text-base">QA Engineer</p>
                     </div>
                     <div className="stat-card">
-                      <p className="stat-card-label">Quiz accuracy</p>
+                      <p className="stat-card-label">Точность квизов</p>
                       <p className="stat-card-value mt-1 text-xl">82%</p>
                     </div>
                   </div>
                   <div className="mini-stat-box mt-3 p-4">
-                    <p className="text-sm font-semibold text-foreground">Dashboard widgets</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Heatmap, radar, recommendations, and weekly quest cards.</p>
+                    <p className="text-sm font-semibold text-foreground">Виджеты дашборда</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Карты навыков, радары компетенций, рекомендации ИИ и еженедельные квесты.</p>
                   </div>
                 </div>
                 <div className="grid gap-3">
-                  {["Track cards", "Mission cards", "Progress widgets"].map((label, i) => (
+                  {["Трекинг прогресса", "Карточки миссий", "Аналитика роста"].map((label, i) => (
                     <article key={label} className="stat-card flex items-start gap-3 p-4">
-                      <div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-sky-400/70" />
+                      <div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-indigo-400/70" />
                       <div>
                         <p className="text-sm font-semibold text-foreground">{label}</p>
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          {i === 0 && "Progress, next module, and ETA in one glance."}
-                          {i === 1 && "Scenario, XP reward, and status-driven actions."}
-                          {i === 2 && "Level growth, streak, and readiness insights."}
+                          {i === 0 && "Динамика, следующий модуль и прогнозируемое время."}
+                          {i === 1 && "Практические сценарии, награды XP и статутные экшены."}
+                          {i === 2 && "Оценка уровней, ударный режим и готовность к работе."}
                         </p>
                       </div>
                     </article>
@@ -412,10 +360,10 @@ export default function HomePage() {
 
           {/* ── Career roadmap ───────────────────────────── */}
           <SectionReveal>
-            <section id="career" className="space-y-8">
+            <section id="career" className="scroll-mt-28 space-y-8">
               <div className="section-header">
-                <p className="kicker">Career path visual map</p>
-                <h2 className="section-title">From beginner to job-ready</h2>
+                <p className="kicker">Карьерная дорожная карта</p>
+                <h2 className="section-title">Путь от новичка к уверенному Junior-у</h2>
               </div>
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {roadmapStages.map((stage, index) => (
@@ -429,7 +377,7 @@ export default function HomePage() {
                       <div className="mt-3 flex items-center gap-1.5">
                         <Zap className="h-3 w-3 shrink-0 text-amber-400" />
                         <span className="text-xs text-muted-foreground">
-                          Unlock: <span className="text-foreground">{stage.unlock}</span>
+                          Откроет: <span className="text-foreground">{stage.unlock}</span>
                         </span>
                       </div>
                     </article>
@@ -444,36 +392,36 @@ export default function HomePage() {
             <section className="surface-elevated grid gap-6 p-5 sm:p-7 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10">
               <div className="flex flex-col justify-center space-y-4">
                 <div className="section-header">
-                  <p className="kicker">AI mentor onboarding</p>
-                  <h2 className="section-title">Personalised guidance from day one</h2>
+                  <p className="kicker">ИИ-ментор рядом всегда</p>
+                  <h2 className="section-title">Сразу выстраиваем персональную стратегию</h2>
                 </div>
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Tell SkillPath your target role and weekly time. AI mentor builds a practical path and adapts it as you progress.
+                  Сообщите Levio вашу целевую профессию и желаемый темп. ИИ-ментор сам создаст пошаговый план и будет адаптировать его под ваш стиль обучения.
                 </p>
-                <Link href="/login" className={cn(buttonVariants({ variant: "accent", size: "sm" }), "w-fit gap-2")}>
+                <Link href="/interview-preview" className={cn(buttonVariants({ variant: "accent", size: "sm" }), "w-fit gap-2")}>
                   <Bot className="h-3.5 w-3.5" />
-                  Ask AI mentor
+                  Живой тест интервью
                 </Link>
               </div>
               <div className="content-card space-y-2.5 rounded-2xl p-4">
                 <div className="flex justify-end">
                   <div className="max-w-[80%] rounded-2xl rounded-tr-sm border border-border/60 bg-card px-3.5 py-2.5 text-sm text-foreground">
-                    I want to become a QA engineer.
+                    Я хочу стать QA инженером.
                   </div>
                 </div>
                 <div className="flex justify-start">
                   <div className="max-w-[80%] rounded-2xl rounded-tl-sm border border-violet-400/20 bg-violet-500/10 px-3.5 py-2.5 text-sm text-violet-100">
-                    Great goal. How many hours can you study each week?
+                    Отличная цель! Сколько часов в неделю сможешь уделять платформе?
                   </div>
                 </div>
                 <div className="flex justify-end">
                   <div className="max-w-[80%] rounded-2xl rounded-tr-sm border border-border/60 bg-card px-3.5 py-2.5 text-sm text-foreground">
-                    Around 7 hours.
+                    Где-то 7 часов.
                   </div>
                 </div>
                 <div className="flex justify-start">
-                  <div className="max-w-[80%] rounded-2xl rounded-tl-sm border border-sky-400/20 bg-sky-500/10 px-3.5 py-2.5 text-sm leading-relaxed text-sky-100">
-                    Recommended path: QA Foundations → API Testing → Bug Tracker Simulation → Mock Interview.
+                  <div className="max-w-[80%] rounded-2xl rounded-tl-sm border border-indigo-400/20 bg-indigo-500/10 px-3.5 py-2.5 text-sm leading-relaxed text-indigo-100">
+                    Твой персональный план: QA Foundations → API Testing → Практика с Баг-Трекером → Мок-интервью.
                   </div>
                 </div>
               </div>
@@ -481,54 +429,19 @@ export default function HomePage() {
           </SectionReveal>
 
           {/* ── Missions ─────────────────────────────────── */}
-          <SectionReveal>
-            <section id="missions" className="space-y-8">
-              <div className="section-header">
-                <p className="kicker">Real-world missions</p>
-                <h2 className="section-title">Practice with scenarios that mirror real teams</h2>
-              </div>
-              <div className="grid gap-5 md:grid-cols-3">
-                {missions.map((mission) => (
-                  <article
-                    key={mission.title}
-                    className={cn("surface-panel-hover flex flex-col gap-4 rounded-2xl border p-5", mission.accent)}
-                  >
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", mission.dot)} />
-                        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                          {mission.category}
-                        </span>
-                      </div>
-                      <h3 className="text-base font-semibold text-foreground">{mission.title}</h3>
-                      <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{mission.scenario}</p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="rounded-lg border border-violet-400/30 bg-violet-500/10 px-2.5 py-1 text-xs font-semibold text-violet-300">
-                        +{mission.xp} XP
-                      </span>
-                      <span className={cn("rounded-lg border px-2.5 py-1 text-xs font-semibold", missionStatusColor(mission.status))}>
-                        {mission.status}
-                      </span>
-                    </div>
-                    <Link href="/missions" className={cn(buttonVariants({ variant: "outline", size: "sm" }), "mt-auto w-full")}>
-                      Open mission
-                    </Link>
-                  </article>
-                ))}
-              </div>
-            </section>
-          </SectionReveal>
+          <Suspense fallback={<MissionsSkeleton />}>
+            <MissionsSection />
+          </Suspense>
 
           {/* ── Outcomes ─────────────────────────────────── */}
           <SectionReveal>
-            <section id="about" className="surface-elevated p-5 sm:p-7">
+            <section id="about" className="surface-elevated scroll-mt-28 p-5 sm:p-7">
               <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
                 <div className="section-header">
-                  <p className="kicker">Outcomes</p>
-                  <h2 className="section-title">What you will be able to do</h2>
+                  <p className="kicker">Результаты</p>
+                  <h2 className="section-title">Чему вы реально научитесь</h2>
                   <p className="text-sm leading-relaxed text-muted-foreground">
-                    Built around the skills that actually matter in QA, BA, and DA roles.
+                    Программа построена только вокруг тех навыков, которые проверяют на собеседованиях.
                   </p>
                 </div>
                 <ul className="grid gap-3 sm:grid-cols-2">
@@ -548,10 +461,10 @@ export default function HomePage() {
 
           {/* ── Pricing ──────────────────────────────────── */}
           <SectionReveal>
-            <section id="pricing" className="space-y-8">
+            <section id="pricing" className="scroll-mt-28 space-y-8">
               <div className="section-header">
-                <p className="kicker">Pricing</p>
-                <h2 className="section-title">Simple plans for every stage</h2>
+                <p className="kicker">Тарифы</p>
+                <h2 className="section-title">Простые планы для любой цели</h2>
               </div>
               <div className="grid gap-5 md:grid-cols-3">
                 {pricingPlans.map((plan, i) => (
@@ -560,38 +473,38 @@ export default function HomePage() {
                     className={cn(
                       "relative flex flex-col gap-5 rounded-2xl border p-6",
                       plan.highlight
-                        ? "border-sky-400/35 bg-gradient-to-b from-sky-500/10 to-slate-900/70 shadow-[0_0_0_1px_rgba(56,189,248,0.12),0_16px_40px_rgba(2,6,23,0.42)]"
+                        ? "border-indigo-400/35 bg-gradient-to-b from-indigo-500/10 to-slate-900/70 shadow-[0_0_0_1px_rgba(99,102,241,0.15),0_16px_40px_rgba(2,6,23,0.42)]"
                         : "surface-subtle",
                     )}
                   >
                     {plan.highlight ? (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                        <span className="inline-flex items-center gap-1 rounded-full border border-sky-400/40 bg-sky-500/20 px-3 py-0.5 text-xs font-semibold text-sky-300">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-indigo-400/40 bg-indigo-500/20 px-3 py-0.5 text-xs font-semibold text-indigo-300">
                           <Sparkles className="h-3 w-3" />
-                          Most popular
+                          Самый популярный
                         </span>
                       </div>
                     ) : null}
                     <div>
-                      <p className="text-sm font-semibold text-foreground">{plan.name}</p>
+                      <p className={cn("text-sm font-semibold", plan.highlight ? "text-white" : "text-foreground")}>{plan.name}</p>
                       <div className="mt-2 flex items-baseline gap-1">
-                        <span className="text-3xl font-bold tracking-tight text-foreground">{plan.price}</span>
+                        <span className={cn("text-3xl font-bold tracking-tight", plan.highlight ? "text-white" : "text-foreground")}>{plan.price}</span>
                         {plan.period ? (
-                          <span className="text-sm text-muted-foreground">{plan.period}</span>
+                          <span className={cn("text-sm", plan.highlight ? "text-white/80" : "text-muted-foreground")}>{plan.period}</span>
                         ) : null}
                       </div>
-                      <p className="mt-1.5 text-xs text-muted-foreground">{plan.description}</p>
+                      <p className={cn("mt-1.5 text-xs", plan.highlight ? "text-slate-300" : "text-muted-foreground")}>{plan.description}</p>
                     </div>
                     <ul className="flex-1 space-y-2">
                       {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <li key={feature} className={cn("flex items-center gap-2 text-sm", plan.highlight ? "text-slate-200" : "text-muted-foreground")}>
                           <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
                           {feature}
                         </li>
                       ))}
                     </ul>
-                    <Link
-                      href="/login"
+                    <a
+                      href={plan.href}
                       className={cn(
                         plan.highlight
                           ? buttonVariants({ size: "sm" })
@@ -600,7 +513,7 @@ export default function HomePage() {
                       )}
                     >
                       {plan.cta}
-                    </Link>
+                    </a>
                   </article>
                   </SectionReveal>
                 ))}
@@ -610,28 +523,29 @@ export default function HomePage() {
 
           {/* ── Final CTA ────────────────────────────────── */}
           <SectionReveal>
-            <section className="relative overflow-hidden rounded-[28px] border border-sky-400/15 bg-gradient-to-br from-slate-900/90 via-indigo-950/60 to-slate-950/90 p-8 text-center shadow-[0_0_0_1px_rgba(56,189,248,0.08),0_24px_60px_rgba(2,6,23,0.5)] sm:p-12">
+            <section className="relative overflow-hidden rounded-[28px] border border-indigo-400/20 bg-gradient-to-br from-indigo-950/80 via-slate-900/90 to-purple-950/70 p-8 text-center shadow-[0_0_0_1px_rgba(99,102,241,0.12),0_24px_60px_rgba(2,6,23,0.5)] sm:p-12">
               <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-                <div className="absolute -left-24 top-[-40px] h-[320px] w-[320px] rounded-full bg-sky-500/12 blur-3xl" />
-                <div className="absolute -right-24 bottom-[-40px] h-[320px] w-[320px] rounded-full bg-violet-500/12 blur-3xl" />
+                <div className="absolute -left-24 top-[-40px] h-[320px] w-[320px] rounded-full bg-indigo-500/15 blur-3xl" />
+                <div className="absolute -right-24 bottom-[-40px] h-[320px] w-[320px] rounded-full bg-purple-500/15 blur-3xl" />
+                <div className="absolute left-1/2 top-1/2 h-[200px] w-[200px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/8 blur-3xl" />
               </div>
               <div className="relative space-y-4">
-                <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                  Build your skills.{" "}
-                  <span className="bg-gradient-to-r from-sky-300 to-violet-300 bg-clip-text text-transparent">
-                    Grow your career.
+                <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                  Развивайте навыки.{" "}
+                  <span className="bg-gradient-to-r from-indigo-300 via-violet-300 to-purple-300 bg-clip-text text-transparent">
+                    Стройте карьеру.
                   </span>
                 </h2>
-                <p className="mx-auto max-w-lg text-base leading-relaxed text-muted-foreground">
-                  Start your learning journey today with role-based tracks, missions, and AI-powered feedback.
+                <p className="mx-auto max-w-lg text-base leading-relaxed text-slate-300">
+                  Начните своё обучение уже сегодня с карьерными треками, миссиями и ИИ-ментором.
                 </p>
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                  <Link href="/login" className={cn(buttonVariants({ size: "lg" }), "gap-2 shadow-[0_10px_30px_rgba(56,189,248,0.3)]")}>
-                    Start learning
+                  <Link href="/skill-test" className={cn(buttonVariants({ size: "lg" }), "gap-2 shadow-[0_10px_30px_rgba(99,102,241,0.35)]")}>
+                    Бесплатный срез навыков
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                   <Link href="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }))}>
-                    Try demo
+                    Сразу войти
                   </Link>
                 </div>
               </div>
@@ -644,37 +558,37 @@ export default function HomePage() {
           <div className="grid gap-8 text-sm text-muted-foreground sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-sky-400/30 bg-sky-500/15 text-sky-200">
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-indigo-400/30 bg-indigo-500/15 text-indigo-200">
                   <Sparkles className="h-3.5 w-3.5" />
                 </span>
-                <p className="font-semibold text-foreground">SkillPath Academy</p>
+                <p className="font-semibold text-foreground">Levio</p>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">Premium local-first EdTech workspace for QA, BA, and DA careers.</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">Премиальная локальная B2B EdTech-платформа для карьеры в QA, BA и DA.</p>
             </div>
             <div className="space-y-2">
-              <p className="module-order-label font-semibold">Product</p>
-              <Link href="/tracks" className="block transition-colors hover:text-foreground">Tracks</Link>
-              <Link href="/missions" className="block transition-colors hover:text-foreground">Missions</Link>
-              <Link href="/career" className="block transition-colors hover:text-foreground">Career</Link>
+              <p className="module-order-label font-semibold">Продукт</p>
+              <Link href="/tracks" className="block transition-colors hover:text-foreground">Треки</Link>
+              <Link href="/missions" className="block transition-colors hover:text-foreground">Миссии</Link>
+              <Link href="/career" className="block transition-colors hover:text-foreground">Карьера</Link>
             </div>
             <div className="space-y-2">
-              <p className="module-order-label font-semibold">AI & Learning</p>
-              <Link href="/dashboard" className="block transition-colors hover:text-foreground">Dashboard</Link>
-              <Link href="/interview" className="block transition-colors hover:text-foreground">AI interview</Link>
-              <Link href="/planner" className="block transition-colors hover:text-foreground">Planner</Link>
+              <p className="module-order-label font-semibold">ИИ и Обучение</p>
+              <Link href="/dashboard" className="block transition-colors hover:text-foreground">Дашборд</Link>
+              <Link href="/interview" className="block transition-colors hover:text-foreground">ИИ Интервью</Link>
+              <Link href="/planner" className="block transition-colors hover:text-foreground">Планировщик</Link>
             </div>
             <div className="space-y-2">
-              <p className="module-order-label font-semibold">Company</p>
-              <a href="#about" className="block transition-colors hover:text-foreground">About</a>
-              <a href="#pricing" className="block transition-colors hover:text-foreground">Pricing</a>
-              <Link href="/login" className="block transition-colors hover:text-foreground">Contact</Link>
+              <p className="module-order-label font-semibold">Компания</p>
+              <a href="#about" className="block transition-colors hover:text-foreground">О нас</a>
+              <a href="#pricing" className="block transition-colors hover:text-foreground">Цены</a>
+              <Link href="/login" className="block transition-colors hover:text-foreground">Контакты</Link>
             </div>
           </div>
           <div className="mt-8 flex items-center justify-between border-t border-border/60 pt-6 text-xs text-muted-foreground">
-            <p>© {new Date().getFullYear()} SkillPath Academy. Local edition.</p>
+            <p>© {new Date().getFullYear()} Levio. Локальная версия.</p>
             <div className="flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              <span>All systems operational</span>
+              <span>Все системы работают в штатном режиме</span>
             </div>
           </div>
         </footer>

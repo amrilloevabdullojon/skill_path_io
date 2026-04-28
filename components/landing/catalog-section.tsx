@@ -63,9 +63,9 @@ const fallbackTracks = [
     slug: "product-manager",
     category: "PRODUCT",
     title: "Product Manager",
-    accent: "border-sky-400/30 bg-sky-500/10",
-    iconColor: "text-sky-300",
-    dot: "bg-sky-400",
+    accent: "border-indigo-400/30 bg-indigo-500/10",
+    iconColor: "text-indigo-300",
+    dot: "bg-indigo-400",
     duration: "8 weeks",
     modules: 14,
     missions: 12,
@@ -76,28 +76,28 @@ const fallbackTracks = [
 
 const fallbackMissions = [
   {
-    title: "API Bug Investigation",
-    scenario: "Release candidate returns inconsistent status codes under edge conditions.",
+    title: "Дебаггинг API (Inkonsistent Status)",
+    scenario: "Релиз-кандидат возвращает случайные статус-коды на крайних кейсах.",
     xp: 140,
-    status: "In progress",
+    status: "В процессе",
     category: "QA",
     accent: "border-emerald-400/25 bg-emerald-500/8",
     dot: "bg-emerald-400",
   },
   {
-    title: "Stakeholder Request to User Story",
-    scenario: "Convert a vague request into clear acceptance criteria and testable scope.",
+    title: "Стейкхолдеры → User Story",
+    scenario: "Преврати размытый бизнес-реквест в четкие критерии приемки.",
     xp: 120,
-    status: "Available",
+    status: "Доступно",
     category: "BA",
     accent: "border-orange-400/25 bg-orange-500/8",
     dot: "bg-orange-400",
   },
   {
-    title: "Retention Dataset Deep Dive",
-    scenario: "Analyze churn signals and propose 3 high-impact product actions.",
+    title: "Анализ Retention датасета",
+    scenario: "Проанализировать причины оттока юзеров и предложить 3 продуктовых метрики.",
     xp: 180,
-    status: "Locked",
+    status: "Закрыто",
     category: "DA",
     accent: "border-violet-400/25 bg-violet-500/8",
     dot: "bg-violet-400",
@@ -109,21 +109,21 @@ function accentByCategory(category: string) {
   if (category === "QA") return "border-emerald-400/30 bg-emerald-500/10";
   if (category === "BA") return "border-orange-400/30 bg-orange-500/10";
   if (category === "DA") return "border-violet-400/30 bg-violet-500/10";
-  return "border-sky-400/30 bg-sky-500/10";
+  return "border-indigo-400/30 bg-indigo-500/10";
 }
 
 function dotByCategory(category: string) {
   if (category === "QA") return "bg-emerald-400";
   if (category === "BA") return "bg-orange-400";
   if (category === "DA") return "bg-violet-400";
-  return "bg-sky-400";
+  return "bg-indigo-400";
 }
 
 function iconColorByCategory(category: string) {
   if (category === "QA") return "text-emerald-300";
   if (category === "BA") return "text-orange-300";
   if (category === "DA") return "text-violet-300";
-  return "text-sky-300";
+  return "text-indigo-300";
 }
 
 function skillHintsByCategory(category: string) {
@@ -137,19 +137,19 @@ function missionAccentByCategory(category: string) {
   if (category === "QA") return "border-emerald-400/25 bg-emerald-500/8";
   if (category === "BA") return "border-orange-400/25 bg-orange-500/8";
   if (category === "DA") return "border-violet-400/25 bg-violet-500/8";
-  return "border-sky-400/25 bg-sky-500/8";
+  return "border-indigo-400/25 bg-indigo-500/8";
 }
 
 function normalizeMissionStatus(status: string) {
-  if (status === "in_progress") return "In progress";
-  if (status === "locked") return "Locked";
-  return "Available";
+  if (status === "in_progress") return "В процессе";
+  if (status === "locked") return "Закрыто";
+  return "Доступно";
 }
 
 function missionStatusColor(status: string) {
-  if (status === "In progress" || status === "in_progress")
-    return "border-sky-400/30 bg-sky-500/10 text-sky-300";
-  if (status === "locked")
+  if (status === "В процессе" || status === "in_progress")
+    return "border-indigo-400/30 bg-indigo-500/10 text-indigo-300";
+  if (status === "Закрыто" || status === "locked")
     return "border-border/60 bg-card/50 text-muted-foreground";
   return "border-emerald-400/30 bg-emerald-500/10 text-emerald-300";
 }
@@ -175,7 +175,7 @@ export async function TracksSection() {
       accent: accentByCategory(course.category),
       iconColor: iconColorByCategory(course.category),
       dot: dotByCategory(course.category),
-      duration: `${Math.max(4, Math.round(course.estimatedDuration / 300))} weeks`,
+      duration: `${Math.max(4, Math.round(course.estimatedDuration / 300))} нед.`,
       modules: course.modules.length,
       missions:
         course.modules.reduce(
@@ -196,8 +196,8 @@ export async function TracksSection() {
       <section id="tracks" className="space-y-8">
         <div className="flex items-end justify-between gap-4">
           <div className="section-header">
-            <p className="kicker">Career tracks</p>
-            <h2 className="section-title">Choose your role-focused path</h2>
+            <p className="kicker">Карьерные треки</p>
+            <h2 className="section-title">Выберите персональный профильный путь</h2>
           </div>
           <Link
             href="/tracks"
@@ -206,7 +206,7 @@ export async function TracksSection() {
               "hidden shrink-0 sm:inline-flex",
             )}
           >
-            All tracks
+            Все треки
           </Link>
         </div>
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -241,15 +241,15 @@ export async function TracksSection() {
               </p>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="stat-card">
-                  <p className="stat-card-label">Duration</p>
+                  <p className="stat-card-label">Длит-ть</p>
                   <p className="stat-card-value mt-1 text-sm">{track.duration}</p>
                 </div>
                 <div className="stat-card">
-                  <p className="stat-card-label">Modules</p>
+                  <p className="stat-card-label">Модули</p>
                   <p className="stat-card-value mt-1 text-sm">{track.modules}</p>
                 </div>
                 <div className="stat-card">
-                  <p className="stat-card-label">Missions</p>
+                  <p className="stat-card-label">Миссии</p>
                   <p className="stat-card-value mt-1 text-sm">{track.missions}</p>
                 </div>
               </div>
@@ -264,7 +264,7 @@ export async function TracksSection() {
                 href={track.href}
                 className={cn(buttonVariants({ variant: "outline", size: "sm" }), "mt-auto w-full")}
               >
-                Explore track
+                Смотреть трек
               </Link>
             </article>
           ))}
@@ -287,7 +287,7 @@ export async function MissionsSection() {
       status: normalizeMissionStatus(mission.status),
       category: "QA",
       accent: missionAccentByCategory("QA"),
-      dot: "bg-sky-400",
+      dot: "bg-indigo-400",
     }));
 
   const missions =
@@ -297,8 +297,8 @@ export async function MissionsSection() {
     <SectionReveal>
       <section id="missions" className="space-y-8">
         <div className="section-header">
-          <p className="kicker">Real-world missions</p>
-          <h2 className="section-title">Practice with scenarios that mirror real teams</h2>
+          <p className="kicker">Практические миссии</p>
+          <h2 className="section-title">Тренируйтесь на сценариях из реальных команд</h2>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
           {missions.map((mission) => (
@@ -341,7 +341,7 @@ export async function MissionsSection() {
                   "mt-auto w-full",
                 )}
               >
-                Open mission
+                Открыть миссию
               </Link>
             </article>
           ))}

@@ -12,16 +12,16 @@ export function LandingHeroPreview() {
       className="relative mx-auto w-full max-w-xl"
     >
       <div className="surface-elevated relative overflow-hidden p-4 sm:p-5">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-52 w-52 rounded-full bg-sky-500/12 blur-3xl" />
+        <div className="pointer-events-none absolute -right-24 -top-24 h-52 w-52 rounded-full bg-indigo-500/12 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 left-20 h-48 w-48 rounded-full bg-violet-500/12 blur-3xl" />
 
         <div className="relative space-y-3">
           <div className="content-card p-3">
-            <p className="data-label">Skill radar</p>
+            <p className="data-label">Радар навыков</p>
             <div className="mt-2 grid grid-cols-5 gap-1.5">
               {[72, 64, 78, 58, 66].map((value, index) => (
                 <div key={value + index} className="mini-stat-box h-10 p-1">
-                  <div className="h-full rounded-md bg-gradient-to-t from-sky-500/45 to-violet-500/35" style={{ opacity: value / 100 }} />
+                  <div className="h-full rounded-md bg-gradient-to-t from-indigo-500/45 to-violet-500/35" style={{ opacity: value / 100 }} />
                 </div>
               ))}
             </div>
@@ -31,7 +31,7 @@ export function LandingHeroPreview() {
             <div className="content-card p-3">
               <p className="inline-flex items-center gap-1 text-xs text-muted-foreground">
                 <Target className="h-3.5 w-3.5 text-emerald-300" />
-                Active tracks
+                Активный трек
               </p>
               <p className="mt-2 text-sm font-semibold text-foreground">QA Engineer</p>
               <div className="progress-track mt-2 h-1.5">
@@ -40,22 +40,22 @@ export function LandingHeroPreview() {
             </div>
             <div className="content-card p-3">
               <p className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                <CheckCircle2 className="h-3.5 w-3.5 text-sky-300" />
-                Mission preview
+                <CheckCircle2 className="h-3.5 w-3.5 text-indigo-300" />
+                Текущая миссия
               </p>
-              <p className="mt-2 text-sm font-semibold text-foreground">API Bug Investigation</p>
-              <p className="mt-1 text-[11px] text-muted-foreground">+140 XP · In progress</p>
+              <p className="mt-2 text-sm font-semibold text-foreground">Дебаггинг API</p>
+              <p className="mt-1 text-[11px] text-muted-foreground">+140 XP · В процессе</p>
             </div>
           </div>
 
           <div className="content-card p-3">
             <div className="flex items-center justify-between">
               <p className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                <BarChart3 className="h-3.5 w-3.5 text-sky-300" />
-                Progress stats
+                <BarChart3 className="h-3.5 w-3.5 text-indigo-300" />
+                Прогресс
               </p>
-              <span className="inline-flex items-center gap-1 text-xs text-sky-300">
-                Open dashboard
+              <span className="inline-flex items-center gap-1 text-xs text-indigo-300">
+                Открыть дашборд
                 <ArrowUpRight className="h-3.5 w-3.5" />
               </span>
             </div>
@@ -65,11 +65,11 @@ export function LandingHeroPreview() {
                 <p className="mt-1 text-foreground">1840</p>
               </div>
               <div className="mini-stat-box p-2">
-                <p className="text-muted-foreground">Track</p>
+                <p className="text-muted-foreground">Трек</p>
                 <p className="mt-1 text-foreground">62%</p>
               </div>
               <div className="mini-stat-box p-2">
-                <p className="text-muted-foreground">Missions</p>
+                <p className="text-muted-foreground">Миссии</p>
                 <p className="mt-1 text-foreground">5</p>
               </div>
             </div>
@@ -84,7 +84,7 @@ export function LandingHeroPreview() {
       >
         <p className="inline-flex items-center gap-1 text-xs text-muted-foreground">
           <Radar className="h-3.5 w-3.5 text-violet-300" />
-          AI mentor active
+          ИИ-ментор онлайн
         </p>
       </motion.div>
     </motion.div>

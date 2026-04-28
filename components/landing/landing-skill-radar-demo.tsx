@@ -7,25 +7,25 @@ import { ArrowUpRight, Sparkles } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-type SkillKey = "Testing" | "SQL" | "Analytics" | "Communication" | "Automation";
+type SkillKey = "Тестирование" | "SQL Базы" | "Аналитика" | "Стейкхолдеры" | "Автоматизация";
 
 const baseRadar: Record<SkillKey, number> = {
-  Testing: 78,
-  SQL: 64,
-  Analytics: 71,
-  Communication: 68,
-  Automation: 56,
+  "Тестирование": 78,
+  "SQL Базы": 64,
+  "Аналитика": 71,
+  "Стейкхолдеры": 68,
+  "Автоматизация": 56,
 };
 
 const growthRadar: Record<SkillKey, number> = {
-  Testing: 84,
-  SQL: 76,
-  Analytics: 79,
-  Communication: 74,
-  Automation: 68,
+  "Тестирование": 84,
+  "SQL Базы": 76,
+  "Аналитика": 79,
+  "Стейкхолдеры": 74,
+  "Автоматизация": 68,
 };
 
-const skillList: SkillKey[] = ["Testing", "SQL", "Analytics", "Communication", "Automation"];
+const skillList: SkillKey[] = ["Тестирование", "SQL Базы", "Аналитика", "Стейкхолдеры", "Автоматизация"];
 
 export function LandingSkillRadarDemo() {
   const [activeSkill, setActiveSkill] = useState<SkillKey | null>(null);
@@ -42,7 +42,7 @@ export function LandingSkillRadarDemo() {
   }, [activeSkill]);
 
   const strongestSkill = useMemo(
-    () => Object.entries(baseRadar).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "Testing",
+    () => Object.entries(baseRadar).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "Тестирование",
     [],
   );
 
@@ -51,12 +51,12 @@ export function LandingSkillRadarDemo() {
       <div className="surface-elevated min-w-0 p-4 sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <p className="kicker">Interactive demo</p>
-            <h3 className="mt-1 text-xl font-semibold text-foreground">Skill growth radar</h3>
+            <p className="kicker">Интерактивный радар</p>
+            <h3 className="mt-1 text-xl font-semibold text-foreground">Динамика навыков</h3>
           </div>
           <span className="inline-flex items-center gap-1 rounded-full border border-violet-400/35 bg-violet-500/15 px-2.5 py-1 text-[11px] text-violet-200">
             <Sparkles className="h-3.5 w-3.5" />
-            Live preview
+            Живое превью
           </span>
         </div>
 
@@ -66,7 +66,7 @@ export function LandingSkillRadarDemo() {
               <PolarGrid stroke="#334155" strokeOpacity={0.7} />
               <PolarAngleAxis dataKey="skill" tick={{ fill: "#94A3B8", fontSize: 12 }} tickLine={false} axisLine={false} />
               <Radar dataKey="projected" stroke="#34d399" strokeDasharray="5 4" fill="#34d399" fillOpacity={0.05} />
-              <Radar dataKey="value" stroke="#7dd3fc" strokeWidth={2} fill="#38bdf8" fillOpacity={0.26} />
+              <Radar dataKey="value" stroke="#a5b4fc" strokeWidth={2} fill="#6366f1" fillOpacity={0.26} />
             </RadarChart>
           </ResponsiveContainer>
         </div>
@@ -83,7 +83,7 @@ export function LandingSkillRadarDemo() {
               className={cn(
                 "rounded-full border px-3 py-1 text-xs transition-colors",
                 activeSkill === skill
-                  ? "border-sky-400/35 bg-sky-500/15 text-sky-200"
+                  ? "border-indigo-400/35 bg-indigo-500/15 text-indigo-200"
                   : "border-border bg-card/75 text-muted-foreground hover:border-border/70",
               )}
             >
@@ -101,19 +101,19 @@ export function LandingSkillRadarDemo() {
         transition={{ duration: 0.42 }}
       >
         <article className="surface-elevated p-4">
-          <p className="data-label">Strongest skill</p>
+          <p className="data-label">Сильный навык</p>
           <p className="mt-1 text-lg font-semibold text-foreground">{strongestSkill}</p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="data-label">Next focus</p>
-          <p className="mt-1 text-lg font-semibold text-foreground">Automation</p>
-          <p className="mt-1 text-xs text-muted-foreground">Boost interview readiness by adding one automation sprint.</p>
+          <p className="data-label">Зона развития</p>
+          <p className="mt-1 text-lg font-semibold text-foreground">Автоматизация</p>
+          <p className="mt-1 text-xs text-muted-foreground">Улучшит скор интервью после спринта.</p>
         </article>
         <article className="surface-elevated p-4">
-          <p className="data-label">Projected growth</p>
-          <p className="mt-1 text-lg font-semibold text-emerald-200">+12% in 6 weeks</p>
-          <p className="mt-1 inline-flex items-center gap-1 text-xs text-sky-300">
-            Open personalized roadmap
+          <p className="data-label">Прогноз роста</p>
+          <p className="mt-1 text-lg font-semibold text-emerald-200">+12% за 6 недель</p>
+          <p className="mt-1 inline-flex items-center gap-1 text-xs text-indigo-300">
+            Открыть личный план
             <ArrowUpRight className="h-3.5 w-3.5" />
           </p>
         </article>
