@@ -9,6 +9,15 @@ export async function touchUserStreakAction(timezoneOffsetMinutes = 0) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) return { success: false };
 
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { id: true },
+    });
+
+    if (!user) {
+      return { success: false, streak: 0 };
+    }
+
     // Compute midnight in the user's local timezone.
     // getTimezoneOffset() returns minutes WEST of UTC (e.g. UTC+5 → -300),
     // so we subtract the offset to shift the UTC timestamp to local time.
@@ -25,13 +34,13 @@ export async function touchUserStreakAction(timezoneOffsetMinutes = 0) {
 
     // Upsert or fetch streak
     let streak = await prisma.userStreak.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: user.id }
     });
 
     if (!streak) {
       streak = await prisma.userStreak.create({
         data: {
-          userId: session.user.id,
+          userId: user.id,
           currentStreak: 1,
           longestStreak: 1,
           lastActivityDate: new Date(),
