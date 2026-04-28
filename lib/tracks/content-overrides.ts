@@ -1368,6 +1368,489 @@ Your recommendation must name the top risks and explain why the team should care
   },
 ];
 
+const QA_REAL_WORLD_LABS: Localized<string>[][] = [
+  [
+    {
+      en: `## Workplace artifact: QA intake note
+
+Use this note when a product manager gives you a new feature before development starts.
+
+| Field | Example |
+| --- | --- |
+| Feature | Email sign-up with verification code |
+| User goal | Create an account and confirm ownership of the email |
+| Main risk | User cannot finish registration because the code expires or error text is unclear |
+| First question | What happens after 3 failed code attempts? |
+| Evidence to collect | Requirements link, test data, screenshots, browser, environment |
+
+## Real beginner task
+
+Write a 6-line QA intake note for this feature: "A learner can save a lesson to bookmarks and find it later in Bookmarks."
+
+Your answer should include:
+- one user goal
+- three product or UI risks
+- two questions for the team
+- one environment where you would test first`,
+      ru: `## Рабочий артефакт: QA intake note
+
+Используйте такую заметку, когда product manager приносит новую фичу еще до разработки.
+
+| Поле | Пример |
+| --- | --- |
+| Feature | Регистрация по email с verification code |
+| Цель пользователя | Создать аккаунт и подтвердить владение email |
+| Главный риск | Пользователь не может завершить регистрацию из-за истекшего кода или непонятной ошибки |
+| Первый вопрос | Что происходит после 3 неверных попыток ввода кода? |
+| Evidence | Ссылка на требования, тестовые данные, screenshots, browser, environment |
+
+## Реальная задача для новичка
+
+Напишите QA intake note на 6 строк для фичи: "Студент может сохранить урок в bookmarks и позже найти его в Bookmarks."
+
+В ответе должны быть:
+- одна цель пользователя
+- три продуктовых или UI-риска
+- два вопроса команде
+- одно окружение, где вы проверите фичу первым`,
+    },
+    {
+      en: `## Workplace artifact: sprint QA map
+
+Use this map to understand where QA participates during a sprint.
+
+| Sprint moment | QA action | Output |
+| --- | --- | --- |
+| Backlog refinement | Find unclear requirements | Questions in the ticket |
+| Planning | Confirm scope and test data | Testing notes |
+| Development | Prepare checks before the build | Checklist or test cases |
+| Code review/build ready | Run smoke and focused checks | Findings and blocker status |
+| Before release | Summarize quality and risk | Release recommendation |
+
+## Real beginner task
+
+For a password reset feature, write one QA action for each sprint moment. Keep each action specific: "ask what happens when token expires" is better than "test everything".`,
+      ru: `## Рабочий артефакт: sprint QA map
+
+Эта карта показывает, где QA участвует в спринте.
+
+| Момент спринта | Действие QA | Результат |
+| --- | --- | --- |
+| Backlog refinement | Найти неясные требования | Вопросы в ticket |
+| Planning | Подтвердить scope и test data | Testing notes |
+| Development | Подготовить проверки до сборки | Checklist или test cases |
+| Code review/build ready | Запустить smoke и focused checks | Findings и blocker status |
+| Before release | Суммировать качество и риски | Release recommendation |
+
+## Реальная задача для новичка
+
+Для фичи password reset напишите по одному QA-действию на каждый момент спринта. Делайте формулировки конкретными: "спросить, что происходит после истечения token" лучше, чем "проверить всё".`,
+    },
+    {
+      en: `## Workplace artifact: risk register
+
+| Risk | Impact | Probability | First check |
+| --- | --- | --- | --- |
+| Duplicate accounts are created | High | Medium | Register twice with the same email |
+| Error text does not explain the problem | Medium | High | Submit invalid email and empty password |
+| Mobile keyboard hides the submit button | Medium | Medium | Test on 390px width |
+| Analytics event is missing | Low | Medium | Confirm event in Network/console |
+
+## Real beginner task
+
+Create a risk register for a checkout page with promo code, payment method, and order confirmation. Add at least 5 risks and mark the first check for each.`,
+      ru: `## Рабочий артефакт: risk register
+
+| Риск | Влияние | Вероятность | Первая проверка |
+| --- | --- | --- | --- |
+| Создаются дубли аккаунтов | High | Medium | Зарегистрироваться дважды с одним email |
+| Текст ошибки не объясняет проблему | Medium | High | Отправить invalid email и пустой password |
+| Mobile keyboard закрывает submit button | Medium | Medium | Проверить на ширине 390px |
+| Analytics event не отправляется | Low | Medium | Проверить event в Network/console |
+
+## Реальная задача для новичка
+
+Создайте risk register для checkout page с promo code, payment method и order confirmation. Добавьте минимум 5 рисков и первую проверку для каждого.`,
+    },
+  ],
+  [
+    {
+      en: `## Workplace artifact: requirement review
+
+Weak requirement: "The user should be able to upload a profile image."
+
+QA rewrite:
+- Accepted formats: JPG, PNG, WebP
+- Max size: 5 MB
+- Min dimensions: 256x256
+- Error state: unsupported format, too large file, upload timeout
+- Success state: avatar preview updates without page reload
+- Accessibility: upload control has visible label and keyboard access
+
+## Real beginner task
+
+Rewrite this vague requirement into testable acceptance criteria: "The lesson search should work fast and show relevant results."`,
+      ru: `## Рабочий артефакт: requirement review
+
+Слабое требование: "Пользователь должен иметь возможность загрузить profile image."
+
+QA-переписывание:
+- Accepted formats: JPG, PNG, WebP
+- Max size: 5 MB
+- Min dimensions: 256x256
+- Error state: unsupported format, too large file, upload timeout
+- Success state: avatar preview обновляется без reload
+- Accessibility: upload control имеет видимый label и доступен с клавиатуры
+
+## Реальная задача для новичка
+
+Перепишите это расплывчатое требование в testable acceptance criteria: "Поиск по урокам должен работать быстро и показывать релевантные результаты."`,
+    },
+    {
+      en: `## Workplace artifact: test design matrix
+
+Feature: age field accepts 18-60.
+
+| Technique | Values | Why |
+| --- | --- | --- |
+| Boundary values | 17, 18, 60, 61 | Finds off-by-one mistakes |
+| Equivalence classes | 25, 10, empty, text | Covers valid and invalid groups |
+| Negative checks | -1, 999, "abc" | Confirms safe validation |
+| State checks | submit disabled/enabled | Confirms UI reacts correctly |
+
+## Real beginner task
+
+Build the same matrix for a password field: minimum 8 characters, must include a number, must include a capital letter.`,
+      ru: `## Рабочий артефакт: test design matrix
+
+Feature: поле age принимает 18-60.
+
+| Техника | Значения | Зачем |
+| --- | --- | --- |
+| Boundary values | 17, 18, 60, 61 | Находит off-by-one ошибки |
+| Equivalence classes | 25, 10, empty, text | Покрывает valid и invalid группы |
+| Negative checks | -1, 999, "abc" | Подтверждает безопасную validation |
+| State checks | submit disabled/enabled | Подтверждает реакцию UI |
+
+## Реальная задача для новичка
+
+Постройте такую же matrix для password field: минимум 8 символов, нужна цифра, нужна заглавная буква.`,
+    },
+    {
+      en: `## Workplace artifact: test case sample
+
+**Title:** Login succeeds with valid credentials  
+**Preconditions:** User exists and email is verified  
+**Data:** student@levio.local / valid password  
+**Steps:**
+1. Open login page
+2. Enter valid email
+3. Enter valid password
+4. Click Sign in
+
+**Expected result:** User lands on Dashboard, session is active, no validation errors are shown.
+
+## Real beginner task
+
+Write two test cases in this format:
+- invalid email format
+- correct email with wrong password`,
+      ru: `## Рабочий артефакт: пример test case
+
+**Title:** Login succeeds with valid credentials  
+**Preconditions:** User exists and email is verified  
+**Data:** student@levio.local / valid password  
+**Steps:**
+1. Open login page
+2. Enter valid email
+3. Enter valid password
+4. Click Sign in
+
+**Expected result:** User lands on Dashboard, session is active, validation errors are not shown.
+
+## Реальная задача для новичка
+
+Напишите два test case в таком же формате:
+- invalid email format
+- correct email with wrong password`,
+    },
+  ],
+  [
+    {
+      en: `## Workplace artifact: browser checklist
+
+Feature: edit profile.
+
+| Area | Checks |
+| --- | --- |
+| UI | Labels, required marks, helper text, disabled/enabled button |
+| Validation | Empty name, long name, invalid characters |
+| State | Loading, success, error, refresh after save |
+| Navigation | Cancel, back button, redirect after save |
+| Mobile | 390px layout, keyboard overlap, tap targets |
+
+## Real beginner task
+
+Run this checklist against any settings page in the project and write 5 findings. A finding can be "works as expected" if it includes evidence.`,
+      ru: `## Рабочий артефакт: browser checklist
+
+Feature: edit profile.
+
+| Зона | Проверки |
+| --- | --- |
+| UI | Labels, required marks, helper text, disabled/enabled button |
+| Validation | Empty name, long name, invalid characters |
+| State | Loading, success, error, refresh after save |
+| Navigation | Cancel, back button, redirect after save |
+| Mobile | 390px layout, keyboard overlap, tap targets |
+
+## Реальная задача для новичка
+
+Пройдите этот checklist на любой settings page в проекте и напишите 5 findings. Finding может быть "works as expected", если есть evidence.`,
+    },
+    {
+      en: `## Workplace artifact: DevTools investigation note
+
+Use this note when the UI shows an error but the reason is unclear.
+
+| Signal | What to capture |
+| --- | --- |
+| Console | Error text, file, line, time |
+| Network | URL, method, status code, request body, response body |
+| Storage | Token exists, cookie expiry, stale local storage value |
+| Reproduction | Exact steps and account used |
+
+## Real beginner task
+
+Simulate a failed login and write a DevTools investigation note. If you cannot access the real backend, describe what you would capture.`,
+      ru: `## Рабочий артефакт: DevTools investigation note
+
+Используйте эту заметку, когда UI показывает ошибку, но причина неясна.
+
+| Signal | Что зафиксировать |
+| --- | --- |
+| Console | Error text, file, line, time |
+| Network | URL, method, status code, request body, response body |
+| Storage | Token exists, cookie expiry, stale local storage value |
+| Reproduction | Точные шаги и account |
+
+## Реальная задача для новичка
+
+Сымитируйте failed login и напишите DevTools investigation note. Если нет доступа к реальному backend, опишите, что именно вы бы зафиксировали.`,
+    },
+    {
+      en: `## Workplace artifact: responsive test run
+
+| Viewport | What to inspect |
+| --- | --- |
+| 1440px desktop | Main layout, sidebar/header, spacing |
+| 1024px tablet | Navigation, cards per row, wrapping |
+| 390px mobile | Text overflow, button size, sticky footer, keyboard |
+| 320px narrow mobile | Long words, icons, critical CTA visibility |
+
+## Real beginner task
+
+Pick one module page and inspect it at 1440px, 390px, and 320px. Report at least one observation per viewport.`,
+      ru: `## Рабочий артефакт: responsive test run
+
+| Viewport | Что проверить |
+| --- | --- |
+| 1440px desktop | Main layout, sidebar/header, spacing |
+| 1024px tablet | Navigation, cards per row, wrapping |
+| 390px mobile | Text overflow, button size, sticky footer, keyboard |
+| 320px narrow mobile | Long words, icons, visibility of critical CTA |
+
+## Реальная задача для новичка
+
+Выберите одну module page и проверьте ее на 1440px, 390px и 320px. Зафиксируйте минимум одно observation на каждый viewport.`,
+    },
+  ],
+  [
+    {
+      en: `## Workplace artifact: API contract card
+
+Endpoint: GET /api/bookmarks
+
+| Item | Expected |
+| --- | --- |
+| Auth | Valid session required |
+| Success status | 200 |
+| Response shape | { bookmarks: [{ id, title, href, createdAt }] } |
+| Empty state | bookmarks is [] |
+| Unauthorized | 401 or redirect to login |
+| Data risk | Deleted lesson should not remain in bookmarks |
+
+## Real beginner task
+
+Write an API contract card for POST /api/bookmarks. Include request body, success response, validation error, and unauthorized behavior.`,
+      ru: `## Рабочий артефакт: API contract card
+
+Endpoint: GET /api/bookmarks
+
+| Item | Expected |
+| --- | --- |
+| Auth | Valid session required |
+| Success status | 200 |
+| Response shape | { bookmarks: [{ id, title, href, createdAt }] } |
+| Empty state | bookmarks is [] |
+| Unauthorized | 401 или redirect to login |
+| Data risk | Deleted lesson не должен оставаться в bookmarks |
+
+## Реальная задача для новичка
+
+Напишите API contract card для POST /api/bookmarks. Укажите request body, success response, validation error и unauthorized behavior.`,
+    },
+    {
+      en: `## Workplace artifact: Postman collection plan
+
+| Request | Purpose | Expected |
+| --- | --- | --- |
+| Login valid user | Get session/token | 200 and user object |
+| Login wrong password | Validate auth error | 401 or clear error |
+| Get profile with auth | Confirm protected data | 200 and profile fields |
+| Get profile without auth | Confirm protection | 401/403 |
+| Update profile invalid name | Validate input | 400/422 with field error |
+
+## Real beginner task
+
+Create a 5-request Postman plan for a lesson bookmark API. Name each request and describe the expected status.`,
+      ru: `## Рабочий артефакт: Postman collection plan
+
+| Request | Purpose | Expected |
+| --- | --- | --- |
+| Login valid user | Получить session/token | 200 and user object |
+| Login wrong password | Проверить auth error | 401 или clear error |
+| Get profile with auth | Подтвердить protected data | 200 and profile fields |
+| Get profile without auth | Подтвердить protection | 401/403 |
+| Update profile invalid name | Проверить input validation | 400/422 with field error |
+
+## Реальная задача для новичка
+
+Создайте 5-request Postman plan для lesson bookmark API. Назовите каждый request и опишите expected status.`,
+    },
+    {
+      en: `## Workplace artifact: API finding
+
+**Title:** POST /api/bookmarks accepts empty lessonId  
+**Environment:** local, Chrome, student account  
+**Request:** POST /api/bookmarks with body { "lessonId": "" }  
+**Expected:** 400 or 422 with field-level validation error  
+**Actual:** 200 and empty bookmark created  
+**Impact:** User can create broken saved items; Bookmarks page may show blank cards  
+**Evidence:** request/response body, timestamp, account
+
+## Real beginner task
+
+Write one API finding for unauthorized access to a protected endpoint.`,
+      ru: `## Рабочий артефакт: API finding
+
+**Title:** POST /api/bookmarks accepts empty lessonId  
+**Environment:** local, Chrome, student account  
+**Request:** POST /api/bookmarks with body { "lessonId": "" }  
+**Expected:** 400 or 422 with field-level validation error  
+**Actual:** 200 and empty bookmark created  
+**Impact:** User can create broken saved items; Bookmarks page may show blank cards  
+**Evidence:** request/response body, timestamp, account
+
+## Реальная задача для новичка
+
+Напишите один API finding для unauthorized access к protected endpoint.`,
+    },
+  ],
+  [
+    {
+      en: `## Workplace artifact: strong bug report
+
+**Title:** Save button remains enabled during profile update and creates duplicate requests  
+**Environment:** local, Chrome 124, student@levio.local  
+**Preconditions:** User is logged in and opens Profile settings  
+**Steps:**
+1. Change the display name
+2. Double-click Save quickly
+3. Open Network tab
+
+**Expected:** Button becomes disabled after first click; only one request is sent  
+**Actual:** Two update requests are sent  
+**Severity:** Medium  
+**Priority:** High if duplicate writes can corrupt data  
+**Evidence:** Network screenshot with two POST/PATCH requests
+
+## Real beginner task
+
+Write a bug report for this defect: "On mobile, the Continue button overlaps the last quiz option."`,
+      ru: `## Рабочий артефакт: сильный bug report
+
+**Title:** Save button remains enabled during profile update and creates duplicate requests  
+**Environment:** local, Chrome 124, student@levio.local  
+**Preconditions:** User is logged in and opens Profile settings  
+**Steps:**
+1. Change the display name
+2. Double-click Save quickly
+3. Open Network tab
+
+**Expected:** Button becomes disabled after first click; only one request is sent  
+**Actual:** Two update requests are sent  
+**Severity:** Medium  
+**Priority:** High if duplicate writes can corrupt data  
+**Evidence:** Network screenshot with two POST/PATCH requests
+
+## Реальная задача для новичка
+
+Напишите bug report для дефекта: "На mobile кнопка Continue перекрывает последний вариант ответа в quiz."`,
+    },
+    {
+      en: `## Workplace artifact: release test strategy
+
+| Test type | When to use | Example |
+| --- | --- | --- |
+| Smoke | Fresh build is deployed | Login, open dashboard, start module |
+| Sanity | One focused fix | Retest bookmark save after fix |
+| Regression | Before release | Login, tracks, module, quiz, certificate |
+| Exploratory | Risk is unclear | Try unusual flows around progress and quiz retry |
+
+## Real beginner task
+
+Prepare a 10-item smoke checklist for releasing the QA learning path.`,
+      ru: `## Рабочий артефакт: release test strategy
+
+| Test type | Когда использовать | Пример |
+| --- | --- | --- |
+| Smoke | Fresh build deployed | Login, open dashboard, start module |
+| Sanity | One focused fix | Retest bookmark save after fix |
+| Regression | Before release | Login, tracks, module, quiz, certificate |
+| Exploratory | Risk is unclear | Try unusual flows around progress and quiz retry |
+
+## Реальная задача для новичка
+
+Подготовьте smoke checklist из 10 пунктов для релиза QA learning path.`,
+    },
+    {
+      en: `## Workplace artifact: release recommendation
+
+**Recommendation:** Ready with risks  
+**Coverage completed:** login, QA track page, first module, quiz fallback, dashboard progress  
+**Open defects:** mobile overlap in quiz options, Gemini AI returns 403 locally  
+**Risk:** Learners can still complete modules, but AI-generated quiz is unavailable until API access is fixed  
+**Decision needed:** Release fallback learning flow now or block release until AI key is corrected
+
+## Real beginner task
+
+Write a release recommendation for a build where payment works, course progress works, but certificate PDF generation fails.`,
+      ru: `## Рабочий артефакт: release recommendation
+
+**Recommendation:** Ready with risks  
+**Coverage completed:** login, QA track page, first module, quiz fallback, dashboard progress  
+**Open defects:** mobile overlap in quiz options, Gemini AI returns 403 locally  
+**Risk:** Learners can still complete modules, but AI-generated quiz is unavailable until API access is fixed  
+**Decision needed:** Release fallback learning flow now or block release until AI key is corrected
+
+## Реальная задача для новичка
+
+Напишите release recommendation для build, где payment работает, course progress работает, но certificate PDF generation fails.`,
+    },
+  ],
+];
+
 function pickLocalized<T>(value: Localized<T>, locale: LearningLocale): T {
   return value[locale];
 }
@@ -1400,7 +1883,12 @@ function applyQuestionOverride(question: RuntimeQuestion, override: OverrideQues
   };
 }
 
-function applyModuleOverride(module: RuntimeModule, override: OverrideModule | undefined, locale: LearningLocale): RuntimeModule {
+function applyModuleOverride(
+  module: RuntimeModule,
+  override: OverrideModule | undefined,
+  locale: LearningLocale,
+  moduleIndex: number,
+): RuntimeModule {
   if (!override) {
     return module;
   }
@@ -1425,10 +1913,12 @@ function applyModuleOverride(module: RuntimeModule, override: OverrideModule | u
       if (!lessonOverride) {
         return lesson;
       }
+      const realWorldLab = QA_REAL_WORLD_LABS[moduleIndex]?.[index];
+      const lessonBody = pickLocalized(lessonOverride.body, locale);
       return {
         ...lesson,
         title: pickLocalized(lessonOverride.title, locale),
-        body: pickLocalized(lessonOverride.body, locale),
+        body: realWorldLab ? `${lessonBody}\n\n${pickLocalized(realWorldLab, locale)}` : lessonBody,
       };
     }),
     quiz: module.quiz
@@ -1457,7 +1947,7 @@ export function applyTrackContentOverrides(course: RuntimeCourse, locale: Learni
     description: pickLocalized(QA_TRACK_DESCRIPTION, locale),
     shortDescription: pickLocalized(QA_TRACK_DESCRIPTION, locale),
     modules: course.modules.map((moduleItem, index) =>
-      applyModuleOverride(moduleItem, QA_MANUAL_MODULES[index], locale),
+      applyModuleOverride(moduleItem, QA_MANUAL_MODULES[index], locale, index),
     ),
   };
 }
