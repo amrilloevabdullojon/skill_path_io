@@ -7,6 +7,11 @@ import { ProgressStatus, QuestionType } from "@prisma/client";
 
 import { authOptions } from "@/lib/auth";
 import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
+import {
+  findRuntimeModuleProgress,
+  findRuntimeModuleProgressById,
+  upsertRuntimeModuleProgress,
+} from "@/lib/learning/progress";
 import { resolveLearningUser } from "@/lib/learning-user";
 import { prisma } from "@/lib/prisma";
 import { applyTrackContentOverrides, normalizeLearningLocale } from "@/lib/tracks/content-overrides";
@@ -58,6 +63,10 @@ function answersMatch(selected: string[], expected: string[]) {
   }
 
   return selected.every((item, index) => item === expected[index]);
+}
+
+function isSingleAnswerQuestion(type: string) {
+  return type === QuestionType.SINGLE || type === "SINGLE" || type === "SINGLE_CHOICE" || type === "TRUE_FALSE";
 }
 
 function parseQuestionOptions(options: unknown) {
@@ -124,44 +133,16 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
   }
 
   const cookieStore = await cookies();
-  const locale = normalizeLearningLocale(cookieStore.get("skillpath-locale")?.value);
+  const locale = normalizeLearningLocale(cookieStore.get("levio-locale")?.value);
 
-  const [quiz, runtimeTrack] = await Promise.all([
-    prisma.quiz.findFirst({
-      where: {
-        id: payload.quizId,
-        moduleId: payload.moduleId,
-        module: {
-          track: {
-            slug: payload.trackSlug,
-          },
-        },
-      },
-      include: {
-        module: {
-          select: {
-            id: true,
-            trackId: true,
-          },
-        },
-        questions: {
-          orderBy: {
-            id: "asc",
-          },
-          select: {
-            id: true,
-            text: true,
-            type: true,
-            options: true,
-            correctAnswer: true,
-          },
-        },
-      },
-    }),
-    resolveRuntimeCourseBySlug(payload.trackSlug, { includeCourseEntities: true }),
-  ]);
+  const runtimeTrack = await resolveRuntimeCourseBySlug(payload.trackSlug, { includeCourseEntities: true });
+  const overriddenTrack = runtimeTrack
+    ? applyTrackContentOverrides(runtimeTrack, locale)
+    : null;
+  const moduleItem = overriddenTrack?.modules.find((moduleEntry) => moduleEntry.id === payload.moduleId) ?? null;
+  const quiz = moduleItem?.quiz?.id === payload.quizId ? moduleItem.quiz : null;
 
-  if (!quiz) {
+  if (!overriddenTrack || !moduleItem || !quiz) {
     return {
       ok: false,
       score: 0,
@@ -193,19 +174,13 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
   }
 
   let correctAnswers = 0;
-  const overriddenTrack = runtimeTrack
-    ? applyTrackContentOverrides(runtimeTrack, locale)
-    : null;
-  const overriddenQuiz = overriddenTrack?.modules.find((moduleItem) => moduleItem.id === payload.moduleId)?.quiz;
-  const questionsForScoring = overriddenQuiz?.id === payload.quizId
-    ? overriddenQuiz.questions
-    : quiz.questions.map((question) => ({
-        id: question.id,
-        text: question.text,
-        type: question.type,
-        options: parseQuestionOptions(question.options),
-        correctAnswer: normalizeAnswerList(question.correctAnswer),
-      }));
+  const questionsForScoring = quiz.questions.map((question) => ({
+    id: question.id,
+    text: question.text,
+    type: question.type,
+    options: parseQuestionOptions(question.options),
+    correctAnswer: normalizeAnswerList(question.correctAnswer),
+  }));
 
   const wrongAnswers: QuizAttemptResult["wrongAnswers"] = [];
   for (const question of questionsForScoring) {
@@ -213,7 +188,7 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
     const expectedAnswers = normalizeAnswerList(question.correctAnswer);
     const isQuestionCorrect = answersMatch(selectedAnswers, expectedAnswers);
 
-    if ((question.type === QuestionType.SINGLE || question.type === "SINGLE") && selectedAnswers.length > 1) {
+    if (isSingleAnswerQuestion(question.type) && selectedAnswers.length > 1) {
       wrongAnswers.push({
         questionId: question.id,
         question: question.text,
@@ -240,86 +215,56 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
   const score = Math.round((correctAnswers / totalQuestions) * 100);
   const passed = score >= quiz.passingScore;
 
-  const existingProgress = await prisma.userProgress.findUnique({
-    where: {
-      userId_moduleId: {
-        userId: user.id,
-        moduleId: quiz.module.id,
-      },
-    },
+  const existingProgress = await findRuntimeModuleProgressById({
+    userId: user.id,
+    moduleId: moduleItem.id,
+    source: overriddenTrack.source,
   });
 
   if (passed) {
-    await prisma.userProgress.upsert({
-      where: {
-        userId_moduleId: {
-          userId: user.id,
-          moduleId: quiz.module.id,
-        },
-      },
-      update: {
-        status: ProgressStatus.COMPLETED,
-        score,
-        completedAt: existingProgress?.completedAt ?? new Date(),
-      },
-      create: {
-        userId: user.id,
-        moduleId: quiz.module.id,
-        status: ProgressStatus.COMPLETED,
-        score,
-        completedAt: new Date(),
-      },
+    await upsertRuntimeModuleProgress({
+      userId: user.id,
+      moduleId: moduleItem.id,
+      source: overriddenTrack.source,
+      status: ProgressStatus.COMPLETED,
+      score,
+      completedAt: existingProgress?.completedAt ?? new Date(),
     });
   } else {
-    await prisma.userProgress.upsert({
-      where: {
-        userId_moduleId: {
-          userId: user.id,
-          moduleId: quiz.module.id,
-        },
-      },
-      update: {
-        status:
-          existingProgress?.status === ProgressStatus.COMPLETED
-            ? ProgressStatus.COMPLETED
-            : ProgressStatus.IN_PROGRESS,
-        score,
-      },
-      create: {
-        userId: user.id,
-        moduleId: quiz.module.id,
-        status: ProgressStatus.IN_PROGRESS,
-        score,
-      },
+    await upsertRuntimeModuleProgress({
+      userId: user.id,
+      moduleId: moduleItem.id,
+      source: overriddenTrack.source,
+      status:
+        existingProgress?.status === ProgressStatus.COMPLETED
+          ? ProgressStatus.COMPLETED
+          : ProgressStatus.IN_PROGRESS,
+      score,
+      completedAt: existingProgress?.completedAt ?? null,
     });
   }
 
-  const [trackModuleCount, completedModuleCount] = await prisma.$transaction([
-    prisma.module.count({
-      where: {
-        trackId: quiz.module.trackId,
-      },
-    }),
-    prisma.userProgress.count({
-      where: {
-        userId: user.id,
-        status: ProgressStatus.COMPLETED,
-        module: {
-          trackId: quiz.module.trackId,
-        },
-      },
-    }),
-  ]);
-
+  const progressRecords = await findRuntimeModuleProgress({
+    userId: user.id,
+    moduleIds: overriddenTrack.modules.map((moduleEntry) => moduleEntry.id),
+    source: overriddenTrack.source,
+  });
+  const completedModuleIds = new Set(
+    progressRecords
+      .filter((progress) => progress.status === ProgressStatus.COMPLETED)
+      .map((progress) => progress.moduleId),
+  );
+  const trackModuleCount = overriddenTrack.modules.length;
+  const completedModuleCount = overriddenTrack.modules.filter((moduleEntry) => completedModuleIds.has(moduleEntry.id)).length;
   const trackCompleted = trackModuleCount > 0 && completedModuleCount === trackModuleCount;
   let certificateIssued = false;
 
-  if (trackCompleted) {
+  if (trackCompleted && overriddenTrack.source === "prisma-track") {
     const existingCertificate = await prisma.certificate.findUnique({
       where: {
         userId_trackId: {
           userId: user.id,
-          trackId: quiz.module.trackId,
+          trackId: overriddenTrack.id,
         },
       },
       select: {
@@ -331,7 +276,7 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
       const createdCertificate = await prisma.certificate.create({
         data: {
           userId: user.id,
-          trackId: quiz.module.trackId,
+          trackId: overriddenTrack.id,
           certificateUrl: "pending",
         },
         select: {
@@ -347,6 +292,45 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
       });
 
       certificateIssued = true;
+    }
+  }
+
+  if (trackCompleted && overriddenTrack.source === "prisma-course") {
+    const course = await prisma.course.findUnique({
+      where: { id: overriddenTrack.id },
+      select: { certificateEnabled: true },
+    });
+
+    if (course?.certificateEnabled) {
+      const existingCertificate = await prisma.courseCertificate.findUnique({
+        where: {
+          userId_courseId: {
+            userId: user.id,
+            courseId: overriddenTrack.id,
+          },
+        },
+        select: { id: true },
+      });
+
+      if (!existingCertificate) {
+        const createdCertificate = await prisma.courseCertificate.create({
+          data: {
+            userId: user.id,
+            courseId: overriddenTrack.id,
+            certificateUrl: "pending",
+          },
+          select: { id: true },
+        });
+
+        await prisma.courseCertificate.update({
+          where: { id: createdCertificate.id },
+          data: {
+            certificateUrl: `/api/course-certificates/${createdCertificate.id}/pdf`,
+          },
+        });
+
+        certificateIssued = true;
+      }
     }
   }
 

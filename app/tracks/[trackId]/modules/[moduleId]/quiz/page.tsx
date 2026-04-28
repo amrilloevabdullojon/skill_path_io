@@ -8,8 +8,8 @@ import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { QuizPlayer } from "@/components/quiz/quiz-player";
 import { authOptions } from "@/lib/auth";
 import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
+import { findRuntimeModuleProgressById } from "@/lib/learning/progress";
 import { resolveLearningUser } from "@/lib/learning-user";
-import { prisma } from "@/lib/prisma";
 import { applyTrackContentOverrides, normalizeLearningLocale } from "@/lib/tracks/content-overrides";
 
 type QuizPageProps = {
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: QuizPageProps): Promise<Metad
   const moduleItem = runtimeTrack?.modules.find((m) => m.id === params.moduleId);
   if (!runtimeTrack || !moduleItem) return {};
   return {
-    title: `Quiz: ${moduleItem.title} — SkillPath Academy`,
+    title: `Quiz: ${moduleItem.title} — Levio`,
     description: `Test your knowledge of ${moduleItem.title} in the ${runtimeTrack.title} track.`,
     robots: { index: false },
   };
@@ -61,13 +61,10 @@ export default async function QuizPage({ params }: QuizPageProps) {
 
   const user = await resolveLearningUser(session?.user?.email);
   const progress = user
-    ? await prisma.userProgress.findUnique({
-        where: {
-          userId_moduleId: {
-            userId: user.id,
-            moduleId: moduleItem.id,
-          },
-        },
+    ? await findRuntimeModuleProgressById({
+        userId: user.id,
+        moduleId: moduleItem.id,
+        source: track.source,
       })
     : null;
 

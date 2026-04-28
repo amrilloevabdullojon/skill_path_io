@@ -1,21 +1,23 @@
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
+import Link from "next/link";
+import { LogIn } from "lucide-react";
 
-import { TrackCard } from "@/components/track-card";
-import { FadeInUp } from "@/components/ui/fade-in";
 import { PageHeader } from "@/components/ui/page-header";
+import { TracksFilterGrid } from "@/components/tracks/tracks-filter-grid";
 import { resolveRuntimeCatalog, toRuntimeTrackCardData } from "@/lib/learning/runtime-content";
 import type { TrackProgress } from "@/lib/learning/runtime-content";
 import { authOptions } from "@/lib/auth";
+import { findRuntimeModuleProgress } from "@/lib/learning/progress";
 import { prisma } from "@/lib/prisma";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Learning Tracks — SkillPath Academy",
+  title: "Learning Tracks — Levio",
   description: "Browse all QA, BA, and DA career tracks. Structured modules, quizzes, and AI missions for every level.",
   openGraph: {
-    title: "Learning Tracks — SkillPath Academy",
+    title: "Learning Tracks — Levio",
     type: "website",
   },
 };
@@ -51,12 +53,15 @@ export default async function TracksPage() {
       select: { id: true },
     });
     if (user) {
-      const progress = await prisma.userProgress.findMany({
-        where: { userId: user.id },
-        select: { moduleId: true, completedAt: true },
-      });
-      for (const p of progress) {
-        progressByModuleId[p.moduleId] = p.completedAt !== null;
+      for (const track of runtimeTracks) {
+        const progress = await findRuntimeModuleProgress({
+          userId: user.id,
+          moduleIds: track.modules.map((moduleItem) => moduleItem.id),
+          source: track.source,
+        });
+        for (const p of progress) {
+          progressByModuleId[p.moduleId] = p.completedAt !== null;
+        }
       }
     }
   }
@@ -78,13 +83,19 @@ export default async function TracksPage() {
         description="Выберите трек, чтобы начать обучение по модулям, квизам и практическим заданиям."
       />
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {tracksWithProgress.map((track, i) => (
-          <FadeInUp key={track.id} delay={i * 0.05}>
-            <TrackCard track={track} />
-          </FadeInUp>
-        ))}
-      </div>
+      {!session && (
+        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl border border-indigo-500/20 bg-indigo-500/5 px-5 py-4">
+          <p className="text-sm text-foreground/80">
+            Войдите в аккаунт, чтобы видеть свой прогресс по трекам и продолжать с того места, где остановились.
+          </p>
+          <Link href="/login" className="btn-primary shrink-0 gap-2 text-sm">
+            <LogIn className="w-4 h-4" />
+            Войти
+          </Link>
+        </div>
+      )}
+
+      <TracksFilterGrid tracks={tracksWithProgress} isAuthenticated={!!session} />
     </section>
   );
 }

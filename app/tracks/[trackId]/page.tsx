@@ -27,6 +27,7 @@ import { LevelBadge } from "@/components/level/level-badge";
 import { TrackStickyProgress } from "@/components/tracks/track-sticky-progress";
 import { authOptions } from "@/lib/auth";
 import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
+import { findRuntimeModuleProgress } from "@/lib/learning/progress";
 import { resolveLearningUser } from "@/lib/learning-user";
 import { getNextLevelTarget, getLevelByXp } from "@/lib/progress/xp";
 import { prisma } from "@/lib/prisma";
@@ -56,8 +57,9 @@ function categoryAccent(category: TrackCategory) {
       badge: "border-emerald-400/35 bg-emerald-500/15 text-emerald-200",
       progress: "bg-emerald-400",
       ring: "ring-emerald-400/35",
-      subtle: "bg-emerald-500/8 border-emerald-400/25",
+      subtle: "bg-emerald-500/8 border-emerald-400/25 backdrop-blur-md",
       strip: "bg-gradient-to-r from-emerald-400 to-emerald-500",
+      glow: "bg-emerald-500",
     };
   }
   if (category === TrackCategory.BA) {
@@ -65,16 +67,18 @@ function categoryAccent(category: TrackCategory) {
       badge: "border-orange-400/35 bg-orange-500/15 text-orange-200",
       progress: "bg-orange-400",
       ring: "ring-orange-400/35",
-      subtle: "bg-orange-500/8 border-orange-400/25",
+      subtle: "bg-orange-500/8 border-orange-400/25 backdrop-blur-md",
       strip: "bg-gradient-to-r from-orange-400 to-orange-500",
+      glow: "bg-orange-500",
     };
   }
   return {
     badge: "border-violet-400/35 bg-violet-500/15 text-violet-200",
     progress: "bg-violet-400",
     ring: "ring-violet-400/35",
-    subtle: "bg-violet-500/8 border-violet-400/25",
+    subtle: "bg-violet-500/8 border-violet-400/25 backdrop-blur-md",
     strip: "bg-gradient-to-r from-violet-400 to-violet-500",
+    glow: "bg-violet-500",
   };
 }
 
@@ -129,13 +133,13 @@ export async function generateMetadata({
   const track = runtimeTrack
     ? applyTrackContentOverrides(runtimeTrack, normalizeLearningLocale(localeValue))
     : null;
-  if (!track) return { title: "Track not found — SkillPath Academy" };
+  if (!track) return { title: "Track not found — Levio" };
   return {
-    title: `${track.title} — SkillPath Academy`,
+    title: `${track.title} — Levio`,
     description: `${track.category} career track with ${track.modules.length} modules. Master real-world skills and land your first tech role.`,
     openGraph: {
       title: track.title,
-      description: `${track.category} career track on SkillPath Academy`,
+      description: `${track.category} career track on Levio`,
       type: "website",
     },
   };
@@ -170,15 +174,21 @@ export default async function TrackDetailsPage({
 
   const [progressRecords, certificate] = await Promise.all([
     user
-      ? prisma.userProgress.findMany({
-          where: { userId: user.id, moduleId: { in: moduleIds } },
+      ? findRuntimeModuleProgress({
+          userId: user.id,
+          moduleIds,
+          source: track.source,
         })
       : Promise.resolve([]),
     user && track.source === "prisma-track"
       ? prisma.certificate.findUnique({
           where: { userId_trackId: { userId: user.id, trackId: track.id } },
         })
-      : Promise.resolve(null),
+      : user && track.source === "prisma-course"
+        ? prisma.courseCertificate.findUnique({
+            where: { userId_courseId: { userId: user.id, courseId: track.id } },
+          })
+        : Promise.resolve(null),
   ]);
 
   const progression = buildTrackProgression({
@@ -278,7 +288,8 @@ export default async function TrackDetailsPage({
       )}
 
       {/* ── HERO ────────────────────────────────────────── */}
-      <header className="surface-elevated overflow-hidden p-0">
+      <header className="surface-elevated overflow-hidden p-0 relative isolate border border-border/50 bg-card/40 backdrop-blur-md shadow-xl shadow-black/5">
+        <div className={cn("absolute top-[-150px] right-[-100px] h-[400px] w-[400px] rounded-full blur-[120px] opacity-20 pointer-events-none -z-10", accent.glow)} />
         <div className={cn("h-1 w-full", accent.strip)} />
 
         <div className="space-y-5 p-5 sm:p-7">
@@ -403,7 +414,7 @@ export default async function TrackDetailsPage({
 
           {/* What you'll learn + Skills */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <section className="surface-elevated space-y-4 p-5">
+            <section className="surface-elevated space-y-4 p-5 border border-border/50 bg-card/40 backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <h2 className="section-title">Чему вы научитесь</h2>
@@ -418,7 +429,7 @@ export default async function TrackDetailsPage({
               </ul>
             </section>
 
-            <section className="surface-elevated space-y-4 p-5">
+            <section className="surface-elevated space-y-4 p-5 border border-border/50 bg-card/40 backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <Target className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <h2 className="section-title">Навыки, которые вы получите</h2>
@@ -452,7 +463,9 @@ export default async function TrackDetailsPage({
           </div>
 
           {/* Module tree */}
-          <section className="surface-elevated space-y-5 p-5">
+          <section className="surface-elevated space-y-5 p-5 border border-border/50 bg-card/40 backdrop-blur-md relative isolate">
+            <div className={cn("absolute top-[20%] left-[-100px] h-[300px] w-[300px] rounded-full blur-[100px] opacity-[0.07] pointer-events-none -z-10", accent.glow)} />
+            <div className={cn("absolute bottom-[-50px] right-[-50px] h-[250px] w-[250px] rounded-full blur-[90px] opacity-[0.05] pointer-events-none -z-10", accent.glow)} />
 
             {/* Header: title + progress bar */}
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -568,7 +581,7 @@ export default async function TrackDetailsPage({
           </section>
 
           {/* Career outcome */}
-          <section className="surface-elevated space-y-4 p-5">
+          <section className="surface-elevated space-y-4 p-5 border border-border/50 bg-card/40 backdrop-blur-md">
             <h2 className="section-title">Карьерный результат</h2>
 
             <div className={cn("rounded-xl border p-4", accent.subtle)}>
@@ -617,7 +630,7 @@ export default async function TrackDetailsPage({
           </section>
 
           {/* Skill radar */}
-          <section className="surface-elevated space-y-4 p-5">
+          <section className="surface-elevated space-y-4 p-5 border border-border/50 bg-card/40 backdrop-blur-md">
             <div>
               <h2 className="section-title">Профиль навыков</h2>
               <p className="mt-0.5 text-xs text-muted-foreground">
@@ -629,7 +642,7 @@ export default async function TrackDetailsPage({
 
           {/* Completion section */}
           {progression.isTrackCompleted && (
-            <section className="surface-elevated space-y-4 p-5">
+            <section className="surface-elevated space-y-4 p-5 border border-border/50 bg-card/40 backdrop-blur-md">
               <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/35 bg-amber-500/12 px-3 py-1 text-xs text-amber-300">
                 <Trophy className="h-4 w-4" />
                 Поздравляем — Трек завершён
@@ -669,7 +682,7 @@ export default async function TrackDetailsPage({
         <aside className="space-y-4 lg:sticky lg:top-8 lg:self-start">
 
           {/* Progress card */}
-          <div className="surface-elevated space-y-4 p-5">
+          <div className="surface-elevated space-y-4 p-5 border border-border/50 bg-card/40 backdrop-blur-md">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-foreground">Ваш прогресс</p>
               <span
@@ -715,7 +728,7 @@ export default async function TrackDetailsPage({
           </div>
 
           {/* Stats: XP ring + Streak */}
-          <div className="surface-elevated overflow-hidden p-0">
+          <div className="surface-elevated overflow-hidden p-0 border border-border/50 bg-card/40 backdrop-blur-md">
             <div className="grid grid-cols-2">
               {/* XP — circular progress ring */}
               <div className="flex flex-col items-center gap-1.5 p-4">
@@ -769,7 +782,7 @@ export default async function TrackDetailsPage({
 
           {/* Badges */}
           {progression.earnedBadges.length > 0 && (
-            <div className="surface-elevated space-y-3 p-4">
+            <div className="surface-elevated space-y-3 p-4 border border-border/50 bg-card/40 backdrop-blur-md">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Значки
               </p>
@@ -789,7 +802,7 @@ export default async function TrackDetailsPage({
 
           {/* Unlocked skills */}
           {progression.unlockedSkills.length > 0 && (
-            <div className="surface-elevated space-y-3 p-4">
+            <div className="surface-elevated space-y-3 p-4 border border-border/50 bg-card/40 backdrop-blur-md">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Разблокированные навыки
               </p>
@@ -811,7 +824,7 @@ export default async function TrackDetailsPage({
           {progression.isTrackCompleted && certificate && (
             <Link
               href={certificate.certificateUrl}
-              className="surface-elevated flex items-center gap-3 p-4 transition-all hover:ring-1 hover:ring-amber-400/40"
+              className="surface-elevated flex items-center gap-3 p-4 border border-amber-500/20 bg-card/40 backdrop-blur-md transition-all hover:bg-card/60 hover:shadow-[0_0_20px_rgba(251,191,36,0.1)]"
             >
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/15">
                 <Trophy className="h-5 w-5 text-amber-400" />

@@ -29,6 +29,7 @@ export {
 } from "@/lib/learning/content-resolver";
 
 import { RuntimeCategory, RuntimeCourse } from "@/lib/learning/content-types";
+import type { RuntimeContentSource } from "@/lib/learning/content-types";
 
 export type TrackProgress = {
   completedModules: number;
@@ -45,6 +46,7 @@ export type RuntimeTrackCardData = {
   level: "Junior" | "Middle";
   durationWeeks: number;
   category: RuntimeCategory;
+  source: RuntimeContentSource;
   modules: Array<{
     id: string;
     title: string;
@@ -66,6 +68,7 @@ export function toRuntimeTrackCardData(course: RuntimeCourse): RuntimeTrackCardD
     level,
     durationWeeks,
     category: course.category,
+    source: course.source,
     modules: course.modules
       .sort((a, b) => a.order - b.order)
       .map((moduleItem) => ({

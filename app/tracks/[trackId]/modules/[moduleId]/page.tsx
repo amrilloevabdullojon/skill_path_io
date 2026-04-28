@@ -16,9 +16,9 @@ import { QuickSaveBookmarkButton } from "@/components/tracks/quick-save-bookmark
 import { TrackStickyProgress } from "@/components/tracks/track-sticky-progress";
 import { authOptions } from "@/lib/auth";
 import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
+import { findRuntimeModuleProgress } from "@/lib/learning/progress";
 import { resolveLearningUser } from "@/lib/learning-user";
 import { buildDefaultAdaptiveSignal } from "@/lib/personalization/adaptive-defaults";
-import { prisma } from "@/lib/prisma";
 import { getAdaptivePath } from "@/lib/recommendations/adaptive-path";
 import { applyTrackContentOverrides, normalizeLearningLocale } from "@/lib/tracks/content-overrides";
 import { buildLessonBlocks, buildLessonRecommendations } from "@/lib/tracks/lesson-blocks";
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: ModulePageProps): Promise<Met
   const moduleItem = runtimeTrack?.modules.find((m) => m.id === params.moduleId);
   if (!runtimeTrack || !moduleItem) return {};
   return {
-    title: `${moduleItem.title} — ${runtimeTrack.title} | SkillPath Academy`,
+    title: `${moduleItem.title} — ${runtimeTrack.title} | Levio`,
     description: moduleItem.description || `${runtimeTrack.category} module: ${moduleItem.title}`,
     robots: { index: false },
   };
@@ -184,13 +184,10 @@ export default async function ModulePage({ params }: ModulePageProps) {
   const isDemoUser = Boolean(user && (!session?.user?.email || session.user.email !== user.email));
 
   const progressRecords = user
-    ? await prisma.userProgress.findMany({
-        where: {
-          userId: user.id,
-          moduleId: {
-            in: track.modules.map((moduleItem) => moduleItem.id),
-          },
-        },
+    ? await findRuntimeModuleProgress({
+        userId: user.id,
+        moduleIds: track.modules.map((moduleItem) => moduleItem.id),
+        source: track.source,
       })
     : [];
 
@@ -222,6 +219,11 @@ export default async function ModulePage({ params }: ModulePageProps) {
   const currentStatus = progressByModuleId.get(currentModule.id)?.status ?? ProgressStatus.NOT_STARTED;
   const completedCount = progression.completedCount;
   const progressPercent = progression.overallProgressPercent;
+
+  const glowColor =
+    trackCategory === TrackCategory.QA ? "bg-emerald-500" :
+    trackCategory === TrackCategory.BA ? "bg-orange-500" :
+    "bg-violet-500";
 
   // Sequential unlock enforcement: if the module is locked, redirect the learner
   if (currentModule.order > 1) {
@@ -375,8 +377,11 @@ export default async function ModulePage({ params }: ModulePageProps) {
         ctaLabel={stickyCtaLabel}
         accentProgress="bg-gradient-to-r from-sky-400 to-violet-500"
       />
-      <section className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)] sm:gap-6">
-        <aside className="surface-elevated space-y-6 p-4 text-foreground sm:p-5 xl:sticky xl:top-20 xl:h-[calc(100vh-6rem)] xl:overflow-y-auto">
+      <section className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)] sm:gap-6 relative isolate">
+        <div className={cn("absolute top-[-10%] left-[-150px] w-[500px] h-[500px] rounded-full blur-[140px] opacity-[0.15] pointer-events-none -z-10", glowColor)} />
+        <div className={cn("absolute bottom-[10%] right-[-150px] w-[600px] h-[600px] rounded-full blur-[160px] opacity-[0.12] pointer-events-none -z-10", glowColor)} />
+
+        <aside className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-6 p-4 text-foreground sm:p-5 xl:sticky xl:top-20 xl:h-[calc(100vh-6rem)] xl:overflow-y-auto shadow-xl shadow-black/5">
           <div className="space-y-2">
             <p className="kicker">Прогресс</p>
             <h2 className="text-lg font-semibold">{track.title}</h2>
@@ -451,9 +456,10 @@ export default async function ModulePage({ params }: ModulePageProps) {
         </aside>
 
         <div className="space-y-6">
-          <header className="surface-elevated space-y-4 p-5 sm:p-6">
+          <header className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-5 sm:p-6 shadow-xl shadow-black/5">
             <Breadcrumb
               items={[
+                { label: "Треки", href: "/tracks" },
                 { label: track.title, href: `/tracks/${track.slug}` },
                 { label: currentModule.title },
               ]}
@@ -497,7 +503,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
             </div>
           </header>
 
-          <section id="module-overview" className="surface-elevated space-y-4 p-5">
+          <section id="module-overview" className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-5">
             <h2 className="section-title">Обзор модуля</h2>
             <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
               <article className="surface-subtle space-y-3 p-4">
@@ -536,17 +542,17 @@ export default async function ModulePage({ params }: ModulePageProps) {
             </div>
           </section>
 
-          <section id="lessons-timeline" className="surface-elevated space-y-4 p-5">
+          <section id="lessons-timeline" className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-5">
             <h2 className="section-title">Путь обучения</h2>
             <LearningFlowTree nodes={timelineNodes} />
           </section>
 
-          <section id="lesson-content" className="surface-elevated space-y-4 p-5">
+          <section id="lesson-content" className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-5">
             <h2 className="section-title">Содержание урока</h2>
             <LessonBlockRenderer blocks={lessonBlocks} />
           </section>
 
-          <section id="practical-task" className="space-y-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/8 p-4 sm:p-5">
+          <section id="practical-task" className="space-y-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md p-4 sm:p-5">
             <h2 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300">Практическое задание</h2>
             <p className="text-sm text-emerald-900/80 dark:text-emerald-100/80">
               {taskLesson?.body ?? "Выполните практическое задание модуля и подготовьте краткое описание результатов."}
@@ -577,7 +583,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
             <AIExerciseReview moduleTitle={currentModule.title} trackTitle={track.title} />
           </section>
 
-          <section id="recommendations" className="surface-elevated space-y-5 p-5">
+          <section id="recommendations" className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-5 p-5">
             <h2 className="section-title">Рекомендации</h2>
 
             {/* Post-lesson recommendations */}
@@ -628,7 +634,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
             </div>
           </section>
 
-          <nav className="surface-elevated flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <nav className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
             <Link
               href={previousModule ? `/tracks/${track.slug}/modules/${previousModule.id}` : `/tracks/${track.slug}`}
               className="btn-secondary inline-flex w-full items-center gap-2 text-left sm:w-auto sm:text-center"
@@ -653,7 +659,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
           </nav>
 
           {progression.isTrackCompleted ? (
-            <section className="surface-elevated space-y-4 p-5">
+            <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-5">
               <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/35 bg-amber-500/12 px-3 py-1 text-xs text-amber-200">
                 <Trophy className="h-4 w-4" />
                 Трек завершён!
