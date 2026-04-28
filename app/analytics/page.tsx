@@ -5,7 +5,7 @@ import { StudentAnalyticsDashboard } from "@/components/analytics/student-analyt
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "My Analytics — SkillPath Academy",
+  title: "My Analytics — Levio",
   description: "Track your learning progress, quiz scores, and XP growth over time.",
   robots: { index: false },
 };

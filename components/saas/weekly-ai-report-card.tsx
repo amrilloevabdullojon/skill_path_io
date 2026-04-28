@@ -1,10 +1,14 @@
+import { getTranslations } from "next-intl/server";
+
 import { WeeklyAiReport } from "@/types/saas";
 
 type WeeklyAiReportCardProps = {
   report: WeeklyAiReport;
 };
 
-export function WeeklyAiReportCard({ report }: WeeklyAiReportCardProps) {
+export async function WeeklyAiReportCard({ report }: WeeklyAiReportCardProps) {
+  const t = await getTranslations("dashboard.weeklyReport");
+
   return (
     <section id="report" className="surface-elevated space-y-4 p-5">
       <h2 className="section-title">{report.headline}</h2>
@@ -14,8 +18,8 @@ export function WeeklyAiReportCard({ report }: WeeklyAiReportCardProps) {
           <li key={item}>{item}</li>
         ))}
       </ul>
-      <p className="rounded-xl border border-sky-400/30 bg-sky-500/10 px-3 py-2 text-sm text-sky-100">
-        Next focus: {report.nextFocus}
+      <p className="rounded-xl border border-indigo-400/30 bg-indigo-500/10 px-3 py-2 text-sm text-indigo-100">
+        {t("nextFocus")} {report.nextFocus}
       </p>
     </section>
   );

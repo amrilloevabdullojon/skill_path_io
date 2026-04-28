@@ -11,14 +11,14 @@ export type LocalAuthUser = {
 const LOCAL_USERS: LocalAuthUser[] = [
   {
     id: "local-admin",
-    email: "admin@skillpath.local",
-    name: "SkillPath Admin",
+    email: "admin@levio.local",
+    name: "Levio Admin",
     role: "ADMIN",
     redirectPath: "/admin",
   },
   {
     id: "local-student",
-    email: "student@skillpath.local",
+    email: "student@levio.local",
     name: "Demo Student",
     role: "STUDENT",
     redirectPath: "/dashboard",

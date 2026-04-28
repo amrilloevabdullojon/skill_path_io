@@ -3,26 +3,26 @@ import { ProductTourStep } from "@/types/saas";
 export const productTourSteps: ProductTourStep[] = [
   {
     id: "tour-dashboard",
-    title: "Dashboard overview",
-    description: "Track learning progress, XP, and weekly priorities in one place.",
+    title: "Обзор панели управления",
+    description: "Следи за прогрессом обучения, XP и приоритетами недели в одном месте.",
     targetId: "hero",
   },
   {
     id: "tour-radar",
-    title: "Skill radar",
-    description: "See strongest and weakest skills, then set the next focus.",
+    title: "Радар навыков",
+    description: "Видь сильные и слабые стороны, выбирай следующую зону роста.",
     targetId: "skills",
   },
   {
     id: "tour-missions",
-    title: "Mission system",
-    description: "Complete real-work missions and convert output into portfolio artifacts.",
+    title: "Система миссий",
+    description: "Выполняй реальные задачи и превращай результаты в артефакты портфолио.",
     targetId: "missions",
   },
   {
     id: "tour-roadmap",
-    title: "Career roadmap",
-    description: "Use readiness scoring and job matching to move toward target role.",
+    title: "Карьерный путь",
+    description: "Используй оценку готовности и подбор вакансий для движения к целевой роли.",
     targetId: "career",
   },
 ];

@@ -1,11 +1,28 @@
 import { NotificationItem } from "@/types/saas";
 
+type NotificationLabels = {
+  missionTitle: string;
+  summaryTitle: string;
+  recommendationTitle: string;
+  jobTitle: string;
+  achievementTitle: string;
+};
+
+const DEFAULT_LABELS: NotificationLabels = {
+  missionTitle: "New mission unlocked",
+  summaryTitle: "Weekly learning summary",
+  recommendationTitle: "AI recommendation",
+  jobTitle: "Job opportunity matched",
+  achievementTitle: "Achievement unlocked",
+};
+
 type BuildNotificationsInput = {
   unlockedMissionTitle: string | null;
   weeklySummaryText: string;
   recommendationTitle: string | null;
   topJobTitle: string | null;
   achievementTitle: string | null;
+  labels?: NotificationLabels;
 };
 
 function createNotificationId(prefix: string, index: number) {
@@ -13,12 +30,13 @@ function createNotificationId(prefix: string, index: number) {
 }
 
 export function buildDashboardNotifications(input: BuildNotificationsInput): NotificationItem[] {
+  const labels = input.labels ?? DEFAULT_LABELS;
   const items: NotificationItem[] = [];
 
   if (input.unlockedMissionTitle) {
     items.push({
       id: createNotificationId("mission", 1),
-      title: "New mission unlocked",
+      title: labels.missionTitle,
       body: input.unlockedMissionTitle,
       type: "mission",
       href: "/missions",
@@ -29,7 +47,7 @@ export function buildDashboardNotifications(input: BuildNotificationsInput): Not
 
   items.push({
     id: createNotificationId("summary", 2),
-    title: "Weekly learning summary",
+    title: labels.summaryTitle,
     body: input.weeklySummaryText,
     type: "summary",
     href: "/dashboard?tab=overview",
@@ -40,7 +58,7 @@ export function buildDashboardNotifications(input: BuildNotificationsInput): Not
   if (input.recommendationTitle) {
     items.push({
       id: createNotificationId("reco", 3),
-      title: "AI recommendation",
+      title: labels.recommendationTitle,
       body: input.recommendationTitle,
       type: "recommendation",
       href: "/dashboard?tab=skills#ai",
@@ -52,7 +70,7 @@ export function buildDashboardNotifications(input: BuildNotificationsInput): Not
   if (input.topJobTitle) {
     items.push({
       id: createNotificationId("job", 4),
-      title: "Job opportunity matched",
+      title: labels.jobTitle,
       body: input.topJobTitle,
       type: "job",
       href: "/marketplace",
@@ -64,7 +82,7 @@ export function buildDashboardNotifications(input: BuildNotificationsInput): Not
   if (input.achievementTitle) {
     items.push({
       id: createNotificationId("achievement", 5),
-      title: "Achievement unlocked",
+      title: labels.achievementTitle,
       body: input.achievementTitle,
       type: "achievement",
       href: "/dashboard?tab=skills#xp",

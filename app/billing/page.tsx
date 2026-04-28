@@ -6,8 +6,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Billing — SkillPath Academy",
-  description: "Manage your subscription plan and billing details.",
+  title: "Оплата и Подписка — Levio",
+  description: "Управляйте своим тарифным планом и данными для биллинга.",
   robots: { index: false },
 };
 import { getDashboardData } from "@/lib/dashboard/data";
@@ -29,9 +29,9 @@ export default async function BillingPage() {
     return (
       <section className="page-shell">
         <EmptyState
-          title="Billing data unavailable"
-          description="Open dashboard after user/content data is available."
-          actionLabel="Open dashboard"
+          title="Данные биллинга недоступны"
+          description="Откройте дашборд после завершения онбординга, чтобы загрузить данные."
+          actionLabel="Открыть дашборд"
           actionHref="/dashboard"
         />
       </section>
@@ -39,7 +39,10 @@ export default async function BillingPage() {
   }
 
   return (
-    <section className="page-shell">
+    <section className="page-shell relative isolate overflow-hidden">
+      {/* Background Neon Orbs */}
+      <div className="absolute top-[5%] -right-[5%] w-[400px] h-[400px] rounded-full bg-violet-500/10 blur-[130px] pointer-events-none -z-10" />
+      <div className="absolute bottom-[20%] -left-[10%] w-[500px] h-[500px] rounded-full bg-sky-500/10 blur-[140px] pointer-events-none -z-10" />
       <SubscriptionBillingPanel
         currentPlanId={dashboard.subscription.state.planId}
         plans={plans}
