@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isDemoModeEnabled } from "@/lib/config/runtime-mode";
-import { ProgressStatus } from "@prisma/client";
+import { ProgressStatus, UserRole } from "@prisma/client";
 
 function errMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
@@ -13,22 +13,61 @@ function errMessage(err: unknown): string {
 
 async function getSubjectUserId() {
   const session = await getServerSession(authOptions);
-  let userId = session?.user?.id;
+  const sessionUserId = session?.user?.id;
+  const sessionEmail = session?.user?.email?.trim().toLowerCase();
 
-  if (!userId && isDemoModeEnabled()) {
-    const { getServerEnv } = await import("@/lib/config/env");
-    const demoEmail = getServerEnv().demoUserEmail;
-    if (demoEmail) {
-      const demoUser = await prisma.user.findUnique({ where: { email: demoEmail } });
-      if (demoUser) userId = demoUser.id;
-    }
-    if (!userId) {
-      const defaultUser = await prisma.user.findFirst({ orderBy: { createdAt: "asc" } });
-      if (defaultUser) userId = defaultUser.id;
+  if (sessionUserId) {
+    const userById = await prisma.user.findUnique({
+      where: { id: sessionUserId },
+      select: { id: true },
+    });
+    if (userById) {
+      return userById.id;
     }
   }
 
-  return userId;
+  if (sessionEmail) {
+    const userByEmail = await prisma.user.findUnique({
+      where: { email: sessionEmail },
+      select: { id: true },
+    });
+    if (userByEmail) {
+      return userByEmail.id;
+    }
+  }
+
+  if (isDemoModeEnabled()) {
+    const { getServerEnv } = await import("@/lib/config/env");
+    const demoEmail = getServerEnv().demoUserEmail;
+    if (demoEmail) {
+      const demoUser = await prisma.user.findUnique({
+        where: { email: demoEmail.trim().toLowerCase() },
+        select: { id: true },
+      });
+      if (demoUser) {
+        return demoUser.id;
+      }
+    }
+
+    const studentUser = await prisma.user.findFirst({
+      where: { role: { in: [UserRole.STUDENT, UserRole.PRO_STUDENT] } },
+      orderBy: { createdAt: "asc" },
+      select: { id: true },
+    });
+    if (studentUser) {
+      return studentUser.id;
+    }
+
+    const defaultUser = await prisma.user.findFirst({
+      orderBy: { createdAt: "asc" },
+      select: { id: true },
+    });
+    if (defaultUser) {
+      return defaultUser.id;
+    }
+  }
+
+  return null;
 }
 
 export async function resetStudentProgressAction() {

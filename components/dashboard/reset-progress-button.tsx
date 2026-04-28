@@ -23,7 +23,7 @@ export function ResetProgressButton({ className }: { className?: string }) {
         alert(result.error ?? "Failed to reset");
       }
     } catch (e) {
-      alert("Error generating pitch mode: " + (e instanceof Error ? e.message : String(e)));
+      alert("Error resetting progress: " + (e instanceof Error ? e.message : String(e)));
     } finally {
       setIsPending(false);
     }
