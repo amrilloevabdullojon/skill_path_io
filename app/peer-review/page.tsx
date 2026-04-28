@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { Inbox, Target, LayoutDashboard } from "lucide-react";
 
 import { PageHeader } from "@/components/ui/page-header";
+import { SwipeDeck } from "@/components/peer-review/swipe-deck";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
-  title: "Peer Review — SkillPath Academy",
+  title: "Peer Review — Levio",
   description: "Review mission submissions from other learners.",
 };
 
@@ -65,40 +67,39 @@ export default async function PeerReviewPage({ searchParams }: PeerReviewPagePro
       )}
 
       {submissions.length === 0 ? (
-        <div className="surface-panel p-8 text-center">
-          <p className="text-muted-foreground">
-            No submissions available for review right now. Check back later!
-          </p>
+        <div className="surface-elevated rounded-2xl p-12 text-center flex flex-col items-center gap-4 mt-4">
+          <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center">
+            <Inbox className="w-8 h-8 text-muted-foreground" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-foreground">Очередь пуста</h2>
+            <p className="mt-1 text-sm text-muted-foreground max-w-sm mx-auto">
+              Нет доступных работ для проверки прямо сейчас. Возвращайтесь позже или займитесь заданиями.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3 justify-center mt-2">
+            <Link href="/missions" className="btn-primary gap-2">
+              <Target className="w-4 h-4" />
+              Перейти к миссиям
+            </Link>
+            <Link href="/dashboard" className="btn-secondary gap-2">
+              <LayoutDashboard className="w-4 h-4" />
+              На дашборд
+            </Link>
+          </div>
         </div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {submissions.map((submission) => (
-            <article key={submission.id} className="surface-panel surface-panel-hover p-5 flex flex-col gap-3">
-              <div>
-                <p className="chip-neutral inline-flex px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide">
-                  Mission
-                </p>
-                <h2 className="mt-3 text-base font-semibold text-foreground line-clamp-2">
-                  {submission.mission.title}
-                </h2>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Submitted{" "}
-                {new Date(submission.submittedAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </p>
-              <Link
-                href={`/peer-review/${submission.id}`}
-                className="btn-primary mt-auto inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium"
-              >
-                Start Review
-              </Link>
-            </article>
-          ))}
-        </div>
+        <>
+          <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-400 border border-indigo-500/20">
+              {submissions.length} {submissions.length === 1 ? "работа" : submissions.length < 5 ? "работы" : "работ"} в очереди
+            </span>
+            <span className="text-xs">· Свайп вправо — одобрить, влево — попросить доработать</span>
+          </div>
+          <div className="mt-4 flex justify-center">
+            <SwipeDeck initialSubmissions={submissions} />
+          </div>
+        </>
       )}
     </section>
   );
