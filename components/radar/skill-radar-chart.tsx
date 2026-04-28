@@ -57,7 +57,7 @@ export function SkillRadarChart({ data }: SkillRadarChartProps) {
           <RadarChart data={data} margin={{ top: 24, right: 30, bottom: 20, left: 30 }}>
             <defs>
               <linearGradient id="skillRadarFill" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#38bdf8" stopOpacity={0.36} />
+                <stop offset="0%" stopColor="#6366f1" stopOpacity={0.36} />
                 <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.18} />
               </linearGradient>
             </defs>
@@ -71,14 +71,14 @@ export function SkillRadarChart({ data }: SkillRadarChartProps) {
             <Tooltip
               contentStyle={{
                 borderRadius: "0.85rem",
-                border: "1px solid #334155",
-                backgroundColor: "#020617",
-                color: "#e2e8f0",
+                border: "1px solid hsl(var(--border))",
+                backgroundColor: "hsl(var(--card))",
+                color: "hsl(var(--foreground))",
               }}
             />
             <Radar
               dataKey="value"
-              stroke="#7dd3fc"
+              stroke="#a5b4fc"
               strokeWidth={2}
               fill="url(#skillRadarFill)"
             />
@@ -89,7 +89,7 @@ export function SkillRadarChart({ data }: SkillRadarChartProps) {
       {/* Legend */}
       <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-gradient-to-br from-sky-400 to-violet-500 opacity-70" />
+          <span className="inline-block h-2.5 w-2.5 rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 opacity-70" />
           Текущий уровень навыков
         </span>
         <span className="text-muted-foreground/40">•</span>

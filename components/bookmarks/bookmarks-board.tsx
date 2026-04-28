@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bookmark, Plus } from "lucide-react";
+import { Bookmark, Plus, Trash2 } from "lucide-react";
 
 import { UserBookmark } from "@/types/personalization";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -98,19 +98,19 @@ export function BookmarksBoard({ initialBookmarks }: { initialBookmarks: UserBoo
   return (
     <section className="space-y-5">
       <header className="surface-elevated space-y-2 p-5 sm:p-6">
-        <p className="kicker">Bookmarks</p>
-        <h1 className="page-title">Saved lessons and modules</h1>
-        <p className="section-description">Pin useful content and use it in speed review mode.</p>
+        <p className="kicker">Закладки</p>
+        <h1 className="page-title">Сохранённые уроки и модули</h1>
+        <p className="section-description">Добавляйте полезные материалы и используйте их в режиме быстрого повторения.</p>
       </header>
 
       <article className="surface-elevated grid gap-3 p-4 md:grid-cols-[1fr_1fr_auto]">
-        <label htmlFor="bookmark-title" className="sr-only">Bookmark title</label>
-        <input id="bookmark-title" value={title} onChange={(event) => setTitle(event.target.value)} className="input-base" placeholder="Bookmark title" />
-        <label htmlFor="bookmark-href" className="sr-only">URL or path</label>
+        <label htmlFor="bookmark-title" className="sr-only">Название закладки</label>
+        <input id="bookmark-title" value={title} onChange={(event) => setTitle(event.target.value)} className="input-base" placeholder="Название закладки" />
+        <label htmlFor="bookmark-href" className="sr-only">URL или путь</label>
         <input id="bookmark-href" value={href} onChange={(event) => setHref(event.target.value)} className="input-base" placeholder="/tracks/..." />
         <button type="button" onClick={addBookmark} disabled={isSubmitting} className="btn-primary inline-flex items-center gap-2">
           <Plus className="h-4 w-4" />
-          {isSubmitting ? "Saving..." : "Save"}
+          {isSubmitting ? "Сохраняем..." : "Сохранить"}
         </button>
         {error ? <p role="alert" className="text-xs text-rose-300 md:col-span-3">{error}</p> : null}
       </article>
@@ -120,8 +120,8 @@ export function BookmarksBoard({ initialBookmarks }: { initialBookmarks: UserBoo
           <div className="xl:col-span-2">
             <EmptyState
               icon={Bookmark}
-              title="No bookmarks yet"
-              description="Save lessons, modules, and quizzes here to revisit them anytime or use in speed review mode."
+              title="Закладок пока нет"
+              description="Сохраняйте уроки, модули и квизы сюда, чтобы вернуться к ним в любой момент или использовать в режиме быстрого повторения."
             />
           </div>
         ) : (
@@ -129,14 +129,20 @@ export function BookmarksBoard({ initialBookmarks }: { initialBookmarks: UserBoo
             <article key={bookmark.id} className="surface-elevated space-y-3 p-4">
               <div className="flex items-start justify-between gap-2">
                 <p className="text-sm font-semibold text-foreground">{bookmark.title}</p>
-                <button type="button" onClick={() => removeBookmark(bookmark.id)} className="text-xs text-muted-foreground hover:text-foreground">
-                  Remove
+                <button
+                  type="button"
+                  onClick={() => removeBookmark(bookmark.id)}
+                  title="Удалить закладку"
+                  className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-muted-foreground hover:bg-rose-500/10 hover:text-rose-400 transition-colors"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Удалить
                 </button>
               </div>
-              <p className="text-xs text-muted-foreground">{bookmark.type} | {bookmark.tag}</p>
-              <Link href={bookmark.href} className="inline-flex items-center gap-2 text-sm text-sky-300 hover:text-sky-200">
+              <p className="text-xs text-muted-foreground">{bookmark.type} · {bookmark.tag}</p>
+              <Link href={bookmark.href} className="inline-flex items-center gap-2 text-sm text-indigo-300 hover:text-indigo-200">
                 <Bookmark className="h-4 w-4" />
-                Open bookmark
+                Открыть
               </Link>
             </article>
           ))

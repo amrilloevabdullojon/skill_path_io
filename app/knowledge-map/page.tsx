@@ -5,7 +5,7 @@ import { KnowledgeMapView } from "@/components/knowledge-map/knowledge-map-view"
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Knowledge Map — SkillPath Academy",
+  title: "Knowledge Map — Levio",
   description: "Visual map of your acquired skills and remaining learning objectives.",
   robots: { index: false },
 };

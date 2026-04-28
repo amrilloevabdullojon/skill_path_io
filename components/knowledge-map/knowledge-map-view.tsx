@@ -17,18 +17,18 @@ export function KnowledgeMapView({ nodes }: { nodes: KnowledgeNode[] }) {
   return (
     <section className="space-y-5">
       <header className="surface-elevated space-y-2 p-5 sm:p-6">
-        <p className="kicker">Knowledge Map</p>
-        <h1 className="page-title">Dependencies, unlocked skills, and next topics</h1>
-        <p className="section-description">Visualize what is completed, what is locked, and what to unlock next.</p>
+        <p className="kicker">Карта знаний</p>
+        <h1 className="page-title">Зависимости, открытые навыки и следующие темы</h1>
+        <p className="section-description">Визуализируй: что завершено, что заблокировано и что открыть следующим.</p>
       </header>
 
       <section className="surface-elevated space-y-3 p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">Completion: {completion.completed}/{completion.total} nodes ({completion.percent}%)</p>
+          <p className="text-sm text-muted-foreground">Выполнено: {completion.completed}/{completion.total} узлов ({completion.percent}%)</p>
           {nextNode ? (
-            <p className="inline-flex items-center gap-2 rounded-full border border-sky-400/35 bg-sky-500/12 px-3 py-1 text-xs text-sky-200">
+            <p className="inline-flex items-center gap-2 rounded-full border border-indigo-400/35 bg-indigo-500/12 px-3 py-1 text-xs text-indigo-200">
               <Sparkles className="h-3.5 w-3.5" />
-              Next recommended: {nextNode.title}
+              Рекомендуется: {nextNode.title}
             </p>
           ) : null}
         </div>
@@ -50,18 +50,18 @@ export function KnowledgeMapView({ nodes }: { nodes: KnowledgeNode[] }) {
                   </div>
                   <div className="mt-1 flex flex-wrap gap-1.5 text-[10px] uppercase tracking-wide">
                     {node.completed ? (
-                      <span className="rounded-full border border-emerald-400/30 bg-emerald-500/12 px-2 py-0.5 text-emerald-200">Completed</span>
+                      <span className="rounded-full border border-emerald-400/30 bg-emerald-500/12 px-2 py-0.5 text-emerald-200">Завершено</span>
                     ) : node.locked ? (
-                      <span className="chip-neutral px-2 py-0.5">Locked</span>
+                      <span className="chip-neutral px-2 py-0.5">Заблокировано</span>
                     ) : (
-                      <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-2 py-0.5 text-amber-200">Available</span>
+                      <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-2 py-0.5 text-amber-200">Доступно</span>
                     )}
                     {node.recommended ? (
-                      <span className="rounded-full border border-sky-400/30 bg-sky-500/10 px-2 py-0.5 text-sky-200">Recommended</span>
+                      <span className="rounded-full border border-indigo-400/30 bg-indigo-500/10 px-2 py-0.5 text-indigo-200">Рекомендуется</span>
                     ) : null}
                   </div>
                   {node.dependencies.length > 0 ? (
-                    <p className="mt-1 text-[11px] text-muted-foreground">Depends on: {node.dependencies.join(", ")}</p>
+                    <p className="mt-1 text-[11px] text-muted-foreground">Зависит от: {node.dependencies.join(", ")}</p>
                   ) : null}
                 </div>
               ))}

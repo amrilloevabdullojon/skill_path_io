@@ -6,9 +6,9 @@ export function DiscussionsHub({ threads }: { threads: DiscussionThread[] }) {
   return (
     <section className="space-y-5">
       <header className="surface-elevated space-y-2 p-5 sm:p-6">
-        <p className="kicker">Discussions</p>
-        <h1 className="page-title">Module threads and peer comments</h1>
-        <p className="section-description">First local version of discussions layer. Ready for future API/DB integration.</p>
+        <p className="kicker">Обсуждения</p>
+        <h1 className="page-title">Темы модулей и комментарии</h1>
+        <p className="section-description">Задавай вопросы, делись идеями и обсуждай темы обучения с другими.</p>
       </header>
 
       <div className="space-y-3">
@@ -34,7 +34,7 @@ export function DiscussionsHub({ threads }: { threads: DiscussionThread[] }) {
 
             <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
               <MessageCircleMore className="h-3.5 w-3.5" />
-              {thread.replies} replies
+              {thread.replies} ответов
             </p>
           </article>
         ))}

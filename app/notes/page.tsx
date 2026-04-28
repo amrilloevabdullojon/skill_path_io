@@ -4,8 +4,8 @@ import { getServerSession } from "next-auth";
 import { NotesBoard } from "@/components/notes/notes-board";
 
 export const metadata: Metadata = {
-  title: "My Notes — SkillPath Academy",
-  description: "Personal learning notes captured during your studies.",
+  title: "Заметки — Levio",
+  description: "Личные заметки, сделанные во время обучения.",
   robots: { index: false },
 };
 import { authOptions } from "@/lib/auth";
@@ -45,7 +45,7 @@ export default async function NotesPage() {
     title: row.title,
     content: row.content,
     track: mapTrack(row.moduleRef),
-    lessonRef: row.lessonRef || row.moduleRef || "General note",
+    lessonRef: row.lessonRef || row.moduleRef || "Общая заметка",
     createdAt: row.createdAt.toISOString(),
   }));
 

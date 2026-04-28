@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Hiring Marketplace — SkillPath Academy",
+  title: "Hiring Marketplace — Levio",
   description: "Connect with companies hiring QA Engineers, Business Analysts, and Data Analysts.",
 };
 import { getDashboardData } from "@/lib/dashboard/data";
@@ -25,9 +25,9 @@ export default async function MarketplacePage() {
     return (
       <section className="page-shell">
         <EmptyState
-          title="Marketplace data unavailable"
-          description="Open dashboard after user/content data is available."
-          actionLabel="Open dashboard"
+          title="Данные маркетплейса недоступны"
+          description="Перейди на дашборд, когда данные пользователя и контент будут загружены."
+          actionLabel="На дашборд"
           actionHref="/dashboard"
         />
       </section>

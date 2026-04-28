@@ -98,7 +98,7 @@ const adminUsers: CommandItem[] = [
   {
     id: "user-admin",
     type: "user",
-    title: "admin@skillpath.local",
+    title: "admin@levio.local",
     subtitle: "ADMIN user",
     href: "/admin/users",
     keywords: ["admin", "user", "role"],
@@ -107,7 +107,7 @@ const adminUsers: CommandItem[] = [
   {
     id: "user-student",
     type: "user",
-    title: "student@skillpath.local",
+    title: "student@levio.local",
     subtitle: "STUDENT user",
     href: "/admin/users",
     keywords: ["student", "user", "role"],

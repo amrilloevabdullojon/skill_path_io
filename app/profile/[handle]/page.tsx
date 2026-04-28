@@ -15,10 +15,10 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: PublicProfilePageProps): Promise<Metadata> {
   return {
-    title: `@${params.handle} — SkillPath Academy`,
-    description: `Public learning profile on SkillPath Academy. See skills, badges, and mission outcomes.`,
+    title: `@${params.handle} — Levio`,
+    description: `Public learning profile on Levio. See skills, badges, and mission outcomes.`,
     openGraph: {
-      title: `@${params.handle} on SkillPath Academy`,
+      title: `@${params.handle} on Levio`,
       description: "Learner profile with skills, badges, and career readiness score.",
       type: "profile",
     },

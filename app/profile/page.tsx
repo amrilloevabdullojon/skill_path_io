@@ -7,8 +7,8 @@ import { User } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Profile — SkillPath Academy",
-  description: "View learner profiles on SkillPath Academy.",
+  title: "Profile — Levio",
+  description: "View learner profiles on Levio.",
 };
 
 export default async function ProfileIndexPage() {

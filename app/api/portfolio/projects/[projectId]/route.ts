@@ -45,7 +45,7 @@ export const PATCH = withErrorHandler(async (request: Request, { params }: Param
     data: {
       title: body.title ?? project.title,
       description: body.description ?? project.description,
-      skillsUsed: body.skillsUsed ?? (project.skillsUsed as string[]),
+      skillsUsed: body.skillsUsed ?? project.skillsUsed,
       resultSummary: body.resultSummary ?? project.resultSummary,
       isPublic: body.isPublic ?? project.isPublic,
       order: body.order ?? project.order,

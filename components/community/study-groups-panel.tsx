@@ -66,7 +66,7 @@ export function StudyGroupsPanel() {
       id: `local-${Date.now()}`,
       title: newGroupName.trim(),
       topic: newGroupTopic.trim(),
-      description: "Custom local study group created in demo mode.",
+      description: "Пользовательская учебная группа, созданная в демо-режиме.",
       membersCount: 1,
       joined: true,
     };
@@ -79,10 +79,10 @@ export function StudyGroupsPanel() {
   return (
     <section className="surface-elevated space-y-5 p-5 sm:p-6">
       <header className="space-y-2">
-        <p className="kicker">Community</p>
-        <h1 className="text-2xl font-semibold text-foreground">Study groups and peer review</h1>
+        <p className="kicker">Сообщество</p>
+        <h1 className="text-2xl font-semibold text-foreground">Учебные группы и взаимная проверка</h1>
         <p className="text-sm text-muted-foreground">
-          Create a group, join discussions, and review assignments from peers.
+          Создавай группы, участвуй в обсуждениях и проверяй задания однокурсников.
         </p>
       </header>
 
@@ -91,20 +91,20 @@ export function StudyGroupsPanel() {
           value={newGroupName}
           onChange={(event) => setNewGroupName(event.target.value)}
           className="input-base"
-          placeholder="Group name"
+          placeholder="Название группы"
         />
         <input
           value={newGroupTopic}
           onChange={(event) => setNewGroupTopic(event.target.value)}
           className="input-base"
-          placeholder="Group topic"
+          placeholder="Тема группы"
         />
         <button type="button" onClick={createGroup} className="btn-primary">
-          Create group
+          Создать группу
         </button>
       </div>
 
-      <p className="text-xs text-muted-foreground">Joined groups: {joinedCount}</p>
+      <p className="text-xs text-muted-foreground">Вступил в групп: {joinedCount}</p>
 
       <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-3">
@@ -124,20 +124,20 @@ export function StudyGroupsPanel() {
                       : "border-border bg-card/85 text-muted-foreground hover:border-border/70"
                   }`}
                 >
-                  {group.joined ? "Joined" : "Join"}
+                  {group.joined ? "Вступил" : "Вступить"}
                 </button>
               </div>
               <p className="mt-2 text-xs text-muted-foreground">{group.description}</p>
               <p className="mt-2 inline-flex items-center gap-2 text-xs text-muted-foreground">
                 <Users className="h-4 w-4" />
-                {group.membersCount} members
+                {group.membersCount} участников
               </p>
             </article>
           ))}
         </div>
 
         <aside className="surface-subtle space-y-3 p-4">
-          <h2 className="text-sm font-semibold text-foreground">Peer review queue</h2>
+          <h2 className="text-sm font-semibold text-foreground">Очередь проверки</h2>
           {peerReviewQueueSeed.map((task) => (
             <div key={task.id} className="content-card p-3">
               <p className="text-sm font-medium text-foreground">{task.title}</p>

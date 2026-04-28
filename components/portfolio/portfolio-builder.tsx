@@ -15,12 +15,12 @@ type PortfolioBuilderProps = {
 };
 
 const sourceOptions: Array<{ value: PortfolioEntrySource | "all"; label: string }> = [
-  { value: "all", label: "All" },
-  { value: "mission", label: "Mission" },
-  { value: "module", label: "Module" },
-  { value: "quiz", label: "Quiz" },
-  { value: "simulation", label: "Simulation" },
-  { value: "certificate", label: "Certificate" },
+  { value: "all", label: "Все" },
+  { value: "mission", label: "Миссии" },
+  { value: "module", label: "Модули" },
+  { value: "quiz", label: "Квизы" },
+  { value: "simulation", label: "Симуляции" },
+  { value: "certificate", label: "Сертификаты" },
 ];
 
 function mergeEntries(runtimeEntries: PortfolioEntry[], localEntries: PortfolioEntry[]) {
@@ -34,7 +34,7 @@ function mergeEntries(runtimeEntries: PortfolioEntry[], localEntries: PortfolioE
 
 function toMarkdown(entries: PortfolioEntry[]) {
   const lines = [
-    "# SkillPath Portfolio",
+    "# Levio Portfolio",
     "",
     `Generated at: ${new Date().toISOString()}`,
     "",
@@ -42,13 +42,13 @@ function toMarkdown(entries: PortfolioEntry[]) {
 
   entries.forEach((entry, index) => {
     lines.push(`## ${index + 1}. ${entry.title}`);
-    lines.push(`- Source: ${entry.source}`);
-    lines.push(`- Created: ${new Date(entry.createdAt).toLocaleString()}`);
-    lines.push(`- Skills: ${entry.skillsUsed.join(", ") || "N/A"}`);
+    lines.push(`- Источник: ${entry.source}`);
+    lines.push(`- Добавлено: ${new Date(entry.createdAt).toLocaleString("ru-RU")}`);
+    lines.push(`- Навыки: ${entry.skillsUsed.join(", ") || "Нет данных"}`);
     lines.push("");
     lines.push(entry.description);
     lines.push("");
-    lines.push(`Result: ${entry.resultSummary}`);
+    lines.push(`Результат: ${entry.resultSummary}`);
     lines.push("");
   });
 
@@ -87,18 +87,18 @@ export function PortfolioBuilder({ initialEntries }: PortfolioBuilderProps) {
   return (
     <section className="space-y-5">
       <header className="surface-elevated space-y-3 p-5 sm:p-6">
-        <p className="kicker">Portfolio Builder</p>
-        <h1 className="page-title">Show your completed work artifacts</h1>
+        <p className="kicker">Конструктор портфолио</p>
+        <h1 className="page-title">Ваши артефакты и проекты</h1>
         <p className="section-description">
-          Completed missions and runtime achievements are collected here as career-ready portfolio evidence.
+          Пройденные миссии и учебные достижения собираются здесь для формирования публичного портфолио.
         </p>
       </header>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         {sourceStats.map((item) => (
-          <article key={item.value} className="surface-subtle p-3">
+          <article key={item.value} className="surface-elevated p-4 border border-border/50 bg-card/40 hover:bg-indigo-500/5 hover:border-indigo-500/20 backdrop-blur-md transition-all shadow-sm">
             <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">{item.label}</p>
-            <p className="mt-1 text-xl font-semibold text-foreground">{item.count}</p>
+            <p className="mt-1 text-2xl font-bold text-foreground text-indigo-400">{item.count}</p>
           </article>
         ))}
       </div>
@@ -122,14 +122,14 @@ export function PortfolioBuilder({ initialEntries }: PortfolioBuilderProps) {
             className="btn-secondary inline-flex items-center gap-2"
             onClick={() =>
               download(
-                "skillpath-portfolio.json",
+                "levio-portfolio.json",
                 JSON.stringify(filteredEntries, null, 2),
                 "application/json",
               )
             }
           >
             <FileJson className="h-4 w-4" />
-            Export JSON
+            Экспорт JSON
           </button>
 
           <button
@@ -137,14 +137,14 @@ export function PortfolioBuilder({ initialEntries }: PortfolioBuilderProps) {
             className="btn-secondary inline-flex items-center gap-2"
             onClick={() =>
               download(
-                "skillpath-portfolio.md",
+                "levio-portfolio.md",
                 toMarkdown(filteredEntries),
                 "text/markdown",
               )
             }
           >
             <FileText className="h-4 w-4" />
-            Export Markdown
+            Экспорт Markdown
           </button>
         </div>
 
@@ -152,7 +152,7 @@ export function PortfolioBuilder({ initialEntries }: PortfolioBuilderProps) {
           <div className="state-panel">
             <p className="inline-flex items-center gap-2">
               <FolderOpenDot className="h-4 w-4 text-muted-foreground" />
-              No portfolio entries yet. Complete a mission and add it from the mission result panel.
+              Пока нет записей. Пройдите миссию или модуль, чтобы добавить сюда проект.
             </p>
           </div>
         ) : (
@@ -161,16 +161,16 @@ export function PortfolioBuilder({ initialEntries }: PortfolioBuilderProps) {
               const isLocal = localEntries.some((item) => item.id === entry.id);
 
               return (
-                <article key={entry.id} className="surface-subtle space-y-3 p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-2">
+                <article key={entry.id} className="surface-elevated space-y-4 p-5 border border-border/50 bg-card/40 hover:bg-card/60 backdrop-blur-md transition-all shadow-sm hover:shadow-[0_4px_20px_rgba(14,165,233,0.1)] group">
+                  <div className="flex flex-wrap items-start justify-between gap-2 border-b border-border/40 pb-3">
                     <div>
                       <p className="text-base font-semibold text-foreground">{entry.title}</p>
                       <p className="mt-1 text-xs text-muted-foreground">
-                        {entry.source} | {new Date(entry.createdAt).toLocaleString()}
+                        {entry.source} | {new Date(entry.createdAt).toLocaleString("ru-RU")}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="chip-neutral px-2.5 py-1 text-[11px]">
+                      <span className="rounded-full border border-indigo-400/30 bg-indigo-500/10 px-3 py-1 text-[11px] font-semibold text-indigo-300">
                         {entry.source}
                       </span>
                       {isLocal ? (
@@ -181,7 +181,7 @@ export function PortfolioBuilder({ initialEntries }: PortfolioBuilderProps) {
                             const next = removePortfolioEntry(entry.id);
                             setLocalEntries(next);
                           }}
-                          aria-label="Remove portfolio entry"
+                          aria-label="Удалить запись"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -195,14 +195,14 @@ export function PortfolioBuilder({ initialEntries }: PortfolioBuilderProps) {
                     {entry.skillsUsed.map((skill) => (
                       <span
                         key={`${entry.id}-${skill}`}
-                        className="rounded-full border border-sky-400/25 bg-sky-500/10 px-2 py-0.5 text-[11px] text-sky-200"
+                        className="rounded-full border border-indigo-400/25 bg-indigo-500/10 px-2 py-0.5 text-[11px] text-indigo-200"
                       >
                         {skill}
                       </span>
                     ))}
                   </div>
 
-                  <p className="content-card px-3 py-2 text-xs text-muted-foreground">
+                  <p className="rounded-xl border border-emerald-400/20 bg-emerald-500/5 px-4 py-3 text-sm text-foreground shadow-sm">
                     {entry.resultSummary}
                   </p>
                 </article>
@@ -221,7 +221,7 @@ export function PortfolioBuilder({ initialEntries }: PortfolioBuilderProps) {
             }}
           >
             <Download className="h-4 w-4" />
-            Clear local mission artifacts
+            Удалить локальные миссии
           </button>
         ) : null}
       </section>

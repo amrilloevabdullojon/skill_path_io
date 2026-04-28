@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { NotebookPen, Plus } from "lucide-react";
+import { NotebookPen, Plus, Trash2 } from "lucide-react";
 
 import { UserNote } from "@/types/personalization";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -32,7 +32,7 @@ function toUserNote(note: ApiNote): UserNote {
     title: note.title,
     content: note.content,
     track: mapTrack(note.moduleRef),
-    lessonRef: note.lessonRef || note.moduleRef || "General note",
+    lessonRef: note.lessonRef || note.moduleRef || "Общая заметка",
     createdAt: note.createdAt,
   };
 }
@@ -58,7 +58,7 @@ export function NotesBoard({ initialNotes }: { initialNotes: UserNote[] }) {
         body: JSON.stringify({
           title: title.trim(),
           content: content.trim(),
-          lessonRef: "Manual note",
+          lessonRef: "Ручная заметка",
           track: "QA",
         }),
       });
@@ -98,25 +98,25 @@ export function NotesBoard({ initialNotes }: { initialNotes: UserNote[] }) {
   return (
     <section className="space-y-5">
       <header className="surface-elevated space-y-2 p-5 sm:p-6">
-        <p className="kicker">Notes</p>
-        <h1 className="page-title">Personal learning notes</h1>
-        <p className="section-description">Save key ideas, shortcuts, and reminders for quick review later.</p>
+        <p className="kicker">Заметки</p>
+        <h1 className="page-title">Личные заметки</h1>
+        <p className="section-description">Сохраняйте ключевые идеи, подсказки и напоминания для быстрого повторения.</p>
       </header>
 
       <article className="surface-elevated space-y-3 p-4">
-        <label htmlFor="note-title" className="sr-only">Note title</label>
-        <input id="note-title" value={title} onChange={(event) => setTitle(event.target.value)} className="input-base" placeholder="Note title" />
-        <label htmlFor="note-content" className="sr-only">Note content</label>
+        <label htmlFor="note-title" className="sr-only">Заголовок заметки</label>
+        <input id="note-title" value={title} onChange={(event) => setTitle(event.target.value)} className="input-base" placeholder="Заголовок заметки" />
+        <label htmlFor="note-content" className="sr-only">Текст заметки</label>
         <textarea
           id="note-content"
           value={content}
           onChange={(event) => setContent(event.target.value)}
           className="textarea-base min-h-[120px]"
-          placeholder="Write your note..."
+          placeholder="Напишите заметку..."
         />
         <button type="button" onClick={addNote} disabled={isSubmitting} className="btn-primary inline-flex items-center gap-2">
           <Plus className="h-4 w-4" />
-          {isSubmitting ? "Saving..." : "Add note"}
+          {isSubmitting ? "Сохраняем..." : "Добавить заметку"}
         </button>
         {error ? <p role="alert" className="text-xs text-rose-300">{error}</p> : null}
       </article>
@@ -126,8 +126,8 @@ export function NotesBoard({ initialNotes }: { initialNotes: UserNote[] }) {
           <div className="xl:col-span-2">
             <EmptyState
               icon={NotebookPen}
-              title="No notes yet"
-              description="Capture key ideas, shortcuts, and reminders as you study — they'll appear here for quick review."
+              title="Заметок пока нет"
+              description="Фиксируйте ключевые идеи, подсказки и напоминания во время учёбы — они появятся здесь для быстрого повторения."
             />
           </div>
         ) : (
@@ -135,8 +135,14 @@ export function NotesBoard({ initialNotes }: { initialNotes: UserNote[] }) {
             <article key={note.id} className="surface-elevated space-y-2 p-4">
               <div className="flex items-start justify-between gap-3">
                 <p className="text-sm font-semibold text-foreground">{note.title}</p>
-                <button type="button" onClick={() => removeNote(note.id)} className="text-xs text-muted-foreground hover:text-foreground">
-                  Remove
+                <button
+                  type="button"
+                  onClick={() => removeNote(note.id)}
+                  title="Удалить заметку"
+                  className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-muted-foreground hover:bg-rose-500/10 hover:text-rose-400 transition-colors"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Удалить
                 </button>
               </div>
               <p className="text-sm text-muted-foreground">{note.content}</p>

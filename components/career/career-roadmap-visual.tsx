@@ -15,55 +15,55 @@ type Stage = {
 const stages: Stage[] = [
   {
     id: "beginner",
-    title: "Beginner",
-    description: "Set role target and baseline skills.",
-    unlockOutcome: "Personal onboarding profile",
+    title: "Новичок",
+    description: "Настройка профиля и стартовых целей.",
+    unlockOutcome: "Персональный Roadmap",
     threshold: 10,
   },
   {
     id: "foundations",
-    title: "Foundations",
-    description: "Complete core modules and key lessons.",
-    unlockOutcome: "Core skill badge",
+    title: "Фундамент",
+    description: "Прохождение базовых модулей теории.",
+    unlockOutcome: "Бейдж базовых знаний",
     threshold: 30,
   },
   {
     id: "practice",
-    title: "Practice",
-    description: "Pass quizzes and practical checkpoints.",
-    unlockOutcome: "Validated practice score",
+    title: "Практика",
+    description: "Квизы и практические чекпоинты.",
+    unlockOutcome: "Подтверждение практики",
     threshold: 50,
   },
   {
     id: "missions",
-    title: "Missions",
-    description: "Solve realistic role-based scenarios.",
-    unlockOutcome: "Portfolio artifact pack",
+    title: "ИИ-Миссии",
+    description: "Решение реальных рабочих сценариев.",
+    unlockOutcome: "Артефакты в портфолио",
     threshold: 65,
   },
   {
     id: "interview-ready",
-    title: "Interview Ready",
-    description: "Complete mock interview and remediation.",
-    unlockOutcome: "Interview readiness report",
+    title: "Готовность к интервью",
+    description: "Собеседование с ИИ-ментором.",
+    unlockOutcome: "Оценка сильных и слабых сторон",
     threshold: 78,
   },
   {
     id: "job-ready",
-    title: "Job Ready",
-    description: "Close remaining skill gaps and finalize plan.",
-    unlockOutcome: "Career action roadmap",
+    title: "Готовность к офферу",
+    description: "Закрытие остаточных компетенций.",
+    unlockOutcome: "Доступ к премиум вакансиям",
     threshold: 90,
   },
 ];
 
 export function CareerRoadmapVisual({ readinessScore }: CareerRoadmapVisualProps) {
   return (
-    <section className="surface-elevated space-y-4 p-5">
+    <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-[24px] space-y-4 p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold text-foreground">Career Roadmap</h2>
-        <span className="chip-neutral px-2.5 py-1 text-xs">
-          readiness {readinessScore}%
+        <h2 className="text-lg font-semibold text-foreground">Карьерный Трек</h2>
+        <span className="inline-flex items-center gap-1 rounded-xl border border-border/60 bg-muted/30 px-3 py-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          готовность: <span className="text-foreground">{readinessScore}%</span>
         </span>
       </div>
 
@@ -80,8 +80,8 @@ export function CareerRoadmapVisual({ readinessScore }: CareerRoadmapVisualProps
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-foreground">{stage.title}</p>
-                    <p className="text-xs text-muted-foreground">{stage.description}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Unlock: {stage.unlockOutcome}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">{stage.description}</p>
+                    <p className="mt-1.5 text-[11px] uppercase tracking-wider font-bold text-indigo-400">Награда: <span className="text-foreground font-medium capitalize-none">{stage.unlockOutcome}</span></p>
                   </div>
                   <span className="mt-0.5">
                     {unlocked ? (
