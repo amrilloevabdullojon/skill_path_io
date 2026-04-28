@@ -1,3 +1,4 @@
+import { getServerEnv } from "@/lib/config/env";
 import { getPlanById, subscriptionPlans } from "@/lib/saas/plans";
 import { SubscriptionPlan, SubscriptionPlanId, SubscriptionState } from "@/types/saas";
 
@@ -30,7 +31,7 @@ function inferPlanFromIdentity(input: ResolveSubscriptionInput): SubscriptionPla
     return "PRO";
   }
 
-  const defaultPlan = process.env.DEFAULT_SUBSCRIPTION_PLAN;
+  const defaultPlan = getServerEnv().defaultSubscriptionPlan;
   if (
     defaultPlan === "FREE"
     || defaultPlan === "PRO"

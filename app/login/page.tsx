@@ -3,10 +3,11 @@ import { getServerSession } from "next-auth";
 
 import { EntryExperience } from "@/components/auth/entry-experience";
 import { authOptions } from "@/lib/auth";
+import { isDemoModeEnabled } from "@/lib/config/runtime-mode";
 
 export const metadata: Metadata = {
-  title: "Sign In — SkillPath Academy",
-  description: "Sign in to your SkillPath Academy account to continue learning.",
+  title: "Sign In — Levio",
+  description: "Sign in to your Levio account to continue learning.",
   robots: { index: false },
 };
 import { getDashboardData } from "@/lib/dashboard/data";
@@ -16,6 +17,7 @@ export const dynamic = "force-dynamic";
 export default async function LoginPage() {
   const session = await getServerSession(authOptions);
   const role = session?.user?.role;
+  const enableDemoAccess = isDemoModeEnabled();
 
   if ((role === "ADMIN" || role === "STUDENT") && session?.user) {
     const data = await getDashboardData({
@@ -28,7 +30,7 @@ export default async function LoginPage() {
         <EntryExperience
           mode="member"
           member={{
-            name: session.user.name ?? "SkillPath User",
+            name: session.user.name ?? "Levio User",
             role,
             totalXp: data?.hero.totalXp ?? 0,
             overallProgress: data?.hero.overallProgress ?? 0,
@@ -45,8 +47,7 @@ export default async function LoginPage() {
 
   return (
     <section className="page-shell">
-      <EntryExperience mode="guest" />
+      <EntryExperience mode="guest" enableDemoAccess={enableDemoAccess} />
     </section>
   );
 }
-

@@ -1,5 +1,7 @@
 import "server-only";
 
+import { validateEnv } from "@/lib/env";
+
 type ServerEnv = {
   databaseUrl: string;
   directUrl: string;
@@ -28,6 +30,7 @@ type ServerEnv = {
   /** Admin AI content generation: max requests per window (per IP). */
   adminAiRateLimitMaxRequests: number;
   adminAiRateLimitWindowMs: number;
+  defaultSubscriptionPlan: string;
 };
 
 let cachedEnv: ServerEnv | null = null;
@@ -54,8 +57,10 @@ export function getServerEnv(): ServerEnv {
     return cachedEnv;
   }
 
+  validateEnv();
+
   const databaseUrl = readString("DATABASE_URL");
-  const directUrl = readString("DIRECT_URL") || databaseUrl;
+  const directUrl = readString("DIRECT_URL");
   const nextAuthUrl = readString("NEXTAUTH_URL");
   const nextPublicAppUrl = readString("NEXT_PUBLIC_APP_URL") || nextAuthUrl;
   const nextAuthSecret = readString("NEXTAUTH_SECRET");
@@ -94,6 +99,7 @@ export function getServerEnv(): ServerEnv {
     mentorRateLimitWindowMs: readPositiveInt("MENTOR_RATE_LIMIT_WINDOW_MS", 60_000),
     adminAiRateLimitMaxRequests: readPositiveInt("ADMIN_AI_RATE_LIMIT_MAX_REQUESTS", 30),
     adminAiRateLimitWindowMs: readPositiveInt("ADMIN_AI_RATE_LIMIT_WINDOW_MS", 60_000),
+    defaultSubscriptionPlan: readString("DEFAULT_SUBSCRIPTION_PLAN") || "FREE",
   };
 
   return cachedEnv;

@@ -25,7 +25,7 @@ function getClientIp(request: Request) {
 
 function buildMentorSystemPrompt(trackTitle: string, moduleTitle: string, lessonText: string) {
   return [
-    `You are an experienced mentor of SkillPath Academy. The student is studying module '${moduleTitle}' in track '${trackTitle}'. Reply in Russian language. Explain simply with examples. Share practical advice from real experience. Use emoji for clarity.`,
+    `You are an experienced mentor of Levio. The student is studying module '${moduleTitle}' in track '${trackTitle}'. Reply in Russian language. Explain simply with examples. Share practical advice from real experience. Use emoji for clarity.`,
     "Lesson context (up to 2000 chars):",
     lessonText || "Lesson context is missing.",
   ].join("\n\n");
@@ -68,7 +68,7 @@ export async function handleMentorRequest(request: Request, body: { context?: Me
     );
   }
 
-  const geminiApiKey = process.env.GEMINI_API_KEY;
+  const geminiApiKey = env.geminiApiKey;
   if (!geminiApiKey) {
     return NextResponse.json(
       { error: "AI service is not configured." },
@@ -118,7 +118,7 @@ export async function handleMentorRequest(request: Request, body: { context?: Me
   const lessonText = toSafeString(body.context?.lessonText, "").slice(0, 2000);
   const systemPrompt = buildMentorSystemPrompt(trackTitle, moduleTitle, lessonText);
 
-  const geminiModel = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const geminiModel = env.geminiModel;
   const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiApiKey}`;
 
   let geminiResponse: Response;

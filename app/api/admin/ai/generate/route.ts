@@ -1,7 +1,6 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-import { authOptions } from "@/lib/auth";
+import { verifyAdminAccess } from "@/lib/auth/server-verify";
 import { getServerEnv } from "@/lib/config/env";
 import { applyRateLimit } from "@/lib/server/rate-limit";
 import { parseAdminAiRequest } from "@/lib/validation/admin-ai";
@@ -70,13 +69,13 @@ function toolInstruction(tool: AdminAiTool) {
   return map[tool];
 }
 
-async function requestAnthropic(payload: AdminAiRequest) {
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
+async function requestGemini(payload: AdminAiRequest, env: ReturnType<typeof getServerEnv>) {
+  const apiKey = env.geminiApiKey;
   if (!apiKey) {
     return null;
   }
 
-  const model = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+  const model = env.geminiModel;
   const contextText = [
     `Course: ${payload.context.courseTitle || "N/A"}`,
     `Module: ${payload.context.moduleTitle || "N/A"}`,
@@ -123,9 +122,9 @@ async function requestAnthropic(payload: AdminAiRequest) {
 }
 
 export async function POST(request: Request) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user || session.user.role !== "ADMIN") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const authError = await verifyAdminAccess();
+  if (authError) {
+    return NextResponse.json({ error: authError.error }, { status: authError.status });
   }
 
   const ip = getIp(request);
@@ -163,8 +162,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing tool or context" }, { status: 400 });
   }
 
-  const anthropicText = await requestAnthropic(body);
-  const resultText = anthropicText ?? buildMockResult(body.tool, body.context);
+  const geminiText = await requestGemini(body, env);
+  const resultText = geminiText ?? buildMockResult(body.tool, body.context);
   const response: AdminAiResponse = {
     result: resultText,
     suggestions: [
@@ -172,7 +171,7 @@ export async function POST(request: Request) {
       "Adapt wording to target audience and track level.",
       "Save a version snapshot after applying AI output.",
     ],
-    source: anthropicText ? "anthropic" : "mock",
+    source: geminiText ? "gemini" : "mock",
   };
 
   return NextResponse.json(response, {

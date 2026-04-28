@@ -106,11 +106,11 @@ function main() {
     console.log(`  ✓ ${msg}`);
   }
 
-  console.log(`\nSkillPath Academy — env check${prodMode ? " [production mode]" : ""}\n`);
+  console.log(`\nLevio — env check${prodMode ? " [production mode]" : ""}\n`);
 
   // ── Required for all modes ────────────────────────────────────────────────
 
-  const required = ["DATABASE_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET"];
+  const required = ["DATABASE_URL", "DIRECT_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET"];
 
   for (const key of required) {
     if (!env[key]) {
