@@ -196,6 +196,7 @@ export function ModuleArtifactWorkspace({
   const [review, setReview] = useState<ReviewResult | null>(null);
   const [errorText, setErrorText] = useState<string | null>(null);
   const [importedSnippet, setImportedSnippet] = useState<ArtifactSnippet | null>(null);
+  const [reviewPlanApplied, setReviewPlanApplied] = useState(false);
   const [isReviewing, setIsReviewing] = useState(false);
 
   useEffect(() => {
@@ -331,6 +332,7 @@ export function ModuleArtifactWorkspace({
       }
 
       setReview(data.result ?? null);
+      setReviewPlanApplied(false);
     } catch (error) {
       setErrorText(error instanceof Error ? error.message : "AI-review временно недоступен.");
     } finally {
@@ -352,6 +354,40 @@ export function ModuleArtifactWorkspace({
       createdAt: new Date().toISOString(),
     });
     setPortfolioSaved(true);
+  }
+
+  function applyReviewPlan() {
+    if (!review) {
+      return;
+    }
+
+    const feedback = review.feedback?.filter(Boolean) ?? [];
+    const nextSteps = review.nextSteps?.filter(Boolean) ?? [];
+    const reviewSummary = [
+      `AI-review: ${review.score ?? "-"} / 100`,
+      feedback.length > 0 ? `Feedback:\n${feedback.map((item) => `- ${item}`).join("\n")}` : "",
+      nextSteps.length > 0 ? `Next steps:\n${nextSteps.map((item) => `- ${item}`).join("\n")}` : "",
+    ].filter(Boolean).join("\n\n");
+
+    setDraft((current) => {
+      const nextDraft: WorkspaceDraft = {
+        ...current,
+        evidence: appendUnique(current.evidence, reviewSummary),
+        decision: appendUnique(
+          current.decision,
+          nextSteps.length > 0
+            ? `План доработки после AI-review:\n${nextSteps.map((item) => `- ${item}`).join("\n")}`
+            : "План доработки после AI-review: уточнить evidence, риск и итоговое решение.",
+        ),
+      };
+      const timestamp = new Date().toISOString();
+      window.localStorage.setItem(storageKey, JSON.stringify({ ...nextDraft, savedAt: timestamp }));
+      setSavedAt(timestamp);
+      return nextDraft;
+    });
+    setReviewPlanApplied(true);
+    setPortfolioSaved(false);
+    focusField("decision");
   }
 
   function focusField(field: WorkspaceDraftField) {
@@ -678,19 +714,52 @@ export function ModuleArtifactWorkspace({
               <ArrowRight className="h-5 w-5 text-muted-foreground" />
             </div>
             {review ? (
-              <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
-                <div className="rounded-xl border border-border/60 bg-card/60 p-2">
-                  <p className="text-muted-foreground">Score</p>
-                  <p className="text-lg font-semibold text-foreground">{review.score ?? "-"}</p>
+              <div className="mt-3 space-y-3">
+                <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                  <div className="rounded-xl border border-border/60 bg-card/60 p-2">
+                    <p className="text-muted-foreground">Score</p>
+                    <p className="text-lg font-semibold text-foreground">{review.score ?? "-"}</p>
+                  </div>
+                  <div className="rounded-xl border border-border/60 bg-card/60 p-2">
+                    <p className="text-muted-foreground">Full</p>
+                    <p className="text-lg font-semibold text-foreground">{review.completeness ?? "-"}</p>
+                  </div>
+                  <div className="rounded-xl border border-border/60 bg-card/60 p-2">
+                    <p className="text-muted-foreground">Logic</p>
+                    <p className="text-lg font-semibold text-foreground">{review.logic ?? "-"}</p>
+                  </div>
                 </div>
-                <div className="rounded-xl border border-border/60 bg-card/60 p-2">
-                  <p className="text-muted-foreground">Full</p>
-                  <p className="text-lg font-semibold text-foreground">{review.completeness ?? "-"}</p>
-                </div>
-                <div className="rounded-xl border border-border/60 bg-card/60 p-2">
-                  <p className="text-muted-foreground">Logic</p>
-                  <p className="text-lg font-semibold text-foreground">{review.logic ?? "-"}</p>
-                </div>
+                {(review.feedback?.length || review.nextSteps?.length) ? (
+                  <div className="rounded-2xl border border-sky-500/25 bg-sky-500/10 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-300">
+                      План доработки
+                    </p>
+                    {review.feedback?.length ? (
+                      <ul className="mt-2 list-disc space-y-1 pl-4 text-xs leading-5 text-muted-foreground">
+                        {review.feedback.slice(0, 3).map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+                    {review.nextSteps?.length ? (
+                      <div className="mt-2 space-y-1">
+                        {review.nextSteps.slice(0, 3).map((item) => (
+                          <p key={item} className="rounded-xl border border-border/50 bg-card/55 px-2 py-1.5 text-xs text-foreground/80">
+                            {item}
+                          </p>
+                        ))}
+                      </div>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={applyReviewPlan}
+                      className="btn-secondary mt-3 inline-flex w-full items-center justify-center gap-2 text-xs"
+                    >
+                      {reviewPlanApplied ? "План добавлен" : "Добавить план в черновик"}
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ) : null}
               </div>
             ) : (
               <p className="mt-3 text-xs leading-5 text-muted-foreground">
