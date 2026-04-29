@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, CheckCircle2, ClipboardCheck, History, Inbox, Loader2, RotateCcw, Save, Sparkles, Trophy } from "lucide-react";
 
 import { upsertPortfolioEntry } from "@/lib/portfolio/local-portfolio";
-import { artifactReadinessPercent, buildArtifactReadinessChecklist, buildReviewGate } from "@/lib/tracks/artifact-readiness";
+import { artifactReadinessPercent, buildArtifactReadinessChecklist, buildReviewActionPlan, buildReviewGate } from "@/lib/tracks/artifact-readiness";
 import { buildModuleShiftSeed, type ModuleShiftBrief } from "@/lib/tracks/module-brief";
 import { cn } from "@/lib/utils";
 
@@ -547,6 +547,12 @@ export function ModuleArtifactWorkspace({
     portfolioSaved,
   });
   const readinessChecklistPercent = artifactReadinessPercent(readinessChecklist);
+  const reviewActionPlan = review
+    ? buildReviewActionPlan({
+        feedback: review.feedback,
+        nextSteps: review.nextSteps,
+      })
+    : [];
   const weakestField = fieldHealth.find((item) => item.status !== "strong") ?? null;
   const decisionFocusField = importedSnippet ? snippetFocusField(importedSnippet) : null;
   const decisionFocusHealth = decisionFocusField ? fieldHealth.find((item) => item.field === decisionFocusField) ?? null : null;
@@ -1325,6 +1331,24 @@ export function ModuleArtifactWorkspace({
                           <p key={item} className="rounded-xl border border-border/50 bg-card/55 px-2 py-1.5 text-xs text-foreground/80">
                             {item}
                           </p>
+                        ))}
+                      </div>
+                    ) : null}
+                    {reviewActionPlan.length > 0 ? (
+                      <div className="mt-3 space-y-2">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Куда внести правки</p>
+                        {reviewActionPlan.map((item) => (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => focusField(item.target)}
+                            className="w-full rounded-xl border border-border/50 bg-card/55 px-2 py-1.5 text-left transition-colors hover:border-sky-500/40"
+                          >
+                            <span className="text-[11px] font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-300">
+                              {item.source === "feedback" ? "Feedback" : "Next step"} {"->"} {item.label}
+                            </span>
+                            <span className="mt-1 block text-xs leading-5 text-muted-foreground">{item.text}</span>
+                          </button>
                         ))}
                       </div>
                     ) : null}

@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { artifactReadinessPercent, buildArtifactReadinessChecklist, buildReviewGate } from "@/lib/tracks/artifact-readiness";
+import {
+  artifactReadinessPercent,
+  buildArtifactReadinessChecklist,
+  buildReviewActionPlan,
+  buildReviewGate,
+} from "@/lib/tracks/artifact-readiness";
 
 describe("artifact readiness", () => {
   it("marks early artifact work as not ready", () => {
@@ -45,5 +50,16 @@ describe("artifact readiness", () => {
       canReview: true,
       title: "AI-review доступен",
     });
+  });
+
+  it("turns review feedback into targeted action items", () => {
+    const plan = buildReviewActionPlan({
+      feedback: ["Add request/response evidence for the failing API call."],
+      nextSteps: ["Write a release recommendation and retest step."],
+    });
+
+    expect(plan).toHaveLength(2);
+    expect(plan[0]).toMatchObject({ target: "evidence", label: "Evidence" });
+    expect(plan[1]).toMatchObject({ target: "decision", label: "Вывод" });
   });
 });

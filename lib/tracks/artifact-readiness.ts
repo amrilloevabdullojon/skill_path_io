@@ -27,6 +27,19 @@ export type ReviewGate = {
   description: string;
 };
 
+export type ReviewActionPlanInput = {
+  feedback?: string[];
+  nextSteps?: string[];
+};
+
+export type ReviewActionItem = {
+  id: string;
+  source: "feedback" | "nextStep";
+  text: string;
+  target: "observation" | "risk" | "testIdea" | "evidence" | "decision";
+  label: string;
+};
+
 export function buildArtifactReadinessChecklist(input: ArtifactReadinessInput): ArtifactReadinessItem[] {
   const reviewScore = input.reviewScore ?? 0;
 
@@ -101,4 +114,80 @@ export function buildReviewGate(input: ReviewGateInput): ReviewGate {
     title: "Нужно больше контекста",
     description: `Добавьте примерно ${missingContent} символов: steps, expected/actual, риск или вывод.`,
   };
+}
+
+function reviewTargetFromText(text: string): ReviewActionItem["target"] {
+  const normalized = text.toLowerCase();
+
+  if (
+    normalized.includes("decision") ||
+    normalized.includes("recommend") ||
+    normalized.includes("retest") ||
+    normalized.includes("вывод") ||
+    normalized.includes("решен") ||
+    normalized.includes("рекоменд")
+  ) {
+    return "decision";
+  }
+  if (
+    normalized.includes("evidence") ||
+    normalized.includes("actual") ||
+    normalized.includes("expected") ||
+    normalized.includes("request") ||
+    normalized.includes("response") ||
+    normalized.includes("step") ||
+    normalized.includes("шаг") ||
+    normalized.includes("скрин")
+  ) {
+    return "evidence";
+  }
+  if (
+    normalized.includes("risk") ||
+    normalized.includes("impact") ||
+    normalized.includes("user") ||
+    normalized.includes("риск") ||
+    normalized.includes("пользователь")
+  ) {
+    return "risk";
+  }
+  if (
+    normalized.includes("test") ||
+    normalized.includes("case") ||
+    normalized.includes("scenario") ||
+    normalized.includes("check") ||
+    normalized.includes("провер") ||
+    normalized.includes("сценар")
+  ) {
+    return "testIdea";
+  }
+  return "observation";
+}
+
+const reviewTargetLabels: Record<ReviewActionItem["target"], string> = {
+  observation: "Наблюдение",
+  risk: "Риск",
+  testIdea: "Проверка",
+  evidence: "Evidence",
+  decision: "Вывод",
+};
+
+export function buildReviewActionPlan(input: ReviewActionPlanInput): ReviewActionItem[] {
+  const feedback = input.feedback?.filter(Boolean).slice(0, 3) ?? [];
+  const nextSteps = input.nextSteps?.filter(Boolean).slice(0, 3) ?? [];
+  const items = [
+    ...feedback.map((text, index) => ({ source: "feedback" as const, text, index })),
+    ...nextSteps.map((text, index) => ({ source: "nextStep" as const, text, index })),
+  ].slice(0, 5);
+
+  return items.map((item) => {
+    const target = reviewTargetFromText(item.text);
+
+    return {
+      id: `${item.source}-${item.index}-${target}`,
+      source: item.source,
+      text: item.text,
+      target,
+      label: reviewTargetLabels[target],
+    };
+  });
 }
