@@ -72,6 +72,7 @@ const emptyDraft: WorkspaceDraft = {
 
 const artifactSnippetEventName = "levio:artifact-snippet";
 const artifactResetEventName = "levio:artifact-reset";
+const artifactUpdatedEventName = "levio:artifact-updated";
 
 const phaseItems = [
   {
@@ -464,6 +465,10 @@ export function ModuleArtifactWorkspace({
     });
   }, [growthEventsStorageKey]);
 
+  const notifyArtifactUpdated = useCallback(() => {
+    window.dispatchEvent(new CustomEvent(artifactUpdatedEventName));
+  }, []);
+
   useEffect(() => {
     const raw = window.localStorage.getItem(storageKey);
     if (!raw) {
@@ -511,6 +516,7 @@ export function ModuleArtifactWorkspace({
         const timestamp = new Date().toISOString();
         window.localStorage.setItem(storageKey, JSON.stringify({ ...nextDraft, savedAt: timestamp }));
         setSavedAt(timestamp);
+        notifyArtifactUpdated();
         return nextDraft;
       });
       setImportedSnippet(snippet);
@@ -525,7 +531,7 @@ export function ModuleArtifactWorkspace({
 
     window.addEventListener(artifactSnippetEventName, handleSnippet);
     return () => window.removeEventListener(artifactSnippetEventName, handleSnippet);
-  }, [addGrowthEvent, storageKey]);
+  }, [addGrowthEvent, notifyArtifactUpdated, storageKey]);
 
   const artifact = useMemo(() => buildArtifact(draft, moduleTitle, finalChallenge), [draft, finalChallenge, moduleTitle]);
   const filledFields = Object.values(draft).filter((value) => value.trim().length > 0).length;
@@ -643,6 +649,7 @@ export function ModuleArtifactWorkspace({
       const timestamp = new Date().toISOString();
       window.localStorage.setItem(storageKey, JSON.stringify({ ...nextDraft, savedAt: timestamp }));
       setSavedAt(timestamp);
+      notifyArtifactUpdated();
       return nextDraft;
     });
     setPortfolioSaved(false);
@@ -676,6 +683,7 @@ export function ModuleArtifactWorkspace({
     const timestamp = new Date().toISOString();
     window.localStorage.setItem(storageKey, JSON.stringify({ ...draft, savedAt: timestamp }));
     setSavedAt(timestamp);
+    notifyArtifactUpdated();
     addGrowthEvent({
       type: "save",
       title: "Черновик закреплён",
@@ -695,6 +703,7 @@ export function ModuleArtifactWorkspace({
     window.localStorage.removeItem(storageKey);
     window.localStorage.removeItem(growthEventsStorageKey);
     window.dispatchEvent(new CustomEvent(artifactResetEventName));
+    notifyArtifactUpdated();
   }
 
   async function runReview() {
@@ -748,6 +757,7 @@ export function ModuleArtifactWorkspace({
       createdAt: new Date().toISOString(),
     });
     setPortfolioSaved(true);
+    notifyArtifactUpdated();
     addGrowthEvent({
       type: "portfolio",
       title: "Плод добавлен в портфолио",
@@ -782,6 +792,7 @@ export function ModuleArtifactWorkspace({
       const timestamp = new Date().toISOString();
       window.localStorage.setItem(storageKey, JSON.stringify({ ...nextDraft, savedAt: timestamp }));
       setSavedAt(timestamp);
+      notifyArtifactUpdated();
       return nextDraft;
     });
     setReviewPlanApplied(true);

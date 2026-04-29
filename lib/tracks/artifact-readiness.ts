@@ -54,6 +54,23 @@ export type PortfolioGate = {
   description: string;
 };
 
+export type ModuleCompletionGateInput = {
+  filledFields: number;
+  hasPortfolioEntry: boolean;
+  isCompleted: boolean;
+};
+
+export type ModuleCompletionGate = {
+  ready: boolean;
+  title: string;
+  description: string;
+  checklist: Array<{
+    id: "artifact" | "portfolio" | "completion";
+    label: string;
+    done: boolean;
+  }>;
+};
+
 export function buildArtifactReadinessChecklist(input: ArtifactReadinessInput): ArtifactReadinessItem[] {
   const reviewScore = input.reviewScore ?? 0;
 
@@ -244,5 +261,41 @@ export function buildPortfolioGate(input: PortfolioGateInput): PortfolioGate {
     recommended,
     title: "Можно сохранить, но стоит усилить",
     description: `Здоровье артефакта ${input.artifactHealth}%. Для портфолио цель - 70%+ и 4 заполненные ветки.`,
+  };
+}
+
+export function buildModuleCompletionGate(input: ModuleCompletionGateInput): ModuleCompletionGate {
+  const hasArtifact = input.filledFields >= 3;
+  const ready = hasArtifact && input.hasPortfolioEntry;
+
+  return {
+    ready,
+    title: input.isCompleted
+      ? "Модуль уже закрыт"
+      : ready
+        ? "Можно закрывать модуль"
+        : "Перед закрытием стоит укрепить результат",
+    description: input.isCompleted
+      ? "Прогресс сохранён. Можно перейти к следующей ветке обучения."
+      : ready
+        ? "Есть рабочий артефакт и портфолио-запись. Завершение будет подкреплено доказательством навыка."
+        : "Завершение доступно, но для осмысленного прогресса лучше сначала собрать артефакт и сохранить результат.",
+    checklist: [
+      {
+        id: "artifact",
+        label: "Артефакт заполнен минимум на 3 ветки",
+        done: hasArtifact,
+      },
+      {
+        id: "portfolio",
+        label: "Результат сохранён в портфолио",
+        done: input.hasPortfolioEntry,
+      },
+      {
+        id: "completion",
+        label: "Модуль отмечен завершённым",
+        done: input.isCompleted,
+      },
+    ],
   };
 }

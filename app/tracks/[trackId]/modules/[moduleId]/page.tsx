@@ -11,6 +11,7 @@ import { LessonBlockRenderer } from "@/components/tracks/lesson-block-renderer";
 import { LearningFlowTree } from "@/components/tracks/learning-flow-tree";
 import { MarkModuleCompleteButton } from "@/components/tracks/mark-module-complete-button";
 import { ModuleArtifactWorkspace } from "@/components/tracks/module-artifact-workspace";
+import { ModuleCompletionReadiness } from "@/components/tracks/module-completion-readiness";
 import { ModuleReadingProgress } from "@/components/tracks/module-reading-progress";
 import { ModuleSidebarNav } from "@/components/tracks/module-sidebar-nav";
 import { QaScenarioLab } from "@/components/tracks/qa-scenario-lab";
@@ -659,6 +660,10 @@ export default async function ModulePage({ params }: ModulePageProps) {
             <p className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-800 dark:text-emerald-200">
               <span className="font-semibold">Финальное задание:</span> {parsedContent.finalChallenge}
             </p>
+            <ModuleCompletionReadiness
+              moduleId={currentModule.id}
+              isCompleted={currentStatus === ProgressStatus.COMPLETED}
+            />
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               <form action={markModuleAsCompleted} className="w-full sm:w-auto">
                 <input type="hidden" name="trackSlug" value={track.slug} />

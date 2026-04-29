@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   artifactReadinessPercent,
   buildArtifactReadinessChecklist,
+  buildModuleCompletionGate,
   buildPortfolioGate,
   buildReviewActionPlan,
   buildReviewGate,
@@ -79,6 +80,20 @@ describe("artifact readiness", () => {
       canSave: true,
       recommended: true,
       title: "Готово для портфолио",
+    });
+  });
+
+  it("builds a soft module completion gate", () => {
+    expect(buildModuleCompletionGate({ filledFields: 2, hasPortfolioEntry: false, isCompleted: false })).toMatchObject({
+      ready: false,
+      title: "Перед закрытием стоит укрепить результат",
+    });
+    expect(buildModuleCompletionGate({ filledFields: 4, hasPortfolioEntry: true, isCompleted: false })).toMatchObject({
+      ready: true,
+      title: "Можно закрывать модуль",
+    });
+    expect(buildModuleCompletionGate({ filledFields: 4, hasPortfolioEntry: true, isCompleted: true }).checklist[2]).toMatchObject({
+      done: true,
     });
   });
 });
