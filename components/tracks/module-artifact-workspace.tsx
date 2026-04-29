@@ -343,6 +343,53 @@ function snippetFocusGuidance(snippet: ArtifactSnippet) {
   return "Начните с наблюдения: какой факт из урока вы увидели и почему он важен для проверки.";
 }
 
+function fieldMicroTask(field: WorkspaceDraftField, snippet: ArtifactSnippet | null) {
+  const context = snippet ? `по ходу "${snippet.selectedLabel}"` : "по текущему модулю";
+  if (field === "observation") {
+    return {
+      title: "Зафиксируйте факт",
+      prompt: `Напишите одно наблюдение ${context}: что пользователь делает, что система показывает и где возникает сигнал для QA.`,
+      starter: snippet
+        ? `[${snippet.lessonTitle}] Наблюдение: выбран ход "${snippet.selectedLabel}". ${snippet.action}`
+        : "Наблюдение: пользователь выполняет [действие], система показывает [результат], но остаётся неясным [сигнал/условие].",
+    };
+  }
+  if (field === "risk") {
+    return {
+      title: "Назовите риск",
+      prompt: `Опишите риск ${context}: кому навредит проблема, что может сломаться и почему это важно до релиза.`,
+      starter: snippet
+        ? `Риск: ${snippet.consequence}`
+        : "Риск: пользователь может столкнуться с [проблема], из-за чего [последствие для пользователя/бизнеса].",
+    };
+  }
+  if (field === "testIdea") {
+    return {
+      title: "Соберите проверку",
+      prompt: `Сформулируйте короткую проверку ${context}: шаг, expected result и один edge case.`,
+      starter: snippet
+        ? `Проверка: ${snippet.artifactHint}`
+        : "Проверка: выполнить [шаги], ожидать [expected result], затем повторить с edge case [условие].",
+    };
+  }
+  if (field === "evidence") {
+    return {
+      title: "Добавьте evidence",
+      prompt: `Укажите доказательство ${context}: steps, test data, expected/actual, screenshot или request/response.`,
+      starter: snippet
+        ? `Evidence: для хода "${snippet.selectedLabel}" приложить steps, test data, expected/actual и подтверждение результата.`
+        : "Evidence: steps, test data, expected result, actual result, окружение и screenshot/request-response.",
+    };
+  }
+  return {
+    title: "Закройте решением",
+    prompt: `Сделайте вывод ${context}: исправить, уточнить, покрыть тестом или принять риск.`,
+    starter: snippet
+      ? `Вывод: продолжить через "${snippet.selectedLabel}" и проверить результат в итоговом артефакте.`
+      : "Вывод: рекомендую [действие], потому что [обоснование]. Следующий шаг: [retest/clarify/fix/accept risk].",
+  };
+}
+
 function appendUnique(current: string, next: string) {
   const trimmedNext = next.trim();
   if (!trimmedNext) {
@@ -524,6 +571,7 @@ export function ModuleArtifactWorkspace({
     },
   ];
   const nextGrowthMilestone = growthMilestones.find((milestone) => !milestone.done) ?? null;
+  const activeMicroTask = fieldMicroTask(guidedField?.field ?? nextGrowthMilestone?.field ?? "observation", importedSnippet);
 
   function updateDraft(field: keyof WorkspaceDraft, value: string) {
     setDraft((current) => ({ ...current, [field]: value }));
@@ -855,6 +903,29 @@ export function ModuleArtifactWorkspace({
         </div>
 
         <aside className="space-y-4">
+          <article className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="kicker text-emerald-700 dark:text-emerald-300">Задание на сейчас</p>
+                <p className="mt-1 text-sm font-semibold text-foreground">{activeMicroTask.title}</p>
+              </div>
+              <Sparkles className="h-5 w-5 text-emerald-500" />
+            </div>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">{activeMicroTask.prompt}</p>
+            <div className="mt-3 rounded-2xl border border-emerald-500/25 bg-background/45 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Можно вставить</p>
+              <p className="mt-1 text-xs leading-5 text-foreground/80">{activeMicroTask.starter}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => insertStarter(guidedField?.field ?? nextGrowthMilestone?.field ?? "observation", activeMicroTask.title, activeMicroTask.starter)}
+              className="btn-secondary mt-3 inline-flex w-full items-center justify-center gap-2 text-xs"
+            >
+              Вставить и доработать
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+          </article>
+
           <article className="rounded-2xl border border-border/60 bg-background/55 p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
