@@ -504,28 +504,62 @@ This is your first portfolio-grade artifact: a small risk map with evidence and 
           ru: "Читайте требования как тестировщик",
         },
         body: {
-          en: `## Start from ambiguity
+          en: `## Scene: the login story is not testable yet
 
-Requirements often sound complete until you try to test them. Words like "fast", "convenient", "correct", or "secure" are weak unless the team defines what they mean.
+The product manager drops a short story into the sprint:
 
-## Questions that improve quality
+> As a returning user, I want to log in quickly so I can continue my course.
 
-Ask about allowed and forbidden values, user roles, empty and error states, scope by browser and device, and side effects such as analytics or notifications.
+It sounds simple, but a tester cannot verify "quickly" or "continue" until the team defines observable behavior. Your first job is to turn vague language into checks.
 
-## Testable language
+## Ambiguity intake
 
-A requirement becomes stronger when the expected result is observable. "The user should log in quickly" is vague. "The user should reach the dashboard after entering valid credentials" is testable.`,
-          ru: `## Начинайте с неоднозначности
+| Vague phrase | QA question | Testable version |
+| --- | --- | --- |
+| quickly | How many seconds is acceptable? | Dashboard opens within 2 seconds after valid login. |
+| continue course | Which page should open? | User lands on the last active module. |
+| wrong password | What message should appear? | Show a neutral error without revealing whether email exists. |
+| remember me | How long should session persist? | Session remains active for 30 days on the same browser. |
 
-Требования часто кажутся полными, пока вы не попробуете их протестировать. Формулировки вроде "быстро", "удобно", "корректно" или "безопасно" слабы, если команда не определила, что именно они означают.
+## Mini action
 
-## Вопросы, которые повышают качество
+Before writing test cases, create three artifact lines:
 
-Спрашивайте про допустимые и запрещенные значения, роли пользователя, empty и error states, scope по браузерам и устройствам, а также побочные эффекты вроде аналитики или уведомлений.
+- **Observation:** login story has undefined success page and session rule.
+- **Risk:** QA may validate the wrong behavior or miss privacy-sensitive errors.
+- **Decision:** ask PM to confirm redirect target, session duration, and error copy.
 
-## Тестируемый язык
+## Artifact seed
 
-Требование становится сильнее, когда ожидаемый результат наблюдаем. "Пользователь должен быстро войти" - расплывчато. "Пользователь должен попасть на dashboard после ввода валидных credentials" - уже тестируемо.`,
+Use this lesson to strengthen **Observation** and **Decision**. A testable requirement should leave less room for opinion.`,
+          ru: `## Сцена: login story пока нельзя тестировать
+
+Product manager добавляет в sprint короткую story:
+
+> Как returning user, я хочу быстро войти, чтобы продолжить курс.
+
+Звучит просто, но тестировщик не может проверить "быстро" и "продолжить", пока команда не договорится о наблюдаемом поведении. Ваша первая задача - превратить расплывчатый язык в проверки.
+
+## Приём неоднозначностей
+
+| Расплывчатая фраза | Вопрос QA | Тестируемая версия |
+| --- | --- | --- |
+| быстро | Сколько секунд допустимо? | Dashboard открывается за 2 секунды после валидного login. |
+| продолжить курс | Какая страница должна открыться? | Пользователь попадает в последний активный module. |
+| неверный пароль | Какое сообщение должно появиться? | Показать нейтральную ошибку без раскрытия, существует ли email. |
+| remember me | Как долго должна жить session? | Session активна 30 дней в том же браузере. |
+
+## Мини-действие
+
+Перед test cases создайте три строки артефакта:
+
+- **Наблюдение:** login story не определяет success page и правило session.
+- **Риск:** QA может проверить не то поведение или пропустить privacy-sensitive ошибки.
+- **Вывод:** уточнить у PM redirect target, session duration и error copy.
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы усилить **Наблюдение** и **Вывод**. Тестируемое требование оставляет меньше места для мнений.`,
         },
       },
       {
@@ -534,28 +568,80 @@ A requirement becomes stronger when the expected result is observable. "The user
           ru: "Базовые техники тест-дизайна",
         },
         body: {
-          en: `## Positive and negative checks
+          en: `## Scene: build coverage without testing everything
 
-Positive testing confirms that the expected path works. Negative testing confirms that invalid input, missing data, and wrong states are handled safely.
+The login form has email, password, remember me, and forgot password. You have 25 minutes before the build review. Testing every combination is impossible, so you design coverage by risk.
 
-## Equivalence and boundaries
+## Coverage map
 
-If many inputs behave the same way, group them into classes. Then test one representative from each class. Add special attention to edges: for a range 18 to 60, check 17, 18, 60, and 61.
+| Technique | Login example | Why it matters |
+| --- | --- | --- |
+| Positive check | valid email + valid password | Confirms the main path works. |
+| Negative check | valid email + wrong password | Confirms safe failure. |
+| Equivalence class | invalid email formats | Avoids repeating the same kind of invalid input. |
+| Boundary | password length 7, 8, 64, 65 | Finds edge behavior around limits. |
+| State transition | logged out -> login -> dashboard -> refresh | Confirms the user lands and stays in the right state. |
 
-## Think in combinations
+## Decision table
 
-When several conditions affect one result, verify combinations. Each condition may work alone while the combined path fails.`,
-          ru: `## Positive и negative checks
+| Email | Password | Remember me | Expected |
+| --- | --- | --- | --- |
+| valid | valid | off | login succeeds, normal session |
+| valid | valid | on | login succeeds, persistent session |
+| valid | wrong | any | neutral error, no login |
+| empty | any | any | inline validation |
+| invalid format | any | any | email format validation |
 
-Positive testing подтверждает, что ожидаемый сценарий работает. Negative testing проверяет, что невалидные данные, пропущенные значения и неправильные состояния обрабатываются безопасно.
+## Mini action
 
-## Equivalence и boundaries
+Pick one risky field and define classes:
 
-Если много входных данных ведут себя одинаково, объедините их в классы. Затем протестируйте по одному представителю из каждого класса. Особое внимание уделяйте границам: для диапазона 18-60 проверьте 17, 18, 60 и 61.
+- valid email: learner@example.com
+- missing @: learner.example.com
+- empty value: ""
+- long value: 255+ characters
+- uppercase value: LEARNER@EXAMPLE.COM
 
-## Думайте комбинациями
+## Artifact seed
 
-Когда на один результат влияют несколько условий, проверяйте их сочетания. Каждое условие может работать отдельно, а вместе сценарий сломается.`,
+Use this lesson to fill **Test idea**. Good test design explains why these checks were chosen, not just what to click.`,
+          ru: `## Сцена: построить покрытие, не тестируя всё подряд
+
+У login form есть email, password, remember me и forgot password. До build review осталось 25 минут. Проверить все комбинации невозможно, поэтому вы строите покрытие по риску.
+
+## Карта покрытия
+
+| Техника | Пример для login | Зачем это важно |
+| --- | --- | --- |
+| Positive check | valid email + valid password | Подтверждает основной путь. |
+| Negative check | valid email + wrong password | Подтверждает безопасный отказ. |
+| Equivalence class | invalid email formats | Не повторяет один и тот же тип невалидного ввода. |
+| Boundary | password length 7, 8, 64, 65 | Находит поведение на границах лимитов. |
+| State transition | logged out -> login -> dashboard -> refresh | Проверяет, что пользователь попадает и остаётся в правильном состоянии. |
+
+## Decision table
+
+| Email | Password | Remember me | Expected |
+| --- | --- | --- | --- |
+| valid | valid | off | login succeeds, normal session |
+| valid | valid | on | login succeeds, persistent session |
+| valid | wrong | any | neutral error, no login |
+| empty | any | any | inline validation |
+| invalid format | any | any | email format validation |
+
+## Мини-действие
+
+Выберите одно рискованное поле и задайте классы:
+
+- valid email: learner@example.com
+- missing @: learner.example.com
+- empty value: ""
+- long value: 255+ characters
+- uppercase value: LEARNER@EXAMPLE.COM
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Проверку**. Хороший test design объясняет, почему выбраны именно эти проверки, а не только что нужно нажать.`,
         },
       },
       {
@@ -564,38 +650,88 @@ Positive testing подтверждает, что ожидаемый сцена�
           ru: "Практика: checklist и test case для логина",
         },
         body: {
-          en: `Deliver two artifacts for a login page.
+          en: `## Scene: handoff to the team
 
-Checklist:
-- page loads and controls are visible
-- submit button state is correct
-- valid login redirects to the expected page
-- invalid password shows the correct error
-- empty fields are validated
-- remember me affects the next session
+The developer asks: "Can you send the login checks before I finish the fix?" This is where junior QA work becomes useful. You do not send a wall of theory. You send a compact checklist and five reproducible test cases.
 
-Detailed test cases:
-1. successful login
-2. wrong password
-3. empty email
-4. invalid email format
-5. password reset link availability`,
-          ru: `Подготовьте два артефакта для страницы логина.
+## Checklist
 
-Checklist:
-- страница загружается и контролы видны
-- состояние submit button корректно
-- успешный логин ведет на ожидаемую страницу
-- неверный пароль показывает правильную ошибку
-- пустые поля валидируются
-- remember me влияет на следующую сессию
+- page loads and all controls are visible
+- submit is disabled until required fields are valid
+- valid login redirects to the confirmed destination
+- invalid password shows neutral error copy
+- empty email and password show inline validation
+- remember me changes session persistence
+- forgot password opens recovery flow
+- refresh after login keeps the expected state
 
-Подробные test case:
-1. успешный вход
-2. неверный пароль
-3. пустой email
-4. невалидный формат email
-5. доступность password reset link`,
+## Five detailed test cases
+
+1. **Successful login**
+   - Preconditions: registered active user exists.
+   - Steps: enter valid email/password, submit.
+   - Expected: dashboard or last active module opens.
+
+2. **Wrong password**
+   - Steps: enter valid email and wrong password.
+   - Expected: neutral error is shown, user stays logged out.
+
+3. **Empty required fields**
+   - Steps: leave email/password empty and try to submit.
+   - Expected: inline validation appears and no request is sent.
+
+4. **Invalid email format**
+   - Steps: enter learner.example.com and any password.
+   - Expected: email format validation blocks submit.
+
+5. **Forgot password availability**
+   - Steps: open forgot password, enter registered email.
+   - Expected: recovery flow starts with safe confirmation copy.
+
+## Artifact seed
+
+Use this lesson to fill **Evidence** and **Decision**: attach checklist, test case results, and the release recommendation for login readiness.`,
+          ru: `## Сцена: передача команде
+
+Разработчик спрашивает: "Можешь прислать login checks до того, как я закончу fix?" Здесь работа junior QA становится полезной. Вы не отправляете стену теории. Вы отправляете компактный checklist и пять воспроизводимых test case.
+
+## Checklist
+
+- page loads, все контролы видны
+- submit disabled, пока required fields невалидны
+- valid login ведёт в подтверждённое место назначения
+- invalid password показывает нейтральный error copy
+- empty email и password показывают inline validation
+- remember me меняет persistence session
+- forgot password открывает recovery flow
+- refresh после login сохраняет ожидаемое состояние
+
+## Пять подробных test case
+
+1. **Successful login**
+   - Preconditions: существует registered active user.
+   - Steps: ввести valid email/password, submit.
+   - Expected: открывается dashboard или последний активный module.
+
+2. **Wrong password**
+   - Steps: ввести valid email и wrong password.
+   - Expected: показана нейтральная ошибка, user остаётся logged out.
+
+3. **Empty required fields**
+   - Steps: оставить email/password пустыми и попробовать submit.
+   - Expected: появляется inline validation и request не отправляется.
+
+4. **Invalid email format**
+   - Steps: ввести learner.example.com и любой password.
+   - Expected: email format validation блокирует submit.
+
+5. **Forgot password availability**
+   - Steps: открыть forgot password, ввести registered email.
+   - Expected: recovery flow стартует с безопасным confirmation copy.
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Evidence** и **Вывод**: приложите checklist, результаты test case и release recommendation по готовности login.`,
         },
       },
     ],
