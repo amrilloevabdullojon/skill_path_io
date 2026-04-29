@@ -79,6 +79,59 @@ const phaseItems = [
   },
 ];
 
+const starterSnippets: Record<WorkspaceDraftField, Array<{ label: string; text: string }>> = {
+  observation: [
+    {
+      label: "UI факт",
+      text: "Наблюдение: пользователь видит [экран/состояние], но не получает понятного подтверждения следующего шага.",
+    },
+    {
+      label: "API факт",
+      text: "Наблюдение: запрос [endpoint/action] возвращает [status/result], но ожидаемый результат для пользователя не очевиден.",
+    },
+  ],
+  risk: [
+    {
+      label: "Пользовательский риск",
+      text: "Риск: пользователь может потерять прогресс или принять неверное решение, потому что система не показывает [важный сигнал].",
+    },
+    {
+      label: "Риск релиза",
+      text: "Риск: если это уйдёт в релиз без проверки, команда может получить регрессию в [критичный сценарий].",
+    },
+  ],
+  testIdea: [
+    {
+      label: "Happy + edge",
+      text: "Проверка: пройти happy path с валидными данными, затем повторить сценарий с граничным условием [edge case].",
+    },
+    {
+      label: "Regression check",
+      text: "Проверка: сверить новый результат с предыдущим поведением и убедиться, что связанный сценарий [scenario] не сломан.",
+    },
+  ],
+  evidence: [
+    {
+      label: "Steps/result",
+      text: "Evidence: шаги воспроизведения, тестовые данные, expected result, actual result и ссылка/скриншот подтверждения.",
+    },
+    {
+      label: "Request/response",
+      text: "Evidence: request payload, response status/body, timestamp и окружение, где проверка была выполнена.",
+    },
+  ],
+  decision: [
+    {
+      label: "Fix",
+      text: "Вывод: рекомендую исправить [что именно], затем выполнить retest по основному сценарию и одному edge case.",
+    },
+    {
+      label: "Clarify",
+      text: "Вывод: перед тестированием нужно уточнить [открытый вопрос], потому что сейчас критерий успеха неоднозначен.",
+    },
+  ],
+};
+
 function buildArtifact(draft: WorkspaceDraft, moduleTitle: string, finalChallenge: string) {
   return [
     `# ${moduleTitle}: рабочий артефакт`,
@@ -294,6 +347,33 @@ export function ModuleArtifactWorkspace({
     setPortfolioSaved(false);
   }
 
+  function insertStarter(field: WorkspaceDraftField, text: string) {
+    setDraft((current) => ({
+      ...current,
+      [field]: appendUnique(current[field], text),
+    }));
+    setPortfolioSaved(false);
+    setReviewPlanApplied(false);
+    window.setTimeout(() => focusField(field), 50);
+  }
+
+  function renderStarters(field: WorkspaceDraftField) {
+    return (
+      <div className="flex flex-wrap gap-1.5">
+        {starterSnippets[field].map((snippet) => (
+          <button
+            key={snippet.label}
+            type="button"
+            onClick={() => insertStarter(field, snippet.text)}
+            className="rounded-full border border-border/60 bg-card/55 px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-foreground"
+          >
+            + {snippet.label}
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   function saveDraft() {
     const timestamp = new Date().toISOString();
     window.localStorage.setItem(storageKey, JSON.stringify({ ...draft, savedAt: timestamp }));
@@ -450,6 +530,7 @@ export function ModuleArtifactWorkspace({
                 className="textarea-base min-h-[112px] bg-background/70"
                 placeholder="Что вы заметили в требованиях, UI, API, данных или поведении системы?"
               />
+              {renderStarters("observation")}
             </label>
             <label className="space-y-1.5">
               <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Риск</span>
@@ -462,6 +543,7 @@ export function ModuleArtifactWorkspace({
                 className="textarea-base min-h-[112px] bg-background/70"
                 placeholder="Что может сломаться для пользователя, бизнеса или команды?"
               />
+              {renderStarters("risk")}
             </label>
             <label className="space-y-1.5">
               <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Проверка</span>
@@ -474,6 +556,7 @@ export function ModuleArtifactWorkspace({
                 className="textarea-base min-h-[112px] bg-background/70"
                 placeholder="Какой тест, чеклист или сценарий докажет, что риск закрыт?"
               />
+              {renderStarters("testIdea")}
             </label>
             <label className="space-y-1.5">
               <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Evidence</span>
@@ -486,6 +569,7 @@ export function ModuleArtifactWorkspace({
                 className="textarea-base min-h-[112px] bg-background/70"
                 placeholder="Какие факты, шаги, ожидаемый результат или скриншоты нужно приложить?"
               />
+              {renderStarters("evidence")}
             </label>
           </div>
 
@@ -500,6 +584,7 @@ export function ModuleArtifactWorkspace({
               className="textarea-base min-h-[104px] bg-background/70"
               placeholder="Что вы рекомендуете сделать дальше: исправить, уточнить, покрыть тестами или принять риск?"
             />
+            {renderStarters("decision")}
           </label>
 
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
