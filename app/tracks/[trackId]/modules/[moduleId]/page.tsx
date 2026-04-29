@@ -10,6 +10,7 @@ import { AIExerciseReview } from "@/components/simulation/ai-exercise-review";
 import { LessonBlockRenderer } from "@/components/tracks/lesson-block-renderer";
 import { LearningFlowTree } from "@/components/tracks/learning-flow-tree";
 import { MarkModuleCompleteButton } from "@/components/tracks/mark-module-complete-button";
+import { ModuleArtifactWorkspace } from "@/components/tracks/module-artifact-workspace";
 import { ModuleReadingProgress } from "@/components/tracks/module-reading-progress";
 import { ModuleSidebarNav } from "@/components/tracks/module-sidebar-nav";
 import { QaScenarioLab } from "@/components/tracks/qa-scenario-lab";
@@ -351,6 +352,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
     ...(showQaScenarioLab ? [{ id: "scenario-lab", label: "QA симулятор" }] : []),
     { id: "lessons-timeline", label: "Путь обучения" },
     { id: "lesson-content", label: "Уроки модуля" },
+    { id: "module-phases", label: "Фазы работы" },
     { id: "practical-task", label: "Практическое задание" },
     ...(currentModule.quiz ? [{ id: "module-quiz", label: "Тест" }] : []),
     ...(currentModuleCard.simulationCount > 0 ? [{ id: "module-simulation", label: "Симуляция" }] : []),
@@ -582,6 +584,14 @@ export default async function ModulePage({ params }: ModulePageProps) {
             </div>
             <LessonBlockRenderer blocks={lessonBlocks} />
           </section>
+
+          <ModuleArtifactWorkspace
+            moduleId={currentModule.id}
+            moduleTitle={currentModule.title}
+            trackTitle={track.title}
+            finalChallenge={parsedContent.finalChallenge}
+            skills={(parsedContent.whatYouWillLearn.length > 0 ? parsedContent.whatYouWillLearn : currentModuleCard.outcomes).slice(0, 8)}
+          />
 
           <section id="practical-task" className="space-y-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md p-4 sm:p-5">
             <h2 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300">Практическое задание</h2>
