@@ -42,6 +42,14 @@ type GrowthEvent = {
   createdAt: string;
 };
 
+type FieldHealth = {
+  field: WorkspaceDraftField;
+  score: number;
+  status: "empty" | "weak" | "growing" | "strong";
+  label: string;
+  guidance: string;
+};
+
 type ModuleArtifactWorkspaceProps = {
   moduleId: string;
   moduleTitle: string;
@@ -148,6 +156,29 @@ const fieldLabels: Record<WorkspaceDraftField, string> = {
   decision: "Вывод",
 };
 
+const fieldHealthRules: Record<WorkspaceDraftField, { strongTerms: string[]; guidance: string }> = {
+  observation: {
+    strongTerms: ["пользователь", "ui", "api", "данн", "экран", "status", "result"],
+    guidance: "Добавьте конкретный факт: экран, API, данные или наблюдаемое поведение.",
+  },
+  risk: {
+    strongTerms: ["риск", "пользователь", "потер", "регресс", "релиз", "слом", "impact"],
+    guidance: "Покажите, кому навредит проблема и что может сломаться в продукте.",
+  },
+  testIdea: {
+    strongTerms: ["провер", "expected", "actual", "edge", "happy", "regression", "сценар"],
+    guidance: "Опишите проверку как сценарий: шаг, ожидание и один edge case.",
+  },
+  evidence: {
+    strongTerms: ["шаг", "expected", "actual", "request", "response", "скрин", "окруж", "timestamp"],
+    guidance: "Добавьте доказательства: шаги, expected/actual, request/response или скриншот.",
+  },
+  decision: {
+    strongTerms: ["исправ", "уточн", "retest", "рекоменд", "вывод", "план", "след"],
+    guidance: "Закройте артефакт решением: исправить, уточнить, покрыть тестами или принять риск.",
+  },
+};
+
 function buildArtifact(draft: WorkspaceDraft, moduleTitle: string, finalChallenge: string) {
   return [
     `# ${moduleTitle}: рабочий артефакт`,
@@ -231,6 +262,51 @@ function growthEventClass(type: GrowthEvent["type"]) {
     return "border-emerald-500/35 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
   }
   return "border-border/60 bg-card/60 text-muted-foreground";
+}
+
+function calculateFieldHealth(field: WorkspaceDraftField, value: string): FieldHealth {
+  const normalized = value.trim().toLowerCase();
+  const rules = fieldHealthRules[field];
+  const matchedTerms = rules.strongTerms.filter((term) => normalized.includes(term)).length;
+  const lengthScore = Math.min(55, Math.floor(normalized.length / 2.8));
+  const signalScore = Math.min(45, matchedTerms * 12);
+  const score = normalized.length === 0 ? 0 : Math.min(100, lengthScore + signalScore);
+  const status: FieldHealth["status"] =
+    score >= 78 ? "strong" : score >= 45 ? "growing" : score > 0 ? "weak" : "empty";
+
+  return {
+    field,
+    score,
+    status,
+    label: fieldLabels[field],
+    guidance: status === "strong" ? "Ветка выглядит зрелой. Можно связывать её с AI-review." : rules.guidance,
+  };
+}
+
+function fieldHealthClass(status: FieldHealth["status"]) {
+  if (status === "strong") {
+    return "border-emerald-500/35 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
+  }
+  if (status === "growing") {
+    return "border-sky-500/35 bg-sky-500/10 text-sky-700 dark:text-sky-300";
+  }
+  if (status === "weak") {
+    return "border-amber-500/35 bg-amber-500/10 text-amber-700 dark:text-amber-300";
+  }
+  return "border-border/60 bg-card/55 text-muted-foreground";
+}
+
+function fieldHealthStatusLabel(status: FieldHealth["status"]) {
+  if (status === "strong") {
+    return "зрелая";
+  }
+  if (status === "growing") {
+    return "растёт";
+  }
+  if (status === "weak") {
+    return "слабая";
+  }
+  return "пустая";
 }
 
 function appendUnique(current: string, next: string) {
@@ -367,6 +443,9 @@ export function ModuleArtifactWorkspace({
   const reviewReady = Boolean(review);
   const strongReview = Boolean(review?.score && review.score >= 85);
   const growthLabel = growthStageLabel(readiness, review, portfolioSaved);
+  const fieldHealth = (Object.keys(emptyDraft) as WorkspaceDraftField[]).map((field) => calculateFieldHealth(field, draft[field]));
+  const artifactHealth = Math.round(fieldHealth.reduce((sum, item) => sum + item.score, 0) / fieldHealth.length);
+  const weakestField = fieldHealth.find((item) => item.status !== "strong") ?? null;
   const growthMilestones = [
     {
       id: "observation",
@@ -720,6 +799,57 @@ export function ModuleArtifactWorkspace({
         </div>
 
         <aside className="space-y-4">
+          <article className="rounded-2xl border border-border/60 bg-background/55 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="kicker">Здоровье веток</p>
+                <p className="mt-1 text-sm font-semibold text-foreground">Качество артефакта до AI-review</p>
+              </div>
+              <span className="rounded-full border border-border/60 bg-card/70 px-3 py-1 text-xs text-muted-foreground">
+                {artifactHealth}%
+              </span>
+            </div>
+            <div className="mt-3 space-y-2">
+              {fieldHealth.map((item) => (
+                <button
+                  key={item.field}
+                  type="button"
+                  onClick={() => focusField(item.field)}
+                  className={cn("w-full rounded-2xl border px-3 py-2 text-left transition-colors hover:border-emerald-500/45", fieldHealthClass(item.status))}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-semibold text-foreground">{item.label}</span>
+                    <span className="shrink-0 text-[11px] uppercase tracking-wide">{fieldHealthStatusLabel(item.status)}</span>
+                  </div>
+                  <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-background/70">
+                    <div className="h-full rounded-full bg-current transition-all" style={{ width: `${item.score}%` }} />
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="mt-3 rounded-2xl border border-border/60 bg-card/55 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Что усилить</p>
+              {weakestField ? (
+                <>
+                  <p className="mt-1 text-sm font-semibold text-foreground">{weakestField.label}</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">{weakestField.guidance}</p>
+                  <button
+                    type="button"
+                    onClick={() => focusField(weakestField.field)}
+                    className="btn-secondary mt-3 inline-flex w-full items-center justify-center gap-2 text-xs"
+                  >
+                    Усилить ветку
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </>
+              ) : (
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  Все ветки достаточно зрелые. Следующий логичный шаг - AI-review и сохранение результата.
+                </p>
+              )}
+            </div>
+          </article>
+
           <article className="overflow-hidden rounded-2xl border border-emerald-500/25 bg-background/55 p-4">
             <div className="flex items-start justify-between gap-3">
               <div>
