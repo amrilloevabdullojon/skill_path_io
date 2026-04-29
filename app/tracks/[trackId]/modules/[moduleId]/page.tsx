@@ -560,6 +560,26 @@ export default async function ModulePage({ params }: ModulePageProps) {
                 Каждый урок оформлен как отдельная рабочая смена: сначала цель, затем материал, затем артефакт для портфолио.
               </p>
             </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              <article className="rounded-2xl border border-emerald-500/25 bg-emerald-500/8 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-300">Контракт модуля</p>
+                <p className="mt-2 text-sm leading-6 text-foreground/80">
+                  Читайте уроки как рабочий кейс: в каждом нужно оставить след в виде заметки, checklist, finding или test case.
+                </p>
+              </article>
+              <article className="rounded-2xl border border-sky-500/25 bg-sky-500/8 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-sky-600 dark:text-sky-300">Темп</p>
+                <p className="mt-2 text-sm leading-6 text-foreground/80">
+                  Один урок - одна короткая смена на 15-20 минут. Не закрывайте всё чтением, фиксируйте evidence.
+                </p>
+              </article>
+              <article className="rounded-2xl border border-amber-500/25 bg-amber-500/8 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-300">Финиш</p>
+                <p className="mt-2 text-sm leading-6 text-foreground/80">
+                  Итогом модуля должен быть один пригодный для портфолио артефакт и готовность пройти quiz.
+                </p>
+              </article>
+            </div>
             <LessonBlockRenderer blocks={lessonBlocks} />
           </section>
 

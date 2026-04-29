@@ -8,6 +8,7 @@ import {
   BookOpenCheck,
   CheckCircle2,
   ClipboardCheck,
+  Gauge,
   FileText,
   Lightbulb,
   PlayCircle,
@@ -129,12 +130,39 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                 </div>
               </header>
 
-              <div className="grid gap-5 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
+              <div className="border-b border-border/40 bg-background/20 p-4 sm:p-5">
+                <div className="grid gap-3 md:grid-cols-3">
+                  {lesson.shiftPlan.map((item, index) => (
+                    <div key={item} className="rounded-2xl border border-border/40 bg-background/45 p-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-300">
+                        Шаг {index + 1}
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-foreground/80">{item}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid gap-5 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_17rem]">
                 <article className="markdown-content min-w-0">
                   <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{block.content || ""}</ReactMarkdown>
                 </article>
 
                 <aside className="space-y-3 lg:sticky lg:top-32 lg:self-start">
+                  <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/8 p-4">
+                    <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                      <Gauge className="h-4 w-4 text-emerald-500" />
+                      Готово, когда
+                    </p>
+                    <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                      {lesson.doneCriteria.map((item) => (
+                        <li key={item} className="flex gap-2">
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                   <div className="rounded-2xl border border-border/40 bg-background/45 p-4">
                     <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
                       <ClipboardCheck className="h-4 w-4 text-emerald-500" />

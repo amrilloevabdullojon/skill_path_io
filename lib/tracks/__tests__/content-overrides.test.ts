@@ -102,6 +102,8 @@ describe("content overrides", () => {
     const lessonPanels = blocks.filter((block) => block.type === "lesson_panel");
     expect(lessonPanels).toHaveLength(3);
     expect(lessonPanels[0]?.lesson?.artifact).toBe("QA intake note or risk list");
+    expect(lessonPanels[0]?.lesson?.shiftPlan).toHaveLength(3);
+    expect(lessonPanels[0]?.lesson?.doneCriteria).toHaveLength(3);
     expect(lessonPanels[0]?.content).toBe("Body one");
     expect(blocks.some((block) => block.type === "callout" && block.title === "10-minute mission")).toBe(true);
     expect(blocks.some((block) => block.type === "list" && block.title === "Beginner step-by-step plan")).toBe(true);

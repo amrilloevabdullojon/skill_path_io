@@ -61,6 +61,8 @@ export type LessonBlock = {
     mission: string;
     artifact: string;
     checkpoint: string;
+    shiftPlan: string[];
+    doneCriteria: string[];
   };
   quickCheck?: LessonQuickCheck;
   challengePrompt?: string;
@@ -286,6 +288,54 @@ function lessonArtifact(category: TrackCategory, lesson: LessonLike, locale: "en
   return locale === "ru" ? "Короткий insight с метрикой и действием" : "Short insight with metric and action";
 }
 
+function lessonShiftPlan(category: TrackCategory, lesson: LessonLike, locale: "en" | "ru") {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? [
+          `Разберите кейс "${lesson.title}" как рабочую задачу, а не как теорию.`,
+          "Выпишите один риск, один вопрос команде и один ожидаемый результат.",
+          "Соберите мини-артефакт: заметку, checklist, finding или test case.",
+        ]
+      : [
+          `Treat "${lesson.title}" as a work task, not as theory.`,
+          "Write one risk, one team question, and one expected result.",
+          "Build a mini artifact: note, checklist, finding, or test case.",
+        ];
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? ["Найдите цель пользователя.", "Уберите расплывчатые слова.", "Запишите acceptance criteria."]
+      : ["Find the user goal.", "Remove vague wording.", "Write acceptance criteria."];
+  }
+  return locale === "ru"
+    ? ["Назовите бизнес-вопрос.", "Выберите метрику.", "Сформулируйте действие."]
+    : ["Name the business question.", "Pick the metric.", "State the action."];
+}
+
+function lessonDoneCriteria(category: TrackCategory, locale: "en" | "ru") {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? [
+          "Есть конкретный проверяемый сценарий.",
+          "Есть evidence: шаги, данные, screenshot, request или expected result.",
+          "Понятно, что делать дальше: retest, bug report, question или quiz.",
+        ]
+      : [
+          "There is a concrete testable scenario.",
+          "There is evidence: steps, data, screenshot, request, or expected result.",
+          "The next action is clear: retest, bug report, question, or quiz.",
+        ];
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? ["Требование можно проверить.", "Есть критерии приемки.", "Есть открытые вопросы."]
+      : ["The requirement is testable.", "Acceptance criteria exist.", "Open questions are captured."];
+  }
+  return locale === "ru"
+    ? ["Метрика названа.", "Риск данных отмечен.", "Вывод связан с действием."]
+    : ["Metric is named.", "Data risk is noted.", "Insight is tied to an action."];
+}
+
 export function buildLessonBlocks(params: {
   category: TrackCategory;
   locale?: "en" | "ru";
@@ -354,6 +404,8 @@ export function buildLessonBlocks(params: {
           checkpoint: locale === "ru"
             ? "После чтения запишите 3 строки: что проверю, какой риск ищу, какой evidence приложу."
             : "After reading, write 3 lines: what I check, what risk I look for, what evidence I attach.",
+          shiftPlan: lessonShiftPlan(category, lesson, locale),
+          doneCriteria: lessonDoneCriteria(category, locale),
         },
       },
     ]));
