@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { TrackCategory } from "@prisma/client";
 
 import { RuntimeCourse } from "@/lib/learning/content-types";
-import { applyTrackContentOverrides } from "@/lib/tracks/content-overrides";
+import { applyTrackContentOverrides, normalizeLearningLocale } from "@/lib/tracks/content-overrides";
 import { buildLessonBlocks } from "@/lib/tracks/lesson-blocks";
 
 function buildRuntimeCourse(): RuntimeCourse {
@@ -72,6 +72,12 @@ function buildRuntimeCourse(): RuntimeCourse {
 }
 
 describe("content overrides", () => {
+  it("defaults learning content to Russian when no locale is set", () => {
+    expect(normalizeLearningLocale(undefined)).toBe("ru");
+    expect(normalizeLearningLocale("")).toBe("ru");
+    expect(normalizeLearningLocale("en")).toBe("en");
+  });
+
   it("localizes QA course content in Russian", () => {
     const course = applyTrackContentOverrides(buildRuntimeCourse(), "ru");
 

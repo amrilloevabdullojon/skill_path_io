@@ -2040,7 +2040,7 @@ function applyModuleOverride(
 }
 
 export function normalizeLearningLocale(value: string | undefined): LearningLocale {
-  return value === "ru" ? "ru" : "en";
+  return value === "en" ? "en" : "ru";
 }
 
 export function applyTrackContentOverrides(course: RuntimeCourse, locale: LearningLocale): RuntimeCourse {

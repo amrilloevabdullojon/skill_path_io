@@ -8,7 +8,7 @@ function resolveLocale(raw: string | undefined): Locale {
   if (raw && (SUPPORTED_LOCALES as readonly string[]).includes(raw)) {
     return raw as Locale;
   }
-  return "en";
+  return "ru";
 }
 
 export default getRequestConfig(async () => {
