@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, CheckCircle2, ClipboardCheck, History, Inbox, Loader2, RotateCcw, Save, Sparkles, Trophy } from "lucide-react";
 
 import { upsertPortfolioEntry } from "@/lib/portfolio/local-portfolio";
+import { buildModuleShiftSeed, type ModuleShiftBrief } from "@/lib/tracks/module-brief";
 import { cn } from "@/lib/utils";
 
 type ReviewResult = {
@@ -37,7 +38,7 @@ type ArtifactSnippet = {
 
 type GrowthEvent = {
   id: string;
-  type: "lesson" | "starter" | "save" | "review" | "plan" | "portfolio";
+  type: "lesson" | "starter" | "brief" | "save" | "review" | "plan" | "portfolio";
   title: string;
   detail: string;
   createdAt: string;
@@ -57,6 +58,7 @@ type ModuleArtifactWorkspaceProps = {
   trackTitle: string;
   finalChallenge: string;
   skills: string[];
+  shiftBrief?: ModuleShiftBrief | null;
 };
 
 const emptyDraft: WorkspaceDraft = {
@@ -260,7 +262,7 @@ function growthEventClass(type: GrowthEvent["type"]) {
   if (type === "review" || type === "plan") {
     return "border-sky-500/35 bg-sky-500/10 text-sky-700 dark:text-sky-300";
   }
-  if (type === "lesson" || type === "starter") {
+  if (type === "lesson" || type === "starter" || type === "brief") {
     return "border-emerald-500/35 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
   }
   return "border-border/60 bg-card/60 text-muted-foreground";
@@ -426,6 +428,7 @@ export function ModuleArtifactWorkspace({
   trackTitle,
   finalChallenge,
   skills,
+  shiftBrief,
 }: ModuleArtifactWorkspaceProps) {
   const storageKey = `levio:module-artifact:${moduleId}`;
   const growthEventsStorageKey = `${storageKey}:growth-events`;
@@ -599,6 +602,35 @@ export function ModuleArtifactWorkspace({
     window.setTimeout(() => focusField(field), 50);
   }
 
+  function plantShiftBrief() {
+    if (!shiftBrief) {
+      return;
+    }
+
+    const seed = buildModuleShiftSeed(shiftBrief);
+    setDraft((current) => {
+      const nextDraft: WorkspaceDraft = {
+        ...current,
+        observation: appendUnique(current.observation, seed.observation),
+        risk: appendUnique(current.risk, seed.risk),
+        testIdea: appendUnique(current.testIdea, seed.testIdea),
+        decision: appendUnique(current.decision, seed.decision),
+      };
+      const timestamp = new Date().toISOString();
+      window.localStorage.setItem(storageKey, JSON.stringify({ ...nextDraft, savedAt: timestamp }));
+      setSavedAt(timestamp);
+      return nextDraft;
+    });
+    setPortfolioSaved(false);
+    setReviewPlanApplied(false);
+    addGrowthEvent({
+      type: "brief",
+      title: "Бриф посажен в артефакт",
+      detail: "Сцена, риск, маршрут и итог смены добавлены как стартовые ветки",
+    });
+    window.setTimeout(() => focusField("observation"), 50);
+  }
+
   function renderStarters(field: WorkspaceDraftField) {
     return (
       <div className="flex flex-wrap gap-1.5">
@@ -760,6 +792,23 @@ export function ModuleArtifactWorkspace({
               </p>
             </div>
           </header>
+
+          {shiftBrief ? (
+            <article className="rounded-2xl border border-emerald-500/25 bg-emerald-500/8 p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Seed из брифа смены</p>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    Посадите сцену, ставки и маршрут модуля в артефакт, чтобы не начинать с пустого листа.
+                  </p>
+                </div>
+                <button type="button" onClick={plantShiftBrief} className="btn-secondary inline-flex shrink-0 items-center justify-center gap-2 text-xs">
+                  Посадить seed
+                  <Sparkles className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </article>
+          ) : null}
 
           <div className="grid gap-3 md:grid-cols-4">
             {phaseItems.map((phase, index) => {

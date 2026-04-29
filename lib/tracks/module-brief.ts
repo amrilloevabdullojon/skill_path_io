@@ -5,6 +5,13 @@ export type ModuleShiftBrief = {
   artifact: string;
 };
 
+export type ModuleShiftSeed = {
+  observation: string;
+  risk: string;
+  testIdea: string;
+  decision: string;
+};
+
 type LessonBriefInput = {
   title: string;
 };
@@ -46,5 +53,14 @@ export function buildQaShiftBrief(params: {
     ...baseBrief,
     route: params.lessons.slice(0, 3).map((lesson, index) => `${index + 1}. ${lesson.title}`),
     artifact: params.finalChallenge,
+  };
+}
+
+export function buildModuleShiftSeed(brief: ModuleShiftBrief): ModuleShiftSeed {
+  return {
+    observation: `Наблюдение: ${brief.scene}`,
+    risk: `Риск: ${brief.stakes}`,
+    testIdea: `Проверка: пройти маршрут уроков как один рабочий кейс: ${brief.route.join(" -> ")}.`,
+    decision: `Вывод: итогом смены должен стать артефакт: ${brief.artifact}`,
   };
 }

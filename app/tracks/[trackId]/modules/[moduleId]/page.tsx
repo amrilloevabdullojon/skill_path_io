@@ -643,6 +643,7 @@ export default async function ModulePage({ params }: ModulePageProps) {
             trackTitle={track.title}
             finalChallenge={parsedContent.finalChallenge}
             skills={(parsedContent.whatYouWillLearn.length > 0 ? parsedContent.whatYouWillLearn : currentModuleCard.outcomes).slice(0, 8)}
+            shiftBrief={qaShiftBrief}
           />
 
           <section id="practical-task" className="space-y-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md p-4 sm:p-5">
