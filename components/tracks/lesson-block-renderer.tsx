@@ -14,6 +14,7 @@ import {
   Lightbulb,
   PlayCircle,
   Quote,
+  Send,
   Sparkles,
   Target,
 } from "lucide-react";
@@ -36,6 +37,27 @@ const decisionToneStyles: Record<LessonDecisionOption["tone"], string> = {
   risk: "border-amber-500/35 bg-amber-500/10 text-amber-700 dark:text-amber-300",
   mastery: "border-sky-500/35 bg-sky-500/10 text-sky-700 dark:text-sky-300",
 };
+
+const artifactSnippetEventName = "levio:artifact-snippet";
+
+function sendDecisionToArtifact(params: {
+  sourceId: string;
+  lessonTitle: string;
+  decision: LessonDecisionOption;
+}) {
+  window.dispatchEvent(
+    new CustomEvent(artifactSnippetEventName, {
+      detail: {
+        sourceId: params.sourceId,
+        lessonTitle: params.lessonTitle,
+        selectedLabel: params.decision.label,
+        action: params.decision.action,
+        consequence: params.decision.consequence,
+        artifactHint: params.decision.artifactHint,
+      },
+    }),
+  );
+}
 
 function BlockCard({
   title,
@@ -208,6 +230,22 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                           <div className={cn("rounded-2xl border p-3", decisionToneStyles[selectedDecision.tone])}>
                             <p className="text-xs font-semibold uppercase tracking-wide opacity-75">Последствие</p>
                             <p className="mt-1 text-sm leading-6">{selectedDecision.consequence}</p>
+                          </div>
+                          <div className="md:col-span-2">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                sendDecisionToArtifact({
+                                  sourceId: block.id,
+                                  lessonTitle: lesson.title,
+                                  decision: selectedDecision,
+                                })
+                              }
+                              className="btn-secondary inline-flex w-full items-center justify-center gap-2 sm:w-auto"
+                            >
+                              <Send className="h-4 w-4" />
+                              Перенести в артефакт
+                            </button>
                           </div>
                         </div>
                       ) : null}

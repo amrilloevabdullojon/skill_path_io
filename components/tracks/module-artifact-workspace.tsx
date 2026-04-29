@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, CheckCircle2, ClipboardCheck, Loader2, RotateCcw, Save, Sparkles, Trophy } from "lucide-react";
+import { ArrowRight, CheckCircle2, ClipboardCheck, Inbox, Loader2, RotateCcw, Save, Sparkles, Trophy } from "lucide-react";
 
 import { upsertPortfolioEntry } from "@/lib/portfolio/local-portfolio";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,15 @@ type WorkspaceDraft = {
   decision: string;
 };
 
+type ArtifactSnippet = {
+  sourceId: string;
+  lessonTitle: string;
+  selectedLabel: string;
+  action: string;
+  consequence: string;
+  artifactHint: string;
+};
+
 type ModuleArtifactWorkspaceProps = {
   moduleId: string;
   moduleTitle: string;
@@ -38,6 +47,8 @@ const emptyDraft: WorkspaceDraft = {
   evidence: "",
   decision: "",
 };
+
+const artifactSnippetEventName = "levio:artifact-snippet";
 
 const phaseItems = [
   {
@@ -103,6 +114,30 @@ function scoreLabel(result: ReviewResult | null) {
   return "вернуться к фазе 1";
 }
 
+function appendUnique(current: string, next: string) {
+  const trimmedNext = next.trim();
+  if (!trimmedNext) {
+    return current;
+  }
+  if (current.includes(trimmedNext)) {
+    return current;
+  }
+  return current.trim().length > 0 ? `${current.trim()}\n\n${trimmedNext}` : trimmedNext;
+}
+
+function applySnippetToDraft(current: WorkspaceDraft, snippet: ArtifactSnippet): WorkspaceDraft {
+  return {
+    observation: appendUnique(
+      current.observation,
+      `[${snippet.lessonTitle}] Выбранный ход: ${snippet.selectedLabel}. ${snippet.action}`,
+    ),
+    risk: appendUnique(current.risk, snippet.consequence),
+    testIdea: appendUnique(current.testIdea, snippet.artifactHint),
+    evidence: current.evidence,
+    decision: appendUnique(current.decision, `Продолжить через "${snippet.selectedLabel}" и проверить результат в итоговом артефакте.`),
+  };
+}
+
 export function ModuleArtifactWorkspace({
   moduleId,
   moduleTitle,
@@ -116,6 +151,7 @@ export function ModuleArtifactWorkspace({
   const [portfolioSaved, setPortfolioSaved] = useState(false);
   const [review, setReview] = useState<ReviewResult | null>(null);
   const [errorText, setErrorText] = useState<string | null>(null);
+  const [importedSnippet, setImportedSnippet] = useState<ArtifactSnippet | null>(null);
   const [isReviewing, setIsReviewing] = useState(false);
 
   useEffect(() => {
@@ -137,6 +173,29 @@ export function ModuleArtifactWorkspace({
     } catch {
       window.localStorage.removeItem(storageKey);
     }
+  }, [storageKey]);
+
+  useEffect(() => {
+    function handleSnippet(event: Event) {
+      const snippet = (event as CustomEvent<ArtifactSnippet>).detail;
+      if (!snippet?.sourceId || !snippet.lessonTitle) {
+        return;
+      }
+
+      setDraft((current) => {
+        const nextDraft = applySnippetToDraft(current, snippet);
+        const timestamp = new Date().toISOString();
+        window.localStorage.setItem(storageKey, JSON.stringify({ ...nextDraft, savedAt: timestamp }));
+        setSavedAt(timestamp);
+        return nextDraft;
+      });
+      setImportedSnippet(snippet);
+      setPortfolioSaved(false);
+      window.location.hash = "module-phases";
+    }
+
+    window.addEventListener(artifactSnippetEventName, handleSnippet);
+    return () => window.removeEventListener(artifactSnippetEventName, handleSnippet);
   }, [storageKey]);
 
   const artifact = useMemo(() => buildArtifact(draft, moduleTitle, finalChallenge), [draft, finalChallenge, moduleTitle]);
@@ -329,6 +388,12 @@ export function ModuleArtifactWorkspace({
 
           {savedAt ? (
             <p className="text-xs text-muted-foreground">Черновик сохранён: {new Date(savedAt).toLocaleString("ru-RU")}</p>
+          ) : null}
+          {importedSnippet ? (
+            <p className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-300">
+              <Inbox className="h-4 w-4" />
+              Добавлено из урока: {importedSnippet.lessonTitle}
+            </p>
           ) : null}
           {errorText ? <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-300">{errorText}</p> : null}
         </div>
