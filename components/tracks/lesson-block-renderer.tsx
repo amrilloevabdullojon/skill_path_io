@@ -44,6 +44,14 @@ const decisionToneStyles: Record<LessonDecisionOption["tone"], string> = {
   mastery: "border-sky-500/35 bg-sky-500/10 text-sky-700 dark:text-sky-300",
 };
 
+const artifactFieldLabels: Record<LessonDecisionOption["artifactField"], string> = {
+  observation: "Наблюдение",
+  risk: "Риск",
+  testIdea: "Проверка",
+  evidence: "Evidence",
+  decision: "Вывод",
+};
+
 const artifactSnippetEventName = "levio:artifact-snippet";
 const lessonDecisionStorageKey = "levio:lesson-decisions:v1";
 
@@ -115,6 +123,29 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
 
   const orderedBlocks = useMemo(() => blocks, [blocks]);
   const lessonPanels = useMemo(() => orderedBlocks.filter((block) => block.type === "lesson_panel" && block.lesson), [orderedBlocks]);
+  const decisionProgress = useMemo(() => {
+    const selected = lessonPanels
+      .map((block) => {
+        const memory = lessonDecisionState[block.id];
+        const decision = block.lesson?.decisionOptions.find((option) => option.id === memory?.decisionId);
+
+        return memory && decision ? { block, decision, memory } : null;
+      })
+      .filter(Boolean) as Array<{
+      block: LessonBlock;
+      decision: LessonDecisionOption;
+      memory: LessonDecisionMemory;
+    }>;
+    const transferred = selected.filter((item) => item.memory.transferredAt);
+    const activeFields = Array.from(new Set(transferred.map((item) => item.decision.artifactField)));
+
+    return {
+      selectedCount: selected.length,
+      transferredCount: transferred.length,
+      total: lessonPanels.length,
+      activeFields,
+    };
+  }, [lessonDecisionState, lessonPanels]);
 
   function updateLessonDecision(blockId: string, decisionId: string, transferred = false) {
     setLessonDecisionState((prev) => {
@@ -137,20 +168,88 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
       {lessonPanels.length > 1 ? (
         <nav className="sticky top-16 z-20 -mx-1 overflow-x-auto rounded-2xl border border-border/40 bg-background/85 p-2 shadow-lg shadow-black/5 backdrop-blur-xl">
           <div className="flex min-w-max items-center gap-2">
-            {lessonPanels.map((block) => (
-              <a
-                key={block.id}
-                href={`#${block.id}`}
-                className="inline-flex items-center gap-2 rounded-xl border border-border/40 bg-card/55 px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:border-emerald-400/40 hover:bg-emerald-500/10 hover:text-foreground"
-              >
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-[11px] text-emerald-500">
-                  {block.lesson?.order}
-                </span>
-                <span className="max-w-[11rem] truncate">{block.lesson?.title}</span>
-              </a>
-            ))}
+            {lessonPanels.map((block) => {
+              const memory = lessonDecisionState[block.id];
+              const decision = block.lesson?.decisionOptions.find((option) => option.id === memory?.decisionId);
+              const isTransferred = Boolean(memory?.transferredAt && decision);
+
+              return (
+                <a
+                  key={block.id}
+                  href={`#${block.id}`}
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition-colors hover:border-emerald-400/40 hover:bg-emerald-500/10 hover:text-foreground",
+                    isTransferred
+                      ? "border-emerald-500/35 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                      : memory
+                        ? "border-sky-500/35 bg-sky-500/10 text-sky-700 dark:text-sky-300"
+                        : "border-border/40 bg-card/55 text-muted-foreground",
+                  )}
+                >
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-background/55 text-[11px]">
+                    {isTransferred ? <CheckCircle2 className="h-3.5 w-3.5" /> : block.lesson?.order}
+                  </span>
+                  <span className="max-w-[11rem] truncate">{block.lesson?.title}</span>
+                </a>
+              );
+            })}
           </div>
         </nav>
+      ) : null}
+
+      {lessonPanels.length > 1 ? (
+        <section className="overflow-hidden rounded-3xl border border-emerald-500/25 bg-emerald-500/8 p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-1">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                <Sparkles className="h-4 w-4 text-emerald-500" />
+                Пульс дерева
+              </p>
+              <p className="text-sm leading-6 text-muted-foreground">
+                Выберите ход в каждом уроке и перенесите его в артефакт. Так ветки уроков превращаются в один рабочий результат.
+              </p>
+            </div>
+            <div className="grid gap-2 text-xs sm:grid-cols-3 lg:w-[28rem]">
+              <div className="rounded-2xl border border-border/45 bg-background/45 p-3">
+                <p className="text-muted-foreground">Выбрано ходов</p>
+                <p className="mt-1 text-lg font-semibold text-foreground">
+                  {decisionProgress.selectedCount}/{decisionProgress.total}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-border/45 bg-background/45 p-3">
+                <p className="text-muted-foreground">В артефакте</p>
+                <p className="mt-1 text-lg font-semibold text-foreground">
+                  {decisionProgress.transferredCount}/{decisionProgress.total}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-border/45 bg-background/45 p-3">
+                <p className="text-muted-foreground">Живые ветки</p>
+                <p className="mt-1 text-lg font-semibold text-foreground">
+                  {decisionProgress.activeFields.length}/5
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {(Object.keys(artifactFieldLabels) as Array<LessonDecisionOption["artifactField"]>).map((field) => {
+              const isActive = decisionProgress.activeFields.includes(field);
+
+              return (
+                <span
+                  key={field}
+                  className={cn(
+                    "rounded-full border px-2.5 py-1 text-[11px] font-semibold",
+                    isActive
+                      ? "border-emerald-500/35 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                      : "border-border/50 bg-card/55 text-muted-foreground",
+                  )}
+                >
+                  {artifactFieldLabels[field]}
+                </span>
+              );
+            })}
+          </div>
+        </section>
       ) : null}
 
       {orderedBlocks.map((block) => {
@@ -182,6 +281,12 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                       <span className="rounded-full border border-border/50 bg-card/65 px-3 py-1 text-xs text-muted-foreground">
                         Рабочая смена
                       </span>
+                      {transferredSelectedDecision && selectedDecision ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/35 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                          В артефакте: {artifactFieldLabels[selectedDecision.artifactField]}
+                        </span>
+                      ) : null}
                     </div>
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600/80 dark:text-emerald-300/80">
