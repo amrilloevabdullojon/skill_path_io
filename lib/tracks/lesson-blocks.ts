@@ -35,6 +35,15 @@ export type LessonQuickCheck = {
   explanation: string;
 };
 
+export type LessonDecisionOption = {
+  id: string;
+  label: string;
+  action: string;
+  consequence: string;
+  artifactHint: string;
+  tone: "growth" | "risk" | "mastery";
+};
+
 export type LessonBlock = {
   id: string;
   type: LessonBlockType;
@@ -63,6 +72,8 @@ export type LessonBlock = {
     checkpoint: string;
     shiftPlan: string[];
     doneCriteria: string[];
+    decisionPrompt: string;
+    decisionOptions: LessonDecisionOption[];
   };
   quickCheck?: LessonQuickCheck;
   challengePrompt?: string;
@@ -336,6 +347,190 @@ function lessonDoneCriteria(category: TrackCategory, locale: "en" | "ru") {
     : ["Metric is named.", "Data risk is noted.", "Insight is tied to an action."];
 }
 
+function lessonDecisionPrompt(category: TrackCategory, lesson: LessonLike, locale: "en" | "ru") {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? `Вы получили задачу по "${lesson.title}". Что сделаете первым, чтобы не просто читать, а реально сдвинуть работу?`
+      : `You got a task about "${lesson.title}". What do you do first to move the work forward instead of just reading?`;
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? `Стейкхолдер принёс идею по "${lesson.title}". Какой первый ход сделает требование проверяемым?`
+      : `A stakeholder brings an idea about "${lesson.title}". Which first move makes the requirement testable?`;
+  }
+  return locale === "ru"
+    ? `Вам дали вопрос по "${lesson.title}". Какой первый ход превратит данные в понятный вывод?`
+    : `You got a question about "${lesson.title}". Which first move turns data into a clear insight?`;
+}
+
+function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, locale: "en" | "ru"): LessonDecisionOption[] {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? [
+          {
+            id: `${lesson.id}-map-risk`,
+            label: "Сначала найти риск",
+            action: "Вы читаете задачу глазами пользователя и отмечаете, где он может застрять, потерять данные или получить неверный результат.",
+            consequence: "Появляется фокус для проверки: команда видит не список терминов, а конкретный продуктовый риск.",
+            artifactHint: "Запишите в артефакт: риск, affected user, expected result.",
+            tone: "growth",
+          },
+          {
+            id: `${lesson.id}-run-check`,
+            label: "Сразу проверить сценарий",
+            action: "Вы берёте самый частый путь пользователя и проходите его до наблюдаемого результата.",
+            consequence: "Вы быстро получаете evidence, но можете пропустить важный edge case, если не сформулируете риск.",
+            artifactHint: "Запишите: steps, test data, expected/actual result.",
+            tone: "mastery",
+          },
+          {
+            id: `${lesson.id}-ask-question`,
+            label: "Задать уточняющий вопрос",
+            action: "Вы фиксируете неизвестное: что считается успехом, какие ограничения есть, кто принимает результат.",
+            consequence: "Снижается риск тестировать не то, но работу нужно завершить конкретной проверкой.",
+            artifactHint: "Запишите: open question и как ответ повлияет на тест.",
+            tone: "risk",
+          },
+        ]
+      : [
+          {
+            id: `${lesson.id}-map-risk`,
+            label: "Find the risk first",
+            action: "You read the task like a user and mark where they can get stuck, lose data, or get a wrong result.",
+            consequence: "The work gets focus: the team sees a product risk instead of a list of terms.",
+            artifactHint: "Write down: risk, affected user, expected result.",
+            tone: "growth",
+          },
+          {
+            id: `${lesson.id}-run-check`,
+            label: "Run a scenario",
+            action: "You take the most common user path and follow it until an observable result.",
+            consequence: "You get evidence quickly, but can miss an edge case if the risk is not clear.",
+            artifactHint: "Write down: steps, test data, expected/actual result.",
+            tone: "mastery",
+          },
+          {
+            id: `${lesson.id}-ask-question`,
+            label: "Ask one question",
+            action: "You capture what is unknown: success criteria, constraints, and who accepts the result.",
+            consequence: "You reduce the risk of testing the wrong thing, but still need to finish with a concrete check.",
+            artifactHint: "Write down: open question and how the answer changes the test.",
+            tone: "risk",
+          },
+        ];
+  }
+
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? [
+          {
+            id: `${lesson.id}-user-goal`,
+            label: "Назвать пользователя и цель",
+            action: "Вы отделяете реальную цель пользователя от желаемого UI или готового решения.",
+            consequence: "Требование становится проще проверить и обсудить с командой.",
+            artifactHint: "Запишите: As a..., I want..., so that...",
+            tone: "growth",
+          },
+          {
+            id: `${lesson.id}-criteria`,
+            label: "Сразу написать критерии",
+            action: "Вы превращаете идею в условия, при которых задача считается готовой.",
+            consequence: "Команда быстрее понимает границы, но может понадобиться уточнить бизнес-ценность.",
+            artifactHint: "Запишите 2-3 acceptance criteria.",
+            tone: "mastery",
+          },
+          {
+            id: `${lesson.id}-question`,
+            label: "Уточнить спорное слово",
+            action: "Вы находите расплывчатую формулировку и задаёте один точный вопрос.",
+            consequence: "Снижается двусмысленность, но после ответа нужно обновить user story.",
+            artifactHint: "Запишите: vague word -> question -> decision.",
+            tone: "risk",
+          },
+        ]
+      : [
+          {
+            id: `${lesson.id}-user-goal`,
+            label: "Name user and goal",
+            action: "You separate the real user goal from a desired UI or preselected solution.",
+            consequence: "The requirement becomes easier to test and discuss with the team.",
+            artifactHint: "Write: As a..., I want..., so that...",
+            tone: "growth",
+          },
+          {
+            id: `${lesson.id}-criteria`,
+            label: "Write criteria",
+            action: "You turn the idea into conditions for when the work is done.",
+            consequence: "The team sees boundaries faster, but business value may still need clarification.",
+            artifactHint: "Write 2-3 acceptance criteria.",
+            tone: "mastery",
+          },
+          {
+            id: `${lesson.id}-question`,
+            label: "Clarify one vague word",
+            action: "You find ambiguous wording and ask one precise question.",
+            consequence: "Ambiguity drops, but the user story must be updated after the answer.",
+            artifactHint: "Write: vague word -> question -> decision.",
+            tone: "risk",
+          },
+        ];
+  }
+
+  return locale === "ru"
+    ? [
+        {
+          id: `${lesson.id}-metric`,
+          label: "Выбрать метрику",
+          action: "Вы связываете бизнес-вопрос с одним измеримым показателем.",
+          consequence: "Анализ получает фокус, но важно проверить качество данных.",
+          artifactHint: "Запишите: question -> metric -> why it matters.",
+          tone: "growth",
+        },
+        {
+          id: `${lesson.id}-quality`,
+          label: "Проверить качество данных",
+          action: "Вы ищете пропуски, выбросы и странные значения до вывода.",
+          consequence: "Вы снижаете риск неверной рекомендации, но можете замедлить получение insight.",
+          artifactHint: "Запишите: data issue -> impact -> fix/check.",
+          tone: "risk",
+        },
+        {
+          id: `${lesson.id}-insight`,
+          label: "Сформулировать вывод",
+          action: "Вы пишете короткое объяснение: что увидел, почему важно, что сделать.",
+          consequence: "Появляется понятный результат для неаналитика, если метрика выбрана корректно.",
+          artifactHint: "Запишите: observation -> implication -> action.",
+          tone: "mastery",
+        },
+      ]
+    : [
+        {
+          id: `${lesson.id}-metric`,
+          label: "Pick a metric",
+          action: "You connect the business question to one measurable signal.",
+          consequence: "The analysis gets focus, but data quality still needs checking.",
+          artifactHint: "Write: question -> metric -> why it matters.",
+          tone: "growth",
+        },
+        {
+          id: `${lesson.id}-quality`,
+          label: "Check data quality",
+          action: "You look for missing values, outliers, and strange records before making a claim.",
+          consequence: "You reduce the risk of a wrong recommendation, but insight may take longer.",
+          artifactHint: "Write: data issue -> impact -> fix/check.",
+          tone: "risk",
+        },
+        {
+          id: `${lesson.id}-insight`,
+          label: "State the insight",
+          action: "You write a short explanation: what I saw, why it matters, what to do.",
+          consequence: "A non-analyst gets a usable result if the metric is sound.",
+          artifactHint: "Write: observation -> implication -> action.",
+          tone: "mastery",
+        },
+      ];
+}
+
 export function buildLessonBlocks(params: {
   category: TrackCategory;
   locale?: "en" | "ru";
@@ -406,6 +601,8 @@ export function buildLessonBlocks(params: {
             : "After reading, write 3 lines: what I check, what risk I look for, what evidence I attach.",
           shiftPlan: lessonShiftPlan(category, lesson, locale),
           doneCriteria: lessonDoneCriteria(category, locale),
+          decisionPrompt: lessonDecisionPrompt(category, lesson, locale),
+          decisionOptions: lessonDecisionOptions(category, lesson, locale),
         },
       },
     ]));

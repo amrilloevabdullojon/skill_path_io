@@ -6,6 +6,7 @@ import rehypeHighlight from "rehype-highlight";
 import {
   AlertTriangle,
   BookOpenCheck,
+  BrainCircuit,
   CheckCircle2,
   ClipboardCheck,
   Gauge,
@@ -18,7 +19,8 @@ import {
 } from "lucide-react";
 
 import { AskAiHintButton } from "@/components/tracks/ask-ai-hint-button";
-import { LessonBlock } from "@/lib/tracks/lesson-blocks";
+import { LessonBlock, LessonDecisionOption } from "@/lib/tracks/lesson-blocks";
+import { cn } from "@/lib/utils";
 
 type LessonBlockRendererProps = {
   blocks: LessonBlock[];
@@ -27,6 +29,12 @@ type LessonBlockRendererProps = {
 type QuickCheckState = {
   selectedIndex: number | null;
   submitted: boolean;
+};
+
+const decisionToneStyles: Record<LessonDecisionOption["tone"], string> = {
+  growth: "border-emerald-500/35 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+  risk: "border-amber-500/35 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+  mastery: "border-sky-500/35 bg-sky-500/10 text-sky-700 dark:text-sky-300",
 };
 
 function BlockCard({
@@ -50,6 +58,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
   const [quickCheckState, setQuickCheckState] = useState<Record<string, QuickCheckState>>({});
   const [challengeDrafts, setChallengeDrafts] = useState<Record<string, string>>({});
   const [challengeSubmitted, setChallengeSubmitted] = useState<Record<string, boolean>>({});
+  const [lessonDecisionState, setLessonDecisionState] = useState<Record<string, string>>({});
 
   const orderedBlocks = useMemo(() => blocks, [blocks]);
   const lessonPanels = useMemo(() => orderedBlocks.filter((block) => block.type === "lesson_panel" && block.lesson), [orderedBlocks]);
@@ -81,6 +90,8 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
           if (!lesson) {
             return null;
           }
+          const selectedDecisionId = lessonDecisionState[block.id] ?? lesson.decisionOptions[0]?.id;
+          const selectedDecision = lesson.decisionOptions.find((option) => option.id === selectedDecisionId) ?? lesson.decisionOptions[0];
 
           return (
             <article
@@ -146,6 +157,62 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
               <div className="grid gap-5 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_17rem]">
                 <article className="markdown-content min-w-0">
                   <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{block.content || ""}</ReactMarkdown>
+
+                  {lesson.decisionOptions.length > 0 ? (
+                    <section className="mt-6 rounded-3xl border border-border/50 bg-background/45 p-4 sm:p-5">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                        <div className="space-y-1">
+                          <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                            <BrainCircuit className="h-4 w-4 text-emerald-500" />
+                            Ветка решения
+                          </p>
+                          <p className="text-sm leading-6 text-muted-foreground">{lesson.decisionPrompt}</p>
+                        </div>
+                        <span className="w-fit rounded-full border border-border/50 bg-card/70 px-3 py-1 text-xs text-muted-foreground">
+                          выберите ход
+                        </span>
+                      </div>
+
+                      <div className="mt-4 grid gap-2 md:grid-cols-3">
+                        {lesson.decisionOptions.map((option) => {
+                          const isSelected = selectedDecision?.id === option.id;
+
+                          return (
+                            <button
+                              key={option.id}
+                              type="button"
+                              onClick={() =>
+                                setLessonDecisionState((prev) => ({
+                                  ...prev,
+                                  [block.id]: option.id,
+                                }))
+                              }
+                              className={cn(
+                                "rounded-2xl border border-border/50 bg-card/60 p-3 text-left text-sm transition-colors hover:border-emerald-400/50 hover:bg-emerald-500/10",
+                                isSelected && decisionToneStyles[option.tone],
+                              )}
+                            >
+                              <span className="font-semibold">{option.label}</span>
+                              <span className="mt-1 block text-xs leading-5 opacity-80">{option.artifactHint}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {selectedDecision ? (
+                        <div className="mt-4 grid gap-3 md:grid-cols-2">
+                          <div className="rounded-2xl border border-border/50 bg-card/60 p-3">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Действие</p>
+                            <p className="mt-1 text-sm leading-6 text-foreground/80">{selectedDecision.action}</p>
+                          </div>
+                          <div className={cn("rounded-2xl border p-3", decisionToneStyles[selectedDecision.tone])}>
+                            <p className="text-xs font-semibold uppercase tracking-wide opacity-75">Последствие</p>
+                            <p className="mt-1 text-sm leading-6">{selectedDecision.consequence}</p>
+                          </div>
+                        </div>
+                      ) : null}
+                    </section>
+                  ) : null}
                 </article>
 
                 <aside className="space-y-3 lg:sticky lg:top-32 lg:self-start">
