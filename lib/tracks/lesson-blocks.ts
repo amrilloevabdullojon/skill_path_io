@@ -41,6 +41,7 @@ export type LessonDecisionOption = {
   action: string;
   consequence: string;
   artifactHint: string;
+  artifactField: "observation" | "risk" | "testIdea" | "evidence" | "decision";
   tone: "growth" | "risk" | "mastery";
 };
 
@@ -373,6 +374,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
             action: "Вы читаете задачу глазами пользователя и отмечаете, где он может застрять, потерять данные или получить неверный результат.",
             consequence: "Появляется фокус для проверки: команда видит не список терминов, а конкретный продуктовый риск.",
             artifactHint: "Запишите в артефакт: риск, affected user, expected result.",
+            artifactField: "risk",
             tone: "growth",
           },
           {
@@ -381,6 +383,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
             action: "Вы берёте самый частый путь пользователя и проходите его до наблюдаемого результата.",
             consequence: "Вы быстро получаете evidence, но можете пропустить важный edge case, если не сформулируете риск.",
             artifactHint: "Запишите: steps, test data, expected/actual result.",
+            artifactField: "evidence",
             tone: "mastery",
           },
           {
@@ -389,6 +392,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
             action: "Вы фиксируете неизвестное: что считается успехом, какие ограничения есть, кто принимает результат.",
             consequence: "Снижается риск тестировать не то, но работу нужно завершить конкретной проверкой.",
             artifactHint: "Запишите: open question и как ответ повлияет на тест.",
+            artifactField: "decision",
             tone: "risk",
           },
         ]
@@ -399,6 +403,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
             action: "You read the task like a user and mark where they can get stuck, lose data, or get a wrong result.",
             consequence: "The work gets focus: the team sees a product risk instead of a list of terms.",
             artifactHint: "Write down: risk, affected user, expected result.",
+            artifactField: "risk",
             tone: "growth",
           },
           {
@@ -407,6 +412,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
             action: "You take the most common user path and follow it until an observable result.",
             consequence: "You get evidence quickly, but can miss an edge case if the risk is not clear.",
             artifactHint: "Write down: steps, test data, expected/actual result.",
+            artifactField: "evidence",
             tone: "mastery",
           },
           {
@@ -415,6 +421,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
             action: "You capture what is unknown: success criteria, constraints, and who accepts the result.",
             consequence: "You reduce the risk of testing the wrong thing, but still need to finish with a concrete check.",
             artifactHint: "Write down: open question and how the answer changes the test.",
+            artifactField: "decision",
             tone: "risk",
           },
         ];
@@ -429,6 +436,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
             action: "Вы отделяете реальную цель пользователя от желаемого UI или готового решения.",
             consequence: "Требование становится проще проверить и обсудить с командой.",
             artifactHint: "Запишите: As a..., I want..., so that...",
+            artifactField: "observation",
             tone: "growth",
           },
           {
@@ -437,6 +445,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
             action: "Вы превращаете идею в условия, при которых задача считается готовой.",
             consequence: "Команда быстрее понимает границы, но может понадобиться уточнить бизнес-ценность.",
             artifactHint: "Запишите 2-3 acceptance criteria.",
+            artifactField: "testIdea",
             tone: "mastery",
           },
           {
@@ -445,6 +454,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
             action: "Вы находите расплывчатую формулировку и задаёте один точный вопрос.",
             consequence: "Снижается двусмысленность, но после ответа нужно обновить user story.",
             artifactHint: "Запишите: vague word -> question -> decision.",
+            artifactField: "decision",
             tone: "risk",
           },
         ]
@@ -455,6 +465,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
             action: "You separate the real user goal from a desired UI or preselected solution.",
             consequence: "The requirement becomes easier to test and discuss with the team.",
             artifactHint: "Write: As a..., I want..., so that...",
+            artifactField: "observation",
             tone: "growth",
           },
           {
@@ -463,6 +474,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
             action: "You turn the idea into conditions for when the work is done.",
             consequence: "The team sees boundaries faster, but business value may still need clarification.",
             artifactHint: "Write 2-3 acceptance criteria.",
+            artifactField: "testIdea",
             tone: "mastery",
           },
           {
@@ -471,6 +483,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
             action: "You find ambiguous wording and ask one precise question.",
             consequence: "Ambiguity drops, but the user story must be updated after the answer.",
             artifactHint: "Write: vague word -> question -> decision.",
+            artifactField: "decision",
             tone: "risk",
           },
         ];
@@ -484,6 +497,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
           action: "Вы связываете бизнес-вопрос с одним измеримым показателем.",
           consequence: "Анализ получает фокус, но важно проверить качество данных.",
           artifactHint: "Запишите: question -> metric -> why it matters.",
+          artifactField: "observation",
           tone: "growth",
         },
         {
@@ -492,6 +506,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
           action: "Вы ищете пропуски, выбросы и странные значения до вывода.",
           consequence: "Вы снижаете риск неверной рекомендации, но можете замедлить получение insight.",
           artifactHint: "Запишите: data issue -> impact -> fix/check.",
+          artifactField: "risk",
           tone: "risk",
         },
         {
@@ -500,6 +515,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
           action: "Вы пишете короткое объяснение: что увидел, почему важно, что сделать.",
           consequence: "Появляется понятный результат для неаналитика, если метрика выбрана корректно.",
           artifactHint: "Запишите: observation -> implication -> action.",
+          artifactField: "decision",
           tone: "mastery",
         },
       ]
@@ -510,6 +526,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
           action: "You connect the business question to one measurable signal.",
           consequence: "The analysis gets focus, but data quality still needs checking.",
           artifactHint: "Write: question -> metric -> why it matters.",
+          artifactField: "observation",
           tone: "growth",
         },
         {
@@ -518,6 +535,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
           action: "You look for missing values, outliers, and strange records before making a claim.",
           consequence: "You reduce the risk of a wrong recommendation, but insight may take longer.",
           artifactHint: "Write: data issue -> impact -> fix/check.",
+          artifactField: "risk",
           tone: "risk",
         },
         {
@@ -526,6 +544,7 @@ function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, loca
           action: "You write a short explanation: what I saw, why it matters, what to do.",
           consequence: "A non-analyst gets a usable result if the metric is sound.",
           artifactHint: "Write: observation -> implication -> action.",
+          artifactField: "decision",
           tone: "mastery",
         },
       ];

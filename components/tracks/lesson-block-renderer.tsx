@@ -32,6 +32,12 @@ type QuickCheckState = {
   submitted: boolean;
 };
 
+type LessonDecisionMemory = {
+  decisionId: string;
+  selectedAt: string;
+  transferredAt?: string;
+};
+
 const decisionToneStyles: Record<LessonDecisionOption["tone"], string> = {
   growth: "border-emerald-500/35 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
   risk: "border-amber-500/35 bg-amber-500/10 text-amber-700 dark:text-amber-300",
@@ -39,6 +45,30 @@ const decisionToneStyles: Record<LessonDecisionOption["tone"], string> = {
 };
 
 const artifactSnippetEventName = "levio:artifact-snippet";
+const lessonDecisionStorageKey = "levio:lesson-decisions:v1";
+
+function loadLessonDecisionMemory() {
+  if (typeof window === "undefined") {
+    return {};
+  }
+
+  try {
+    const raw = window.localStorage.getItem(lessonDecisionStorageKey);
+    if (!raw) {
+      return {};
+    }
+
+    const parsed = JSON.parse(raw) as Record<string, LessonDecisionMemory>;
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    window.localStorage.removeItem(lessonDecisionStorageKey);
+    return {};
+  }
+}
+
+function saveLessonDecisionMemory(next: Record<string, LessonDecisionMemory>) {
+  window.localStorage.setItem(lessonDecisionStorageKey, JSON.stringify(next));
+}
 
 function sendDecisionToArtifact(params: {
   sourceId: string;
@@ -54,6 +84,7 @@ function sendDecisionToArtifact(params: {
         action: params.decision.action,
         consequence: params.decision.consequence,
         artifactHint: params.decision.artifactHint,
+        artifactField: params.decision.artifactField,
       },
     }),
   );
@@ -80,10 +111,26 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
   const [quickCheckState, setQuickCheckState] = useState<Record<string, QuickCheckState>>({});
   const [challengeDrafts, setChallengeDrafts] = useState<Record<string, string>>({});
   const [challengeSubmitted, setChallengeSubmitted] = useState<Record<string, boolean>>({});
-  const [lessonDecisionState, setLessonDecisionState] = useState<Record<string, string>>({});
+  const [lessonDecisionState, setLessonDecisionState] = useState<Record<string, LessonDecisionMemory>>(loadLessonDecisionMemory);
 
   const orderedBlocks = useMemo(() => blocks, [blocks]);
   const lessonPanels = useMemo(() => orderedBlocks.filter((block) => block.type === "lesson_panel" && block.lesson), [orderedBlocks]);
+
+  function updateLessonDecision(blockId: string, decisionId: string, transferred = false) {
+    setLessonDecisionState((prev) => {
+      const next = {
+        ...prev,
+        [blockId]: {
+          decisionId,
+          selectedAt: prev[blockId]?.decisionId === decisionId ? prev[blockId]?.selectedAt ?? new Date().toISOString() : new Date().toISOString(),
+          transferredAt: transferred ? new Date().toISOString() : prev[blockId]?.decisionId === decisionId ? prev[blockId]?.transferredAt : undefined,
+        },
+      };
+
+      saveLessonDecisionMemory(next);
+      return next;
+    });
+  }
 
   return (
     <div className="space-y-4">
@@ -112,8 +159,10 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
           if (!lesson) {
             return null;
           }
-          const selectedDecisionId = lessonDecisionState[block.id] ?? lesson.decisionOptions[0]?.id;
+          const decisionMemory = lessonDecisionState[block.id];
+          const selectedDecisionId = decisionMemory?.decisionId ?? lesson.decisionOptions[0]?.id;
           const selectedDecision = lesson.decisionOptions.find((option) => option.id === selectedDecisionId) ?? lesson.decisionOptions[0];
+          const transferredSelectedDecision = Boolean(decisionMemory?.transferredAt && decisionMemory.decisionId === selectedDecision?.id);
 
           return (
             <article
@@ -203,12 +252,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                             <button
                               key={option.id}
                               type="button"
-                              onClick={() =>
-                                setLessonDecisionState((prev) => ({
-                                  ...prev,
-                                  [block.id]: option.id,
-                                }))
-                              }
+                              onClick={() => updateLessonDecision(block.id, option.id)}
                               className={cn(
                                 "rounded-2xl border border-border/50 bg-card/60 p-3 text-left text-sm transition-colors hover:border-emerald-400/50 hover:bg-emerald-500/10",
                                 isSelected && decisionToneStyles[option.tone],
@@ -232,19 +276,30 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                             <p className="mt-1 text-sm leading-6">{selectedDecision.consequence}</p>
                           </div>
                           <div className="md:col-span-2">
+                            <div className="mb-3 rounded-2xl border border-border/45 bg-card/50 p-3 text-xs leading-5 text-muted-foreground">
+                              <p className="font-semibold text-foreground">
+                                След урока: {selectedDecision.label} {"->"} {selectedDecision.artifactHint}
+                              </p>
+                              <p className="mt-1">
+                                {transferredSelectedDecision
+                                  ? `Уже перенесено в артефакт: ${new Date(decisionMemory?.transferredAt ?? "").toLocaleString("ru-RU")}.`
+                                  : "Перенесите ход в артефакт, чтобы дерево выбрало следующую живую ветку."}
+                              </p>
+                            </div>
                             <button
                               type="button"
-                              onClick={() =>
+                              onClick={() => {
                                 sendDecisionToArtifact({
                                   sourceId: block.id,
                                   lessonTitle: lesson.title,
                                   decision: selectedDecision,
-                                })
-                              }
+                                });
+                                updateLessonDecision(block.id, selectedDecision.id, true);
+                              }}
                               className="btn-secondary inline-flex w-full items-center justify-center gap-2 sm:w-auto"
                             >
                               <Send className="h-4 w-4" />
-                              Перенести в артефакт
+                              {transferredSelectedDecision ? "Обновить артефакт" : "Перенести в артефакт"}
                             </button>
                           </div>
                         </div>

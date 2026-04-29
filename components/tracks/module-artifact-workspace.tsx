@@ -32,6 +32,7 @@ type ArtifactSnippet = {
   action: string;
   consequence: string;
   artifactHint: string;
+  artifactField?: WorkspaceDraftField;
 };
 
 type GrowthEvent = {
@@ -310,6 +311,10 @@ function fieldHealthStatusLabel(status: FieldHealth["status"]) {
 }
 
 function snippetFocusField(snippet: ArtifactSnippet): WorkspaceDraftField {
+  if (snippet.artifactField && snippet.artifactField in emptyDraft) {
+    return snippet.artifactField;
+  }
+
   const text = `${snippet.selectedLabel} ${snippet.action} ${snippet.consequence} ${snippet.artifactHint}`.toLowerCase();
   if (text.includes("question") || text.includes("уточ") || text.includes("clarify") || text.includes("open question")) {
     return "decision";
@@ -443,7 +448,7 @@ export function ModuleArtifactWorkspace({
   const addGrowthEvent = useCallback((event: Omit<GrowthEvent, "id" | "createdAt">) => {
     const nextEvent: GrowthEvent = {
       ...event,
-      id: `${Date.now()}-${event.type}`,
+      id: `${Date.now()}-${event.type}-${Math.random().toString(16).slice(2)}`,
       createdAt: new Date().toISOString(),
     };
 
@@ -624,6 +629,9 @@ export function ModuleArtifactWorkspace({
   function resetDraft() {
     setDraft(emptyDraft);
     setReview(null);
+    setErrorText(null);
+    setImportedSnippet(null);
+    setReviewPlanApplied(false);
     setPortfolioSaved(false);
     setSavedAt(null);
     setGrowthEvents([]);
