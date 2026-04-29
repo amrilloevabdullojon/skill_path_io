@@ -92,6 +92,9 @@ describe("content overrides", () => {
     expect(course.modules[2]?.lessons[0]?.body).toContain("profile settings после UI redesign");
     expect(course.modules[2]?.lessons[1]?.body).toContain("Путь расследования");
     expect(course.modules[2]?.lessons[2]?.body).toContain("Формат report");
+    expect(course.modules[3]?.lessons[0]?.body).toContain("UI говорит");
+    expect(course.modules[3]?.lessons[1]?.body).toContain("Postman rescue kit");
+    expect(course.modules[3]?.lessons[2]?.body).toContain("Decision matrix");
     expect(course.modules[0]?.quiz?.questions[0]?.options[1]?.text).toContain("Снижать риски");
   });
 

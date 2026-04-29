@@ -1294,38 +1294,74 @@ Use this lesson to fill **Decision**: what should block release, what can ship w
           ru: "Основы HTTP и JSON",
         },
         body: {
-          en: `## Think in requests and responses
+          en: `## Scene: the UI says "profile cannot be saved"
 
-The client sends a request. The server returns a response. Your task is to understand whether the response matches the contract and the business expectation.
+The browser shows a generic error after the user edits a profile. The designer thinks it is a copy bug, the frontend engineer thinks the API is unstable, and backend says "works on my machine". Your job is to read the request and response like evidence.
 
-## Common methods
+## Request-response map
 
-- GET to read data
-- POST to create
-- PUT or PATCH to update
-- DELETE to remove
+| Question | Where to look | Example clue |
+| --- | --- | --- |
+| What is the app asking for? | method + URL | PATCH /api/profile |
+| Who is asking? | Authorization header | Bearer token present or missing |
+| What changed? | JSON body | {"timezone": "", "displayName": "Maya"} |
+| What did server decide? | status code | 422 validation error |
+| Why did it decide that? | response body | "timezone is required" |
 
-## Status codes you will see often
+## Status code story
 
-- 200, 201, 400, 401, 403, 404, 500
+- 200/201: the action succeeded.
+- 400/422: the client sent invalid data.
+- 401: the user is not authenticated.
+- 403: the user is authenticated but not allowed.
+- 404: the resource does not exist or is hidden.
+- 500: the server failed unexpectedly.
 
-JSON is the structure of the payload. As a tester, you care whether required fields exist, values make sense, and errors are handled consistently.`,
-          ru: `## Думайте запросами и ответами
+## Mini action
 
-Клиент отправляет request. Сервер возвращает response. Ваша задача - понять, соответствует ли ответ контракту и бизнес-ожиданию.
+Turn one API response into a finding:
 
-## Частые методы
+**Observation:** PATCH /api/profile returns 422.
+**Evidence:** response body says timezone is required.
+**Risk:** UI hides timezone on mobile, so mobile users cannot save profile.
 
-- GET для чтения данных
-- POST для создания
-- PUT или PATCH для обновления
-- DELETE для удаления
+## Artifact seed
 
-## Status codes, которые вы будете видеть постоянно
+Use this lesson to fill **Evidence** and **Risk** for an API-backed bug.`,
+          ru: `## Сцена: UI говорит "profile cannot be saved"
 
-- 200, 201, 400, 401, 403, 404, 500
+Браузер показывает generic error после редактирования profile. Designer думает, что это copy bug, frontend engineer подозревает нестабильный API, а backend говорит "works on my machine". Ваша задача - прочитать request и response как evidence.
 
-JSON - это структура payload. Для тестировщика важно, существуют ли обязательные поля, логичны ли значения и одинаково ли система обрабатывает ошибки.`,
+## Карта request-response
+
+| Вопрос | Где смотреть | Example clue |
+| --- | --- | --- |
+| Что app пытается сделать? | method + URL | PATCH /api/profile |
+| Кто делает запрос? | Authorization header | Bearer token есть или отсутствует |
+| Что изменилось? | JSON body | {"timezone": "", "displayName": "Maya"} |
+| Что решил server? | status code | 422 validation error |
+| Почему он так решил? | response body | "timezone is required" |
+
+## История status codes
+
+- 200/201: действие успешно.
+- 400/422: client отправил невалидные данные.
+- 401: user не authenticated.
+- 403: user authenticated, но нет доступа.
+- 404: resource не существует или скрыт.
+- 500: server упал неожиданно.
+
+## Мини-действие
+
+Превратите один API response в finding:
+
+**Наблюдение:** PATCH /api/profile возвращает 422.
+**Evidence:** response body говорит timezone is required.
+**Риск:** UI скрывает timezone на mobile, поэтому mobile users не могут сохранить profile.
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Evidence** и **Риск** для API-backed bug.`,
         },
       },
       {
@@ -1334,32 +1370,70 @@ JSON - это структура payload. Для тестировщика важ
           ru: "Workflow в Postman",
         },
         body: {
-          en: `## Basic flow
+          en: `## Scene: build a Postman rescue kit
 
-In Postman, you choose a method, set the URL, add headers or authorization, optionally send a body, and inspect the response.
+The frontend bug is disputed. To avoid guessing, create a tiny Postman collection that reproduces the same behavior outside the UI.
 
-## What to validate
+## Collection setup
 
-- status code
-- response body structure
-- required fields and data types
-- error message on invalid input
-- authorization behavior with missing or expired token
+| Request | Purpose | Must validate |
+| --- | --- | --- |
+| POST /api/login | get token | 200, token exists, user id exists |
+| GET /api/profile | read current data | 200, required profile fields |
+| PATCH /api/profile | save valid update | 200, changed values persist |
+| PATCH /api/profile invalid | trigger validation | 400/422, actionable error |
+| GET /api/profile without token | auth boundary | 401, no private data |
 
-If UI and API disagree, compare the request, response, and visible behavior instead of guessing.`,
-          ru: `## Базовый flow
+## Variables
 
-В Postman вы выбираете метод, задаете URL, добавляете headers или authorization, при необходимости отправляете body и исследуете response.
+- baseUrl: local or staging API URL
+- token: value from login response
+- profileId: id from profile response
 
-## Что проверять
+## Evidence rule
 
-- status code
-- структуру response body
-- обязательные поля и типы данных
-- error message при невалидном вводе
-- поведение authorization при отсутствии или истечении token
+Every request should answer one release question:
 
-Если UI и API противоречат друг другу, сравнивайте request, response и видимое поведение, а не гадайте.`,
+- Can a real user complete the flow?
+- Is invalid data rejected clearly?
+- Is private data protected?
+- Does API behavior match what UI promises?
+
+## Artifact seed
+
+Use this lesson to fill **Test idea** and **Evidence** with request names, statuses, and payload notes.`,
+          ru: `## Сцена: собрать Postman rescue kit
+
+Frontend bug спорный. Чтобы не гадать, создайте маленькую Postman collection, которая воспроизводит то же поведение вне UI.
+
+## Setup коллекции
+
+| Request | Зачем нужен | Что проверить |
+| --- | --- | --- |
+| POST /api/login | получить token | 200, token exists, user id exists |
+| GET /api/profile | прочитать текущие данные | 200, обязательные profile fields |
+| PATCH /api/profile | сохранить valid update | 200, changed values persist |
+| PATCH /api/profile invalid | вызвать validation | 400/422, actionable error |
+| GET /api/profile without token | проверить auth boundary | 401, no private data |
+
+## Variables
+
+- baseUrl: local или staging API URL
+- token: значение из login response
+- profileId: id из profile response
+
+## Evidence rule
+
+Каждый request должен отвечать на один release question:
+
+- Может ли real user завершить flow?
+- Отклоняются ли invalid data понятно?
+- Защищены ли private data?
+- Совпадает ли API behavior с тем, что обещает UI?
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Проверку** и **Evidence**: request names, statuses и payload notes.`,
         },
       },
       {
@@ -1368,20 +1442,76 @@ If UI and API disagree, compare the request, response, and visible behavior inst
           ru: "Практика: проверка login и profile API",
         },
         body: {
-          en: `Build a small API check session.
+          en: `## Scene: decide if profile release is blocked
 
-1. Send a valid login request and verify success response.
-2. Send an invalid login request and verify error handling.
-3. Reuse the token for a profile request.
-4. Try the same profile request without token.
-5. Write a short note comparing valid and unauthorized behavior.`,
-          ru: `Проведите небольшую API-check сессию.
+You have one hour before release review. The UI smoke is mixed: desktop works, mobile save fails, and the API returns clear validation errors. Your final job is not just to send requests. It is to turn API checks into a release decision.
 
-1. Отправьте валидный login request и проверьте успешный ответ.
-2. Отправьте невалидный login request и проверьте обработку ошибки.
-3. Используйте token для profile request.
-4. Повторите тот же profile request без token.
-5. Напишите короткую заметку, сравнивающую valid и unauthorized behavior.`,
+## API check session
+
+1. Login with valid credentials and save token evidence.
+2. Login with invalid password and verify no token leaks.
+3. Fetch profile with token and list required fields.
+4. Update profile with valid displayName and timezone.
+5. Update profile with empty timezone and capture validation.
+6. Repeat profile fetch without token and verify 401.
+
+## Decision matrix
+
+| Result | Meaning | Release decision |
+| --- | --- | --- |
+| Valid update works in API and UI | flow healthy | can ship |
+| API works, UI fails | frontend bug | ship only if non-critical or fix UI |
+| API rejects valid data | backend/contract bug | block release |
+| Unauthorized request exposes data | security bug | block release |
+
+## Final artifact
+
+Write a short API QA note:
+
+- endpoints tested
+- highest-risk failure
+- evidence from status/body
+- decision: ready, ready with risk, or blocked
+- one retest step after fix
+
+## Artifact seed
+
+Use this lesson to fill **Decision** and connect API evidence back to user impact.`,
+          ru: `## Сцена: решить, блокирует ли profile release
+
+До release review остался один час. UI smoke смешанный: desktop работает, mobile save fails, а API возвращает понятные validation errors. Ваша финальная задача - не просто отправить requests. Нужно превратить API checks в release decision.
+
+## API check session
+
+1. Login с valid credentials и сохранить token evidence.
+2. Login с invalid password и проверить, что token не leaked.
+3. Fetch profile с token и перечислить required fields.
+4. Update profile с valid displayName и timezone.
+5. Update profile с empty timezone и сохранить validation.
+6. Повторить profile fetch without token и проверить 401.
+
+## Decision matrix
+
+| Result | Meaning | Release decision |
+| --- | --- | --- |
+| Valid update works in API and UI | flow healthy | can ship |
+| API works, UI fails | frontend bug | ship only if non-critical or fix UI |
+| API rejects valid data | backend/contract bug | block release |
+| Unauthorized request exposes data | security bug | block release |
+
+## Финальный артефакт
+
+Напишите короткую API QA note:
+
+- endpoints tested
+- highest-risk failure
+- evidence из status/body
+- decision: ready, ready with risk или blocked
+- один retest step after fix
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Вывод** и связать API evidence с user impact.`,
         },
       },
     ],
