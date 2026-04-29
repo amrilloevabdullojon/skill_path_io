@@ -95,7 +95,7 @@ const config: Config = {
         caption: ["0.75rem", { lineHeight: "1.4", letterSpacing: "0.02em" }],
       },
       fontFamily: {
-        sans: ["var(--font-manrope)", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
+        sans: ["var(--font-manrope, 'Segoe UI')", "Helvetica Neue", "Arial", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius-lg)",

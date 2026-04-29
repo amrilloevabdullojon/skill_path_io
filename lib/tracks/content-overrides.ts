@@ -1686,42 +1686,74 @@ Use this lesson to fill **Decision** and connect API evidence back to user impac
           ru: "Пишите баг-репорты, которыми можно пользоваться",
         },
         body: {
-          en: `## A useful bug report answers three questions
+          en: `## Scene: the bug that blocks release review
 
-1. What is broken?
-2. How can the team reproduce it?
-3. Why does it matter?
+Release review starts in 40 minutes. You found that mobile users cannot save profile settings because timezone is hidden and the API returns 422. A weak ticket says "profile save broken". A useful ticket lets the team reproduce, judge impact, and decide.
 
-## Core structure
+## Build the report from evidence
 
-- title
-- environment
-- preconditions
-- steps to reproduce
-- expected result
-- actual result
-- severity and priority
-- attachments if useful
+| Field | Weak version | Useful version |
+| --- | --- | --- |
+| Title | Save does not work | Mobile profile save fails when timezone field is hidden |
+| Environment | mobile | iPhone 13 viewport 390x844, staging, user role learner |
+| Steps | click save | Open profile, change display name, tap Save on mobile |
+| Expected | save | Profile changes persist and success message appears |
+| Actual | error | Generic error appears; PATCH /api/profile returns 422 timezone required |
+| Impact | bad | Mobile users cannot update account settings |
 
-Write facts, not frustration.`,
-          ru: `## Полезный баг-репорт отвечает на три вопроса
+## Severity vs priority
 
-1. Что сломано?
-2. Как это воспроизвести?
-3. Почему это важно?
+- Severity: how badly the product is broken.
+- Priority: how soon the team should fix it.
 
-## Базовая структура
+A typo in legal copy may be low severity but high priority. A rare visual glitch may be low priority even if it looks ugly.
 
-- title
-- environment
-- preconditions
-- steps to reproduce
-- expected result
-- actual result
-- severity и priority
-- attachments при необходимости
+## Mini action
 
-Пишите факты, а не эмоции.`,
+Write one ticket summary:
+
+**Bug:** mobile profile save fails when timezone is hidden.
+**Evidence:** screenshot + PATCH /api/profile 422 response.
+**Impact:** users on mobile cannot save account changes.
+**Recommendation:** block release until fixed or hide mobile profile editing.
+
+## Artifact seed
+
+Use this lesson to fill **Evidence**, **Risk**, and **Decision** with a bug report the team can act on.`,
+          ru: `## Сцена: bug, который блокирует release review
+
+Release review начнётся через 40 минут. Вы нашли, что mobile users не могут сохранить profile settings, потому что timezone скрыт, а API возвращает 422. Слабый ticket говорит "profile save broken". Полезный ticket помогает команде воспроизвести, оценить impact и принять решение.
+
+## Соберите report из evidence
+
+| Поле | Слабая версия | Полезная версия |
+| --- | --- | --- |
+| Title | Save does not work | Mobile profile save fails when timezone field is hidden |
+| Environment | mobile | iPhone 13 viewport 390x844, staging, user role learner |
+| Steps | click save | Open profile, change display name, tap Save on mobile |
+| Expected | save | Profile changes persist and success message appears |
+| Actual | error | Generic error appears; PATCH /api/profile returns 422 timezone required |
+| Impact | bad | Mobile users cannot update account settings |
+
+## Severity vs priority
+
+- Severity: насколько сильно сломан product.
+- Priority: как срочно команде нужно это исправить.
+
+Typo в legal copy может иметь low severity, но high priority. Редкий visual glitch может иметь low priority, даже если выглядит неприятно.
+
+## Мини-действие
+
+Напишите один ticket summary:
+
+**Bug:** mobile profile save fails when timezone is hidden.
+**Evidence:** screenshot + PATCH /api/profile 422 response.
+**Impact:** users on mobile cannot save account changes.
+**Recommendation:** block release until fixed или hide mobile profile editing.
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Evidence**, **Риск** и **Вывод** баг-репортом, по которому команда может действовать.`,
         },
       },
       {
@@ -1730,36 +1762,68 @@ Write facts, not frustration.`,
           ru: "Smoke, sanity, regression и exploratory testing",
         },
         body: {
-          en: `## Smoke
+          en: `## Scene: choose the right test pass
 
-Smoke confirms the build is stable enough for deeper testing. It covers the most critical paths only.
+The fix for profile save just arrived. You have 25 minutes before the release decision. Checking everything is impossible, so you choose the test pass that fits the risk.
 
-## Sanity
+## Test-pass menu
 
-Sanity focuses on a narrow area, usually after a specific fix.
+| Situation | Best pass | What you check |
+| --- | --- | --- |
+| New build just deployed | Smoke | login, dashboard, profile save, course start |
+| One bug was fixed | Sanity | the fixed profile save path and nearby states |
+| Shared auth code changed | Regression | login, profile, API auth, protected pages |
+| Behavior is unclear | Exploratory | follow clues, vary data, inspect edge cases |
 
-## Regression
+## Time-boxed plan
 
-Regression checks whether old behavior still works after new changes.
+1. Smoke: can the core learner flow still start and finish?
+2. Sanity: does mobile profile save now work?
+3. Regression: did desktop profile save, login, and API auth stay healthy?
+4. Exploratory: try long display name, empty timezone, double tap Save.
 
-## Exploratory
+## Evidence rule
 
-Exploratory testing is purposeful investigation, not random clicking.`,
-          ru: `## Smoke
+Every pass should produce a decision, not just activity:
 
-Smoke подтверждает, что сборка достаточно стабильна для дальнейшего тестирования. Оно покрывает только самые критичные пути.
+- pass: no blocker found
+- fail: blocker or open risk found
+- skip: not enough time, name the risk
 
-## Sanity
+## Artifact seed
 
-Sanity фокусируется на узкой зоне, обычно после конкретного фикса.
+Use this lesson to fill **Test idea** and **Decision** with the exact checks you chose under time pressure.`,
+          ru: `## Сцена: выбрать правильный test pass
 
-## Regression
+Fix для profile save только что приехал. До release decision осталось 25 минут. Проверить всё невозможно, поэтому вы выбираете test pass под главный risk.
 
-Regression проверяет, не сломался ли старый функционал после новых изменений.
+## Меню test-pass
 
-## Exploratory
+| Situation | Best pass | Что проверять |
+| --- | --- | --- |
+| New build just deployed | Smoke | login, dashboard, profile save, course start |
+| One bug was fixed | Sanity | fixed profile save path и nearby states |
+| Shared auth code changed | Regression | login, profile, API auth, protected pages |
+| Behavior is unclear | Exploratory | follow clues, vary data, inspect edge cases |
 
-Exploratory testing - это целенаправленное исследование, а не хаотичные клики.`,
+## Time-boxed plan
+
+1. Smoke: может ли core learner flow стартовать и завершиться?
+2. Sanity: работает ли mobile profile save после fix?
+3. Regression: не сломались ли desktop profile save, login и API auth?
+4. Exploratory: попробуйте long display name, empty timezone, double tap Save.
+
+## Evidence rule
+
+Каждый pass должен давать decision, а не просто активность:
+
+- pass: blocker не найден
+- fail: найден blocker или open risk
+- skip: времени не хватило, risk назван явно
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Проверку** и **Вывод** конкретными проверками, выбранными под ограничение времени.`,
         },
       },
       {
@@ -1768,24 +1832,78 @@ Exploratory testing - это целенаправленное исследова
           ru: "Финальная практика: рекомендация к релизу",
         },
         body: {
-          en: `Test one small web feature and package your work like a junior QA engineer.
+          en: `## Scene: your first release recommendation
 
-Deliver:
-1. at least 5 bug reports
-2. one smoke checklist
-3. one short regression list
-4. one release recommendation: ready, ready with risks, or not ready
+The release owner asks: "Can we ship today?" You cannot answer with feelings. You answer with evidence, blockers, open risks, and a retest plan.
 
-Your recommendation must name the top risks and explain why the team should care.`,
-          ru: `Протестируйте одну небольшую web-фичу и оформите результат как junior QA engineer.
+## Release pack
 
-Подготовьте:
-1. минимум 5 баг-репортов
-2. один smoke-checklist
-3. один короткий regression-list
-4. одну release-рекомендацию: ready, ready with risks или not ready
+| Section | What to include |
+| --- | --- |
+| Scope | profile settings on desktop and mobile |
+| Evidence | screenshots, API statuses, reproduced steps |
+| Bugs | 5 reports grouped by blocker, major, minor |
+| Smoke | core paths checked after latest build |
+| Regression | old behavior that still works |
+| Open risks | skipped checks and uncertain areas |
+| Recommendation | ready, ready with risks, or blocked |
 
-В рекомендации обязательно назовите ключевые риски и объясните, почему команде важно на них смотреть.`,
+## Recommendation examples
+
+- Ready: no blockers, smoke passed, regression around changed area passed.
+- Ready with risks: no blocker, but mobile edge cases were not fully covered.
+- Blocked: mobile profile save still fails or unauthorized data leaks.
+
+## Final artifact
+
+Prepare a release recommendation:
+
+1. top 3 findings
+2. one blocker decision, if any
+3. smoke result
+4. regression result
+5. retest checklist after fixes
+6. final call: ready, ready with risks, or blocked
+
+## Artifact seed
+
+Use this lesson to complete the module artifact: a short QA release note that sounds like a real team document.`,
+          ru: `## Сцена: ваша первая release recommendation
+
+Release owner спрашивает: "Can we ship today?" Нельзя отвечать ощущениями. Нужно ответить evidence, blockers, open risks и retest plan.
+
+## Release pack
+
+| Section | Что включить |
+| --- | --- |
+| Scope | profile settings on desktop and mobile |
+| Evidence | screenshots, API statuses, reproduced steps |
+| Bugs | 5 reports grouped by blocker, major, minor |
+| Smoke | core paths checked after latest build |
+| Regression | old behavior that still works |
+| Open risks | skipped checks and uncertain areas |
+| Recommendation | ready, ready with risks или blocked |
+
+## Примеры recommendation
+
+- Ready: blockers нет, smoke passed, regression around changed area passed.
+- Ready with risks: blocker нет, но mobile edge cases покрыты не полностью.
+- Blocked: mobile profile save всё ещё fails или unauthorized data leaks.
+
+## Финальный артефакт
+
+Подготовьте release recommendation:
+
+1. top 3 findings
+2. blocker decision, если есть
+3. smoke result
+4. regression result
+5. retest checklist after fixes
+6. final call: ready, ready with risks или blocked
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы завершить module artifact: короткую QA release note, которая звучит как реальный командный документ.`,
         },
       },
     ],

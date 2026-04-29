@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 
@@ -7,12 +6,6 @@ import "@/styles/globals.css";
 import { AppShell } from "@/components/layout/app-shell";
 import { Providers } from "@/components/providers";
 import { NetworkStatus } from "@/components/global/network-status";
-
-const manrope = Manrope({
-  subsets: ["latin", "cyrillic"],
-  variable: "--font-manrope",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://levio.app"),
@@ -58,7 +51,7 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={manrope.variable} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body className="min-h-screen bg-background text-foreground">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Providers>
