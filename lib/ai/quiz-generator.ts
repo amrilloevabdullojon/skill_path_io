@@ -14,6 +14,7 @@ export type AiQuizQuestion = {
 export type AiQuizGenerationResult = {
   questions: AiQuizQuestion[];
   source: "ai" | "fallback";
+  fallbackReason?: "ai_unavailable" | "invalid_ai_response";
 };
 
 type GenerateAiQuizInput = {
@@ -28,8 +29,11 @@ type CachedAiQuizInput = Omit<GenerateAiQuizInput, "fallbackQuestions">;
 const OPTION_IDS = ["a", "b", "c", "d"];
 const quizCache = new Map<string, AiQuizGenerationResult>();
 
-function fallbackQuizResult(fallbackQuestions: AiQuizQuestion[]) {
-  return { questions: fallbackQuestions, source: "fallback" as const };
+function fallbackQuizResult(
+  fallbackQuestions: AiQuizQuestion[],
+  fallbackReason: AiQuizGenerationResult["fallbackReason"],
+) {
+  return { questions: fallbackQuestions, source: "fallback" as const, fallbackReason };
 }
 
 function buildQuizCacheKey({ trackTitle, moduleItem, locale }: CachedAiQuizInput) {
@@ -237,18 +241,14 @@ export async function generateAiQuizQuestions({
   });
 
   if (!result.ok) {
-    const fallbackResult = fallbackQuizResult(fallbackQuestions);
-    quizCache.set(cacheKey, fallbackResult);
-    return fallbackResult;
+    return fallbackQuizResult(fallbackQuestions, "ai_unavailable");
   }
 
   const parsed = safeParseJson(result.data);
   const generatedQuestions = normalizeGeneratedQuestions(parsed, moduleItem.id);
 
   if (generatedQuestions.length < 5) {
-    const fallbackResult = fallbackQuizResult(fallbackQuestions);
-    quizCache.set(cacheKey, fallbackResult);
-    return fallbackResult;
+    return fallbackQuizResult(fallbackQuestions, "invalid_ai_response");
   }
 
   const generatedResult = { questions: generatedQuestions.slice(0, 5), source: "ai" as const };

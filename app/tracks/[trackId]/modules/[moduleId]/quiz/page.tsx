@@ -88,6 +88,12 @@ export default async function QuizPage({ params }: QuizPageProps) {
   const questions = generatedQuiz.questions;
   const quizId = generatedQuiz.source === "ai" ? `${moduleItem.quiz.id}:ai` : moduleItem.quiz.id;
   const quizTitle = generatedQuiz.source === "ai" ? `${moduleItem.quiz.title} · AI` : moduleItem.quiz.title;
+  const quizFallbackMessage =
+    generatedQuiz.source === "fallback"
+      ? generatedQuiz.fallbackReason === "invalid_ai_response"
+        ? "AI вернул вопросы не в учебном формате, поэтому открыт проверенный базовый quiz."
+        : "AI-генерация временно недоступна, поэтому открыт проверенный базовый quiz."
+      : null;
 
   const lessonContext = [
     moduleItem.title,
@@ -132,6 +138,7 @@ export default async function QuizPage({ params }: QuizPageProps) {
         passingScore={moduleItem.quiz.passingScore}
         questions={questions}
         generatedByAi={generatedQuiz.source === "ai"}
+        fallbackMessage={quizFallbackMessage}
         lessonContext={lessonContext}
       />
 

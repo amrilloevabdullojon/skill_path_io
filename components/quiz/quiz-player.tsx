@@ -19,6 +19,7 @@ type QuizPlayerProps = {
   passingScore: number;
   questions: QuizQuestion[];
   generatedByAi?: boolean;
+  fallbackMessage?: string | null;
   lessonContext: string;
 };
 
@@ -38,6 +39,7 @@ export function QuizPlayer({
   passingScore,
   questions,
   generatedByAi = false,
+  fallbackMessage = null,
   lessonContext,
 }: QuizPlayerProps) {
   const [isPending, startTransition] = useTransition();
@@ -249,8 +251,15 @@ export function QuizPlayer({
                 <span className="rounded-full border border-emerald-500/35 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-300">
                   AI-generated
                 </span>
+              ) : fallbackMessage ? (
+                <span className="rounded-full border border-amber-500/35 bg-amber-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">
+                  fallback
+                </span>
               ) : null}
             </div>
+            {fallbackMessage ? (
+              <p className="mt-2 max-w-2xl text-xs leading-5 text-muted-foreground">{fallbackMessage}</p>
+            ) : null}
           </div>
           <div className="text-sm text-muted-foreground">
             Вопрос {currentIndex + 1} из {totalQuestions}
