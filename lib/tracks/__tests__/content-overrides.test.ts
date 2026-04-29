@@ -89,6 +89,9 @@ describe("content overrides", () => {
     expect(course.modules[1]?.lessons[0]?.body).toContain("login story");
     expect(course.modules[1]?.lessons[1]?.body).toContain("Decision table");
     expect(course.modules[1]?.lessons[2]?.body).toContain("Пять подробных test case");
+    expect(course.modules[2]?.lessons[0]?.body).toContain("profile settings после UI redesign");
+    expect(course.modules[2]?.lessons[1]?.body).toContain("Путь расследования");
+    expect(course.modules[2]?.lessons[2]?.body).toContain("Формат report");
     expect(course.modules[0]?.quiz?.questions[0]?.options[1]?.text).toContain("Снижать риски");
   });
 

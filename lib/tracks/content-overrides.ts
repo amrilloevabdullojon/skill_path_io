@@ -906,36 +906,70 @@ Use this lesson to fill **Evidence** and **Decision**: attach checklist, test ca
           ru: "Формы, состояния и пользовательские сценарии",
         },
         body: {
-          en: `## Start from the user goal
+          en: `## Scene: profile settings after a UI redesign
 
-A good browser test follows user intent. For a profile page, the goal might be to update personal data, upload an avatar, or change password. Each goal creates a small flow with its own success, error, loading, and empty states.
+The team redesigned profile settings. The page now has display name, avatar upload, timezone, password change, and notification toggles. Product says: "It is just settings, quick smoke should be enough." Your job is to prove what is safe and where the user can lose trust.
 
-## Common web checks
+## Flow map
 
-- field validation and inline errors
-- disabled and enabled button states
-- redirects and navigation after submit
-- session behavior after refresh
-- messages after success and failure
+| User goal | Check | Risk if missed |
+| --- | --- | --- |
+| Update display name | save valid, long, empty, special characters | profile shows wrong identity |
+| Upload avatar | valid image, huge file, unsupported type | broken image or failed save |
+| Change timezone | save, refresh, revisit dashboard | schedule appears in wrong time |
+| Change password | current password, new password rules, logout behavior | account security issue |
+| Toggle notifications | save on/off, refresh, verify persisted state | user receives unwanted emails |
 
-## Look beyond the happy path
+## State checklist
 
-Try invalid input, long text, special symbols, empty fields, expired sessions, and double clicks. Many real bugs appear when the user behaves imperfectly, not ideally.`,
-          ru: `## Начинайте с цели пользователя
+- Initial: fields load with current values.
+- Editing: save button enables only when something changed.
+- Loading: duplicate clicks do not create duplicate requests.
+- Success: clear confirmation and persisted state.
+- Error: message explains what failed and keeps user input.
 
-Хорошая browser-проверка опирается на намерение пользователя. Для profile page целью может быть обновление данных, загрузка avatar или смена пароля. Каждая цель создает отдельный flow со своими success, error, loading и empty states.
+## Mini action
 
-## Частые web-проверки
+Write one observation and one risk before touching the page:
 
-- валидация полей и inline-ошибки
-- disabled и enabled состояния кнопок
-- редиректы и навигация после submit
-- поведение сессии после refresh
-- сообщения об успехе и ошибке
+**Observation:** settings has five independent controls, but one shared save action.
+**Risk:** a failed save can make the user believe changes were applied when they were not.
 
-## Смотрите дальше happy path
+## Artifact seed
 
-Пробуйте невалидные данные, длинный текст, специальные символы, пустые поля, истекшие сессии и двойные клики. Многие реальные баги проявляются тогда, когда пользователь ведет себя не идеально, а как в жизни.`,
+Use this lesson to fill **Observation**, **Risk**, and **Test idea** for browser testing.`,
+          ru: `## Сцена: profile settings после UI redesign
+
+Команда переработала profile settings. На странице теперь display name, avatar upload, timezone, password change и notification toggles. Product говорит: "Это просто settings, quick smoke достаточно". Ваша задача - доказать, что безопасно, и где пользователь может потерять доверие.
+
+## Карта flow
+
+| Цель пользователя | Проверка | Риск, если пропустить |
+| --- | --- | --- |
+| Обновить display name | valid, long, empty, special characters | profile показывает неправильную identity |
+| Загрузить avatar | valid image, huge file, unsupported type | broken image или failed save |
+| Изменить timezone | save, refresh, revisit dashboard | расписание отображается в неверном времени |
+| Сменить password | current password, new password rules, logout behavior | account security issue |
+| Переключить notifications | save on/off, refresh, verify persisted state | user получает нежелательные emails |
+
+## Checklist состояний
+
+- Initial: поля загружены с текущими значениями.
+- Editing: save button включается только после изменения.
+- Loading: double click не создаёт duplicate requests.
+- Success: есть понятное confirmation и persisted state.
+- Error: сообщение объясняет сбой и сохраняет user input.
+
+## Мини-действие
+
+Перед проверкой страницы запишите observation и risk:
+
+**Наблюдение:** settings имеет пять независимых controls, но один общий save action.
+**Риск:** failed save может убедить пользователя, что изменения применились, хотя это не так.
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Наблюдение**, **Риск** и **Проверку** для browser testing.`,
         },
       },
       {
@@ -944,28 +978,74 @@ Try invalid input, long text, special symbols, empty fields, expired sessions, a
           ru: "DevTools для Manual QA",
         },
         body: {
-          en: `## Console
+          en: `## Scene: save button does nothing
 
-Console is useful when the UI looks wrong but you need technical clues. JavaScript errors, failed scripts, and warnings often explain why the page stopped responding.
+During the test run, the Save button becomes active, but clicking it shows no success message. Do not guess. Investigate like QA who can separate UI, client, and API signals.
 
-## Network
+## Investigation path
 
-Network tab shows requests, response codes, payloads, timing, and failed resources. If login fails, the problem might be a 401 response, invalid request body, or timeout.
+| Signal | What to inspect | Evidence to capture |
+| --- | --- | --- |
+| UI state | button disabled/loading, visible toast, field values | screenshot before and after click |
+| Console | JavaScript errors or warnings | exact error text and timestamp |
+| Network | request method, URL, status, payload, response body | request/response details |
+| Storage | auth token, stale profile data, feature flags | key/value that explains behavior |
+| Repro scope | browser, viewport, account, environment | environment line in report |
 
-## Storage and cookies
+## Example finding
 
-Cookies, local storage, and session storage help explain why a user stays logged in, loses settings, or sees stale data.`,
-          ru: `## Console
+**Observation:** clicking Save sends PATCH /api/profile and receives 422.
+**Evidence:** response body says timezone is required, but timezone field is hidden on mobile.
+**Risk:** mobile users cannot save profile changes.
+**Decision:** report as functional bug with mobile layout condition.
 
-Console полезна, когда UI выглядит неправильно, а вам нужны технические подсказки. JavaScript-errors, failed scripts и warnings часто объясняют, почему страница перестала отвечать.
+## Mini action
 
-## Network
+Create one DevTools note:
 
-Во вкладке Network видны запросы, response codes, payload, время и неуспешные ресурсы. Если логин не работает, проблема может быть в 401-ответе, некорректном request body или timeout.
+- request URL and method
+- status code
+- request payload
+- response body
+- visible UI behavior
 
-## Storage и cookies
+## Artifact seed
 
-Cookies, local storage и session storage помогают понять, почему пользователь остается залогинен, теряет настройки или видит устаревшие данные.`,
+Use this lesson to fill **Evidence**. DevTools evidence should make the bug reproducible without asking you to explain it live.`,
+          ru: `## Сцена: save button ничего не делает
+
+Во время test run кнопка Save становится активной, но после клика success message не появляется. Не угадывайте. Расследуйте как QA, который умеет разделять UI, client и API signals.
+
+## Путь расследования
+
+| Сигнал | Что смотреть | Какое evidence сохранить |
+| --- | --- | --- |
+| UI state | button disabled/loading, visible toast, field values | screenshot до и после клика |
+| Console | JavaScript errors или warnings | точный error text и timestamp |
+| Network | request method, URL, status, payload, response body | request/response details |
+| Storage | auth token, stale profile data, feature flags | key/value, объясняющий behavior |
+| Repro scope | browser, viewport, account, environment | строка окружения в report |
+
+## Пример finding
+
+**Наблюдение:** click Save отправляет PATCH /api/profile и получает 422.
+**Evidence:** response body говорит timezone is required, но timezone field скрыт на mobile.
+**Риск:** mobile users не могут сохранить profile changes.
+**Вывод:** оформить functional bug с условием mobile layout.
+
+## Мини-действие
+
+Создайте одну DevTools note:
+
+- request URL and method
+- status code
+- request payload
+- response body
+- visible UI behavior
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Evidence**. DevTools evidence должно делать bug воспроизводимым без устного объяснения.`,
         },
       },
       {
@@ -974,24 +1054,72 @@ Cookies, local storage и session storage помогают понять, поч�
           ru: "Практика: browser test run",
         },
         body: {
-          en: `Open one settings or profile page and perform a structured check.
+          en: `## Scene: turn a browser run into a report
 
-1. Validate all visible controls and labels.
-2. Try valid and invalid changes.
-3. Refresh the page and confirm saved state.
-4. Open DevTools and inspect one request.
-5. Resize to mobile width and capture layout findings.
+After 35 minutes of testing profile settings, your raw notes are messy: screenshots, one 422 response, a mobile overlap, and two unclear messages. The team needs a structured report, not a pile of observations.
 
-Expected output: short report with at least 8 findings grouped into UI, validation, and technical observations.`,
-          ru: `Откройте одну страницу settings или profile и выполните структурированную проверку.
+## Test run plan
 
-1. Проверьте все видимые контролы и подписи.
-2. Попробуйте валидные и невалидные изменения.
-3. Обновите страницу и подтвердите сохраненное состояние.
-4. Откройте DevTools и исследуйте один запрос.
-5. Уменьшите ширину до mobile и зафиксируйте layout findings.
+1. Desktop happy path: update display name and timezone.
+2. Desktop negative path: empty name, huge avatar, wrong password.
+3. Mobile layout: profile form, avatar area, save button.
+4. Refresh persistence: save, refresh, revisit dashboard.
+5. DevTools evidence: inspect one failed request.
 
-Ожидаемый результат: короткий отчет минимум с 8 находками, сгруппированными по UI, validation и technical observations.`,
+## Report format
+
+| Group | Finding | Evidence | Decision |
+| --- | --- | --- | --- |
+| UI | Save button overlaps avatar on 375px width | screenshot mobile-375.png | fix before release |
+| Validation | Empty display name allows request | PATCH payload + 422 response | block submit client-side |
+| Data | Timezone does not persist after refresh | before/after screenshots | investigate API/state |
+| Copy | Error message says "Something went wrong" | screenshot + response body | replace with actionable text |
+
+## Final artifact
+
+Write a short browser QA report with:
+
+- 8 findings grouped by UI, validation, network/data, and copy
+- top 3 risks for release
+- recommendation: ready, ready with risks, or not ready
+- one retest checklist after fixes
+
+## Artifact seed
+
+Use this lesson to fill **Decision**: what should block release, what can ship with risk, and what must be retested.`,
+          ru: `## Сцена: превратить browser run в report
+
+После 35 минут проверки profile settings сырые заметки выглядят хаотично: screenshots, один 422 response, mobile overlap и два непонятных сообщения. Команде нужен структурированный report, а не куча наблюдений.
+
+## План test run
+
+1. Desktop happy path: update display name и timezone.
+2. Desktop negative path: empty name, huge avatar, wrong password.
+3. Mobile layout: profile form, avatar area, save button.
+4. Refresh persistence: save, refresh, revisit dashboard.
+5. DevTools evidence: исследовать один failed request.
+
+## Формат report
+
+| Группа | Finding | Evidence | Decision |
+| --- | --- | --- | --- |
+| UI | Save button overlaps avatar на 375px width | screenshot mobile-375.png | fix before release |
+| Validation | Empty display name отправляет request | PATCH payload + 422 response | block submit client-side |
+| Data | Timezone не сохраняется после refresh | before/after screenshots | investigate API/state |
+| Copy | Error message says "Something went wrong" | screenshot + response body | replace with actionable text |
+
+## Финальный артефакт
+
+Напишите короткий browser QA report:
+
+- 8 findings, сгруппированных как UI, validation, network/data и copy
+- top 3 risks для release
+- recommendation: ready, ready with risks или not ready
+- retest checklist после fixes
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Вывод**: что блокирует release, что можно выпустить с риском и что нужно retest.`,
         },
       },
     ],
