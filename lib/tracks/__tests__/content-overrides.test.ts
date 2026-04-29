@@ -78,6 +78,8 @@ describe("content overrides", () => {
     expect(course.description).toContain("ручному тестированию");
     expect(course.modules[0]?.title).toBe("Основы ручного тестирования");
     expect(course.modules[0]?.lessons[0]?.title).toBe("Чем занимается Manual QA");
+    expect(course.modules[0]?.lessons[0]?.body).toContain("Сцена");
+    expect(course.modules[0]?.lessons[2]?.body).toContain("risk map");
     expect(course.modules[0]?.quiz?.questions[0]?.options[1]?.text).toContain("Снижать риски");
   });
 

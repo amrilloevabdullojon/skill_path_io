@@ -138,36 +138,58 @@ const QA_MANUAL_MODULES: OverrideModule[] = [
           ru: "Чем занимается Manual QA",
         },
         body: {
-          en: `## Role in plain words
+          en: `## Scene: first day on the product team
 
-Manual QA helps the team understand the current quality of a product. The goal is not random clicking. The goal is to reduce release risk and make product behavior visible.
+You join a sprint planning call. The product manager says: "Registration is almost ready. We just need QA to check it quickly." The task sounds small, but nobody has written what "works" means.
 
-## What QA is responsible for
+Your job is not to click every button. Your job is to make risk visible before the team ships.
 
-- reading requirements and finding ambiguity early
-- preparing checks before a feature is considered done
-- validating both expected and unexpected user behavior
-- documenting defects clearly enough for the team to act fast
-- retesting fixes and reporting remaining risk
+## What you inspect first
 
-## What QA is not responsible for
+| Signal | What you ask | Why it matters |
+| --- | --- | --- |
+| User goal | Can a new user create an account without help? | This protects the main product path. |
+| Acceptance criteria | What result counts as success? | Without this, testing becomes opinion. |
+| Failure points | Where can the user get stuck or lose data? | These are release risks. |
+| Evidence | What proof will convince the team? | Evidence turns a feeling into a decision. |
 
-QA does not guarantee zero bugs. A tester provides evidence, coverage, and judgment. Quality is a shared responsibility between product, design, development, and QA.`,
-          ru: `## Роль простыми словами
+## Mini action
 
-Manual QA помогает команде понимать текущее состояние качества продукта. Цель не в хаотичных кликах. Цель в том, чтобы снижать релизные риски и делать поведение продукта прозрачным.
+Write three lines before you test:
 
-## За что отвечает QA
+1. **Observation:** The user tries to create an account with email and password.
+2. **Risk:** unclear validation can block signup or create duplicate accounts.
+3. **Check:** valid signup, invalid email, duplicate email, weak password.
 
-- читает требования и заранее находит неоднозначности
-- готовит проверки до того, как фича считается готовой
-- валидирует ожидаемое и неожиданное поведение пользователя
-- описывает дефекты так, чтобы команда могла быстро среагировать
-- перепроверяет исправления и сообщает об оставшихся рисках
+## Artifact seed
 
-## За что QA не отвечает
+Use this lesson to fill the **Observation** and **Risk** branches of the artifact. A good QA note starts with a fact, then explains why the fact matters.`,
+          ru: `## Сцена: первый день в продуктовой команде
 
-QA не гарантирует полное отсутствие багов. Тестировщик дает evidence, покрытие и обоснованную оценку. Качество - общая ответственность продукта, дизайна, разработки и QA.`,
+Вы подключаетесь к sprint planning. Product manager говорит: "Регистрация почти готова. Нужно, чтобы QA быстро проверил". Задача звучит маленькой, но никто не написал, что именно считается "работает".
+
+Ваша работа - не нажать все кнопки подряд. Ваша работа - сделать риск видимым до релиза.
+
+## Что смотреть первым
+
+| Сигнал | Что спросить | Зачем это важно |
+| --- | --- | --- |
+| Цель пользователя | Может ли новый пользователь создать аккаунт без помощи? | Это защищает главный продуктовый путь. |
+| Acceptance criteria | Какой результат считается успехом? | Без этого тестирование превращается во мнение. |
+| Точки отказа | Где пользователь может застрять или потерять данные? | Это релизные риски. |
+| Evidence | Какое доказательство убедит команду? | Evidence превращает ощущение в решение. |
+
+## Мини-действие
+
+Перед тестированием запишите три строки:
+
+1. **Наблюдение:** пользователь пытается создать аккаунт через email и password.
+2. **Риск:** неясная валидация может заблокировать регистрацию или создать дубли.
+3. **Проверка:** валидная регистрация, неверный email, повторный email, слабый пароль.
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить ветки **Наблюдение** и **Риск**. Хорошая QA-заметка начинается с факта, а потом объясняет, почему факт важен.`,
         },
       },
       {
@@ -176,28 +198,68 @@ QA не гарантирует полное отсутствие багов. Т�
           ru: "Как устроен процесс разработки",
         },
         body: {
-          en: `## SDLC and STLC
+          en: `## Scene: the feature moves through the sprint
 
-Software moves through idea, requirements, design, development, testing, release, and support. Testing is not a last-minute activity. Good QA starts asking questions during requirements and design.
+The signup task starts as a short product idea. Then design adds fields, development builds validation, and QA receives a staging link. If QA only appears at the end, every unclear decision becomes expensive.
 
-## Agile basics
+Think of delivery as a chain:
 
-In Agile teams, work is split into iterations. Common rituals are backlog refinement, sprint planning, daily sync, review, and retrospective. QA is expected to stay close to the team throughout the sprint.
+| Stage | QA move | Output |
+| --- | --- | --- |
+| Idea | Ask what user problem is solved | product risk list |
+| Requirements | Find vague words and missing rules | open questions |
+| Development | Prepare checks before build is done | checklist or test cases |
+| Testing | Compare expected and actual behavior | evidence |
+| Release | Say what is safe, risky, or blocked | release recommendation |
 
-## Practical mindset
+## Micro scenario
 
-When you hear "the task is done", ask what was implemented, what is out of scope, what environments are ready, and what can break around the feature.`,
-          ru: `## SDLC и STLC
+The developer says: "Registration is done on staging." Do not answer "ok, I will test everything." Ask for the minimum inputs:
 
-Продукт проходит этапы идеи, требований, дизайна, разработки, тестирования, релиза и поддержки. Тестирование - не финальная формальность. Хороший QA начинает задавать вопросы уже на стадии требований и дизайна.
+- staging URL and test account rules
+- acceptance criteria
+- known limitations
+- browser/device priority
+- rollback or hotfix contact if signup breaks
 
-## База Agile
+## Mini action
 
-В Agile-командах работа идет итерациями. Частые ритуалы: backlog refinement, sprint planning, daily sync, review и retrospective. От QA ожидается постоянная вовлеченность в команду на протяжении всего спринта.
+Turn the process into a test idea:
 
-## Практический подход
+**Check:** create account with valid email and password.
+**Expected:** account is created once, user sees confirmation, duplicate email is blocked.
+**Evidence:** browser, test data, actual message, screenshot if behavior is wrong.`,
+          ru: `## Сцена: фича проходит через спринт
 
-Когда вы слышите "задача готова", спросите, что именно реализовано, что осталось вне scope, какие среды готовы и что может сломаться рядом с фичей.`,
+Задача регистрации начинается как короткая продуктовая идея. Потом дизайн добавляет поля, разработчик делает валидацию, а QA получает staging-ссылку. Если QA появляется только в конце, каждое неясное решение становится дорогим.
+
+Думайте о delivery как о цепочке:
+
+| Этап | Ход QA | Выход |
+| --- | --- | --- |
+| Идея | Спросить, какую проблему пользователя решаем | список продуктовых рисков |
+| Требования | Найти расплывчатые слова и пропущенные правила | открытые вопросы |
+| Разработка | Подготовить проверки до завершения билда | checklist или test cases |
+| Тестирование | Сравнить expected и actual behavior | evidence |
+| Релиз | Сказать, что безопасно, рискованно или заблокировано | release recommendation |
+
+## Микро-сценарий
+
+Разработчик говорит: "Регистрация готова на staging". Не отвечайте "ок, всё протестирую". Сначала запросите минимальные входные данные:
+
+- staging URL и правила тестовых аккаунтов
+- acceptance criteria
+- известные ограничения
+- приоритетные browser/device
+- контакт для rollback или hotfix, если signup сломается
+
+## Мини-действие
+
+Превратите процесс в test idea:
+
+**Проверка:** создать аккаунт с валидным email и password.
+**Expected:** аккаунт создаётся один раз, пользователь видит подтверждение, повторный email блокируется.
+**Evidence:** browser, test data, actual message, screenshot при неверном поведении.`,
         },
       },
       {
@@ -206,24 +268,68 @@ When you hear "the task is done", ask what was implemented, what is out of scope
           ru: "Практика: карта рисков для регистрации",
         },
         body: {
-          en: `Inspect a simple sign-up flow and produce a short QA note.
+          en: `## Scene: you own the first QA artifact
 
-1. List product risks: missing validation, duplicated accounts, unclear errors.
-2. List UI risks: broken button state, hidden helper text, mobile layout overlap.
-3. List process risks: no test data, unclear acceptance criteria, no rollback plan.
-4. Mark each risk as low, medium, or high impact.
-5. Explain which 3 risks must be discussed before release.
+The team wants to release signup tomorrow. You have 20 minutes to produce something useful. The goal is not a long document. The goal is a risk map that helps the team decide what to fix or clarify.
 
-Expected output: a one-page summary with risks, impact, and questions for the team.`,
-          ru: `Посмотрите на простой сценарий регистрации и подготовьте короткую QA-заметку.
+## Your working brief
 
-1. Перечислите продуктовые риски: нет валидации, создаются дубли аккаунтов, ошибки непонятны.
-2. Перечислите UI-риски: сломанное состояние кнопки, скрытый helper text, наложение верстки на мобильных.
-3. Перечислите процессные риски: нет тестовых данных, acceptance criteria неясны, отсутствует rollback plan.
-4. Отметьте каждый риск как low, medium или high impact.
-5. Объясните, какие 3 риска нужно обсудить с командой до релиза.
+Feature: user signs up with email and password.
+Platforms: desktop Chrome and mobile Safari.
+Known rule: password must be at least 8 characters.
+Unknowns: duplicate email behavior, error text, confirmation screen.
 
-Ожидаемый результат: одностраничное summary с рисками, влиянием и вопросами для команды.`,
+## Build the risk map
+
+| Risk | Impact | First check | Evidence |
+| --- | --- | --- | --- |
+| Weak password accepted | high | try 7 characters | expected/actual message |
+| Duplicate email creates second account | high | register same email twice | account state and response |
+| Error message is unclear | medium | enter invalid email | screenshot and text |
+| Button stays active during submit | medium | double click Sign up | duplicate request or UI lock |
+| Mobile layout hides helper text | medium | open on mobile width | screenshot |
+
+## Final move
+
+Choose three risks that must be discussed before release. For each one, write:
+
+1. what you observed
+2. why it matters
+3. which check proves it
+4. what the team should do next
+
+This is your first portfolio-grade artifact: a small risk map with evidence and a clear decision.`,
+          ru: `## Сцена: вы отвечаете за первый QA-артефакт
+
+Команда хочет выпустить регистрацию завтра. У вас есть 20 минут, чтобы сделать что-то полезное. Цель - не длинный документ. Цель - risk map, который помогает команде решить, что исправить или уточнить.
+
+## Рабочий бриф
+
+Фича: пользователь регистрируется через email и password.
+Платформы: desktop Chrome и mobile Safari.
+Известное правило: password минимум 8 символов.
+Неизвестно: поведение при повторном email, текст ошибки, экран подтверждения.
+
+## Соберите risk map
+
+| Риск | Impact | Первая проверка | Evidence |
+| --- | --- | --- | --- |
+| Слабый password принимается | high | ввести 7 символов | expected/actual message |
+| Повторный email создаёт второй аккаунт | high | зарегистрировать один email дважды | состояние аккаунта и response |
+| Ошибка непонятна пользователю | medium | ввести неверный email | screenshot и текст |
+| Кнопка активна во время submit | medium | дважды нажать Sign up | duplicate request или UI lock |
+| На mobile скрыт helper text | medium | открыть mobile width | screenshot |
+
+## Финальный ход
+
+Выберите три риска, которые нужно обсудить до релиза. Для каждого напишите:
+
+1. что вы наблюдали
+2. почему это важно
+3. какая проверка это доказывает
+4. что команда должна сделать дальше
+
+Это первый артефакт портфолио: маленькая risk map с evidence и понятным решением.`,
         },
       },
     ],
@@ -1539,9 +1645,9 @@ Feature: поле age принимает 18-60.
     {
       en: `## Workplace artifact: test case sample
 
-**Title:** Login succeeds with valid credentials  
-**Preconditions:** User exists and email is verified  
-**Data:** student@levio.local / valid password  
+**Title:** Login succeeds with valid credentials
+**Preconditions:** User exists and email is verified
+**Data:** student@levio.local / valid password
 **Steps:**
 1. Open login page
 2. Enter valid email
@@ -1557,9 +1663,9 @@ Write two test cases in this format:
 - correct email with wrong password`,
       ru: `## Рабочий артефакт: пример test case
 
-**Title:** Login succeeds with valid credentials  
-**Preconditions:** User exists and email is verified  
-**Data:** student@levio.local / valid password  
+**Title:** Login succeeds with valid credentials
+**Preconditions:** User exists and email is verified
+**Data:** student@levio.local / valid password
 **Steps:**
 1. Open login page
 2. Enter valid email
@@ -1731,12 +1837,12 @@ Create a 5-request Postman plan for a lesson bookmark API. Name each request and
     {
       en: `## Workplace artifact: API finding
 
-**Title:** POST /api/bookmarks accepts empty lessonId  
-**Environment:** local, Chrome, student account  
-**Request:** POST /api/bookmarks with body { "lessonId": "" }  
-**Expected:** 400 or 422 with field-level validation error  
-**Actual:** 200 and empty bookmark created  
-**Impact:** User can create broken saved items; Bookmarks page may show blank cards  
+**Title:** POST /api/bookmarks accepts empty lessonId
+**Environment:** local, Chrome, student account
+**Request:** POST /api/bookmarks with body { "lessonId": "" }
+**Expected:** 400 or 422 with field-level validation error
+**Actual:** 200 and empty bookmark created
+**Impact:** User can create broken saved items; Bookmarks page may show blank cards
 **Evidence:** request/response body, timestamp, account
 
 ## Real beginner task
@@ -1744,12 +1850,12 @@ Create a 5-request Postman plan for a lesson bookmark API. Name each request and
 Write one API finding for unauthorized access to a protected endpoint.`,
       ru: `## Рабочий артефакт: API finding
 
-**Title:** POST /api/bookmarks accepts empty lessonId  
-**Environment:** local, Chrome, student account  
-**Request:** POST /api/bookmarks with body { "lessonId": "" }  
-**Expected:** 400 or 422 with field-level validation error  
-**Actual:** 200 and empty bookmark created  
-**Impact:** User can create broken saved items; Bookmarks page may show blank cards  
+**Title:** POST /api/bookmarks accepts empty lessonId
+**Environment:** local, Chrome, student account
+**Request:** POST /api/bookmarks with body { "lessonId": "" }
+**Expected:** 400 or 422 with field-level validation error
+**Actual:** 200 and empty bookmark created
+**Impact:** User can create broken saved items; Bookmarks page may show blank cards
 **Evidence:** request/response body, timestamp, account
 
 ## Реальная задача для новичка
@@ -1761,18 +1867,18 @@ Write one API finding for unauthorized access to a protected endpoint.`,
     {
       en: `## Workplace artifact: strong bug report
 
-**Title:** Save button remains enabled during profile update and creates duplicate requests  
-**Environment:** local, Chrome 124, student@levio.local  
-**Preconditions:** User is logged in and opens Profile settings  
+**Title:** Save button remains enabled during profile update and creates duplicate requests
+**Environment:** local, Chrome 124, student@levio.local
+**Preconditions:** User is logged in and opens Profile settings
 **Steps:**
 1. Change the display name
 2. Double-click Save quickly
 3. Open Network tab
 
-**Expected:** Button becomes disabled after first click; only one request is sent  
-**Actual:** Two update requests are sent  
-**Severity:** Medium  
-**Priority:** High if duplicate writes can corrupt data  
+**Expected:** Button becomes disabled after first click; only one request is sent
+**Actual:** Two update requests are sent
+**Severity:** Medium
+**Priority:** High if duplicate writes can corrupt data
 **Evidence:** Network screenshot with two POST/PATCH requests
 
 ## Real beginner task
@@ -1780,18 +1886,18 @@ Write one API finding for unauthorized access to a protected endpoint.`,
 Write a bug report for this defect: "On mobile, the Continue button overlaps the last quiz option."`,
       ru: `## Рабочий артефакт: сильный bug report
 
-**Title:** Save button remains enabled during profile update and creates duplicate requests  
-**Environment:** local, Chrome 124, student@levio.local  
-**Preconditions:** User is logged in and opens Profile settings  
+**Title:** Save button remains enabled during profile update and creates duplicate requests
+**Environment:** local, Chrome 124, student@levio.local
+**Preconditions:** User is logged in and opens Profile settings
 **Steps:**
 1. Change the display name
 2. Double-click Save quickly
 3. Open Network tab
 
-**Expected:** Button becomes disabled after first click; only one request is sent  
-**Actual:** Two update requests are sent  
-**Severity:** Medium  
-**Priority:** High if duplicate writes can corrupt data  
+**Expected:** Button becomes disabled after first click; only one request is sent
+**Actual:** Two update requests are sent
+**Severity:** Medium
+**Priority:** High if duplicate writes can corrupt data
 **Evidence:** Network screenshot with two POST/PATCH requests
 
 ## Реальная задача для новичка
@@ -1827,10 +1933,10 @@ Prepare a 10-item smoke checklist for releasing the QA learning path.`,
     {
       en: `## Workplace artifact: release recommendation
 
-**Recommendation:** Ready with risks  
-**Coverage completed:** login, QA track page, first module, quiz fallback, dashboard progress  
-**Open defects:** mobile overlap in quiz options, Gemini AI returns 403 locally  
-**Risk:** Learners can still complete modules, but AI-generated quiz is unavailable until API access is fixed  
+**Recommendation:** Ready with risks
+**Coverage completed:** login, QA track page, first module, quiz fallback, dashboard progress
+**Open defects:** mobile overlap in quiz options, Gemini AI returns 403 locally
+**Risk:** Learners can still complete modules, but AI-generated quiz is unavailable until API access is fixed
 **Decision needed:** Release fallback learning flow now or block release until AI key is corrected
 
 ## Real beginner task
@@ -1838,10 +1944,10 @@ Prepare a 10-item smoke checklist for releasing the QA learning path.`,
 Write a release recommendation for a build where payment works, course progress works, but certificate PDF generation fails.`,
       ru: `## Рабочий артефакт: release recommendation
 
-**Recommendation:** Ready with risks  
-**Coverage completed:** login, QA track page, first module, quiz fallback, dashboard progress  
-**Open defects:** mobile overlap in quiz options, Gemini AI returns 403 locally  
-**Risk:** Learners can still complete modules, but AI-generated quiz is unavailable until API access is fixed  
+**Recommendation:** Ready with risks
+**Coverage completed:** login, QA track page, first module, quiz fallback, dashboard progress
+**Open defects:** mobile overlap in quiz options, Gemini AI returns 403 locally
+**Risk:** Learners can still complete modules, but AI-generated quiz is unavailable until API access is fixed
 **Decision needed:** Release fallback learning flow now or block release until AI key is corrected
 
 ## Реальная задача для новичка
