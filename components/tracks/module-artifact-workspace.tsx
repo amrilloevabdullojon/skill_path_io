@@ -68,6 +68,7 @@ const emptyDraft: WorkspaceDraft = {
 };
 
 const artifactSnippetEventName = "levio:artifact-snippet";
+const artifactResetEventName = "levio:artifact-reset";
 
 const phaseItems = [
   {
@@ -637,6 +638,7 @@ export function ModuleArtifactWorkspace({
     setGrowthEvents([]);
     window.localStorage.removeItem(storageKey);
     window.localStorage.removeItem(growthEventsStorageKey);
+    window.dispatchEvent(new CustomEvent(artifactResetEventName));
   }
 
   async function runReview() {

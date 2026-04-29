@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import {
@@ -53,6 +53,7 @@ const artifactFieldLabels: Record<LessonDecisionOption["artifactField"], string>
 };
 
 const artifactSnippetEventName = "levio:artifact-snippet";
+const artifactResetEventName = "levio:artifact-reset";
 const lessonDecisionStorageKey = "levio:lesson-decisions:v1";
 
 function loadLessonDecisionMemory() {
@@ -146,6 +147,27 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
       activeFields,
     };
   }, [lessonDecisionState, lessonPanels]);
+  const lessonPanelIds = useMemo(() => lessonPanels.map((block) => block.id), [lessonPanels]);
+  const clearLessonDecisions = useCallback(() => {
+    setLessonDecisionState((prev) => {
+      const next = { ...prev };
+      lessonPanelIds.forEach((id) => {
+        delete next[id];
+      });
+
+      saveLessonDecisionMemory(next);
+      return next;
+    });
+  }, [lessonPanelIds]);
+
+  useEffect(() => {
+    function handleArtifactReset() {
+      clearLessonDecisions();
+    }
+
+    window.addEventListener(artifactResetEventName, handleArtifactReset);
+    return () => window.removeEventListener(artifactResetEventName, handleArtifactReset);
+  }, [clearLessonDecisions]);
 
   function updateLessonDecision(blockId: string, decisionId: string, transferred = false) {
     setLessonDecisionState((prev) => {
@@ -249,6 +271,15 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
               );
             })}
           </div>
+          {decisionProgress.selectedCount > 0 ? (
+            <button
+              type="button"
+              onClick={clearLessonDecisions}
+              className="mt-3 rounded-full border border-border/50 bg-card/55 px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-foreground"
+            >
+              Сбросить ходы уроков
+            </button>
+          ) : null}
         </section>
       ) : null}
 
