@@ -147,6 +147,24 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
       activeFields,
     };
   }, [lessonDecisionState, lessonPanels]);
+  const nextLessonTarget = useMemo(() => {
+    const target = lessonPanels.find((block) => {
+      const memory = lessonDecisionState[block.id];
+      return !memory?.transferredAt;
+    });
+
+    if (!target?.lesson) {
+      return null;
+    }
+
+    const memory = lessonDecisionState[target.id];
+
+    return {
+      href: `#${target.id}`,
+      title: target.lesson.title,
+      action: memory?.decisionId ? "Перенесите выбранный ход в артефакт" : "Выберите один рабочий ход",
+    };
+  }, [lessonDecisionState, lessonPanels]);
   const lessonPanelIds = useMemo(() => lessonPanels.map((block) => block.id), [lessonPanels]);
   const clearLessonDecisions = useCallback(() => {
     setLessonDecisionState((prev) => {
@@ -271,6 +289,25 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
               );
             })}
           </div>
+          {nextLessonTarget ? (
+            <div className="mt-3 flex flex-col gap-2 rounded-2xl border border-border/45 bg-background/45 p-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Следующий шаг</p>
+                <p className="mt-1 font-semibold text-foreground">{nextLessonTarget.action}</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">{nextLessonTarget.title}</p>
+              </div>
+              <a
+                href={nextLessonTarget.href}
+                className="btn-secondary inline-flex items-center justify-center px-3 py-2 text-xs"
+              >
+                Перейти к уроку
+              </a>
+            </div>
+          ) : (
+            <div className="mt-3 rounded-2xl border border-emerald-500/35 bg-emerald-500/10 p-3 text-sm text-emerald-700 dark:text-emerald-300">
+              Все ходы перенесены в артефакт. Теперь усиливайте поля и запускайте AI-review.
+            </div>
+          )}
           {decisionProgress.selectedCount > 0 ? (
             <button
               type="button"
@@ -290,8 +327,8 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
             return null;
           }
           const decisionMemory = lessonDecisionState[block.id];
-          const selectedDecisionId = decisionMemory?.decisionId ?? lesson.decisionOptions[0]?.id;
-          const selectedDecision = lesson.decisionOptions.find((option) => option.id === selectedDecisionId) ?? lesson.decisionOptions[0];
+          const selectedDecisionId = decisionMemory?.decisionId;
+          const selectedDecision = lesson.decisionOptions.find((option) => option.id === selectedDecisionId);
           const transferredSelectedDecision = Boolean(decisionMemory?.transferredAt && decisionMemory.decisionId === selectedDecision?.id);
 
           return (
