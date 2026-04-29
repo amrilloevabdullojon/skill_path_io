@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, CheckCircle2, ClipboardCheck, History, Inbox, Loader2, RotateCcw, Save, Sparkles, Trophy } from "lucide-react";
 
 import { upsertPortfolioEntry } from "@/lib/portfolio/local-portfolio";
-import { artifactReadinessPercent, buildArtifactReadinessChecklist, buildReviewActionPlan, buildReviewGate } from "@/lib/tracks/artifact-readiness";
+import { artifactReadinessPercent, buildArtifactReadinessChecklist, buildPortfolioGate, buildReviewActionPlan, buildReviewGate } from "@/lib/tracks/artifact-readiness";
 import { buildModuleShiftSeed, type ModuleShiftBrief } from "@/lib/tracks/module-brief";
 import { cn } from "@/lib/utils";
 
@@ -553,6 +553,12 @@ export function ModuleArtifactWorkspace({
         nextSteps: review.nextSteps,
       })
     : [];
+  const portfolioGate = buildPortfolioGate({
+    filledFields,
+    artifactHealth,
+    hasReview: reviewReady,
+    reviewScore: review?.score ?? null,
+  });
   const weakestField = fieldHealth.find((item) => item.status !== "strong") ?? null;
   const decisionFocusField = importedSnippet ? snippetFocusField(importedSnippet) : null;
   const decisionFocusHealth = decisionFocusField ? fieldHealth.find((item) => item.field === decisionFocusField) ?? null : null;
@@ -939,7 +945,7 @@ export function ModuleArtifactWorkspace({
             <button
               type="button"
               onClick={saveToPortfolio}
-              disabled={filledFields < 3}
+              disabled={!portfolioGate.canSave}
               className="btn-secondary inline-flex items-center justify-center gap-2 disabled:opacity-55"
             >
               <Trophy className="h-4 w-4" />
@@ -961,6 +967,18 @@ export function ModuleArtifactWorkspace({
           >
             <p className="font-semibold text-foreground">{reviewGate.title}</p>
             <p className="mt-1 text-xs leading-5 text-muted-foreground">{reviewGate.description}</p>
+          </div>
+
+          <div
+            className={cn(
+              "rounded-2xl border px-3 py-2 text-sm",
+              portfolioGate.recommended
+                ? "border-amber-500/35 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                : "border-border/60 bg-card/55 text-muted-foreground",
+            )}
+          >
+            <p className="font-semibold text-foreground">{portfolioGate.title}</p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">{portfolioGate.description}</p>
           </div>
 
           {savedAt ? (

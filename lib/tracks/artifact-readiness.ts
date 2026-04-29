@@ -40,6 +40,20 @@ export type ReviewActionItem = {
   label: string;
 };
 
+export type PortfolioGateInput = {
+  filledFields: number;
+  artifactHealth: number;
+  hasReview: boolean;
+  reviewScore?: number | null;
+};
+
+export type PortfolioGate = {
+  canSave: boolean;
+  recommended: boolean;
+  title: string;
+  description: string;
+};
+
 export function buildArtifactReadinessChecklist(input: ArtifactReadinessInput): ArtifactReadinessItem[] {
   const reviewScore = input.reviewScore ?? 0;
 
@@ -190,4 +204,45 @@ export function buildReviewActionPlan(input: ReviewActionPlanInput): ReviewActio
       label: reviewTargetLabels[target],
     };
   });
+}
+
+export function buildPortfolioGate(input: PortfolioGateInput): PortfolioGate {
+  const canSave = input.filledFields >= 3;
+  const recommended = input.filledFields >= 4 && input.artifactHealth >= 70 && input.hasReview;
+
+  if (recommended) {
+    return {
+      canSave,
+      recommended,
+      title: "Готово для портфолио",
+      description: input.reviewScore
+        ? `Артефакт зрелый и проверен AI-review: ${input.reviewScore}/100.`
+        : "Артефакт зрелый и проверен AI-review.",
+    };
+  }
+
+  if (!canSave) {
+    return {
+      canSave,
+      recommended,
+      title: "Портфолио пока закрыто",
+      description: "Заполните минимум 3 ветки артефакта, чтобы сохранить осмысленный результат.",
+    };
+  }
+
+  if (!input.hasReview) {
+    return {
+      canSave,
+      recommended,
+      title: "Можно сохранить черновик",
+      description: "Для сильного портфолио лучше сначала получить AI-review и доработать слабые места.",
+    };
+  }
+
+  return {
+    canSave,
+    recommended,
+    title: "Можно сохранить, но стоит усилить",
+    description: `Здоровье артефакта ${input.artifactHealth}%. Для портфолио цель - 70%+ и 4 заполненные ветки.`,
+  };
 }

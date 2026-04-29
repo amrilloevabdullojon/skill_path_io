@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   artifactReadinessPercent,
   buildArtifactReadinessChecklist,
+  buildPortfolioGate,
   buildReviewActionPlan,
   buildReviewGate,
 } from "@/lib/tracks/artifact-readiness";
@@ -61,5 +62,23 @@ describe("artifact readiness", () => {
     expect(plan).toHaveLength(2);
     expect(plan[0]).toMatchObject({ target: "evidence", label: "Evidence" });
     expect(plan[1]).toMatchObject({ target: "decision", label: "Вывод" });
+  });
+
+  it("separates portfolio draft save from recommended portfolio quality", () => {
+    expect(buildPortfolioGate({ filledFields: 2, artifactHealth: 40, hasReview: false })).toMatchObject({
+      canSave: false,
+      recommended: false,
+      title: "Портфолио пока закрыто",
+    });
+    expect(buildPortfolioGate({ filledFields: 3, artifactHealth: 62, hasReview: false })).toMatchObject({
+      canSave: true,
+      recommended: false,
+      title: "Можно сохранить черновик",
+    });
+    expect(buildPortfolioGate({ filledFields: 5, artifactHealth: 88, hasReview: true, reviewScore: 91 })).toMatchObject({
+      canSave: true,
+      recommended: true,
+      title: "Готово для портфолио",
+    });
   });
 });
