@@ -114,6 +114,41 @@ function scoreLabel(result: ReviewResult | null) {
   return "вернуться к фазе 1";
 }
 
+function growthStageLabel(readiness: number, review: ReviewResult | null, portfolioSaved: boolean) {
+  if (portfolioSaved) {
+    return "Плод в портфолио";
+  }
+  if (review?.score && review.score >= 85) {
+    return "Спелый артефакт";
+  }
+  if (review) {
+    return "Проверенный росток";
+  }
+  if (readiness >= 80) {
+    return "Почти созрел";
+  }
+  if (readiness >= 40) {
+    return "Растущая ветка";
+  }
+  if (readiness > 0) {
+    return "Первый росток";
+  }
+  return "Пустая ветка";
+}
+
+function fruitClass(isReady: boolean, isReviewReady: boolean, isPortfolioReady: boolean) {
+  if (isPortfolioReady) {
+    return "border-amber-400/60 bg-amber-400 text-amber-950 shadow-amber-400/30";
+  }
+  if (isReviewReady) {
+    return "border-emerald-400/60 bg-emerald-500 text-white shadow-emerald-500/25";
+  }
+  if (isReady) {
+    return "border-sky-400/60 bg-sky-500 text-white shadow-sky-500/20";
+  }
+  return "border-border/70 bg-muted text-muted-foreground";
+}
+
 function appendUnique(current: string, next: string) {
   const trimmedNext = next.trim();
   if (!trimmedNext) {
@@ -202,6 +237,16 @@ export function ModuleArtifactWorkspace({
   const filledFields = Object.values(draft).filter((value) => value.trim().length > 0).length;
   const readiness = Math.round((filledFields / Object.keys(emptyDraft).length) * 100);
   const canReview = artifact.replace(/Пока не заполнено\./g, "").trim().length > 180 && filledFields >= 3;
+  const reviewReady = Boolean(review);
+  const strongReview = Boolean(review?.score && review.score >= 85);
+  const growthLabel = growthStageLabel(readiness, review, portfolioSaved);
+  const growthMilestones = [
+    { id: "observation", label: "Наблюдение", done: draft.observation.trim().length > 0 },
+    { id: "risk", label: "Риск", done: draft.risk.trim().length > 0 },
+    { id: "test", label: "Проверка", done: draft.testIdea.trim().length > 0 },
+    { id: "evidence", label: "Evidence", done: draft.evidence.trim().length > 0 },
+    { id: "decision", label: "Вывод", done: draft.decision.trim().length > 0 },
+  ];
 
   function updateDraft(field: keyof WorkspaceDraft, value: string) {
     setDraft((current) => ({ ...current, [field]: value }));
@@ -399,6 +444,94 @@ export function ModuleArtifactWorkspace({
         </div>
 
         <aside className="space-y-4">
+          <article className="overflow-hidden rounded-2xl border border-emerald-500/25 bg-background/55 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="kicker">Дерево артефакта</p>
+                <p className="mt-1 text-lg font-semibold text-foreground">{growthLabel}</p>
+              </div>
+              <span className="rounded-full border border-border/60 bg-card/70 px-3 py-1 text-xs text-muted-foreground">
+                {readiness}%
+              </span>
+            </div>
+
+            <div className="relative mt-5 h-56 overflow-hidden rounded-2xl border border-border/60 bg-card/45">
+              <div className="absolute inset-x-0 bottom-0 h-14 bg-emerald-500/8" />
+              <div className="absolute bottom-9 left-1/2 h-28 w-3 -translate-x-1/2 rounded-full bg-emerald-900/35 dark:bg-emerald-400/25" />
+              <div
+                className="absolute bottom-9 left-1/2 w-3 -translate-x-1/2 rounded-full bg-emerald-500 transition-all duration-500"
+                style={{ height: `${Math.max(22, readiness)}%` }}
+              />
+
+              <div className="absolute bottom-28 left-1/2 h-2 w-24 origin-left -rotate-[28deg] rounded-full bg-emerald-500/60" />
+              <div className="absolute bottom-32 right-1/2 h-2 w-24 origin-right rotate-[28deg] rounded-full bg-emerald-500/60" />
+              <div className="absolute bottom-20 left-1/2 h-2 w-20 origin-left rotate-[18deg] rounded-full bg-emerald-500/45" />
+              <div className="absolute bottom-24 right-1/2 h-2 w-20 origin-right -rotate-[18deg] rounded-full bg-emerald-500/45" />
+
+              {growthMilestones.map((milestone, index) => {
+                const positions = [
+                  "left-[18%] top-[28%]",
+                  "right-[18%] top-[24%]",
+                  "left-[24%] top-[55%]",
+                  "right-[25%] top-[52%]",
+                  "left-1/2 top-[14%] -translate-x-1/2",
+                ];
+
+                return (
+                  <span
+                    key={milestone.id}
+                    className={cn(
+                      "absolute inline-flex h-9 w-9 items-center justify-center rounded-full border text-xs font-semibold shadow-lg transition-all",
+                      positions[index],
+                      fruitClass(milestone.done, reviewReady, portfolioSaved),
+                    )}
+                    title={milestone.label}
+                  >
+                    {index + 1}
+                  </span>
+                );
+              })}
+
+              <span
+                className={cn(
+                  "absolute bottom-8 right-8 inline-flex h-11 w-11 items-center justify-center rounded-full border text-xs font-bold shadow-lg transition-all",
+                  fruitClass(strongReview, strongReview, portfolioSaved),
+                )}
+                title="AI-review и портфолио"
+              >
+                {portfolioSaved ? "P" : reviewReady ? "AI" : "Q"}
+              </span>
+            </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+              {growthMilestones.map((milestone) => (
+                <p
+                  key={milestone.id}
+                  className={cn(
+                    "rounded-xl border px-2 py-1.5",
+                    milestone.done
+                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                      : "border-border/60 bg-card/55 text-muted-foreground",
+                  )}
+                >
+                  {milestone.done ? "✓ " : ""}
+                  {milestone.label}
+                </p>
+              ))}
+              <p
+                className={cn(
+                  "rounded-xl border px-2 py-1.5",
+                  reviewReady
+                    ? "border-sky-500/30 bg-sky-500/10 text-sky-700 dark:text-sky-300"
+                    : "border-border/60 bg-card/55 text-muted-foreground",
+                )}
+              >
+                {reviewReady ? "✓ " : ""}
+                AI-review
+              </p>
+            </div>
+          </article>
+
           <article className="rounded-2xl border border-border/60 bg-background/55 p-4">
             <div className="flex items-center justify-between gap-3">
               <div>
