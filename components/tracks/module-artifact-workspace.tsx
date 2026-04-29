@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, CheckCircle2, ClipboardCheck, Inbox, Loader2, RotateCcw, Save, Sparkles, Trophy } from "lucide-react";
 
 import { upsertPortfolioEntry } from "@/lib/portfolio/local-portfolio";
@@ -22,6 +22,8 @@ type WorkspaceDraft = {
   evidence: string;
   decision: string;
 };
+
+type WorkspaceDraftField = keyof WorkspaceDraft;
 
 type ArtifactSnippet = {
   sourceId: string;
@@ -181,6 +183,13 @@ export function ModuleArtifactWorkspace({
   skills,
 }: ModuleArtifactWorkspaceProps) {
   const storageKey = `levio:module-artifact:${moduleId}`;
+  const fieldRefs = useRef<Record<WorkspaceDraftField, HTMLTextAreaElement | null>>({
+    observation: null,
+    risk: null,
+    testIdea: null,
+    evidence: null,
+    decision: null,
+  });
   const [draft, setDraft] = useState<WorkspaceDraft>(emptyDraft);
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [portfolioSaved, setPortfolioSaved] = useState(false);
@@ -241,12 +250,43 @@ export function ModuleArtifactWorkspace({
   const strongReview = Boolean(review?.score && review.score >= 85);
   const growthLabel = growthStageLabel(readiness, review, portfolioSaved);
   const growthMilestones = [
-    { id: "observation", label: "Наблюдение", done: draft.observation.trim().length > 0 },
-    { id: "risk", label: "Риск", done: draft.risk.trim().length > 0 },
-    { id: "test", label: "Проверка", done: draft.testIdea.trim().length > 0 },
-    { id: "evidence", label: "Evidence", done: draft.evidence.trim().length > 0 },
-    { id: "decision", label: "Вывод", done: draft.decision.trim().length > 0 },
+    {
+      id: "observation",
+      field: "observation" as const,
+      label: "Наблюдение",
+      done: draft.observation.trim().length > 0,
+      prompt: "Начните с факта: что именно вы увидели в задаче, UI, API или данных.",
+    },
+    {
+      id: "risk",
+      field: "risk" as const,
+      label: "Риск",
+      done: draft.risk.trim().length > 0,
+      prompt: "Опишите, кому и чем навредит проблема, если её пропустить.",
+    },
+    {
+      id: "test",
+      field: "testIdea" as const,
+      label: "Проверка",
+      done: draft.testIdea.trim().length > 0,
+      prompt: "Сформулируйте один сценарий, который докажет или опровергнет риск.",
+    },
+    {
+      id: "evidence",
+      field: "evidence" as const,
+      label: "Evidence",
+      done: draft.evidence.trim().length > 0,
+      prompt: "Укажите, какие шаги, данные, screenshot, request или expected result приложите.",
+    },
+    {
+      id: "decision",
+      field: "decision" as const,
+      label: "Вывод",
+      done: draft.decision.trim().length > 0,
+      prompt: "Закройте работу решением: исправить, уточнить, покрыть тестами или принять риск.",
+    },
   ];
+  const nextGrowthMilestone = growthMilestones.find((milestone) => !milestone.done) ?? null;
 
   function updateDraft(field: keyof WorkspaceDraft, value: string) {
     setDraft((current) => ({ ...current, [field]: value }));
@@ -314,6 +354,15 @@ export function ModuleArtifactWorkspace({
     setPortfolioSaved(true);
   }
 
+  function focusField(field: WorkspaceDraftField) {
+    const element = fieldRefs.current[field];
+    if (!element) {
+      return;
+    }
+    element.scrollIntoView({ behavior: "smooth", block: "center" });
+    window.setTimeout(() => element.focus(), 250);
+  }
+
   return (
     <section id="module-phases" className="surface-elevated border border-border/50 bg-card/45 backdrop-blur-md p-5 sm:p-6">
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -357,6 +406,9 @@ export function ModuleArtifactWorkspace({
             <label className="space-y-1.5">
               <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Наблюдение</span>
               <textarea
+                ref={(node) => {
+                  fieldRefs.current.observation = node;
+                }}
                 value={draft.observation}
                 onChange={(event) => updateDraft("observation", event.target.value)}
                 className="textarea-base min-h-[112px] bg-background/70"
@@ -366,6 +418,9 @@ export function ModuleArtifactWorkspace({
             <label className="space-y-1.5">
               <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Риск</span>
               <textarea
+                ref={(node) => {
+                  fieldRefs.current.risk = node;
+                }}
                 value={draft.risk}
                 onChange={(event) => updateDraft("risk", event.target.value)}
                 className="textarea-base min-h-[112px] bg-background/70"
@@ -375,6 +430,9 @@ export function ModuleArtifactWorkspace({
             <label className="space-y-1.5">
               <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Проверка</span>
               <textarea
+                ref={(node) => {
+                  fieldRefs.current.testIdea = node;
+                }}
                 value={draft.testIdea}
                 onChange={(event) => updateDraft("testIdea", event.target.value)}
                 className="textarea-base min-h-[112px] bg-background/70"
@@ -384,6 +442,9 @@ export function ModuleArtifactWorkspace({
             <label className="space-y-1.5">
               <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Evidence</span>
               <textarea
+                ref={(node) => {
+                  fieldRefs.current.evidence = node;
+                }}
                 value={draft.evidence}
                 onChange={(event) => updateDraft("evidence", event.target.value)}
                 className="textarea-base min-h-[112px] bg-background/70"
@@ -395,6 +456,9 @@ export function ModuleArtifactWorkspace({
           <label className="block space-y-1.5">
             <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Вывод</span>
             <textarea
+              ref={(node) => {
+                fieldRefs.current.decision = node;
+              }}
               value={draft.decision}
               onChange={(event) => updateDraft("decision", event.target.value)}
               className="textarea-base min-h-[104px] bg-background/70"
@@ -478,17 +542,20 @@ export function ModuleArtifactWorkspace({
                 ];
 
                 return (
-                  <span
+                  <button
                     key={milestone.id}
+                    type="button"
+                    onClick={() => focusField(milestone.field)}
                     className={cn(
                       "absolute inline-flex h-9 w-9 items-center justify-center rounded-full border text-xs font-semibold shadow-lg transition-all",
                       positions[index],
+                      "hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500/50",
                       fruitClass(milestone.done, reviewReady, portfolioSaved),
                     )}
                     title={milestone.label}
                   >
                     {index + 1}
-                  </span>
+                  </button>
                 );
               })}
 
@@ -505,10 +572,12 @@ export function ModuleArtifactWorkspace({
 
             <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
               {growthMilestones.map((milestone) => (
-                <p
+                <button
                   key={milestone.id}
+                  type="button"
+                  onClick={() => focusField(milestone.field)}
                   className={cn(
-                    "rounded-xl border px-2 py-1.5",
+                    "rounded-xl border px-2 py-1.5 text-left transition-colors hover:border-emerald-500/40",
                     milestone.done
                       ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
                       : "border-border/60 bg-card/55 text-muted-foreground",
@@ -516,7 +585,7 @@ export function ModuleArtifactWorkspace({
                 >
                   {milestone.done ? "✓ " : ""}
                   {milestone.label}
-                </p>
+                </button>
               ))}
               <p
                 className={cn(
@@ -529,6 +598,58 @@ export function ModuleArtifactWorkspace({
                 {reviewReady ? "✓ " : ""}
                 AI-review
               </p>
+            </div>
+            <div className="mt-3 rounded-2xl border border-border/60 bg-card/55 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Следующий рост</p>
+              {nextGrowthMilestone ? (
+                <>
+                  <p className="mt-1 text-sm font-semibold text-foreground">{nextGrowthMilestone.label}</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">{nextGrowthMilestone.prompt}</p>
+                  <button
+                    type="button"
+                    onClick={() => focusField(nextGrowthMilestone.field)}
+                    className="btn-secondary mt-3 inline-flex w-full items-center justify-center gap-2 text-xs"
+                  >
+                    Перейти к полю
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </>
+              ) : !reviewReady ? (
+                <>
+                  <p className="mt-1 text-sm font-semibold text-foreground">Проверить зрелость</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    Все плоды заполнены. Запустите AI-review, чтобы увидеть, насколько артефакт готов к портфолио.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={runReview}
+                    disabled={!canReview || isReviewing}
+                    className="btn-secondary mt-3 inline-flex w-full items-center justify-center gap-2 text-xs disabled:opacity-55"
+                  >
+                    {isReviewing ? "Проверяю..." : "Запустить AI-review"}
+                    <Sparkles className="h-3.5 w-3.5" />
+                  </button>
+                </>
+              ) : !portfolioSaved ? (
+                <>
+                  <p className="mt-1 text-sm font-semibold text-foreground">Закрепить результат</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    Артефакт проверен. Сохраните его в портфолио, чтобы плод стал финальным доказательством навыка.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={saveToPortfolio}
+                    className="btn-secondary mt-3 inline-flex w-full items-center justify-center gap-2 text-xs"
+                  >
+                    Добавить в портфолио
+                    <Trophy className="h-3.5 w-3.5" />
+                  </button>
+                </>
+              ) : (
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  Артефакт сохранён. Можно закрывать модуль или переходить к следующей ветке обучения.
+                </p>
+              )}
             </div>
           </article>
 
