@@ -309,6 +309,40 @@ function fieldHealthStatusLabel(status: FieldHealth["status"]) {
   return "пустая";
 }
 
+function snippetFocusField(snippet: ArtifactSnippet): WorkspaceDraftField {
+  const text = `${snippet.selectedLabel} ${snippet.action} ${snippet.consequence} ${snippet.artifactHint}`.toLowerCase();
+  if (text.includes("question") || text.includes("уточ") || text.includes("clarify") || text.includes("open question")) {
+    return "decision";
+  }
+  if (text.includes("evidence") || text.includes("actual") || text.includes("request") || text.includes("response") || text.includes("steps")) {
+    return "evidence";
+  }
+  if (text.includes("scenario") || text.includes("сценар") || text.includes("check") || text.includes("провер")) {
+    return "testIdea";
+  }
+  if (text.includes("risk") || text.includes("риск")) {
+    return "risk";
+  }
+  return "observation";
+}
+
+function snippetFocusGuidance(snippet: ArtifactSnippet) {
+  const field = snippetFocusField(snippet);
+  if (field === "decision") {
+    return "Вы выбрали путь уточнения. Закройте его решением: какой вопрос открыт и как ответ изменит проверку.";
+  }
+  if (field === "evidence") {
+    return "Вы выбрали путь проверки. Добавьте доказательство: steps, test data, expected/actual или request/response.";
+  }
+  if (field === "testIdea") {
+    return "Вы выбрали путь сценария. Сформулируйте проверку так, чтобы она доказывала или опровергала риск.";
+  }
+  if (field === "risk") {
+    return "Вы выбрали путь риска. Усильте формулировку: кому навредит проблема и что может сломаться.";
+  }
+  return "Начните с наблюдения: какой факт из урока вы увидели и почему он важен для проверки.";
+}
+
 function appendUnique(current: string, next: string) {
   const trimmedNext = next.trim();
   if (!trimmedNext) {
@@ -446,6 +480,12 @@ export function ModuleArtifactWorkspace({
   const fieldHealth = (Object.keys(emptyDraft) as WorkspaceDraftField[]).map((field) => calculateFieldHealth(field, draft[field]));
   const artifactHealth = Math.round(fieldHealth.reduce((sum, item) => sum + item.score, 0) / fieldHealth.length);
   const weakestField = fieldHealth.find((item) => item.status !== "strong") ?? null;
+  const decisionFocusField = importedSnippet ? snippetFocusField(importedSnippet) : null;
+  const decisionFocusHealth = decisionFocusField ? fieldHealth.find((item) => item.field === decisionFocusField) ?? null : null;
+  const guidedField = decisionFocusHealth && decisionFocusHealth.status !== "strong" ? decisionFocusHealth : weakestField;
+  const guidedFieldReason = importedSnippet && guidedField?.field === decisionFocusField
+    ? snippetFocusGuidance(importedSnippet)
+    : guidedField?.guidance;
   const growthMilestones = [
     {
       id: "observation",
@@ -790,10 +830,26 @@ export function ModuleArtifactWorkspace({
             <p className="text-xs text-muted-foreground">Черновик сохранён: {new Date(savedAt).toLocaleString("ru-RU")}</p>
           ) : null}
           {importedSnippet ? (
-            <p className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-300">
-              <Inbox className="h-4 w-4" />
-              Добавлено из урока: {importedSnippet.lessonTitle}
-            </p>
+            <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-700 dark:text-emerald-300">
+              <p className="inline-flex items-center gap-2 font-semibold">
+                <Inbox className="h-4 w-4" />
+                След выбора: {importedSnippet.lessonTitle}
+              </p>
+              <div className="mt-2 grid gap-2 md:grid-cols-2">
+                <p className="rounded-xl border border-emerald-500/25 bg-background/45 px-3 py-2 text-xs leading-5 text-muted-foreground">
+                  Ход: <span className="font-semibold text-foreground">{importedSnippet.selectedLabel}</span>
+                </p>
+                {decisionFocusField ? (
+                  <button
+                    type="button"
+                    onClick={() => focusField(decisionFocusField)}
+                    className="rounded-xl border border-emerald-500/25 bg-background/45 px-3 py-2 text-left text-xs leading-5 text-muted-foreground transition-colors hover:border-emerald-500/45 hover:text-foreground"
+                  >
+                    Следующий фокус: <span className="font-semibold text-foreground">{fieldLabels[decisionFocusField]}</span>
+                  </button>
+                ) : null}
+              </div>
+            </div>
           ) : null}
           {errorText ? <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-300">{errorText}</p> : null}
         </div>
@@ -829,13 +885,13 @@ export function ModuleArtifactWorkspace({
             </div>
             <div className="mt-3 rounded-2xl border border-border/60 bg-card/55 p-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Что усилить</p>
-              {weakestField ? (
+              {guidedField ? (
                 <>
-                  <p className="mt-1 text-sm font-semibold text-foreground">{weakestField.label}</p>
-                  <p className="mt-1 text-xs leading-5 text-muted-foreground">{weakestField.guidance}</p>
+                  <p className="mt-1 text-sm font-semibold text-foreground">{guidedField.label}</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">{guidedFieldReason}</p>
                   <button
                     type="button"
-                    onClick={() => focusField(weakestField.field)}
+                    onClick={() => focusField(guidedField.field)}
                     className="btn-secondary mt-3 inline-flex w-full items-center justify-center gap-2 text-xs"
                   >
                     Усилить ветку
