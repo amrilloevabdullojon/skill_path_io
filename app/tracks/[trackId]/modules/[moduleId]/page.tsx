@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { LessonType, ProgressStatus, TrackCategory } from "@prisma/client";
-import { ChevronLeft, ChevronRight, CircleCheckBig, Clock3, Flag, Layers3, Sparkles, Trophy } from "lucide-react";
+import { ChevronLeft, ChevronRight, CircleCheckBig, Clock3, Flag, Layers3, Route, Sparkles, Trophy } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { getLocale } from "next-intl/server";
 
@@ -24,6 +24,7 @@ import { buildDefaultAdaptiveSignal } from "@/lib/personalization/adaptive-defau
 import { getAdaptivePath } from "@/lib/recommendations/adaptive-path";
 import { applyTrackContentOverrides, normalizeLearningLocale } from "@/lib/tracks/content-overrides";
 import { buildLessonBlocks, buildLessonRecommendations } from "@/lib/tracks/lesson-blocks";
+import { buildQaShiftBrief } from "@/lib/tracks/module-brief";
 import {
   LearningPathState,
   buildTrackProgression,
@@ -346,6 +347,13 @@ export default async function ModulePage({ params }: ModulePageProps) {
     .join("\n\n")
     .slice(0, 2000);
   const showQaScenarioLab = trackCategory === TrackCategory.QA;
+  const qaShiftBrief = showQaScenarioLab
+    ? buildQaShiftBrief({
+        moduleOrder: currentModule.order,
+        lessons: currentModule.lessons.map((lesson) => ({ title: lesson.title })),
+        finalChallenge: parsedContent.finalChallenge,
+      })
+    : null;
 
   const navLinks = [
     { id: "module-overview", label: showQaScenarioLab ? "Корни модуля" : "Обзор модуля" },
@@ -562,6 +570,50 @@ export default async function ModulePage({ params }: ModulePageProps) {
                 Каждый урок оформлен как отдельная рабочая смена: сначала цель, затем материал, затем артефакт для портфолио.
               </p>
             </div>
+            {qaShiftBrief ? (
+              <section className="overflow-hidden rounded-3xl border border-emerald-500/25 bg-emerald-500/8">
+                <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_22rem]">
+                  <article className="space-y-4 p-4 sm:p-5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/35 bg-background/45 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        Бриф смены
+                      </span>
+                      <span className="rounded-full border border-border/50 bg-card/60 px-3 py-1 text-xs text-muted-foreground">
+                        один кейс на весь модуль
+                      </span>
+                    </div>
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div className="rounded-2xl border border-border/45 bg-background/45 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Сцена</p>
+                        <p className="mt-2 text-sm leading-6 text-foreground/85">{qaShiftBrief.scene}</p>
+                      </div>
+                      <div className="rounded-2xl border border-border/45 bg-background/45 p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Ставки</p>
+                        <p className="mt-2 text-sm leading-6 text-foreground/85">{qaShiftBrief.stakes}</p>
+                      </div>
+                    </div>
+                    <div className="rounded-2xl border border-emerald-500/25 bg-background/45 p-4">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Итог смены</p>
+                      <p className="mt-2 text-sm leading-6 text-foreground/85">{qaShiftBrief.artifact}</p>
+                    </div>
+                  </article>
+                  <aside className="border-t border-border/40 bg-background/35 p-4 sm:p-5 lg:border-l lg:border-t-0">
+                    <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                      <Route className="h-4 w-4 text-emerald-500" />
+                      Маршрут уроков
+                    </p>
+                    <ol className="mt-3 space-y-2">
+                      {qaShiftBrief.route.map((item) => (
+                        <li key={item} className="rounded-2xl border border-border/45 bg-card/50 px-3 py-2 text-sm leading-6 text-muted-foreground">
+                          {item}
+                        </li>
+                      ))}
+                    </ol>
+                  </aside>
+                </div>
+              </section>
+            ) : null}
             <div className="grid gap-3 md:grid-cols-3">
               <article className="rounded-2xl border border-emerald-500/25 bg-emerald-500/8 p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-300">Контракт модуля</p>
