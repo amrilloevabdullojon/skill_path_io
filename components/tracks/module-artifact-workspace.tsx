@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, CheckCircle2, ClipboardCheck, History, Inbox, Loader2, RotateCcw, Save, Sparkles, Trophy } from "lucide-react";
 
 import { upsertPortfolioEntry } from "@/lib/portfolio/local-portfolio";
+import { artifactReadinessPercent, buildArtifactReadinessChecklist } from "@/lib/tracks/artifact-readiness";
 import { buildModuleShiftSeed, type ModuleShiftBrief } from "@/lib/tracks/module-brief";
 import { cn } from "@/lib/utils";
 
@@ -535,6 +536,15 @@ export function ModuleArtifactWorkspace({
   const growthLabel = growthStageLabel(readiness, review, portfolioSaved);
   const fieldHealth = (Object.keys(emptyDraft) as WorkspaceDraftField[]).map((field) => calculateFieldHealth(field, draft[field]));
   const artifactHealth = Math.round(fieldHealth.reduce((sum, item) => sum + item.score, 0) / fieldHealth.length);
+  const readinessChecklist = buildArtifactReadinessChecklist({
+    filledFields,
+    totalFields: Object.keys(emptyDraft).length,
+    artifactHealth,
+    hasReview: reviewReady,
+    reviewScore: review?.score ?? null,
+    portfolioSaved,
+  });
+  const readinessChecklistPercent = artifactReadinessPercent(readinessChecklist);
   const weakestField = fieldHealth.find((item) => item.status !== "strong") ?? null;
   const decisionFocusField = importedSnippet ? snippetFocusField(importedSnippet) : null;
   const decisionFocusHealth = decisionFocusField ? fieldHealth.find((item) => item.field === decisionFocusField) ?? null : null;
@@ -983,6 +993,39 @@ export function ModuleArtifactWorkspace({
               Вставить и доработать
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
+          </article>
+
+          <article className="rounded-2xl border border-border/60 bg-background/55 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="kicker">Чеклист зрелости</p>
+                <p className="mt-1 text-sm font-semibold text-foreground">Что нужно до сильного результата</p>
+              </div>
+              <span className="rounded-full border border-border/60 bg-card/70 px-3 py-1 text-xs text-muted-foreground">
+                {readinessChecklistPercent}%
+              </span>
+            </div>
+            <div className="mt-3 space-y-2">
+              {readinessChecklist.map((item) => (
+                <div
+                  key={item.id}
+                  className={cn(
+                    "rounded-2xl border px-3 py-2",
+                    item.done
+                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                      : "border-border/60 bg-card/55 text-muted-foreground",
+                  )}
+                >
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className={cn("mt-0.5 h-4 w-4 shrink-0", item.done ? "text-emerald-500" : "text-muted-foreground/50")} />
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">{item.label}</p>
+                      <p className="mt-0.5 text-xs leading-5 text-muted-foreground">{item.description}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </article>
 
           <article className="rounded-2xl border border-border/60 bg-background/55 p-4">
