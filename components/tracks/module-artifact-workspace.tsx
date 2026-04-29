@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, CheckCircle2, ClipboardCheck, Inbox, Loader2, RotateCcw, Save, Sparkles, Trophy } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, CheckCircle2, ClipboardCheck, History, Inbox, Loader2, RotateCcw, Save, Sparkles, Trophy } from "lucide-react";
 
 import { upsertPortfolioEntry } from "@/lib/portfolio/local-portfolio";
 import { cn } from "@/lib/utils";
@@ -32,6 +32,14 @@ type ArtifactSnippet = {
   action: string;
   consequence: string;
   artifactHint: string;
+};
+
+type GrowthEvent = {
+  id: string;
+  type: "lesson" | "starter" | "save" | "review" | "plan" | "portfolio";
+  title: string;
+  detail: string;
+  createdAt: string;
 };
 
 type ModuleArtifactWorkspaceProps = {
@@ -132,6 +140,14 @@ const starterSnippets: Record<WorkspaceDraftField, Array<{ label: string; text: 
   ],
 };
 
+const fieldLabels: Record<WorkspaceDraftField, string> = {
+  observation: "Наблюдение",
+  risk: "Риск",
+  testIdea: "Проверка",
+  evidence: "Evidence",
+  decision: "Вывод",
+};
+
 function buildArtifact(draft: WorkspaceDraft, moduleTitle: string, finalChallenge: string) {
   return [
     `# ${moduleTitle}: рабочий артефакт`,
@@ -204,6 +220,19 @@ function fruitClass(isReady: boolean, isReviewReady: boolean, isPortfolioReady: 
   return "border-border/70 bg-muted text-muted-foreground";
 }
 
+function growthEventClass(type: GrowthEvent["type"]) {
+  if (type === "portfolio") {
+    return "border-amber-500/35 bg-amber-500/10 text-amber-700 dark:text-amber-300";
+  }
+  if (type === "review" || type === "plan") {
+    return "border-sky-500/35 bg-sky-500/10 text-sky-700 dark:text-sky-300";
+  }
+  if (type === "lesson" || type === "starter") {
+    return "border-emerald-500/35 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
+  }
+  return "border-border/60 bg-card/60 text-muted-foreground";
+}
+
 function appendUnique(current: string, next: string) {
   const trimmedNext = next.trim();
   if (!trimmedNext) {
@@ -236,6 +265,7 @@ export function ModuleArtifactWorkspace({
   skills,
 }: ModuleArtifactWorkspaceProps) {
   const storageKey = `levio:module-artifact:${moduleId}`;
+  const growthEventsStorageKey = `${storageKey}:growth-events`;
   const fieldRefs = useRef<Record<WorkspaceDraftField, HTMLTextAreaElement | null>>({
     observation: null,
     risk: null,
@@ -251,6 +281,21 @@ export function ModuleArtifactWorkspace({
   const [importedSnippet, setImportedSnippet] = useState<ArtifactSnippet | null>(null);
   const [reviewPlanApplied, setReviewPlanApplied] = useState(false);
   const [isReviewing, setIsReviewing] = useState(false);
+  const [growthEvents, setGrowthEvents] = useState<GrowthEvent[]>([]);
+
+  const addGrowthEvent = useCallback((event: Omit<GrowthEvent, "id" | "createdAt">) => {
+    const nextEvent: GrowthEvent = {
+      ...event,
+      id: `${Date.now()}-${event.type}`,
+      createdAt: new Date().toISOString(),
+    };
+
+    setGrowthEvents((current) => {
+      const nextEvents = [nextEvent, ...current].slice(0, 8);
+      window.localStorage.setItem(growthEventsStorageKey, JSON.stringify(nextEvents));
+      return nextEvents;
+    });
+  }, [growthEventsStorageKey]);
 
   useEffect(() => {
     const raw = window.localStorage.getItem(storageKey);
@@ -274,6 +319,20 @@ export function ModuleArtifactWorkspace({
   }, [storageKey]);
 
   useEffect(() => {
+    const raw = window.localStorage.getItem(growthEventsStorageKey);
+    if (!raw) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as GrowthEvent[];
+      setGrowthEvents(Array.isArray(parsed) ? parsed.slice(0, 8) : []);
+    } catch {
+      window.localStorage.removeItem(growthEventsStorageKey);
+    }
+  }, [growthEventsStorageKey]);
+
+  useEffect(() => {
     function handleSnippet(event: Event) {
       const snippet = (event as CustomEvent<ArtifactSnippet>).detail;
       if (!snippet?.sourceId || !snippet.lessonTitle) {
@@ -289,12 +348,17 @@ export function ModuleArtifactWorkspace({
       });
       setImportedSnippet(snippet);
       setPortfolioSaved(false);
+      addGrowthEvent({
+        type: "lesson",
+        title: "Рост из урока",
+        detail: `${snippet.lessonTitle}: ${snippet.selectedLabel}`,
+      });
       window.location.hash = "module-phases";
     }
 
     window.addEventListener(artifactSnippetEventName, handleSnippet);
     return () => window.removeEventListener(artifactSnippetEventName, handleSnippet);
-  }, [storageKey]);
+  }, [addGrowthEvent, storageKey]);
 
   const artifact = useMemo(() => buildArtifact(draft, moduleTitle, finalChallenge), [draft, finalChallenge, moduleTitle]);
   const filledFields = Object.values(draft).filter((value) => value.trim().length > 0).length;
@@ -347,13 +411,18 @@ export function ModuleArtifactWorkspace({
     setPortfolioSaved(false);
   }
 
-  function insertStarter(field: WorkspaceDraftField, text: string) {
+  function insertStarter(field: WorkspaceDraftField, label: string, text: string) {
     setDraft((current) => ({
       ...current,
       [field]: appendUnique(current[field], text),
     }));
     setPortfolioSaved(false);
     setReviewPlanApplied(false);
+    addGrowthEvent({
+      type: "starter",
+      title: "Подсказка стала заготовкой",
+      detail: `${label} → ${fieldLabels[field]}`,
+    });
     window.setTimeout(() => focusField(field), 50);
   }
 
@@ -364,7 +433,7 @@ export function ModuleArtifactWorkspace({
           <button
             key={snippet.label}
             type="button"
-            onClick={() => insertStarter(field, snippet.text)}
+            onClick={() => insertStarter(field, snippet.label, snippet.text)}
             className="rounded-full border border-border/60 bg-card/55 px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-foreground"
           >
             + {snippet.label}
@@ -378,6 +447,11 @@ export function ModuleArtifactWorkspace({
     const timestamp = new Date().toISOString();
     window.localStorage.setItem(storageKey, JSON.stringify({ ...draft, savedAt: timestamp }));
     setSavedAt(timestamp);
+    addGrowthEvent({
+      type: "save",
+      title: "Черновик закреплён",
+      detail: `${filledFields} из 5 частей артефакта заполнены`,
+    });
   }
 
   function resetDraft() {
@@ -385,7 +459,9 @@ export function ModuleArtifactWorkspace({
     setReview(null);
     setPortfolioSaved(false);
     setSavedAt(null);
+    setGrowthEvents([]);
     window.localStorage.removeItem(storageKey);
+    window.localStorage.removeItem(growthEventsStorageKey);
   }
 
   async function runReview() {
@@ -413,6 +489,11 @@ export function ModuleArtifactWorkspace({
 
       setReview(data.result ?? null);
       setReviewPlanApplied(false);
+      addGrowthEvent({
+        type: "review",
+        title: "AI-review проверил зрелость",
+        detail: data.result?.score ? `Оценка ${data.result.score}/100, ${scoreLabel(data.result)}` : "Оценка получена",
+      });
     } catch (error) {
       setErrorText(error instanceof Error ? error.message : "AI-review временно недоступен.");
     } finally {
@@ -434,6 +515,11 @@ export function ModuleArtifactWorkspace({
       createdAt: new Date().toISOString(),
     });
     setPortfolioSaved(true);
+    addGrowthEvent({
+      type: "portfolio",
+      title: "Плод добавлен в портфолио",
+      detail: review?.score ? `Сохранено с AI-review ${review.score}/100` : "Сохранено как локальный QA artifact",
+    });
   }
 
   function applyReviewPlan() {
@@ -467,6 +553,11 @@ export function ModuleArtifactWorkspace({
     });
     setReviewPlanApplied(true);
     setPortfolioSaved(false);
+    addGrowthEvent({
+      type: "plan",
+      title: "План доработки встроен",
+      detail: nextSteps.length > 0 ? `${nextSteps.length} следующих шага добавлены в вывод` : "Добавлен базовый план улучшения",
+    });
     focusField("decision");
   }
 
@@ -772,6 +863,35 @@ export function ModuleArtifactWorkspace({
                 </p>
               )}
             </div>
+          </article>
+
+          <article className="rounded-2xl border border-border/60 bg-background/55 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="kicker">Кольца роста</p>
+                <p className="mt-1 text-sm font-semibold text-foreground">История развития артефакта</p>
+              </div>
+              <History className="h-5 w-5 text-emerald-500" />
+            </div>
+            {growthEvents.length > 0 ? (
+              <ol className="mt-3 space-y-2">
+                {growthEvents.slice(0, 5).map((event) => (
+                  <li key={event.id} className={cn("rounded-2xl border px-3 py-2", growthEventClass(event.type))}>
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-sm font-semibold text-foreground">{event.title}</p>
+                      <time className="shrink-0 text-[11px] text-muted-foreground">
+                        {new Date(event.createdAt).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}
+                      </time>
+                    </div>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">{event.detail}</p>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="mt-3 rounded-2xl border border-dashed border-border/70 bg-card/45 p-3 text-xs leading-5 text-muted-foreground">
+                Первое кольцо появится, когда вы перенесёте выбор из урока, используете заготовку или сохраните черновик.
+              </p>
+            )}
           </article>
 
           <article className="rounded-2xl border border-border/60 bg-background/55 p-4">
