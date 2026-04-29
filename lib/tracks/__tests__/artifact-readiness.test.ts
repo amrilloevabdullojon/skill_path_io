@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { artifactReadinessPercent, buildArtifactReadinessChecklist } from "@/lib/tracks/artifact-readiness";
+import { artifactReadinessPercent, buildArtifactReadinessChecklist, buildReviewGate } from "@/lib/tracks/artifact-readiness";
 
 describe("artifact readiness", () => {
   it("marks early artifact work as not ready", () => {
@@ -30,5 +30,20 @@ describe("artifact readiness", () => {
     expect(checklist.map((item) => item.done)).toEqual([true, true, true, true]);
     expect(checklist[2]?.description).toContain("88");
     expect(artifactReadinessPercent(checklist)).toBe(100);
+  });
+
+  it("explains why AI review is gated", () => {
+    expect(buildReviewGate({ contentLength: 80, filledFields: 1 })).toMatchObject({
+      canReview: false,
+      title: "AI-review пока закрыт",
+    });
+    expect(buildReviewGate({ contentLength: 220, filledFields: 2 })).toMatchObject({
+      canReview: false,
+      title: "Нужно больше веток",
+    });
+    expect(buildReviewGate({ contentLength: 220, filledFields: 3 })).toMatchObject({
+      canReview: true,
+      title: "AI-review доступен",
+    });
   });
 });

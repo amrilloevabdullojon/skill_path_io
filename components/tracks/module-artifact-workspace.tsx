@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, CheckCircle2, ClipboardCheck, History, Inbox, Loader2, RotateCcw, Save, Sparkles, Trophy } from "lucide-react";
 
 import { upsertPortfolioEntry } from "@/lib/portfolio/local-portfolio";
-import { artifactReadinessPercent, buildArtifactReadinessChecklist } from "@/lib/tracks/artifact-readiness";
+import { artifactReadinessPercent, buildArtifactReadinessChecklist, buildReviewGate } from "@/lib/tracks/artifact-readiness";
 import { buildModuleShiftSeed, type ModuleShiftBrief } from "@/lib/tracks/module-brief";
 import { cn } from "@/lib/utils";
 
@@ -530,7 +530,9 @@ export function ModuleArtifactWorkspace({
   const artifact = useMemo(() => buildArtifact(draft, moduleTitle, finalChallenge), [draft, finalChallenge, moduleTitle]);
   const filledFields = Object.values(draft).filter((value) => value.trim().length > 0).length;
   const readiness = Math.round((filledFields / Object.keys(emptyDraft).length) * 100);
-  const canReview = artifact.replace(/Пока не заполнено\./g, "").trim().length > 180 && filledFields >= 3;
+  const reviewContentLength = artifact.replace(/Пока не заполнено\./g, "").trim().length;
+  const reviewGate = buildReviewGate({ contentLength: reviewContentLength, filledFields });
+  const canReview = reviewGate.canReview;
   const reviewReady = Boolean(review);
   const strongReview = Boolean(review?.score && review.score >= 85);
   const growthLabel = growthStageLabel(readiness, review, portfolioSaved);
@@ -941,6 +943,18 @@ export function ModuleArtifactWorkspace({
               <RotateCcw className="h-4 w-4" />
               Сбросить
             </button>
+          </div>
+
+          <div
+            className={cn(
+              "rounded-2xl border px-3 py-2 text-sm",
+              canReview
+                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                : "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+            )}
+          >
+            <p className="font-semibold text-foreground">{reviewGate.title}</p>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">{reviewGate.description}</p>
           </div>
 
           {savedAt ? (
