@@ -26,6 +26,7 @@ import { getAdaptivePath } from "@/lib/recommendations/adaptive-path";
 import { applyTrackContentOverrides, normalizeLearningLocale } from "@/lib/tracks/content-overrides";
 import { buildLessonBlocks, buildLessonRecommendations } from "@/lib/tracks/lesson-blocks";
 import { buildQaShiftBrief } from "@/lib/tracks/module-brief";
+import { buildModulePrimaryCta } from "@/lib/tracks/module-cta";
 import {
   LearningPathState,
   buildTrackProgression,
@@ -368,12 +369,10 @@ export default async function ModulePage({ params }: ModulePageProps) {
     { id: "recommendations", label: "Рекомендации" },
   ];
 
-  const stickyCtaHref =
-    currentStatus === ProgressStatus.COMPLETED && nextModule
-      ? `/tracks/${track.slug}/modules/${nextModule.id}`
-      : "#practical-task";
-  const stickyCtaLabel =
-    currentStatus === ProgressStatus.COMPLETED && nextModule ? "Следующий" : "Завершить";
+  const modulePrimaryCta = buildModulePrimaryCta({
+    isCompleted: currentStatus === ProgressStatus.COMPLETED,
+    nextModuleHref: nextModule ? `/tracks/${track.slug}/modules/${nextModule.id}` : null,
+  });
 
   return (
     <>
@@ -382,8 +381,8 @@ export default async function ModulePage({ params }: ModulePageProps) {
         progressPercent={progressPercent}
         completedCount={completedCount}
         totalModules={track.modules.length}
-        ctaHref={stickyCtaHref}
-        ctaLabel={stickyCtaLabel}
+        ctaHref={modulePrimaryCta.href}
+        ctaLabel={modulePrimaryCta.label}
         accentProgress="bg-gradient-to-r from-sky-400 to-violet-500"
       />
       <section className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)] sm:gap-6 relative isolate">
@@ -445,14 +444,16 @@ export default async function ModulePage({ params }: ModulePageProps) {
             <ModuleSidebarNav links={navLinks} />
           </nav>
 
-          {/* Quick-access complete button */}
           <div className="space-y-2">
             <p className="kicker">Действие</p>
-            <form action={markModuleAsCompleted}>
-              <input type="hidden" name="trackSlug" value={track.slug} />
-              <input type="hidden" name="moduleId" value={currentModule.id} />
-              <MarkModuleCompleteButton isCompleted={currentStatus === ProgressStatus.COMPLETED} />
-            </form>
+            <Link
+              href={modulePrimaryCta.href}
+              className="btn-primary inline-flex w-full items-center justify-center gap-1.5 text-sm"
+            >
+              {modulePrimaryCta.label}
+              <ChevronRight className="h-4 w-4" />
+            </Link>
+            <p className="text-xs leading-5 text-muted-foreground">{modulePrimaryCta.description}</p>
             {currentModule.quiz && (
               <Link
                 href={`/tracks/${track.slug}/modules/${currentModule.id}/quiz`}
