@@ -71,6 +71,18 @@ export type ModuleCompletionGate = {
   }>;
 };
 
+export type ModuleSubmissionBriefInput = ModuleCompletionGateInput & {
+  totalFields?: number;
+};
+
+export type ModuleSubmissionBrief = {
+  maturityLabel: string;
+  headline: string;
+  description: string;
+  nextAction: string;
+  tone: "seed" | "draft" | "portfolio" | "completed";
+};
+
 export function buildArtifactReadinessChecklist(input: ArtifactReadinessInput): ArtifactReadinessItem[] {
   const reviewScore = input.reviewScore ?? 0;
 
@@ -297,5 +309,50 @@ export function buildModuleCompletionGate(input: ModuleCompletionGateInput): Mod
         done: input.isCompleted,
       },
     ],
+  };
+}
+
+export function buildModuleSubmissionBrief(input: ModuleSubmissionBriefInput): ModuleSubmissionBrief {
+  const totalFields = input.totalFields ?? 5;
+  const filledLabel = `${Math.min(input.filledFields, totalFields)}/${totalFields}`;
+  const hasArtifact = input.filledFields >= 3;
+  const ready = hasArtifact && input.hasPortfolioEntry;
+
+  if (input.isCompleted) {
+    return {
+      maturityLabel: "Сдано",
+      headline: "Артефакт принят как доказательство навыка",
+      description: "Модуль уже закрыт. Используйте результат как портфолио-историю или переходите к следующей ветке.",
+      nextAction: "Перейдите дальше или вернитесь к артефакту, если хотите усилить формулировки.",
+      tone: "completed",
+    };
+  }
+
+  if (ready) {
+    return {
+      maturityLabel: "Готов к сдаче",
+      headline: "Есть рабочий артефакт и портфолио-запись",
+      description: `Заполнено ${filledLabel} частей. Теперь завершение модуля подкреплено конкретным evidence.`,
+      nextAction: "Проверьте формулировку вывода и нажмите завершение в практическом задании.",
+      tone: "portfolio",
+    };
+  }
+
+  if (hasArtifact) {
+    return {
+      maturityLabel: "Черновик зрелый",
+      headline: "Артефакт уже можно превратить в портфолио",
+      description: `Заполнено ${filledLabel} частей. Осталось закрепить результат, чтобы прогресс не был просто прочитанным уроком.`,
+      nextAction: "Сохраните артефакт в портфолио, затем закрывайте модуль.",
+      tone: "draft",
+    };
+  }
+
+  return {
+    maturityLabel: "Нужны корни",
+    headline: "Пока не хватает доказательства работы",
+    description: `Заполнено ${filledLabel} частей. Модуль лучше закрывать после наблюдения, риска и проверки.`,
+    nextAction: "Вернитесь к фазам артефакта и заполните минимум 3 ветки.",
+    tone: "seed",
   };
 }

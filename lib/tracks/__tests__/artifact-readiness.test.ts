@@ -4,6 +4,7 @@ import {
   artifactReadinessPercent,
   buildArtifactReadinessChecklist,
   buildModuleCompletionGate,
+  buildModuleSubmissionBrief,
   buildPortfolioGate,
   buildReviewActionPlan,
   buildReviewGate,
@@ -94,6 +95,21 @@ describe("artifact readiness", () => {
     });
     expect(buildModuleCompletionGate({ filledFields: 4, hasPortfolioEntry: true, isCompleted: true }).checklist[2]).toMatchObject({
       done: true,
+    });
+  });
+
+  it("explains the module submission maturity state", () => {
+    expect(buildModuleSubmissionBrief({ filledFields: 1, hasPortfolioEntry: false, isCompleted: false })).toMatchObject({
+      maturityLabel: "Нужны корни",
+      tone: "seed",
+    });
+    expect(buildModuleSubmissionBrief({ filledFields: 4, hasPortfolioEntry: false, isCompleted: false })).toMatchObject({
+      maturityLabel: "Черновик зрелый",
+      tone: "draft",
+    });
+    expect(buildModuleSubmissionBrief({ filledFields: 4, hasPortfolioEntry: true, isCompleted: false })).toMatchObject({
+      maturityLabel: "Готов к сдаче",
+      tone: "portfolio",
     });
   });
 });

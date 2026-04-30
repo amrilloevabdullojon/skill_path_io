@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CheckCircle2, RefreshCw } from "lucide-react";
+import { CheckCircle2, ClipboardCheck, FileCheck2, RefreshCw } from "lucide-react";
 
 import { readPortfolioEntriesFromLocal } from "@/lib/portfolio/local-portfolio";
-import { buildModuleCompletionGate } from "@/lib/tracks/artifact-readiness";
+import { buildModuleCompletionGate, buildModuleSubmissionBrief } from "@/lib/tracks/artifact-readiness";
 import { cn } from "@/lib/utils";
 
 type ModuleCompletionReadinessProps = {
@@ -22,28 +22,53 @@ type StoredArtifactDraft = {
 
 const artifactUpdatedEventName = "levio:artifact-updated";
 
-function readArtifactFilledFields(moduleId: string) {
+const artifactFieldViews: Array<{
+  key: keyof StoredArtifactDraft;
+  label: string;
+  fallback: string;
+}> = [
+  { key: "observation", label: "Наблюдение", fallback: "Что увидели в продукте" },
+  { key: "risk", label: "Риск", fallback: "Кого и как это заденет" },
+  { key: "testIdea", label: "Проверка", fallback: "Как доказать поведение" },
+  { key: "evidence", label: "Evidence", fallback: "Шаги, факты, ссылки" },
+  { key: "decision", label: "Вывод", fallback: "Что делать дальше" },
+];
+
+function readArtifactDraft(moduleId: string): StoredArtifactDraft {
   try {
     const raw = window.localStorage.getItem(`levio:module-artifact:${moduleId}`);
     if (!raw) {
-      return 0;
+      return {};
     }
 
-    const parsed = JSON.parse(raw) as StoredArtifactDraft;
-    return [parsed.observation, parsed.risk, parsed.testIdea, parsed.evidence, parsed.decision]
-      .filter((value) => typeof value === "string" && value.trim().length > 0)
-      .length;
+    return JSON.parse(raw) as StoredArtifactDraft;
   } catch {
-    return 0;
+    return {};
   }
 }
 
+function countArtifactFilledFields(draft: StoredArtifactDraft) {
+  return artifactFieldViews.filter(({ key }) => {
+    const value = draft[key];
+    return typeof value === "string" && value.trim().length > 0;
+  }).length;
+}
+
+function previewArtifactValue(value: string | undefined, fallback: string) {
+  if (!value?.trim()) {
+    return fallback;
+  }
+
+  const normalized = value.trim().replace(/\s+/g, " ");
+  return normalized.length > 74 ? `${normalized.slice(0, 74)}...` : normalized;
+}
+
 export function ModuleCompletionReadiness({ moduleId, isCompleted }: ModuleCompletionReadinessProps) {
-  const [filledFields, setFilledFields] = useState(0);
+  const [artifactDraft, setArtifactDraft] = useState<StoredArtifactDraft>({});
   const [hasPortfolioEntry, setHasPortfolioEntry] = useState(false);
 
   const refresh = useCallback(() => {
-    setFilledFields(readArtifactFilledFields(moduleId));
+    setArtifactDraft(readArtifactDraft(moduleId));
     setHasPortfolioEntry(readPortfolioEntriesFromLocal().some((entry) => entry.sourceRef === moduleId));
   }, [moduleId]);
 
@@ -60,8 +85,13 @@ export function ModuleCompletionReadiness({ moduleId, isCompleted }: ModuleCompl
     };
   }, [refresh]);
 
+  const filledFields = useMemo(() => countArtifactFilledFields(artifactDraft), [artifactDraft]);
   const gate = useMemo(
     () => buildModuleCompletionGate({ filledFields, hasPortfolioEntry, isCompleted }),
+    [filledFields, hasPortfolioEntry, isCompleted],
+  );
+  const submissionBrief = useMemo(
+    () => buildModuleSubmissionBrief({ filledFields, hasPortfolioEntry, isCompleted }),
     [filledFields, hasPortfolioEntry, isCompleted],
   );
 
@@ -105,6 +135,70 @@ export function ModuleCompletionReadiness({ moduleId, isCompleted }: ModuleCompl
             </div>
           </div>
         ))}
+      </div>
+      <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <div
+          className={cn(
+            "rounded-2xl border p-4",
+            submissionBrief.tone === "completed" || submissionBrief.tone === "portfolio"
+              ? "border-emerald-500/30 bg-background/40"
+              : submissionBrief.tone === "draft"
+                ? "border-sky-500/30 bg-background/40"
+                : "border-amber-500/30 bg-background/40",
+          )}
+        >
+          <div className="flex items-start gap-3">
+            <div
+              className={cn(
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border",
+                submissionBrief.tone === "completed" || submissionBrief.tone === "portfolio"
+                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300"
+                  : submissionBrief.tone === "draft"
+                    ? "border-sky-500/30 bg-sky-500/10 text-sky-600 dark:text-sky-300"
+                    : "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-300",
+              )}
+            >
+              <ClipboardCheck className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Паспорт сдачи · {submissionBrief.maturityLabel}
+              </p>
+              <h3 className="mt-1 text-sm font-semibold text-foreground">{submissionBrief.headline}</h3>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">{submissionBrief.description}</p>
+            </div>
+          </div>
+          <p className="mt-3 rounded-xl border border-border/50 bg-card/45 px-3 py-2 text-xs leading-5 text-foreground/80">
+            {submissionBrief.nextAction}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-border/50 bg-card/45 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Что сдаёте</p>
+            <span className="rounded-full border border-border/50 bg-background/45 px-2 py-0.5 text-[11px] text-muted-foreground">
+              {filledFields}/{artifactFieldViews.length} веток
+            </span>
+          </div>
+          <div className="mt-3 space-y-2">
+            {artifactFieldViews.map((field) => {
+              const value = artifactDraft[field.key];
+              const done = typeof value === "string" && value.trim().length > 0;
+
+              return (
+                <div key={field.key} className="flex items-start gap-2 rounded-xl border border-border/40 bg-background/35 px-3 py-2">
+                  <FileCheck2 className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", done ? "text-emerald-500" : "text-muted-foreground/45")} />
+                  <div className="min-w-0">
+                    <p className={cn("text-xs font-medium", done ? "text-foreground" : "text-muted-foreground")}>{field.label}</p>
+                    <p className="mt-0.5 break-words text-[11px] leading-4 text-muted-foreground">
+                      {previewArtifactValue(value, field.fallback)}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </article>
   );
