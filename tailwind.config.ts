@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 
 const config: Config = {
-  darkMode: ["class"],
+  darkMode: ["selector", '[data-theme="dark"]'],
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -57,6 +57,8 @@ const config: Config = {
           da: "hsl(var(--track-da))",
         },
         border: "hsl(var(--border))",
+        "border-subtle": "hsl(var(--border-subtle))",
+        "border-strong": "hsl(var(--border-strong))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         /* Phase 6: semantic accent palette (supports opacity modifier) */
@@ -103,7 +105,8 @@ const config: Config = {
         sm: "var(--radius-sm)",
         xl: "1.25rem",
         "2xl": "1.5rem",
-        "3xl": "1.7rem",
+        "3xl": "1.75rem",
+        "4xl": "2rem",
       },
       boxShadow: {
         soft: "0 14px 42px rgba(2, 6, 23, 0.36)",
@@ -117,6 +120,19 @@ const config: Config = {
       },
       transitionTimingFunction: {
         smooth: "cubic-bezier(0.22, 1, 0.36, 1)",
+      },
+      letterSpacing: {
+        kicker: "0.18em",
+      },
+      zIndex: {
+        base: "var(--z-base)",
+        raised: "var(--z-raised)",
+        sticky: "var(--z-sticky)",
+        overlay: "var(--z-overlay)",
+        drawer: "var(--z-drawer)",
+        modal: "var(--z-modal)",
+        toast: "var(--z-toast)",
+        tooltip: "var(--z-tooltip)",
       },
     },
   },

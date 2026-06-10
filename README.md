@@ -1,4 +1,4 @@
-# SkillPath Academy
+# Levio
 
 Next.js 14 App Router learning and career platform with Prisma + PostgreSQL, SaaS feature gating, analytics, marketplace, and admin studio.
 

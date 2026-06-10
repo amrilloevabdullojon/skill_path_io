@@ -8,7 +8,14 @@
   "rules": {
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
-    "react/no-unescaped-entities": "warn"
+    "react/no-unescaped-entities": "warn",
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/text-(3xl|4xl|5xl|6xl) font-(bold|extrabold)/]",
+        "message": "Use .page-title / .hero-title / .metric-value utility class instead of ad-hoc 'text-Nxl font-bold'. Heading scale is governed by the design system — see styles/globals.css."
+      }
+    ]
   },
   "overrides": [
     {

@@ -79,14 +79,25 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Production env preflight
+        run: npm run check:env:prod
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/dummy?schema=public"
+          DIRECT_URL: "postgresql://user:pass@localhost:5432/dummy?schema=public"
+          NEXTAUTH_URL: "https://ci.example.com"
+          NEXT_PUBLIC_APP_URL: "https://ci.example.com"
+          NEXTAUTH_SECRET: "ci-production-secret-placeholder-32chars"
+          ENABLE_DEMO_MODE: "false"
+          NEXT_PUBLIC_ENABLE_DEMO_MODE: "false"
+          DEFAULT_SUBSCRIPTION_PLAN: "FREE"
+
       - name: Build Next.js app
         run: npm run build
         env:
           DATABASE_URL: "postgresql://user:pass@localhost:5432/dummy?schema=public"
           DIRECT_URL: "postgresql://user:pass@localhost:5432/dummy?schema=public"
           NEXTAUTH_URL: "http://localhost:3000"
-          NEXTAUTH_SECRET: "ci-secret-placeholder"
-          DEMO_USER_EMAIL: "demo@skillpath.local"
-          DEMO_USER_PASSWORD: "demo123"
-          ENABLE_DEMO_MODE: "true"
+          NEXTAUTH_SECRET: "ci-build-secret-placeholder-32chars"
+          ENABLE_DEMO_MODE: "false"
+          NEXT_PUBLIC_ENABLE_DEMO_MODE: "false"
           DEFAULT_SUBSCRIPTION_PLAN: "FREE"
