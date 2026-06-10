@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+import { readBearerToken, verifyAccessToken } from "@/lib/auth/tokens";
+
 /**
  * Routes that require no authentication at all.
  * Checked as prefix matches before any token verification.
  */
 const PUBLIC_PREFIXES = [
-  "/api/auth/",   // NextAuth own endpoints (signin, signout, callback, session, csrf)
-  "/api/health",  // Health-check — must stay reachable without a session
-  "/api/public/", // Endpoints that intentionally accept anonymous callers
+  "/api/auth/",        // NextAuth own endpoints (signin, signout, callback, session, csrf)
+  "/api/v1/auth/login",   // Token login — issues tokens, no session yet
+  "/api/v1/auth/refresh", // Token refresh — authenticated by the refresh token itself
+  "/api/health",       // Health-check — must stay reachable without a session
+  "/api/public/",      // Endpoints that intentionally accept anonymous callers
   "/login",
   "/p/",          // Public portfolio pages (/p/[slug])
   "/interview-preview",
@@ -35,13 +39,29 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = await getToken({ req: request });
   const isApiRoute = pathname.startsWith("/api/");
   const isAdminRoute =
     pathname.startsWith("/admin") || pathname.startsWith("/api/admin");
 
+  // Resolve identity from either a NextAuth session cookie (web) or a
+  // Bearer access token (mobile / API clients).
+  const cookieToken = await getToken({ req: request });
+  let isAuthed = Boolean(cookieToken);
+  let role: string | undefined = cookieToken?.role as string | undefined;
+
+  if (!isAuthed) {
+    const bearer = readBearerToken(request.headers.get("authorization"));
+    if (bearer) {
+      const identity = await verifyAccessToken(bearer);
+      if (identity) {
+        isAuthed = true;
+        role = identity.role;
+      }
+    }
+  }
+
   // ── Unauthenticated ──────────────────────────────────────────────────────
-  if (!token) {
+  if (!isAuthed) {
     if (isApiRoute) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -54,7 +74,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // ── Admin-only routes ────────────────────────────────────────────────────
-  if (isAdminRoute && token.role !== "ADMIN") {
+  if (isAdminRoute && role !== "ADMIN") {
     if (isApiRoute) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
