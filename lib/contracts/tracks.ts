@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import type { RuntimeCatalog } from "@/lib/learning/content-types";
 
-import { booleanParam } from "@/lib/api/v1/http";
+import { booleanParam } from "@/lib/contracts/params";
 
 /**
  * Contract for `GET /api/v1/tracks`.

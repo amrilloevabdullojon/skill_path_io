@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { apiOk, Errors } from "@/lib/api/error-handler";
+import { booleanParam } from "@/lib/contracts/params";
+
+// Re-export so existing `@/lib/api/v1/http` imports keep working. The canonical
+// definition lives in the portable (server-free) contracts/params module.
+export { booleanParam };
 
 /**
  * Shared HTTP helpers for the versioned `/api/v1/*` API.
@@ -18,20 +23,6 @@ function formatZodError(error: z.ZodError): string {
   return error.issues
     .map((issue) => `${issue.path.join(".") || "(root)"}: ${issue.message}`)
     .join("; ");
-}
-
-/** Coerce a query-string value into a boolean with a default. Accepts 1/0/true/false/yes/no. */
-export function booleanParam(defaultValue: boolean) {
-  return z.preprocess((value) => {
-    if (value === undefined || value === null || value === "") return defaultValue;
-    if (typeof value === "boolean") return value;
-    if (typeof value === "string") {
-      const normalized = value.trim().toLowerCase();
-      if (["1", "true", "yes", "on"].includes(normalized)) return true;
-      if (["0", "false", "no", "off"].includes(normalized)) return false;
-    }
-    return value;
-  }, z.boolean());
 }
 
 /** Parse and validate URL query params against a schema. Throws `VALIDATION_ERROR` on failure. */
