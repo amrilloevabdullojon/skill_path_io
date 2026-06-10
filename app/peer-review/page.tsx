@@ -10,15 +10,16 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
-  title: "Peer Review — Levio",
+  title: "Peer Review",
   description: "Review mission submissions from other learners.",
 };
 
 interface PeerReviewPageProps {
-  searchParams: { reviewed?: string };
+  searchParams: Promise<{ reviewed?: string }>;
 }
 
 export default async function PeerReviewPage({ searchParams }: PeerReviewPageProps) {
+  const resolvedSearchParams = await searchParams;
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
@@ -50,7 +51,7 @@ export default async function PeerReviewPage({ searchParams }: PeerReviewPagePro
     take: 20,
   });
 
-  const reviewed = searchParams.reviewed === "1";
+  const reviewed = resolvedSearchParams.reviewed === "1";
 
   return (
     <section className="page-shell">

@@ -1,8 +1,23 @@
 "use client";
 
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useCallback, useMemo, useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { TrackCategory } from "@prisma/client";
-import { ArrowRight, Loader2, RefreshCw, Mic, StopCircle, Sparkles, AlertTriangle, ShieldCheck, Timer } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpenCheck,
+  BriefcaseBusiness,
+  ClipboardCheck,
+  Loader2,
+  RefreshCw,
+  Mic,
+  StopCircle,
+  Sparkles,
+  AlertTriangle,
+  ShieldCheck,
+  Target,
+  Timer,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { interviewNextSteps, interviewTrackLabel } from "@/features/interview/trainer";
@@ -90,13 +105,9 @@ export function MockInterviewPanel() {
     };
   }, [currentIndex, recognition]);
 
-  // Read aloud the current question and reset timer
+  // Read aloud the current question.
   useEffect(() => {
     if (currentQuestion && !evaluation && !isLoading) {
-      // 1. Reset timer
-      setTimeLeft(TIMER_SECONDS);
-
-      // 2. TTS
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel(); // Stop any pending speech
         const msg = new SpeechSynthesisUtterance(currentQuestion.text);
@@ -114,14 +125,6 @@ export function MockInterviewPanel() {
   }, [currentQuestion, evaluation, isLoading]);
 
   const handleTimeOutRef = useRef<() => void>(() => {});
-  handleTimeOutRef.current = () => {
-    stopRecording();
-    if (isLast) {
-      finishInterview();
-    } else {
-      setCurrentIndex((prev) => Math.min(prev + 1, questions.length - 1));
-    }
-  };
 
   // Timer Tick
   useEffect(() => {
@@ -223,12 +226,12 @@ export function MockInterviewPanel() {
     }
   };
 
-  const stopRecording = () => {
+  const stopRecording = useCallback(() => {
     if (recognition) {
       recognition.stop();
     }
     setIsRecording(false);
-  };
+  }, [recognition]);
 
   async function startInterview(selectedTrack: TrackCategory) {
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
@@ -254,6 +257,7 @@ export function MockInterviewPanel() {
       setQuestions(data.questions);
       setAnswers({});
       setCurrentIndex(0);
+      setTimeLeft(TIMER_SECONDS);
     } catch (error) {
       setErrorText(error instanceof Error ? error.message : "Unknown interview error.");
     } finally {
@@ -261,7 +265,7 @@ export function MockInterviewPanel() {
     }
   }
 
-  async function finishInterview() {
+  const finishInterview = useCallback(async () => {
     if ('speechSynthesis' in window) window.speechSynthesis.cancel();
     stopRecording();
     setIsLoading(true);
@@ -288,7 +292,19 @@ export function MockInterviewPanel() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [payloadAnswers, stopRecording, track]);
+
+  useEffect(() => {
+    handleTimeOutRef.current = () => {
+      stopRecording();
+      if (isLast) {
+        finishInterview();
+      } else {
+        setTimeLeft(TIMER_SECONDS);
+        setCurrentIndex((prev) => Math.min(prev + 1, questions.length - 1));
+      }
+    };
+  }, [finishInterview, isLast, questions.length, stopRecording]);
 
   const formatTimer = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -297,21 +313,64 @@ export function MockInterviewPanel() {
   };
 
   return (
-    <section className="space-y-6 max-w-4xl mx-auto">
-      <header className="space-y-2 text-center my-6">
-        <p className="kicker justify-center flex items-center gap-2"><Sparkles className="h-4 w-4" /> Профессиональный ИИ-ментор</p>
-        <h1 className="text-3xl font-bold text-foreground">Симулятор Собеседования</h1>
-        <p className="text-sm text-muted-foreground max-w-lg mx-auto">
-          Тренируйтесь в условиях реальных IT-собеседований с таймером. Используйте микрофон, чтобы начать отвечать с ходу.
-        </p>
+    <section className="space-y-6">
+      <header className="surface-elevated space-y-5 p-5 sm:p-7">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
+          <div className="space-y-3">
+            <p className="kicker flex items-center gap-2 text-indigo-400"><Sparkles className="h-4 w-4" /> Карьерная тренировка</p>
+            <h1 className="page-title text-foreground">Симулятор собеседования</h1>
+            <p className="text-sm text-muted-foreground max-w-2xl">
+              Проверьте, как звучат ваши ответы перед реальным рынком: структура, конкретика, уверенность и связь с портфолио.
+            </p>
+          </div>
+          <Link href="/career" className="btn-secondary inline-flex items-center justify-center gap-2 rounded-lg">
+            <BriefcaseBusiness className="h-4 w-4" />
+            Вернуться к готовности
+          </Link>
+        </div>
+        <div className="grid gap-3 md:grid-cols-4">
+          <Link href="/review" className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-3 transition-colors hover:bg-indigo-500/15">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-indigo-300">Перед интервью</p>
+            <p className="mt-1 inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+              Повторить слабое
+              <Target className="h-4 w-4" />
+            </p>
+          </Link>
+          <Link href="/portfolio" className="rounded-xl border border-border bg-background/60 p-3 transition-colors hover:bg-background/80">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Аргументы</p>
+            <p className="mt-1 inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+              Портфолио
+              <ClipboardCheck className="h-4 w-4" />
+            </p>
+          </Link>
+          <Link href="/notes" className="rounded-xl border border-border bg-background/60 p-3 transition-colors hover:bg-background/80">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Шпаргалки</p>
+            <p className="mt-1 inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+              Заметки
+              <BookOpenCheck className="h-4 w-4" />
+            </p>
+          </Link>
+          <Link href="/jobs" className="rounded-xl border border-border bg-background/60 p-3 transition-colors hover:bg-background/80">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">После</p>
+            <p className="mt-1 inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+              Вакансии
+              <BriefcaseBusiness className="h-4 w-4" />
+            </p>
+          </Link>
+        </div>
       </header>
 
       {questions.length === 0 && (
-        <div className="surface-elevated p-8 text-center space-y-6">
+        <div className="surface-elevated mx-auto max-w-4xl p-8 text-center space-y-6">
           <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-indigo-500/10 text-indigo-400 mb-2">
             <Mic className="h-8 w-8" />
           </div>
-          <h2 className="text-xl font-semibold">Выберите профессию для старта</h2>
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold">Выберите профессию для старта</h2>
+            <p className="mx-auto max-w-xl text-sm text-muted-foreground">
+              Начните с роли из карьерного трека. После оценки вернитесь в review, портфолио или job matching по результату.
+            </p>
+          </div>
           <div className="flex flex-wrap gap-4 justify-center">
             {[TrackCategory.QA, TrackCategory.BA, TrackCategory.DA].map((item) => (
               <button
@@ -325,7 +384,7 @@ export function MockInterviewPanel() {
                     : "border-border bg-card hover:border-border/70 hover:bg-muted/50 text-foreground"
                 } disabled:opacity-50`}
               >
-                {interviewTrackLabel(item)} Интервью
+                {interviewTrackLabel(item)}
               </button>
             ))}
           </div>
@@ -341,7 +400,7 @@ export function MockInterviewPanel() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="surface-elevated overflow-hidden"
+            className="surface-elevated mx-auto max-w-4xl overflow-hidden"
           >
             {/* Top Bar with Timer */}
             <div className="flex items-center justify-between border-b border-border/50 bg-muted/20 px-6 py-4">
@@ -359,6 +418,21 @@ export function MockInterviewPanel() {
             </div>
 
             <div className="p-6 sm:p-10 space-y-8">
+              <div className="grid gap-3 text-sm md:grid-cols-3">
+                <div className="rounded-xl border border-border bg-background/60 p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Формат</p>
+                  <p className="mt-1 font-semibold text-foreground">Короткий STAR-ответ</p>
+                </div>
+                <div className="rounded-xl border border-border bg-background/60 p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Фокус</p>
+                  <p className="mt-1 font-semibold text-foreground">{currentQuestion.expectedFocus}</p>
+                </div>
+                <div className="rounded-xl border border-border bg-background/60 p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Цель</p>
+                  <p className="mt-1 font-semibold text-foreground">Конкретика вместо общих слов</p>
+                </div>
+              </div>
+
               {/* AI Avatar & Question */}
               <div className="flex flex-col items-center text-center space-y-5">
                 <div className="relative">
@@ -410,7 +484,7 @@ export function MockInterviewPanel() {
                     disabled={isSimulating && isRecording}
                     className={`p-3 rounded-full transition-all shadow-lg ${
                       isRecording
-                        ? "bg-rose-500 text-white hover:bg-rose-600 scale-110"
+                        ? "bg-rose-500 text-primary-foreground hover:bg-rose-600 scale-110"
                         : "bg-surface text-muted-foreground border border-border hover:text-foreground hover:bg-muted"
                     } disabled:opacity-50`}
                   >
@@ -428,7 +502,11 @@ export function MockInterviewPanel() {
                 <div className="flex gap-3 justify-end w-full sm:w-auto">
                     <button
                       type="button"
-                      onClick={() => setCurrentIndex((prev) => Math.max(prev - 1, 0))}
+                      onClick={() => {
+                        stopRecording();
+                        setTimeLeft(TIMER_SECONDS);
+                        setCurrentIndex((prev) => Math.max(prev - 1, 0));
+                      }}
                       disabled={currentIndex === 0 || isLoading}
                       className="btn-secondary disabled:opacity-50"
                     >
@@ -438,7 +516,11 @@ export function MockInterviewPanel() {
                     {!isLast ? (
                       <button
                         type="button"
-                        onClick={() => { stopRecording(); setCurrentIndex((prev) => Math.min(prev + 1, questions.length - 1)); }}
+                        onClick={() => {
+                          stopRecording();
+                          setTimeLeft(TIMER_SECONDS);
+                          setCurrentIndex((prev) => Math.min(prev + 1, questions.length - 1));
+                        }}
                         disabled={!canGoNext || isLoading}
                         className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-50 min-w-[120px]"
                       >
@@ -450,7 +532,7 @@ export function MockInterviewPanel() {
                         type="button"
                         onClick={finishInterview}
                         disabled={!canGoNext || isLoading}
-                        className="btn-primary bg-emerald-500 hover:bg-emerald-600 text-white min-w-[140px] inline-flex items-center justify-center gap-2 shadow-[0_10px_24px_rgba(16,185,129,0.3)] disabled:opacity-50"
+                        className="btn-success-base focus-ring inline-flex min-w-[140px] items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold disabled:opacity-50"
                       >
                         {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
                         Завершить
@@ -468,16 +550,16 @@ export function MockInterviewPanel() {
             key="interview-evaluation"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="space-y-6"
+            className="mx-auto max-w-5xl space-y-6"
           >
             <div className="surface-elevated border-indigo-500/30 bg-indigo-500/5 p-8 sm:p-12 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-400 to-purple-400" />
 
               <div className="text-center mb-10">
                  <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-indigo-500/10 text-indigo-400 mb-6 border-4 border-indigo-500/20">
-                    <span className="text-3xl font-bold">{evaluation.score}</span><span className="text-sm mt-2">/10</span>
+                    <span className="metric-value text-indigo-500 dark:text-indigo-300">{evaluation.score}</span><span className="text-sm mt-2">/10</span>
                  </div>
-                 <h2 className="text-3xl font-bold text-foreground">Результаты Собеседования</h2>
+                 <h2 className="page-title text-foreground">Результаты Собеседования</h2>
                  <p className="chip-neutral inline-flex items-center gap-2 px-4 py-1.5 mt-4 text-sm font-semibold">
                     Ваш оцененный уровень: {evaluation.level}
                  </p>
@@ -542,6 +624,21 @@ export function MockInterviewPanel() {
                       <span key={item} className="px-3 py-1.5 rounded-lg border border-border bg-card text-xs text-muted-foreground">{item}</span>
                     ))}
                  </div>
+              </div>
+
+              <div className="mt-6 grid gap-3 border-t border-border/50 pt-6 md:grid-cols-3">
+                <Link href="/review" className="btn-secondary inline-flex items-center justify-center gap-2 rounded-lg">
+                  <Target className="h-4 w-4" />
+                  Повторить слабые темы
+                </Link>
+                <Link href="/portfolio" className="btn-secondary inline-flex items-center justify-center gap-2 rounded-lg">
+                  <ClipboardCheck className="h-4 w-4" />
+                  Обновить аргументы
+                </Link>
+                <Link href="/jobs" className="btn-primary inline-flex items-center justify-center gap-2 rounded-lg">
+                  Перейти к вакансиям
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
             </div>
           </motion.div>

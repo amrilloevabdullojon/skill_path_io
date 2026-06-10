@@ -221,7 +221,7 @@ export function HiringMarketplaceHub({
                       
                       <div className="flex items-start justify-between gap-4 relative z-10">
                         <div className="flex gap-4">
-                          <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-xl font-bold text-white shadow-inner", getGradient(match.company))}>
+                          <div className={cn("flex h-12 w-12 shrink-0 items-center justify-center rounded-xl font-bold text-primary-foreground shadow-inner", getGradient(match.company))}>
                             {match.company.substring(0, 2).toUpperCase()}
                           </div>
                           <div>
@@ -251,7 +251,7 @@ export function HiringMarketplaceHub({
                             </div>
                           </div>
                         )}
-                        <div className="bg-white/40 dark:bg-black/20 rounded-xl p-3 border border-border/40">
+                        <div className="bg-white/40 dark:bg-black/20 rounded-xl p-3 border border-border-subtle">
                           <p className="text-xs font-bold text-foreground mb-2 flex items-center gap-1">
                             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> Evidence Signals
                           </p>
@@ -266,7 +266,7 @@ export function HiringMarketplaceHub({
                         </div>
                       </div>
                       
-                      <button onClick={() => apply(match.roleId)} disabled={isApplying === match.roleId} className="w-full mt-4 btn-primary justify-center bg-indigo-600 hover:bg-indigo-700 text-white border-transparent">
+                      <button onClick={() => apply(match.roleId)} disabled={isApplying === match.roleId} className="w-full mt-4 btn-primary justify-center bg-indigo-600 hover:bg-indigo-700 text-primary-foreground border-transparent">
                         {isApplying === match.roleId ? "Submitting..." : "Apply with Profile"} <Send className="w-3.5 h-3.5 ml-1" />
                       </button>
                     </article>
@@ -281,7 +281,7 @@ export function HiringMarketplaceHub({
                 {roles.map((role) => (
                   <article key={role.id} className="group flex flex-col rounded-2xl border bg-card p-5 shadow-sm transition-all hover:shadow-md hover:border-indigo-500/30">
                     <div className="flex items-start justify-between gap-3 mb-4">
-                      <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-bold text-white text-sm", getGradient(role.company))}>
+                      <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-bold text-primary-foreground text-sm", getGradient(role.company))}>
                         {role.company.charAt(0)}
                       </div>
                       <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider border">

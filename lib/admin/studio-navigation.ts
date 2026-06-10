@@ -9,6 +9,10 @@ export type StudioAdminLink = {
 export const studioAdminLinks: StudioAdminLink[] = [
   { href: "/admin/dashboard", label: "Dashboard", permission: "courses.read" },
   { href: "/admin/courses", label: "Courses", permission: "courses.read" },
+  { href: "/admin/tracks", label: "Tracks", permission: "courses.read" },
+  { href: "/admin/modules", label: "Modules", permission: "courses.read" },
+  { href: "/admin/lessons", label: "Lessons", permission: "courses.read" },
+  { href: "/admin/quizzes", label: "Quizzes", permission: "courses.read" },
   { href: "/admin/users", label: "Users", permission: "users.manage" },
   { href: "/admin/certificates", label: "Certificates", permission: "certificates.manage" },
   { href: "/admin/analytics", label: "Analytics", permission: "analytics.read" },

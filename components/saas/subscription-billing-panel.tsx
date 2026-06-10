@@ -27,10 +27,10 @@ export function SubscriptionBillingPanel({ currentPlanId, plans, usage }: Subscr
 
   return (
     <section className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 surface-hero border border-indigo-500/20 bg-card/40 backdrop-blur-md p-6 sm:p-8 rounded-[24px]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 surface-hero border border-indigo-500/20 bg-card p-6 sm:p-8 rounded-2xl">
         <div className="space-y-2 relative z-10">
           <p className="kicker text-indigo-400 font-semibold tracking-widest uppercase">Подписка B2B</p>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Управление тарифом и оплата</h1>
+          <h1 className="page-title tracking-tight text-foreground">Управление тарифом и оплата</h1>
           <p className="text-sm text-foreground/70 max-w-2xl">
             Тарифные планы для индивидуального обучения и команд. Управляйте расходами, загружайте акты и следите за лимитами.
           </p>
@@ -73,7 +73,7 @@ export function SubscriptionBillingPanel({ currentPlanId, plans, usage }: Subscr
             return (
               <article
                 key={plan.id}
-                className={`relative overflow-hidden surface-elevated border bg-card/60 backdrop-blur-md space-y-4 p-6 rounded-[24px] transition-all hover:shadow-[0_8px_30px_rgba(99,102,241,0.1)] ${
+                className={`relative overflow-hidden surface-elevated border bg-card space-y-4 p-6 rounded-2xl transition-all hover:shadow-[0_8px_30px_rgba(99,102,241,0.1)] ${
                   isCurrent ? "border-indigo-400/50 shadow-[0_0_20px_rgba(99,102,241,0.15)] bg-gradient-to-br from-indigo-900/10 to-indigo-900/10" : "border-border/50"
                 }`}
               >
@@ -93,7 +93,7 @@ export function SubscriptionBillingPanel({ currentPlanId, plans, usage }: Subscr
                 
                 <div className="relative z-10 pt-2 pb-2">
                   <div className="flex items-end gap-1">
-                    <p className="text-4xl font-extrabold text-foreground">${price}</p>
+                    <p className="metric-value-lg text-foreground">${price}</p>
                     <span className="text-sm text-foreground/60 mb-1">/ мес.</span>
                   </div>
                   {!isAnnual && plan.annualPriceUsd > 0 && (
@@ -104,7 +104,7 @@ export function SubscriptionBillingPanel({ currentPlanId, plans, usage }: Subscr
                   )}
                 </div>
 
-                <ul className="space-y-3 relative z-10 pt-4 border-t border-border/40">
+                <ul className="space-y-3 relative z-10 pt-4 border-t border-border-subtle">
                   {plan.featureBundle.features.slice(0, 6).map((feature) => (
                     <li key={feature} className="flex items-start gap-2 text-sm text-foreground/80">
                       <Check className="h-4 w-4 shrink-0 text-emerald-400 mt-0.5" />
@@ -124,7 +124,7 @@ export function SubscriptionBillingPanel({ currentPlanId, plans, usage }: Subscr
         </div>
       </div>
 
-      <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-5 p-6 rounded-[24px]">
+      <section className="surface-elevated border border-border/50 bg-card space-y-5 p-6 rounded-2xl">
         <h2 className="text-xl font-bold text-foreground">Использование лимитов</h2>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {usage.map((item) => {
@@ -139,7 +139,7 @@ export function SubscriptionBillingPanel({ currentPlanId, plans, usage }: Subscr
                 className={`relative rounded-xl border p-5 transition-all ${
                   isReached ? "border-rose-500/40 bg-rose-500/5 shadow-[0_0_15px_rgba(244,63,94,0.1)]" 
                   : isWarning ? "border-amber-500/40 bg-amber-500/5" 
-                  : "border-border/40 bg-card/60"
+                  : "border-border-subtle bg-card/60"
                 }`}
               >
                 <div className="flex items-start justify-between gap-2 mb-3">
@@ -148,7 +148,7 @@ export function SubscriptionBillingPanel({ currentPlanId, plans, usage }: Subscr
                 </div>
                 
                 <div className="mb-4">
-                  <span className="text-3xl font-extrabold text-foreground leading-none">{item.used}</span>
+                  <span className="metric-value leading-none">{item.used}</span>
                   <span className="text-sm text-foreground/60 ml-1">/ {formatLimit(item.limit)}</span>
                 </div>
 
@@ -175,11 +175,11 @@ export function SubscriptionBillingPanel({ currentPlanId, plans, usage }: Subscr
         </div>
       </section>
 
-      <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-5 p-6 sm:p-8 rounded-[24px] overflow-hidden">
+      <section className="surface-elevated border border-border/50 bg-card space-y-5 p-6 sm:p-8 rounded-2xl overflow-hidden">
         <h2 className="text-xl font-bold text-foreground">Сравнение возможностей</h2>
         <div className="table-shell border-t border-border/30 pt-4 overflow-x-auto">
           <table className="table-base min-w-[840px] border-collapse w-full">
-            <thead className="table-head border-b border-border/40">
+            <thead className="table-head border-b border-border-subtle">
               <tr>
                 <th className="px-4 py-4 text-left text-sm font-semibold tracking-wider text-foreground/60">Функция</th>
                 {plans.map((plan) => (

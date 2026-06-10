@@ -50,7 +50,7 @@ const STATE_CARD: Record<LearningPathState, string> = {
   in_progress:
     "bg-indigo-500/15 border border-indigo-400/30 border-l-2 border-l-indigo-400 ring-1 ring-indigo-400/25 shadow-[0_0_24px_-4px_rgba(99,102,241,0.25)] backdrop-blur-md",
   available:
-    "bg-card/40 backdrop-blur-md border border-border/50 hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:shadow-[0_4px_20px_-8px_rgba(99,102,241,0.2)] transition-all",
+    "bg-card border border-border/50 hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:shadow-[0_4px_20px_-8px_rgba(99,102,241,0.2)] transition-all",
   locked: "bg-muted/10 border-border/30 backdrop-blur-sm",
 };
 

@@ -4,36 +4,33 @@ import { useEffect, useMemo, useState } from "react";
 import { MessagesSquare, Users } from "lucide-react";
 
 import { peerReviewQueueSeed, studyGroupsSeed, StudyGroup } from "@/features/community/study-groups";
+import { useBrowserStorageItem } from "@/hooks/use-browser-storage";
 
 type LocalGroupState = StudyGroup & {
   joined: boolean;
 };
 
 const STORAGE_KEY = "skillpath:study-groups";
+const seedGroups = () => studyGroupsSeed.map((group) => ({ ...group, joined: false }));
+
+function parseStoredGroups(raw: string | null): LocalGroupState[] {
+  if (!raw) return seedGroups();
+
+  try {
+    const parsed = JSON.parse(raw) as LocalGroupState[];
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : seedGroups();
+  } catch {
+    return seedGroups();
+  }
+}
 
 export function StudyGroupsPanel() {
-  const [groups, setGroups] = useState<LocalGroupState[]>([]);
+  const rawGroups = useBrowserStorageItem("local", STORAGE_KEY);
+  const persistedGroups = useMemo(() => parseStoredGroups(rawGroups), [rawGroups]);
+  const [localGroups, setLocalGroups] = useState<LocalGroupState[] | null>(null);
+  const groups = localGroups ?? persistedGroups;
   const [newGroupName, setNewGroupName] = useState("");
   const [newGroupTopic, setNewGroupTopic] = useState("");
-
-  useEffect(() => {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      setGroups(studyGroupsSeed.map((group) => ({ ...group, joined: false })));
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(raw) as LocalGroupState[];
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        setGroups(parsed);
-      } else {
-        setGroups(studyGroupsSeed.map((group) => ({ ...group, joined: false })));
-      }
-    } catch {
-      setGroups(studyGroupsSeed.map((group) => ({ ...group, joined: false })));
-    }
-  }, []);
 
   useEffect(() => {
     if (groups.length > 0) {
@@ -44,8 +41,8 @@ export function StudyGroupsPanel() {
   const joinedCount = useMemo(() => groups.filter((group) => group.joined).length, [groups]);
 
   function toggleJoin(id: string) {
-    setGroups((prev) =>
-      prev.map((group) =>
+    setLocalGroups((prev) =>
+      (prev ?? groups).map((group) =>
         group.id === id
           ? {
               ...group,
@@ -71,7 +68,7 @@ export function StudyGroupsPanel() {
       joined: true,
     };
 
-    setGroups((prev) => [created, ...prev]);
+    setLocalGroups((prev) => [created, ...(prev ?? groups)]);
     setNewGroupName("");
     setNewGroupTopic("");
   }

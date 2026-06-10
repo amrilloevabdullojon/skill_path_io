@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CheckCircle2, Sparkles, Trophy } from "lucide-react";
 
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
+import { Badge } from "@/components/ui/badge";
 import { WeeklyQuest } from "@/types/personalization";
 
 export function DashboardWeeklyQuestsSection({ quests }: { quests: WeeklyQuest[] }) {
@@ -42,7 +43,7 @@ export function DashboardWeeklyQuestsSection({ quests }: { quests: WeeklyQuest[]
           return (
             <article 
               key={quest.id} 
-              className={`relative overflow-hidden surface-elevated border bg-card/60 backdrop-blur-xl p-5 rounded-2xl transition-all duration-300 shadow-[0_4px_25px_rgba(0,0,0,0.05)] hover:-translate-y-1 ${
+              className={`relative overflow-hidden surface-elevated border bg-card p-5 rounded-2xl transition-all duration-300 shadow-[0_4px_25px_rgba(0,0,0,0.05)] hover:-translate-y-1 ${
                 isCompleted 
                   ? "border-emerald-500/30 hover:border-emerald-500/50" 
                   : "border-indigo-500/20 hover:border-indigo-500/40"
@@ -66,14 +67,8 @@ export function DashboardWeeklyQuestsSection({ quests }: { quests: WeeklyQuest[]
                     <p className="text-xs text-foreground/70 mt-1 max-w-[250px]">{quest.description}</p>
                   </div>
                 </div>
-                <div className="shrink-0 flex justify-end">
-                  <span className={`inline-flex items-center rounded-full border px-3 py-1 font-extrabold uppercase tracking-widest text-[10px] ${
-                    isCompleted 
-                      ? "border-emerald-500/40 bg-emerald-500/20 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.3)]" 
-                      : "border-amber-500/40 bg-amber-500/20 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.3)]"
-                  }`}>
-                    +{quest.rewardXp} XP
-                  </span>
+                <div className="flex shrink-0 justify-end">
+                  <Badge variant={isCompleted ? "success" : "warning"}>+{quest.rewardXp} XP</Badge>
                 </div>
               </div>
 

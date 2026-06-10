@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
+import { QuizMistakesReview, type QuizMistakeItem } from "@/components/review/quiz-mistakes-review";
 import { SpeedReviewMode } from "@/components/review/speed-review-mode";
-import { buildSpeedReviewCards } from "@/features/review/speed-review";
+import { buildSpeedReviewCards, type ReviewCard } from "@/features/review/speed-review";
 import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { UserBookmark, UserNote } from "@/types/personalization";
 
 export const metadata: Metadata = {
-  title: "Быстрая проверка — Levio",
+  title: "Быстрая проверка",
   description: "Повторяйте сохраненные закладки и заметки в режиме быстрых флеш-карточек.",
   robots: { index: false },
 };
-import { prisma } from "@/lib/prisma";
-import { UserBookmark, UserNote } from "@/types/personalization";
 
 function mapTrack(moduleRef: string): UserNote["track"] {
   const normalized = moduleRef.toLowerCase();
@@ -31,6 +32,36 @@ function mapBookmarkType(value: string): UserBookmark["type"] {
   return "lesson";
 }
 
+function parseAnswerIds(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
+}
+
+function parseOptions(value: unknown): Array<{ id: string; text: string }> {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.flatMap((item) => {
+    if (typeof item === "string") {
+      return [{ id: item, text: item }];
+    }
+    if (item && typeof item === "object" && "id" in item && "text" in item) {
+      const id = String(item.id);
+      const text = String(item.text);
+      return id && text ? [{ id, text }] : [];
+    }
+    return [];
+  });
+}
+
+function answerLabels(answerIds: string[], options: Array<{ id: string; text: string }>): string[] {
+  const optionLabelById = new Map(options.map((option) => [option.id, option.text]));
+  return answerIds.map((id) => optionLabelById.get(id) ?? id);
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function ReviewPage() {
@@ -42,7 +73,7 @@ export default async function ReviewPage() {
         select: { id: true },
       })
     : null;
-  const [noteRows, bookmarkRows] = user
+  const [noteRows, bookmarkRows, mistakeRows] = user
     ? await Promise.all([
         prisma.userNote.findMany({
           where: { userId: user.id },
@@ -54,8 +85,34 @@ export default async function ReviewPage() {
           orderBy: { updatedAt: "desc" },
           take: 80,
         }),
+        prisma.quizQuestionResult.findMany({
+          where: {
+            attempt: { userId: user.id },
+          },
+          orderBy: { createdAt: "desc" },
+          take: 300,
+          select: {
+            id: true,
+            questionId: true,
+            questionText: true,
+            isCorrect: true,
+            options: true,
+            selectedAnswerIds: true,
+            correctAnswerIds: true,
+            attempt: {
+              select: {
+                trackTitle: true,
+                trackSlug: true,
+                moduleId: true,
+                moduleTitle: true,
+                quizTitle: true,
+                submittedAt: true,
+              },
+            },
+          },
+        }),
       ])
-    : [[], []];
+    : [[], [], []];
 
   const notes: UserNote[] = noteRows.map((row) => ({
     id: row.id,
@@ -72,14 +129,50 @@ export default async function ReviewPage() {
     type: mapBookmarkType(row.type),
     tag: row.tag || "General",
   }));
-  const cards = buildSpeedReviewCards(notes, bookmarks);
+
+  const unresolvedMistakeRows = [];
+  const seenQuestionIds = new Set<string>();
+  for (const row of mistakeRows) {
+    if (seenQuestionIds.has(row.questionId)) {
+      continue;
+    }
+    seenQuestionIds.add(row.questionId);
+    if (!row.isCorrect) {
+      unresolvedMistakeRows.push(row);
+    }
+  }
+
+  const mistakes: QuizMistakeItem[] = unresolvedMistakeRows.map((row) => {
+    const options = parseOptions(row.options);
+
+    return {
+      id: row.id,
+      question: row.questionText,
+      selectedAnswers: answerLabels(parseAnswerIds(row.selectedAnswerIds), options),
+      correctAnswers: answerLabels(parseAnswerIds(row.correctAnswerIds), options),
+      trackTitle: row.attempt.trackTitle,
+      trackSlug: row.attempt.trackSlug,
+      moduleId: row.attempt.moduleId,
+      moduleTitle: row.attempt.moduleTitle,
+      quizTitle: row.attempt.quizTitle,
+      submittedAt: row.attempt.submittedAt,
+    };
+  });
+
+  const mistakeCards: ReviewCard[] = mistakes.slice(0, 8).map((mistake) => ({
+    id: `mistake-${mistake.id}`,
+    title: `Ошибка: ${mistake.moduleTitle}`,
+    type: "mistake",
+    detail: mistake.question,
+    answer: `Правильный ответ: ${
+      mistake.correctAnswers.length > 0 ? mistake.correctAnswers.join(", ") : "ответ не указан"
+    }`,
+  }));
+  const cards = buildSpeedReviewCards(notes, bookmarks, mistakeCards);
 
   return (
-    <section className="page-shell relative isolate overflow-hidden">
-      {/* Background Neon Orbs */}
-      <div className="absolute top-[5%] right-[10%] w-[400px] h-[400px] rounded-full bg-violet-500/15 blur-[120px] pointer-events-none -z-10" />
-      <div className="absolute bottom-[10%] left-[5%] w-[500px] h-[500px] rounded-full bg-sky-500/10 blur-[130px] pointer-events-none -z-10" />
-      
+    <section className="page-shell space-y-8">
+      <QuizMistakesReview mistakes={mistakes} />
       <SpeedReviewMode cards={cards} />
     </section>
   );

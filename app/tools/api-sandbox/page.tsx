@@ -7,18 +7,18 @@ import { Button } from "@/components/ui/button";
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
 const MOCK_ENDPOINTS: Record<string, { status: number, body: JsonValue }> = {
-  "GET https://api.skillpath.io/v1/users": {
+  "GET https://api.levio.app/v1/users": {
     status: 200,
     body: [
       { id: 1, name: "Ivan Ivanov", email: "ivan@example.com", role: "QA Engineer" },
       { id: 2, name: "Anna Smirnova", email: "anna@example.com", role: "Business Analyst" }
     ]
   },
-  "GET https://api.skillpath.io/v1/users/1": {
+  "GET https://api.levio.app/v1/users/1": {
     status: 200,
     body: { id: 1, name: "Ivan Ivanov", email: "ivan@example.com", role: "QA Engineer" }
   },
-  "POST https://api.skillpath.io/v1/login": {
+  "POST https://api.levio.app/v1/login": {
     status: 200,
     body: { token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...", expires_in: 3600 }
   },
@@ -26,7 +26,7 @@ const MOCK_ENDPOINTS: Record<string, { status: number, body: JsonValue }> = {
 
 export default function ApiSandboxPage() {
   const [method, setMethod] = useState("GET");
-  const [url, setUrl] = useState("https://api.skillpath.io/v1/users");
+  const [url, setUrl] = useState("https://api.levio.app/v1/users");
   const [activeTab, setActiveTab] = useState<"params" | "headers" | "body">("headers");
   
   const [headers, setHeaders] = useState([{ key: "Content-Type", value: "application/json" }]);
@@ -84,14 +84,14 @@ export default function ApiSandboxPage() {
     <div className="max-w-6xl mx-auto space-y-6 pt-6">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground inline-flex items-center gap-2">
+          <h1 className="page-title text-foreground inline-flex items-center gap-2">
             <span className="p-2 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 shadow-[0_0_15px_rgba(56,189,248,0.1)]">
               <Network className="h-5 w-5" />
             </span>
             API Sandbox
           </h1>
           <p className="text-sm text-foreground/60 mt-1">
-            Моделируйте REST запросы для отработки навыков тестирования API. Используйте `https://api.skillpath.io/v1/users`.
+            Моделируйте REST запросы для отработки навыков тестирования API. Используйте `https://api.levio.app/v1/users`.
           </p>
         </div>
         <div className="flex gap-2">
@@ -105,7 +105,7 @@ export default function ApiSandboxPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* REQUEST SECTION */}
         <div className="space-y-4">
-          <div className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-2xl overflow-hidden shadow-sm">
+          <div className="surface-elevated border border-border/50 bg-card rounded-2xl overflow-hidden shadow-sm">
             <div className="flex border-b border-border/50 bg-background/30 px-3 py-3 gap-2">
               <select 
                 className="bg-transparent text-sm font-bold w-[90px] outline-none text-sky-400"
@@ -125,7 +125,7 @@ export default function ApiSandboxPage() {
                 placeholder="https://api.example.com/v1/resource"
                 className="flex-1 bg-transparent text-sm outline-none text-foreground"
               />
-              <Button onClick={handleSend} disabled={isLoading} className="bg-sky-500 hover:bg-sky-400 text-white rounded-lg h-8 px-4 font-bold tracking-wide shadow-[0_0_15px_rgba(56,189,248,0.3)]">
+              <Button onClick={handleSend} disabled={isLoading} className="bg-sky-500 hover:bg-sky-400 text-primary-foreground rounded-lg h-8 px-4 font-bold tracking-wide shadow-[0_0_15px_rgba(56,189,248,0.3)]">
                 {isLoading ? <Activity className="h-4 w-4 animate-spin" /> : <><Play className="h-3.5 w-3.5 mr-1.5" /> SEND</>}
               </Button>
             </div>
@@ -195,7 +195,7 @@ export default function ApiSandboxPage() {
 
         {/* RESPONSE SECTION */}
         <div className="space-y-4">
-          <div className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-2xl overflow-hidden shadow-sm h-full flex flex-col">
+          <div className="surface-elevated border border-border/50 bg-card rounded-2xl overflow-hidden shadow-sm h-full flex flex-col">
             <div className="flex border-b border-border/50 bg-background/40 px-4 py-3 gap-4 items-center min-h-[57px]">
               <p className="text-xs font-bold text-foreground/50 uppercase tracking-widest mr-auto">Response</p>
               

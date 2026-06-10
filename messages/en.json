@@ -33,6 +33,10 @@
   },
   "nav": {
     "menu": "Menu",
+    "today": "Today",
+    "study": "Study",
+    "practice": "Practice",
+    "progress": "Progress",
     "overview": "Overview",
     "tracks": "Tracks",
     "missions": "Missions",
@@ -67,7 +71,7 @@
     "saas": "SaaS",
     "community": "Community",
     "quickTip": "Quick tip",
-    "quickTipText": "Press Cmd/Ctrl + K to search lessons, missions, jobs, and admin entities.",
+    "quickTipText": "Search lessons, missions, progress, and portfolio from one place.",
     "quickTipDismiss": "Got it",
     "focusMode": "Focus learning mode",
     "exitFocusMode": "Exit",
@@ -77,7 +81,7 @@
     "adminPanel": "Admin Panel",
     "quickActions": "Quick actions",
     "openCommandPalette": "Open command palette",
-    "searchPlaceholder": "Search modules, missions, jobs… (Cmd/Ctrl + K)",
+    "searchPlaceholder": "Search modules, missions, progress…",
     "cmdK": "Cmd + K",
     "notifications": "Notifications",
     "openNavigation": "Open navigation",
@@ -373,6 +377,8 @@
       }
     },
     "tabs": {
+      "today": "Today",
+      "progress": "Progress",
       "overview": "Overview",
       "skills": "Skills",
       "career": "Career"

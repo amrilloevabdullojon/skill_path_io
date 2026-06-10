@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { BugReportSimulation } from "@/components/simulation/bug-report-simulation";
 
 export const metadata: Metadata = {
-  title: "Симулятор Баг-трекера — Levio",
+  title: "Симулятор Баг-трекера",
   description: "QA симуляция: практикуйтесь в написании понятных и воспроизводимых баг-репортов в реалистичном баг-трекере.",
 };
 

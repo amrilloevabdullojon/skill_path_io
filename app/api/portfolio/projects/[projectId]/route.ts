@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { apiOk, Errors, withErrorHandler } from "@/lib/api/error-handler";
 import { prisma } from "@/lib/prisma";
 
-type Params = { params: { projectId: string } };
+type Params = { params: Promise<{ projectId: string }> };
 
 async function resolveProject(projectId: string, userEmail: string) {
   const user = await prisma.user.findUnique({
@@ -29,7 +29,8 @@ export const PATCH = withErrorHandler(async (request: Request, { params }: Param
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) throw Errors.unauthorized();
 
-  const project = await resolveProject(params.projectId, session.user.email);
+  const { projectId } = await params;
+  const project = await resolveProject(projectId, session.user.email);
 
   const body = (await request.json()) as {
     title?: string;
@@ -61,7 +62,8 @@ export const DELETE = withErrorHandler(async (_request: Request, { params }: Par
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) throw Errors.unauthorized();
 
-  const project = await resolveProject(params.projectId, session.user.email);
+  const { projectId } = await params;
+  const project = await resolveProject(projectId, session.user.email);
 
   await prisma.portfolioProject.delete({ where: { id: project.id } });
 

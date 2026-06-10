@@ -241,6 +241,7 @@ export type DashboardData = {
   reviewPreview: {
     bookmarkCount: number;
     noteCount: number;
+    mistakeCount: number;
   };
   portfolioPreview: {
     totalEntries: number;
@@ -539,37 +540,55 @@ export async function getDashboardData(params: {
 
   const td = await getTranslations("dashboard.data");
 
-  const [user, runtimeCatalog, leaderboardUsers] = await Promise.all([
-    resolveDashboardUser(preferredEmail),
-    resolveRuntimeCatalog({ includeCourseEntities: true }),
-    prisma.user.findMany({
-      // Cap leaderboard to avoid full-table scans as the user base grows.
-      // Top-N ranking is sufficient for motivational display purposes.
-      take: MAX_LEADERBOARD_USERS,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        progresses: {
-          select: {
-            status: true,
-            score: true,
+  let user: Awaited<ReturnType<typeof resolveDashboardUser>>;
+  let runtimeCatalog: Awaited<ReturnType<typeof resolveRuntimeCatalog>>;
+  let leaderboardUsers: Array<{
+    id: string;
+    name: string | null;
+    email: string;
+    progresses: Array<{ status: ProgressStatus; score: number | null }>;
+    _count: { certificates: number; courseCertificates: number };
+    userStreak: { currentStreak: number } | null;
+  }>;
+
+  try {
+    [user, runtimeCatalog, leaderboardUsers] = await Promise.all([
+      resolveDashboardUser(preferredEmail),
+      resolveRuntimeCatalog({ includeCourseEntities: true }),
+      prisma.user.findMany({
+        // Cap leaderboard to avoid full-table scans as the user base grows.
+        // Top-N ranking is sufficient for motivational display purposes.
+        take: MAX_LEADERBOARD_USERS,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          progresses: {
+            select: {
+              status: true,
+              score: true,
+            },
+          },
+          _count: {
+            select: {
+              certificates: true,
+              courseCertificates: true,
+            },
+          },
+          userStreak: {
+            select: {
+              currentStreak: true,
+            },
           },
         },
-        _count: {
-          select: {
-            certificates: true,
-            courseCertificates: true,
-          },
-        },
-        userStreak: {
-          select: {
-            currentStreak: true,
-          },
-        },
-      },
-    }),
-  ]);
+      }),
+    ]);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[dashboard] Failed to resolve dashboard bootstrap data", error);
+    }
+    return null;
+  }
 
   if (!user) {
     return null;
@@ -599,6 +618,7 @@ export async function getDashboardData(params: {
     weeklyQuestRows,
     noteCount,
     bookmarkCount,
+    quizReviewRows,
     activeLearningPlan,
   ] = await Promise.all([
     withOptionalTableFallback(
@@ -673,6 +693,20 @@ export async function getDashboardData(params: {
         where: { userId: user.id },
       }),
       0,
+    ),
+    withOptionalTableFallback(
+      prisma.quizQuestionResult.findMany({
+        where: {
+          attempt: { userId: user.id },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 500,
+        select: {
+          questionId: true,
+          isCorrect: true,
+        },
+      }),
+      [] as Array<{ questionId: string; isCorrect: boolean }>,
     ),
     withOptionalTableFallback(
       prisma.learningPlan.findFirst({
@@ -812,7 +846,7 @@ export async function getDashboardData(params: {
   const groupedLeaderboard = buildLeaderboard(
     leaderboardUsers.map((item) => ({
       id: item.id,
-      name: item.name,
+      name: item.name ?? "Levio User",
       email: item.email,
       progresses: item.progresses,
       certificates: item._count.certificates + item._count.courseCertificates,
@@ -884,7 +918,7 @@ export async function getDashboardData(params: {
     baseRecommendationText: baseRecommendations[0],
   });
 
-  const onboardingProfile = getOnboardingProfileFromCookie();
+  const onboardingProfile = await getOnboardingProfileFromCookie();
   const adaptiveSignal = {
     quizAccuracy,
     frequentMistakes: lowScoreProgress
@@ -1004,7 +1038,7 @@ export async function getDashboardData(params: {
       objective: mission.objective,
       steps: parseStringArray(mission.steps),
       skillsUsed: defaultSkillsByTrackTag(category),
-      expectedResult: mission.expectedResult || "Complete objective with a production-style deliverable.",
+      expectedResult: mission.expectedResult || "Закройте цель готовым артефактом продакшн-уровня.",
       difficulty,
       xpReward: mission.xpReward,
       aiEvaluation: mission.aiEvaluationEnabled,
@@ -1065,9 +1099,22 @@ export async function getDashboardData(params: {
       missingRequirements: job.missingRequirements,
     }));
 
+  const seenQuizQuestionIds = new Set<string>();
+  let mistakeCount = 0;
+  for (const row of quizReviewRows) {
+    if (seenQuizQuestionIds.has(row.questionId)) {
+      continue;
+    }
+    seenQuizQuestionIds.add(row.questionId);
+    if (!row.isCorrect) {
+      mistakeCount += 1;
+    }
+  }
+
   const reviewPreview = {
     bookmarkCount: bookmarkCount,
     noteCount: noteCount,
+    mistakeCount: mistakeCount,
   };
 
   const now = new Date();
@@ -1450,7 +1497,7 @@ export async function getDashboardData(params: {
 
     return {
       userId: member.id,
-      name: member.name,
+      name: member.name ?? "Levio User",
       role: index === 0 && role === "ADMIN" ? "MANAGER" : "LEARNER",
       assignedTrack,
       progressPercent: Math.round((memberCompleted / memberTotal) * 100),

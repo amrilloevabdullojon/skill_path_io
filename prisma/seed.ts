@@ -1,5 +1,6 @@
 import {
   LessonType,
+  Prisma,
   PrismaClient,
   ProgressStatus,
   QuestionType,
@@ -28,7 +29,7 @@ const trackTemplates = [
   },
   {
     slug: "business-analyst",
-    title: "Бизнес Знаналитик",
+    title: "Бизнес Аналитик",
     description: "Трек по бизнес-анализу: сбор требований, работа со стейкхолдерами, постановка задач и документирование.",
     icon: "briefcase",
     color: "#F97316",
@@ -195,28 +196,126 @@ const weeklyQuestTemplates = [
 
 const lessonTypes: LessonType[] = [LessonType.TEXT, LessonType.VIDEO, LessonType.TASK];
 
+type SeededQuestion = {
+  id: string;
+  text: string;
+  type: QuestionType;
+  options: Prisma.JsonValue;
+  correctAnswer: Prisma.JsonValue;
+};
+
+type SeededModule = {
+  id: string;
+  title: string;
+  order: number;
+  quiz: {
+    id: string;
+    title: string;
+    passingScore: number;
+    questions: SeededQuestion[];
+  } | null;
+};
+
 function buildQuestion(moduleTitle: string, questionOrder: number) {
   const isMulti = questionOrder % 2 === 0;
   const questionType = isMulti ? QuestionType.MULTI : QuestionType.SINGLE;
 
   return {
-    text: `${moduleTitle}: question ${questionOrder}`,
+    text: `${moduleTitle}: вопрос ${questionOrder}`,
     type: questionType,
     options: [
-      { id: "A", text: "Option A" },
-      { id: "B", text: "Option B" },
-      { id: "C", text: "Option C" },
-      { id: "D", text: "Option D" },
+      { id: "A", text: "Проверить основной сценарий" },
+      { id: "B", text: "Пропустить негативные кейсы" },
+      { id: "C", text: "Сверить ожидаемый результат" },
+      { id: "D", text: "Закрыть задачу без доказательств" },
     ],
     correctAnswer: isMulti ? ["A", "C"] : ["A"],
   };
 }
 
+function selectedAnswersForQuestion(question: SeededQuestion, shouldBeCorrect: boolean) {
+  if (shouldBeCorrect) {
+    return question.correctAnswer;
+  }
+
+  return question.type === QuestionType.MULTI ? ["B", "D"] : ["B"];
+}
+
+function toInputJson(value: Prisma.JsonValue): Prisma.InputJsonValue | typeof Prisma.JsonNull {
+  return value === null ? Prisma.JsonNull : value;
+}
+
+async function createSeededQuizAttempt(params: {
+  userId: string;
+  source: string;
+  trackSlug: string;
+  trackTitle: string;
+  module: SeededModule;
+  score: number;
+  correctAnswers: number;
+  submittedDaysAgo: number;
+  durationSeconds: number;
+}) {
+  if (!params.module.quiz) {
+    return;
+  }
+
+  const questions = params.module.quiz.questions;
+  const correctQuestionIds = new Set(questions.slice(0, params.correctAnswers).map((question) => question.id));
+  const submittedAt = new Date(Date.now() - params.submittedDaysAgo * 24 * 60 * 60 * 1000);
+
+  await prisma.quizAttempt.create({
+    data: {
+      userId: params.userId,
+      source: params.source,
+      trackSlug: params.trackSlug,
+      trackTitle: params.trackTitle,
+      moduleId: params.module.id,
+      moduleTitle: params.module.title,
+      quizId: params.module.quiz.id,
+      quizTitle: params.module.quiz.title,
+      score: params.score,
+      passingScore: params.module.quiz.passingScore,
+      passed: params.score >= params.module.quiz.passingScore,
+      totalQuestions: questions.length,
+      correctAnswers: params.correctAnswers,
+      startedAt: new Date(submittedAt.getTime() - params.durationSeconds * 1000),
+      submittedAt,
+      durationSeconds: params.durationSeconds,
+      questionResults: {
+        create: questions.map((question) => {
+          const isCorrect = correctQuestionIds.has(question.id);
+
+          return {
+            questionId: question.id,
+            questionText: question.text,
+            questionType: question.type,
+            options: toInputJson(question.options),
+            selectedAnswerIds: toInputJson(selectedAnswersForQuestion(question, isCorrect)),
+            correctAnswerIds: toInputJson(question.correctAnswer),
+            isCorrect,
+            createdAt: submittedAt,
+          };
+        }),
+      },
+    },
+  });
+}
+
 async function main() {
+  const allowDestructiveSeed = process.env.SEED_ALLOW_DESTRUCTIVE === "true";
+  if (process.env.NODE_ENV === "production" && !allowDestructiveSeed) {
+    throw new Error(
+      "Refusing to run destructive seed in production. Set SEED_ALLOW_DESTRUCTIVE=true only for an intentional reset.",
+    );
+  }
+
   await prisma.discussionComment.deleteMany();
   await prisma.discussionThread.deleteMany();
   await prisma.userBookmark.deleteMany();
   await prisma.userNote.deleteMany();
+  await prisma.quizQuestionResult.deleteMany();
+  await prisma.quizAttempt.deleteMany();
   await prisma.missionSubmission.deleteMany();
   await prisma.learningMission.deleteMany();
   await prisma.weeklyQuest.deleteMany();
@@ -224,10 +323,23 @@ async function main() {
   await prisma.knowledgeNode.deleteMany();
   await prisma.jobPosting.deleteMany();
   await prisma.jobRole.deleteMany();
+  await prisma.lessonBlock.deleteMany();
+  await prisma.courseQuestion.deleteMany();
+  await prisma.courseQuiz.deleteMany();
+  await prisma.assignment.deleteMany();
+  await prisma.simulation.deleteMany();
+  await prisma.caseStudy.deleteMany();
   await prisma.userProgress.deleteMany();
   await prisma.courseModuleProgress.deleteMany();
   await prisma.certificate.deleteMany();
   await prisma.courseCertificate.deleteMany();
+  await prisma.certificateConfig.deleteMany();
+  await prisma.courseAnalyticsSnapshot.deleteMany();
+  await prisma.courseTemplate.deleteMany();
+  await prisma.courseVersion.deleteMany();
+  await prisma.courseLesson.deleteMany();
+  await prisma.courseModule.deleteMany();
+  await prisma.course.deleteMany();
   await prisma.question.deleteMany();
   await prisma.quiz.deleteMany();
   await prisma.lesson.deleteMany();
@@ -253,13 +365,36 @@ async function main() {
       role: UserRole.STUDENT,
     },
   });
+  const supportStudents = await prisma.user.createManyAndReturn({
+    data: [
+      {
+        name: "Nodira QA",
+        email: "nodira.qa@levio.local",
+        role: UserRole.STUDENT,
+      },
+      {
+        name: "Aziz Analyst",
+        email: "aziz.analyst@levio.local",
+        role: UserRole.STUDENT,
+      },
+      {
+        name: "Madina Data",
+        email: "madina.data@levio.local",
+        role: UserRole.STUDENT,
+      },
+    ],
+    select: {
+      id: true,
+      name: true,
+    },
+  });
 
   const createdTracks: Array<{
     id: string;
     slug: string;
     title: string;
     category: TrackCategory;
-    modules: Array<{ id: string; title: string; order: number }>;
+    modules: SeededModule[];
   }> = [];
 
   for (const track of trackTemplates) {
@@ -278,31 +413,31 @@ async function main() {
             return {
               order: moduleOrder,
               title: moduleTitle,
-              description: `${moduleTitle}: practical module ${moduleOrder}`,
+              description: `${moduleTitle}: практический модуль ${moduleOrder}`,
               duration: 60 + moduleOrder * 15,
               content: {
-                overview: `Module content for "${moduleTitle}"`,
+                overview: `Короткий практический обзор модуля "${moduleTitle}".`,
                 outcomes: [
-                  "Understand key concepts",
-                  "Apply knowledge on a practical case",
-                  "Prepare for the next module",
+                  "Понять ключевые принципы темы",
+                  "Применить навык на практическом кейсе",
+                  "Подготовиться к следующему модулю",
                 ],
-                resources: ["Notes", "Checklist", "Practice task"],
+                resources: ["Конспект", "Чеклист", "Практическое задание"],
               },
               lessons: {
                 create: Array.from({ length: 3 }, (_, lessonIndex) => {
                   const lessonOrder = lessonIndex + 1;
                   return {
                     order: lessonOrder,
-                    title: `${moduleTitle}: lesson ${lessonOrder}`,
-                    body: `Lesson ${lessonOrder} content for "${moduleTitle}".`,
+                    title: `${moduleTitle}: урок ${lessonOrder}`,
+                    body: `Урок ${lessonOrder} помогает закрепить тему "${moduleTitle}" через понятные шаги, примеры и мини-практику.`,
                     type: lessonTypes[lessonIndex],
                   };
                 }),
               },
               quiz: {
                 create: {
-                  title: `${moduleTitle}: final quiz`,
+                  title: `Итоговый тест: ${moduleTitle}`,
                   passingScore: 70,
                   questions: {
                     create: Array.from({ length: 5 }, (_, questionIndex) =>
@@ -318,7 +453,27 @@ async function main() {
       include: {
         modules: {
           orderBy: { order: "asc" },
-          select: { id: true, title: true, order: true },
+          select: {
+            id: true,
+            title: true,
+            order: true,
+            quiz: {
+              select: {
+                id: true,
+                title: true,
+                passingScore: true,
+                questions: {
+                  select: {
+                    id: true,
+                    text: true,
+                    type: true,
+                    options: true,
+                    correctAnswer: true,
+                  },
+                },
+              },
+            },
+          },
         },
       },
     });
@@ -330,6 +485,87 @@ async function main() {
       category: createdTrack.category,
       modules: createdTrack.modules,
     });
+  }
+
+  const qaTrack = createdTracks.find((track) => track.slug === "qa-engineer");
+  const baTrack = createdTracks.find((track) => track.slug === "business-analyst");
+  const daTrack = createdTracks.find((track) => track.slug === "data-analyst");
+
+  if (qaTrack && baTrack && daTrack) {
+    const demoAttempts = [
+      {
+        userId: student.id,
+        track: qaTrack,
+        module: qaTrack.modules[0],
+        score: 86,
+        correctAnswers: 4,
+        submittedDaysAgo: 6,
+        durationSeconds: 620,
+      },
+      {
+        userId: student.id,
+        track: qaTrack,
+        module: qaTrack.modules[1],
+        score: 62,
+        correctAnswers: 3,
+        submittedDaysAgo: 2,
+        durationSeconds: 740,
+      },
+      {
+        userId: supportStudents[0]?.id,
+        track: qaTrack,
+        module: qaTrack.modules[1],
+        score: 48,
+        correctAnswers: 2,
+        submittedDaysAgo: 1,
+        durationSeconds: 810,
+      },
+      {
+        userId: supportStudents[1]?.id,
+        track: baTrack,
+        module: baTrack.modules[1],
+        score: 56,
+        correctAnswers: 3,
+        submittedDaysAgo: 3,
+        durationSeconds: 690,
+      },
+      {
+        userId: supportStudents[2]?.id,
+        track: daTrack,
+        module: daTrack.modules[1],
+        score: 44,
+        correctAnswers: 2,
+        submittedDaysAgo: 4,
+        durationSeconds: 880,
+      },
+      {
+        userId: supportStudents[2]?.id,
+        track: daTrack,
+        module: daTrack.modules[0],
+        score: 78,
+        correctAnswers: 4,
+        submittedDaysAgo: 7,
+        durationSeconds: 560,
+      },
+    ];
+
+    for (const attempt of demoAttempts) {
+      if (!attempt.userId || !attempt.module) {
+        continue;
+      }
+
+      await createSeededQuizAttempt({
+        userId: attempt.userId,
+        source: "seed-demo",
+        trackSlug: attempt.track.slug,
+        trackTitle: attempt.track.title,
+        module: attempt.module,
+        score: attempt.score,
+        correctAnswers: attempt.correctAnswers,
+        submittedDaysAgo: attempt.submittedDaysAgo,
+        durationSeconds: attempt.durationSeconds,
+      });
+    }
   }
 
   await prisma.userProgress.createMany({
@@ -602,6 +838,9 @@ async function main() {
     lessonCount,
     quizCount,
     questionCount,
+    userCount,
+    quizAttemptCount,
+    quizQuestionResultCount,
     missionCount,
     jobPostingCount,
     weeklyQuestCount,
@@ -613,6 +852,9 @@ async function main() {
     prisma.lesson.count(),
     prisma.quiz.count(),
     prisma.question.count(),
+    prisma.user.count(),
+    prisma.quizAttempt.count(),
+    prisma.quizQuestionResult.count(),
     prisma.learningMission.count(),
     prisma.jobPosting.count(),
     prisma.weeklyQuest.count(),
@@ -621,12 +863,14 @@ async function main() {
   ]);
 
   console.log("Seed completed");
-  console.log(`Users: 2 (admin: ${admin.email}, student: ${student.email})`);
+  console.log(`Users: ${userCount} (admin: ${admin.email}, student: ${student.email})`);
   console.log(`Tracks: ${trackCount}`);
   console.log(`Modules: ${moduleCount}`);
   console.log(`Lessons: ${lessonCount}`);
   console.log(`Quizzes: ${quizCount}`);
   console.log(`Questions: ${questionCount}`);
+  console.log(`Quiz attempts: ${quizAttemptCount}`);
+  console.log(`Question results: ${quizQuestionResultCount}`);
   console.log(`Missions: ${missionCount}`);
   console.log(`Job postings: ${jobPostingCount}`);
   console.log(`Weekly quests: ${weeklyQuestCount}`);

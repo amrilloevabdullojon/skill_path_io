@@ -316,8 +316,8 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
     "Нужно пересмотреть рискованные решения";
 
   return (
-    <section id="scenario-lab" className="surface-elevated overflow-hidden border border-emerald-500/25 bg-card/60 backdrop-blur-md">
-      <div className="border-b border-border/60 bg-background/25 p-5 sm:p-6">
+    <section id="scenario-lab" className="surface-elevated overflow-hidden border border-emerald-500/25 bg-card">
+      <div className="border-b border-border bg-background/25 p-5 sm:p-6">
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
@@ -325,11 +325,11 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
                 <Radio className="h-4 w-4" />
                 Древо жизни
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-3 py-1 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground">
                 <Timer className="h-4 w-4" />
                 {scenario.scene.pressure}
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-3 py-1 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground">
                 <Target className="h-4 w-4" />
                 {scenario.scene.product}
               </span>
@@ -344,14 +344,14 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
             </div>
 
             <div className="grid gap-3 md:grid-cols-3">
-              <div className="rounded-2xl border border-border/60 bg-card/50 p-4">
+              <div className="rounded-2xl border border-border bg-card/50 p-4">
                 <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <Target className="h-4 w-4" />
                   Корни
                 </p>
                 <p className="mt-2 text-sm font-semibold text-foreground">{scenario.scene.roots}</p>
               </div>
-              <div className="rounded-2xl border border-border/60 bg-card/50 p-4 md:col-span-2">
+              <div className="rounded-2xl border border-border bg-card/50 p-4 md:col-span-2">
                 <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <Zap className="h-4 w-4" />
                   Ствол сценария
@@ -362,7 +362,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
             </div>
           </div>
 
-          <div className="rounded-3xl border border-border/60 bg-card/55 p-4">
+          <div className="rounded-3xl border border-border bg-card/55 p-4">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -387,7 +387,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
 
       <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-4 p-5 sm:p-6">
-          <div className="rounded-2xl border border-border/60 bg-background/35 p-4">
+          <div className="rounded-2xl border border-border bg-background/35 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Текущая ветвь</p>
             <p className="mt-2 text-base font-semibold text-foreground">{currentStep.title}</p>
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{currentStep.prompt}</p>
@@ -399,7 +399,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
               const selected = step.choices.find((choice) => choice.id === selectedId);
 
               return (
-                <article key={step.id} className="overflow-hidden rounded-2xl border border-border/60 bg-card/45">
+                <article key={step.id} className="overflow-hidden rounded-2xl border border-border bg-card/45">
                   <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/50 bg-background/25 px-4 py-3">
                     <div className="min-w-0">
                       <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Ветвь решения {stepIndex + 1}</p>
@@ -429,7 +429,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
                             "rounded-xl border px-3 py-2.5 text-left text-sm transition-all",
                             isSelected && choice.correct && "border-emerald-500/45 bg-emerald-500/10 text-foreground ring-1 ring-emerald-500/20",
                             isSelected && !choice.correct && "border-amber-500/45 bg-amber-500/10 text-foreground ring-1 ring-amber-500/20",
-                            !isSelected && "border-border/60 bg-card/50 text-muted-foreground hover:border-emerald-500/35 hover:bg-card/70 hover:text-foreground",
+                            !isSelected && "border-border bg-card/50 text-muted-foreground hover:border-emerald-500/35 hover:bg-card/70 hover:text-foreground",
                           )}
                         >
                           {choice.label}
@@ -449,7 +449,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
           </div>
         </div>
 
-        <aside className="border-t border-border/60 bg-background/30 p-5 xl:border-l xl:border-t-0">
+        <aside className="border-t border-border bg-background/30 p-5 xl:border-l xl:border-t-0">
           <div className="sticky top-24 space-y-5">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Плод модуля</p>
@@ -459,7 +459,7 @@ export function QaScenarioLab({ moduleTitle, moduleOrder, quizHref }: QaScenario
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border/60 bg-card/50 p-4">
+            <div className="rounded-2xl border border-border bg-card/50 p-4">
               <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
                 <FileText className="h-4 w-4" />
                 Кольца решений

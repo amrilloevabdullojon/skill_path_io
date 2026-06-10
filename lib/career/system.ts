@@ -121,7 +121,7 @@ function buildDefaultPlan(goal: string, weeklyHours: number): LearningPlan {
     tasks: [
       {
         id: "task-lesson",
-        title: "Complete one core lesson",
+        title: "Пройти один ключевой урок",
         type: "lesson",
         durationMinutes: 45,
         day: "Monday",
@@ -129,7 +129,7 @@ function buildDefaultPlan(goal: string, weeklyHours: number): LearningPlan {
       },
       {
         id: "task-quiz",
-        title: "Run one quiz remediation",
+        title: "Закрепить материал тестом",
         type: "quiz",
         durationMinutes: 35,
         day: "Wednesday",
@@ -137,7 +137,7 @@ function buildDefaultPlan(goal: string, weeklyHours: number): LearningPlan {
       },
       {
         id: "task-practice",
-        title: "Execute one practical mission",
+        title: "Выполнить одну практическую миссию",
         type: "mission",
         durationMinutes: 60,
         day: "Friday",

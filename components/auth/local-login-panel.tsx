@@ -52,7 +52,7 @@ export function LocalLoginPanel() {
         <p className="inline-flex items-center gap-1.5 rounded-full border border-indigo-400/30 bg-indigo-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-indigo-400 mb-3 relative z-10">
           Демо Доступ
         </p>
-        <h2 className="text-2xl font-bold text-foreground drop-shadow-sm">Войти в систему</h2>
+        <h2 className="section-title text-foreground drop-shadow-sm">Войти в систему</h2>
         <p className="mt-1.5 text-sm text-foreground/60 font-medium">
           Выберите роль, чтобы протестировать платформу с точки зрения администратора или студента.
         </p>

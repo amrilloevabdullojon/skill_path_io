@@ -237,7 +237,7 @@ export default function InterviewPreviewPage() {
 
       <div className="w-full max-w-3xl relative z-10 mt-12">
         <div className="text-center mb-10 space-y-3">
-          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-foreground">
+          <h1 className="hero-title text-foreground">
             Живой тест ИИ-ментора
           </h1>
           <p className="text-muted-foreground text-base max-w-xl mx-auto">
@@ -266,7 +266,7 @@ export default function InterviewPreviewPage() {
                     onClick={() => setTrack(t)}
                     className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                       track === t
-                        ? "bg-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.3)]"
+                        ? "bg-indigo-500 text-primary-foreground shadow-[0_0_15px_rgba(99,102,241,0.3)]"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
@@ -288,7 +288,7 @@ export default function InterviewPreviewPage() {
                           <motion.div animate={{ height: [12, 20, 12] }} transition={{ repeat: Infinity, duration: 0.8, delay: 0.4 }} className="w-1.5 bg-white rounded-full" />
                         </div>
                       ) : (
-                        <Volume2 className="h-8 w-8 text-white group-hover:text-indigo-200 transition-colors" />
+                        <Volume2 className="h-8 w-8 text-primary-foreground group-hover:text-indigo-200 transition-colors" />
                       )}
                     </div>
                   </div>
@@ -356,7 +356,7 @@ export default function InterviewPreviewPage() {
                         disabled={isSimulating && isRecording}
                         className={`p-3 rounded-full transition-all relative z-10 ${
                           isRecording 
-                            ? "bg-rose-500 text-white shadow-lg" 
+                            ? "bg-rose-500 text-primary-foreground shadow-lg" 
                             : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/80"
                         } disabled:opacity-50`}
                       >
@@ -377,7 +377,7 @@ export default function InterviewPreviewPage() {
                   <button
                     onClick={handleSubmit}
                     disabled={loading || answer.length === 0}
-                    className="btn-primary px-8 py-4 text-base font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-3 shadow-[0_4px_20px_rgba(14,165,233,0.3)]"
+                    className="btn-primary px-8 py-4 text-base font-bold transition-all hover:scale-105 active:scale-95 flex items-center gap-3"
                   >
                     {loading ? (
                       <><Loader2 className="h-5 w-5 animate-spin" /> Оценка...</>
@@ -399,10 +399,10 @@ export default function InterviewPreviewPage() {
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-teal-400" />
                 
                 <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-6 border-4 border-emerald-500/20 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-                  <span className="text-3xl font-bold"><AnimatedScore score={result.score} /></span><span className="text-sm mt-2">/10</span>
+                  <span className="metric-value text-emerald-500 dark:text-emerald-300"><AnimatedScore score={result.score} /></span><span className="text-sm mt-2">/10</span>
                 </div>
                 
-                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-6">Оценка Завершена</h2>
+                <h2 className="text-2xl sm:page-title text-foreground mb-6">Оценка Завершена</h2>
                 
                 <div className="text-left space-y-5 max-w-2xl mx-auto">
                   <div className="p-5 rounded-2xl border border-border bg-card shadow-sm">

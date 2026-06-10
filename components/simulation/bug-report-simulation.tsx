@@ -53,11 +53,11 @@ export function BugReportSimulation() {
   }
 
   return (
-    <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-6 p-5 sm:p-7 relative isolate overflow-hidden rounded-[24px]">
+    <section className="surface-elevated border border-border/50 bg-card space-y-6 p-5 sm:p-7 relative isolate overflow-hidden rounded-2xl">
       <div className="absolute top-[-50px] right-[-50px] w-[300px] h-[300px] rounded-full bg-emerald-500/10 blur-[100px] pointer-events-none -z-10" />
       <header className="space-y-2">
         <p className="kicker">Симуляция QA</p>
-        <h1 className="text-2xl font-bold text-foreground">Симулятор баг-трекера (Jira)</h1>
+        <h1 className="page-title text-foreground">Симулятор баг-трекера (Jira)</h1>
         <p className="text-sm text-foreground/70">
           Создайте баг-репорт в стиле Jira и получите автоматическую оценку качества от ИИ.
         </p>
@@ -67,10 +67,10 @@ export function BugReportSimulation() {
         <input
           value={title}
           onChange={(event) => setTitle(event.target.value)}
-          className="input-base bg-card/60 backdrop-blur-sm border-border/40 focus:border-emerald-500/50 focus:ring-emerald-500/20"
+          className="input-base bg-card/60 backdrop-blur-sm border-border-subtle focus:border-emerald-500/50 focus:ring-emerald-500/20"
           placeholder="Краткое описание (Title)..."
         />
-        <select value={severity} onChange={(event) => setSeverity(event.target.value as BugSeverity)} className="select-base bg-card/60 backdrop-blur-sm border-border/40 focus:border-emerald-500/50 focus:ring-emerald-500/20">
+        <select value={severity} onChange={(event) => setSeverity(event.target.value as BugSeverity)} className="select-base bg-card/60 backdrop-blur-sm border-border-subtle focus:border-emerald-500/50 focus:ring-emerald-500/20">
           {severityValues.map((value) => (
             <option key={value} value={value}>
               Серьезность: {value}
@@ -82,19 +82,19 @@ export function BugReportSimulation() {
       <textarea
         value={stepsToReproduce}
         onChange={(event) => setStepsToReproduce(event.target.value)}
-        className="textarea-base min-h-[110px] bg-card/60 backdrop-blur-sm border-border/40 focus:border-emerald-500/50 focus:ring-emerald-500/20"
+        className="textarea-base min-h-[110px] bg-card/60 backdrop-blur-sm border-border-subtle focus:border-emerald-500/50 focus:ring-emerald-500/20"
         placeholder="Шаги для воспроизведения (Steps to reproduce)..."
       />
       <textarea
         value={expectedResult}
         onChange={(event) => setExpectedResult(event.target.value)}
-        className="textarea-base min-h-[80px] bg-card/60 backdrop-blur-sm border-border/40 focus:border-emerald-500/50 focus:ring-emerald-500/20"
+        className="textarea-base min-h-[80px] bg-card/60 backdrop-blur-sm border-border-subtle focus:border-emerald-500/50 focus:ring-emerald-500/20"
         placeholder="Ожидаемый результат (Expected result)..."
       />
       <textarea
         value={actualResult}
         onChange={(event) => setActualResult(event.target.value)}
-        className="textarea-base min-h-[80px] bg-card/60 backdrop-blur-sm border-border/40 focus:border-emerald-500/50 focus:ring-emerald-500/20"
+        className="textarea-base min-h-[80px] bg-card/60 backdrop-blur-sm border-border-subtle focus:border-emerald-500/50 focus:ring-emerald-500/20"
         placeholder="Фактический результат (Actual result)..."
       />
 
@@ -102,7 +102,7 @@ export function BugReportSimulation() {
         type="button"
         onClick={submitForReview}
         disabled={isLoading}
-        className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-60 bg-emerald-500 hover:bg-emerald-400 text-black shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] border-emerald-400 font-semibold"
+        className="btn-primary gap-2 disabled:opacity-60"
       >
         <Bug className="h-5 w-5" />
         {isLoading ? "Анализирую..." : "Проверить баг-репорт с ИИ"}

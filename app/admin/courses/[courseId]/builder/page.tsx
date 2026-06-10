@@ -3,19 +3,20 @@ import { requireAdminRoute } from "@/lib/admin-auth";
 import { hasAdminPermission } from "@/lib/permissions/admin-permissions";
 
 type AdminCourseBuilderPageProps = {
-  params: {
+  params: Promise<{
     courseId: string;
-  };
+  }>;
 };
 
 export default async function AdminCourseBuilderPage({ params }: AdminCourseBuilderPageProps) {
+  const resolvedParams = await params;
   const admin = await requireAdminRoute();
   const canWrite = hasAdminPermission(admin.adminRole, "builder.write");
   const canPublish = hasAdminPermission(admin.adminRole, "courses.publish");
 
   return (
     <CourseBuilderStudio
-      courseId={params.courseId}
+      courseId={resolvedParams.courseId}
       canWrite={canWrite}
       canPublish={canPublish}
     />

@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Оплата и Подписка — Levio",
+  title: "Оплата и Подписка",
   description: "Управляйте своим тарифным планом и данными для биллинга.",
   robots: { index: false },
 };

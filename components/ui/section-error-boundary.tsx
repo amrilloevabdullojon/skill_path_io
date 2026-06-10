@@ -25,7 +25,7 @@ export class SectionErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-[28px] border border-rose-500/20 bg-rose-500/5 p-8 text-center">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-rose-500/20 bg-rose-500/5 p-8 text-center">
           <AlertTriangle className="h-6 w-6 text-rose-400" />
           <div>
             <p className="text-sm font-semibold text-foreground">

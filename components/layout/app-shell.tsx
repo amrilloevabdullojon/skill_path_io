@@ -1,34 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
 import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { touchUserStreakAction } from "@/app/actions/streak";
 import {
   Bell,
-  BriefcaseBusiness,
+  ChartLine,
   ChevronLeft,
   ChevronRight,
   Command,
   FlameKindling,
+  FolderKanban,
   Home,
-  Menu,
   Rocket,
   Target,
   Users,
 } from "lucide-react";
 
+import { DensityToggle } from "@/components/ui/density-toggle";
 import { Dropdown } from "@/components/ui/dropdown";
-import { Input } from "@/components/ui/input";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { SiteFooter } from "@/components/site-footer";
 import { cn } from "@/lib/utils";
 import { useUiStore } from "@/store/user/use-ui-store";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
+import { useShellData } from "@/hooks/use-shell-data";
 
 const AppCommandPalette = dynamic(
   () => import("@/components/layout/app-command-palette").then((mod) => mod.AppCommandPalette),
@@ -48,11 +48,11 @@ type NavItem = {
 };
 
 const mobileBottomItems: NavItem[] = [
-  { id: "home", labelKey: "home", href: "/dashboard", icon: Home },
-  { id: "tracks", labelKey: "tracks", href: "/tracks", icon: Target },
-  { id: "missions", labelKey: "missions", href: "/missions", icon: Rocket },
-  { id: "jobs", labelKey: "jobs", href: "/marketplace", icon: BriefcaseBusiness },
-  { id: "menu", labelKey: "menu", href: "#", icon: Menu },
+  { id: "today", labelKey: "today", href: "/dashboard", icon: Home },
+  { id: "study", labelKey: "study", href: "/tracks", icon: Target },
+  { id: "practice", labelKey: "practice", href: "/missions", icon: Rocket },
+  { id: "progress", labelKey: "progress", href: "/dashboard?tab=skills", icon: ChartLine },
+  { id: "portfolio", labelKey: "portfolio", href: "/portfolio", icon: FolderKanban },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -65,18 +65,19 @@ export function AppShell({ children }: AppShellProps) {
   const { data: session, status } = useSession();
   const t = useTranslations("nav");
   const tCommon = useTranslations("common");
-  const [notificationCount, setNotificationCount] = useState(0);
-  const [streakCount, setStreakCount] = useState<number | null>(null);
-  
+
   const isAdmin = session?.user?.role === "ADMIN";
   const isAuthenticated = status === "authenticated";
-  const isAuthScreen = pathname.startsWith("/login");
+  const isFunnelScreen =
+    pathname.startsWith("/skill-test") || pathname.startsWith("/onboarding");
+  const isAuthScreen = pathname.startsWith("/login") || isFunnelScreen;
   const isMarketingRoute = pathname === "/";
   const isFocusLearningMode = /^\/tracks\/[^/]+\/modules\/[^/]+$/.test(pathname);
+
+  const { notificationCount, streakCount } = useShellData(isAuthenticated);
   const {
     isSidebarOpen,
     isSidebarCollapsed,
-    toggleSidebar,
     closeSidebar,
     toggleSidebarCollapsed,
     openCommandPalette,
@@ -89,6 +90,40 @@ export function AppShell({ children }: AppShellProps) {
       closeSidebar();
     }
   }, [toggleSidebarCollapsed, closeSidebar]);
+
+  // ESC key closes mobile drawer (a11y + expected behaviour).
+  useEffect(() => {
+    if (!isSidebarOpen) return;
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        closeSidebar();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isSidebarOpen, closeSidebar]);
+
+  // Swipe-left on mobile drawer closes it.
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const handleTouchStart = useCallback((event: React.TouchEvent) => {
+    if (!isSidebarOpen) return;
+    const touch = event.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  }, [isSidebarOpen]);
+  const handleTouchEnd = useCallback(
+    (event: React.TouchEvent) => {
+      if (!isSidebarOpen || !touchStartRef.current) return;
+      const touch = event.changedTouches[0];
+      const dx = touch.clientX - touchStartRef.current.x;
+      const dy = touch.clientY - touchStartRef.current.y;
+      touchStartRef.current = null;
+      // Horizontal left-swipe with > 60px delta, dominant over vertical → close.
+      if (dx < -60 && Math.abs(dx) > Math.abs(dy)) {
+        closeSidebar();
+      }
+    },
+    [isSidebarOpen, closeSidebar],
+  );
 
   const userEmail = session?.user?.email;
   const userDropdownItems = useMemo(
@@ -112,51 +147,6 @@ export function AppShell({ children }: AppShellProps) {
     [isAdmin, isAuthenticated, userEmail, t, tCommon],
   );
 
-  useEffect(() => {
-    let mounted = true;
-
-    // 1. Load Notifications
-    async function loadNotifications() {
-      try {
-        const response = await fetch("/api/notifications");
-        if (!response.ok) return;
-        const data = (await response.json()) as { notifications?: Array<{ id: string }> };
-        if (mounted) {
-          setNotificationCount(Array.isArray(data.notifications) ? data.notifications.length : 0);
-        }
-      } catch {
-        if (mounted) setNotificationCount(0);
-      }
-    }
-
-    // 2. Load and Touch User Streak (Lazy Update)
-    async function touchAndLoadStreak() {
-      if (isAuthenticated) {
-        const result = await touchUserStreakAction(new Date().getTimezoneOffset());
-        if (mounted && result.success && result.streak !== undefined) {
-          setStreakCount(result.streak);
-        }
-      }
-    }
-
-    void loadNotifications();
-    void touchAndLoadStreak();
-
-    // 3. Refresh notifications when the user returns to the tab
-    function handleVisibilityChange() {
-      if (document.visibilityState === "visible" && mounted) {
-        void loadNotifications();
-      }
-    }
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      mounted = false;
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [isAuthenticated]);
-
   if (isMarketingRoute) {
     return (
       <main className="min-h-screen">
@@ -167,10 +157,14 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <>
-      <div className="app-shell">
+      <div className={cn("app-shell", (isAuthScreen || isFocusLearningMode) && "lg:!grid-cols-1")}>
         {!isAuthScreen && !isFocusLearningMode ? (
           <>
             <aside
+              id="sidebar-nav"
+              aria-label="Основная навигация"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
               className={cn(
                 "app-sidebar",
                 isSidebarCollapsed ? "hidden w-24 lg:block" : "",
@@ -225,43 +219,46 @@ export function AppShell({ children }: AppShellProps) {
           </>
         ) : null}
 
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-foreground focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-        >
-          Skip to main content
-        </a>
+        <div className="sr-only focus-within:not-sr-only focus-within:fixed focus-within:left-4 focus-within:top-4 focus-within:z-tooltip focus-within:flex focus-within:flex-col focus-within:gap-1.5">
+          <a
+            href="#main-content"
+            className="rounded-xl bg-background px-4 py-2 text-sm font-semibold text-foreground ring-2 ring-indigo-500"
+          >
+            Skip to main content
+          </a>
+          <a
+            href="#sidebar-nav"
+            className="rounded-xl bg-background px-4 py-2 text-sm font-semibold text-foreground ring-2 ring-indigo-500"
+          >
+            Skip to navigation
+          </a>
+        </div>
 
         <div className="app-main">
           {!isAuthScreen && !isFocusLearningMode ? (
-            <header className="app-topbar premium-glow">
-              <div className="flex flex-1 items-center gap-2">
-                <div className="relative min-w-0 flex-1">
-                  <Input
-                    readOnly
-                    onClick={openCommandPalette}
-                    value=""
-                    placeholder={t("searchPlaceholder")}
-                    className="cursor-pointer pr-10"
-                    aria-label={t("openCommandPalette")}
-                  />
-                  <Command className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                </div>
-              </div>
+            <header className="app-topbar">
+              <button
+                type="button"
+                onClick={openCommandPalette}
+                className="input-base flex flex-1 items-center justify-between gap-2 text-left text-muted-foreground"
+                aria-label={t("openCommandPalette")}
+              >
+                <span className="flex items-center gap-2 truncate">
+                  <Command className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{t("searchPlaceholder")}</span>
+                </span>
+              </button>
 
               <div className="flex items-center gap-2">
                 <ThemeToggle />
                 {isAuthenticated && streakCount !== null && (
-                  <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-card border rounded-full mr-2 shadow-sm font-mono text-sm font-bold border-orange-500/30 text-orange-500">
-                    <FlameKindling className="h-4 w-4 fill-orange-500 text-orange-500" />
+                  <span className="xp-pill hidden items-center gap-1.5 px-3 py-1.5 font-mono text-sm font-bold text-orange-400 sm:inline-flex">
+                    <FlameKindling className="h-4 w-4 fill-orange-400" />
                     {streakCount}
-                  </div>
+                  </span>
                 )}
+                <DensityToggle className="hidden xl:inline-flex" />
                 <LanguageSwitcher className="hidden lg:flex" />
-                <Link href="/tracks" className="btn-secondary hidden lg:inline-flex">{t("quickActions")}</Link>
-                <button type="button" onClick={openCommandPalette} className="btn-secondary hidden md:inline-flex">
-                  {t("cmdK")}
-                </button>
                 <Link
                   href="/notifications"
                   className="btn-secondary relative h-10 w-10 p-0"
@@ -269,7 +266,7 @@ export function AppShell({ children }: AppShellProps) {
                 >
                   <Bell className="h-4 w-4" />
                   {notificationCount > 0 ? (
-                    <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-500 px-1 text-[10px] font-semibold text-white">
+                    <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-500 px-1 text-[10px] font-semibold text-primary-foreground">
                       {notificationCount > 9 ? "9+" : notificationCount}
                     </span>
                   ) : (
@@ -302,7 +299,7 @@ export function AppShell({ children }: AppShellProps) {
           ) : null}
 
           <main id="main-content" className={cn("min-w-0", !isAuthScreen ? "px-1 pb-2 sm:px-2" : "px-1")}>{children}</main>
-          {!isFocusLearningMode ? <SiteFooter /> : null}
+          {!isFocusLearningMode && !isFunnelScreen ? <SiteFooter /> : null}
         </div>
       </div>
 
@@ -311,18 +308,7 @@ export function AppShell({ children }: AppShellProps) {
           {mobileBottomItems.map((item) => {
             const Icon = item.icon;
             const label = t(item.labelKey as Parameters<typeof t>[0]);
-            return item.id === "menu" ? (
-              <button
-                key={item.id}
-                type="button"
-                onClick={toggleSidebar}
-                className={cn("mobile-bottom-link", isSidebarOpen && "mobile-bottom-link-active")}
-                aria-expanded={isSidebarOpen}
-              >
-                <Icon className="h-4 w-4" />
-                <span>{label}</span>
-              </button>
-            ) : (
+            return (
               <Link
                 key={item.id}
                 href={item.href}

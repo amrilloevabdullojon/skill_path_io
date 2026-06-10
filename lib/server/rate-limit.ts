@@ -50,7 +50,6 @@ type Bucket = {
 };
 
 declare global {
-  // eslint-disable-next-line no-var
   var skillPathRateLimitStore: Map<string, Bucket> | undefined;
 }
 

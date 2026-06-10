@@ -8,7 +8,11 @@ export type ReviewCard = {
   answer?: string; // Optional answer for interactive checking
 };
 
-export function buildSpeedReviewCards(notes: UserNote[], bookmarks: UserBookmark[]): ReviewCard[] {
+export function buildSpeedReviewCards(
+  notes: UserNote[],
+  bookmarks: UserBookmark[],
+  mistakeCards: ReviewCard[] = [],
+): ReviewCard[] {
   const noteCards: ReviewCard[] = notes.slice(0, 4).map((note) => ({
     id: `note-${note.id}`,
     title: note.title,
@@ -110,5 +114,5 @@ export function buildSpeedReviewCards(notes: UserNote[], bookmarks: UserBookmark
     }
   ];
 
-  return [...quickQuestions, ...noteCards, ...bookmarkCards];
+  return [...mistakeCards, ...quickQuestions, ...noteCards, ...bookmarkCards];
 }

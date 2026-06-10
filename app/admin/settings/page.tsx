@@ -30,7 +30,7 @@ export default async function AdminSettingsPage() {
           <h2 className="text-lg font-semibold text-foreground">Site</h2>
 
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">
               Site name
             </span>
             <input
@@ -42,7 +42,7 @@ export default async function AdminSettingsPage() {
           </label>
 
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">
               Site description
             </span>
             <input
@@ -53,7 +53,7 @@ export default async function AdminSettingsPage() {
           </label>
 
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">
               Support email
             </span>
             <input
@@ -70,7 +70,7 @@ export default async function AdminSettingsPage() {
           <h2 className="text-lg font-semibold text-foreground">Access</h2>
 
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">
               Allow registration
             </span>
             <select
@@ -84,7 +84,7 @@ export default async function AdminSettingsPage() {
           </label>
 
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">
               Require email verification
             </span>
             <select
@@ -98,7 +98,7 @@ export default async function AdminSettingsPage() {
           </label>
 
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">
               Default user role
             </span>
             <select
@@ -121,7 +121,7 @@ export default async function AdminSettingsPage() {
           </div>
 
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">
               Core AI Services (Gemini Integration)
             </span>
             <select
@@ -135,7 +135,7 @@ export default async function AdminSettingsPage() {
           </label>
 
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">
               Public AI Rate Limit (Per User / Minute)
             </span>
             <input
@@ -149,7 +149,7 @@ export default async function AdminSettingsPage() {
           </label>
 
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">
               Code Tinder Module
             </span>
             <select
@@ -168,7 +168,7 @@ export default async function AdminSettingsPage() {
           <h2 className="text-lg font-semibold text-foreground">System</h2>
 
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">
               Maintenance mode
             </span>
             <select
@@ -182,7 +182,7 @@ export default async function AdminSettingsPage() {
           </label>
 
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">
               Analytics
             </span>
             <select
@@ -196,7 +196,7 @@ export default async function AdminSettingsPage() {
           </label>
 
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="text-xs uppercase tracking-widest text-muted-foreground">
               Max upload size (MB)
             </span>
             <input

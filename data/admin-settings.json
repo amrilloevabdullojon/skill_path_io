@@ -1,5 +1,5 @@
 {
-  "siteName": "Levio_",
+  "siteName": "Levio",
   "siteDescription": "Professional skills learning platform",
   "allowRegistration": true,
   "requireEmailVerification": false,
@@ -7,5 +7,5 @@
   "analyticsEnabled": true,
   "defaultUserRole": "STUDENT",
   "maxUploadSizeMb": 10,
-  "supportEmail": "support@skillpath.io"
+  "supportEmail": "support@levio.app"
 }

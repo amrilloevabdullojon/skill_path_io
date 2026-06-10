@@ -9,14 +9,14 @@ import { getOnboardingProfileFromCookie } from "@/lib/personalization/profile-st
 import { parseQuizAccuracy } from "@/lib/utils/parse";
 
 export const metadata: Metadata = {
-  title: "Подбор Вакансий — Levio",
+  title: "Подбор Вакансий",
   description: "Изучите вакансии, которые подходят вашему уровню навыков и отслеживайте прогресс.",
 };
 
 export const dynamic = "force-dynamic";
 
 export default async function JobsPage() {
-  const profile = getOnboardingProfileFromCookie();
+  const profile = await getOnboardingProfileFromCookie();
   const session = await getServerSession(authOptions);
   const dashboard = await getDashboardData({
     preferredEmail: session?.user?.email,
@@ -50,4 +50,3 @@ export default async function JobsPage() {
     </section>
   );
 }
-

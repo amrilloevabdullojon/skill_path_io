@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/ui/page-header";
 
 export const metadata: Metadata = {
-  title: "Case Studies — Levio",
+  title: "Case Studies",
   description: "Real-world case studies to practice QA, BA, and DA skills.",
 };
 

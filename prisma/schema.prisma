@@ -70,6 +70,7 @@ model User {
   readinessSnapshots ReadinessScoreSnapshot[]
   userStreak         UserStreak?
   dailyChallenges    DailyChallenge[]
+  quizAttempts       QuizAttempt[]
 }
 
 model Track {
@@ -174,6 +175,50 @@ model CourseModuleProgress {
   @@index([userId])
   @@index([courseModuleId])
   @@index([status])
+}
+
+model QuizAttempt {
+  id              String               @id @default(cuid())
+  userId          String
+  source          String
+  trackSlug       String
+  trackTitle      String
+  moduleId        String
+  moduleTitle     String
+  quizId          String
+  quizTitle       String
+  score           Int
+  passingScore    Int
+  passed          Boolean
+  totalQuestions  Int
+  correctAnswers  Int
+  startedAt       DateTime?
+  submittedAt     DateTime             @default(now())
+  durationSeconds Int?
+  user            User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionResults QuizQuestionResult[]
+
+  @@index([userId, submittedAt])
+  @@index([userId, moduleId, submittedAt])
+  @@index([quizId, submittedAt])
+  @@index([passed])
+}
+
+model QuizQuestionResult {
+  id                String      @id @default(cuid())
+  attemptId         String
+  questionId        String
+  questionText      String      @db.Text
+  questionType      String
+  options           Json        @default("[]")
+  selectedAnswerIds Json        @default("[]")
+  correctAnswerIds  Json        @default("[]")
+  isCorrect         Boolean
+  createdAt         DateTime    @default(now())
+  attempt           QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@index([attemptId])
+  @@index([questionId, isCorrect])
 }
 
 model Certificate {
@@ -330,22 +375,22 @@ model Course {
 }
 
 model CourseModule {
-  id                String              @id @default(cuid())
+  id                String                 @id @default(cuid())
   courseId          String
   title             String
-  description       String              @default("")
+  description       String                 @default("")
   order             Int
-  estimatedDuration Int                 @default(0)
-  status            StudioContentStatus @default(DRAFT)
-  unlockRule        Json                @default("{}")
-  prerequisiteIds   String[]            @default([])
-  xpReward          Int                 @default(0)
-  visibility        StudioVisibility    @default(PUBLIC)
-  icon              String              @default("")
-  themeColor        String              @default("#38bdf8")
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  course            Course              @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  estimatedDuration Int                    @default(0)
+  status            StudioContentStatus    @default(DRAFT)
+  unlockRule        Json                   @default("{}")
+  prerequisiteIds   String[]               @default([])
+  xpReward          Int                    @default(0)
+  visibility        StudioVisibility       @default(PUBLIC)
+  icon              String                 @default("")
+  themeColor        String                 @default("#38bdf8")
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  course            Course                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessons           CourseLesson[]
   quizzes           CourseQuiz[]
   assignments       Assignment[]

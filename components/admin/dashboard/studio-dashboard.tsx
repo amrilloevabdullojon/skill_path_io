@@ -1,19 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import { Activity, BarChart3, BookOpen, FileStack, Layers3, Medal, Plus, Sparkles, Users, Bot, Zap, Code2, Clock } from "lucide-react";
+import {
+  Activity,
+  AlertTriangle,
+  BarChart3,
+  BookOpen,
+  Bot,
+  CheckCircle2,
+  Clock,
+  Code2,
+  FileQuestion,
+  FileStack,
+  Layers3,
+  ListChecks,
+  Medal,
+  Plus,
+  Sparkles,
+  Users,
+  Zap,
+} from "lucide-react";
 
 import { StudioKpiCard } from "@/components/admin/studio-kpi-card";
-import { useCourseBuilderStore } from "@/store/admin/use-course-builder-store";
 import type { LiveFeedItem } from "@/app/admin/dashboard/page";
 
 type StudioDashboardProps = {
   realStats: {
     users: number;
     tracks: number;
+    publishedTracks: number;
+    draftTracks: number;
     modules: number;
+    modulesWithoutLessons: number;
+    modulesWithoutQuiz: number;
     lessons: number;
     quizzes: number;
+    quizzesWithoutQuestions: number;
     certificates: number;
     missionSubmissions: number;
     peerReviews: number;
@@ -35,75 +57,75 @@ function formatTimeAgo(date: Date) {
 }
 
 export function StudioDashboard({ realStats, liveFeed = [] }: StudioDashboardProps) {
-  const courses = useCourseBuilderStore((state) => state.courses);
-
-  const draftCourses = courses.filter((entity) => entity.course.status === "DRAFT").length;
-  const publishedCourses = courses.filter((entity) => entity.course.status === "PUBLISHED").length;
+  const contentIssues = realStats.modulesWithoutLessons + realStats.modulesWithoutQuiz + realStats.quizzesWithoutQuestions;
+  const readyScore = Math.max(
+    0,
+    Math.min(
+      100,
+      Math.round(
+        (realStats.publishedTracks / Math.max(1, realStats.tracks)) * 55 +
+          (1 - contentIssues / Math.max(1, realStats.modules + realStats.quizzes)) * 45,
+      ),
+    ),
+  );
 
   return (
     <section className="page-shell">
       <header className="surface-elevated space-y-2 p-5 text-foreground">
-        <p className="kicker">Academy Studio</p>
-        <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
+        <p className="kicker">Content Studio</p>
+        <h1 className="text-2xl font-semibold">Publishing cockpit</h1>
         <p className="text-sm text-muted-foreground">
-          Build, publish, and analyze course content with a visual LMS constructor.
+          Create tracks, fill modules, check quizzes, and publish only when the learner path is complete.
         </p>
       </header>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StudioKpiCard label="Total courses" value={courses.length} helper={`${draftCourses} draft / ${publishedCourses} published`} icon={<BookOpen className="h-4 w-4" />} />
-        <StudioKpiCard label="Code Tinder Swipes" value={realStats.peerReviews} helper={`${realStats.missionSubmissions} total submissions`} icon={<Layers3 className="h-4 w-4" />} />
-        <StudioKpiCard label="AI Resumes Scanned" value={realStats.aiResumesScanned} helper="Using Gemini integration" icon={<FileStack className="h-4 w-4" />} />
-        <StudioKpiCard label="AI Interviews" value={realStats.aiInterviews} helper="Practice sessions held" icon={<Sparkles className="h-4 w-4" />} />
+        <StudioKpiCard label="Publishing readiness" value={`${readyScore}%`} helper={`${contentIssues} content gaps`} icon={<CheckCircle2 className="h-4 w-4" />} />
+        <StudioKpiCard label="Tracks" value={realStats.tracks} helper={`${realStats.publishedTracks} published / ${realStats.draftTracks} draft`} icon={<BookOpen className="h-4 w-4" />} />
+        <StudioKpiCard label="Modules" value={realStats.modules} helper={`${realStats.modulesWithoutLessons} without lessons`} icon={<Layers3 className="h-4 w-4" />} />
+        <StudioKpiCard label="Quizzes" value={realStats.quizzes} helper={`${realStats.quizzesWithoutQuestions} without questions`} icon={<FileQuestion className="h-4 w-4" />} />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.25fr_0.75fr]">
         <section className="surface-elevated space-y-3 p-5">
-          <h2 className="text-lg font-semibold text-foreground">Quick actions</h2>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <Link href="/admin/courses/new" className="btn-primary gap-2">
+          <h2 className="text-lg font-semibold text-foreground">Content workflow</h2>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <Link href="/admin/tracks/new" className="btn-primary gap-2">
               <Plus className="h-4 w-4" />
-              Create new course
+              New track
             </Link>
-            <Link href="/admin/users" className="btn-secondary gap-2">
-              <Users className="h-4 w-4" />
-              Manage users
+            <Link href="/admin/modules/new" className="btn-secondary gap-2">
+              <Layers3 className="h-4 w-4" />
+              Add module
+            </Link>
+            <Link href="/admin/lessons/new" className="btn-secondary gap-2">
+              <FileStack className="h-4 w-4" />
+              Add lesson
+            </Link>
+            <Link href="/admin/quizzes/new" className="btn-secondary gap-2">
+              <FileQuestion className="h-4 w-4" />
+              Add quiz
+            </Link>
+            <Link href="/admin/tracks?status=DRAFT" className="btn-secondary gap-2">
+              <ListChecks className="h-4 w-4" />
+              Review drafts
             </Link>
             <Link href="/admin/analytics" className="btn-secondary gap-2">
               <BarChart3 className="h-4 w-4" />
-              Platform analytics
+              Analytics
             </Link>
           </div>
         </section>
 
         <section className="surface-elevated space-y-3 p-5">
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-emerald-500" />
-            Gamification & AI
+            <AlertTriangle className="h-5 w-5 text-amber-500" />
+            Content gaps
           </h2>
-          <div className="space-y-4 text-sm text-foreground">
-            <div>
-              <p className="flex items-center justify-between font-mono">
-                <span className="text-muted-foreground">Code Submissions</span>
-                <span className="font-bold">{realStats.missionSubmissions}</span>
-              </p>
-              <div className="h-2 w-full bg-muted mt-1 rounded-full overflow-hidden">
-                <div className="h-full bg-slate-500 w-full" />
-              </div>
-            </div>
-            
-            <div>
-              <p className="flex items-center justify-between font-mono">
-                <span className="text-muted-foreground">Peer Reviews (Tinder)</span>
-                <span className="font-bold text-emerald-500">{realStats.peerReviews}</span>
-              </p>
-              <div className="h-2 w-full bg-muted mt-1 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-emerald-500" 
-                  style={{ width: `${Math.min(100, Math.max(5, (realStats.peerReviews / Math.max(1, realStats.missionSubmissions)) * 100))}%` }} 
-                />
-              </div>
-            </div>
+          <div className="space-y-2 text-sm text-muted-foreground">
+            <GapRow href="/admin/modules" label="Modules without lessons" value={realStats.modulesWithoutLessons} />
+            <GapRow href="/admin/modules" label="Modules without quiz" value={realStats.modulesWithoutQuiz} />
+            <GapRow href="/admin/quizzes" label="Quizzes without questions" value={realStats.quizzesWithoutQuestions} />
           </div>
         </section>
 
@@ -116,6 +138,8 @@ export function StudioDashboard({ realStats, liveFeed = [] }: StudioDashboardPro
             <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><FileStack className="h-4 w-4 text-muted-foreground" />Lessons</span><span>{realStats.lessons}</span></p>
             <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><Sparkles className="h-4 w-4 text-muted-foreground" />Quizzes</span><span>{realStats.quizzes}</span></p>
             <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><Medal className="h-4 w-4 text-muted-foreground" />Certificates</span><span>{realStats.certificates}</span></p>
+            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><Code2 className="h-4 w-4 text-muted-foreground" />Mission submissions</span><span>{realStats.missionSubmissions}</span></p>
+            <p className="flex items-center justify-between"><span className="inline-flex items-center gap-2"><Zap className="h-4 w-4 text-muted-foreground" />Peer reviews</span><span>{realStats.peerReviews}</span></p>
           </div>
         </section>
       </div>
@@ -163,5 +187,22 @@ export function StudioDashboard({ realStats, liveFeed = [] }: StudioDashboardPro
         )}
       </section>
     </section>
+  );
+}
+
+function GapRow({ href, label, value }: { href: string; label: string; value: number }) {
+  const ok = value === 0;
+
+  return (
+    <Link
+      href={href}
+      className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background/60 px-3 py-2 transition hover:border-primary/40"
+    >
+      <span className="inline-flex items-center gap-2">
+        {ok ? <CheckCircle2 className="h-4 w-4 text-emerald-400" /> : <AlertTriangle className="h-4 w-4 text-amber-400" />}
+        {label}
+      </span>
+      <span className={ok ? "font-semibold text-emerald-300" : "font-semibold text-amber-300"}>{value}</span>
+    </Link>
   );
 }

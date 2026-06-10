@@ -17,12 +17,13 @@ export const metadata: Metadata = {
 export default async function EditPermissionPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const resolvedParams = await params;
   await requireAdminPermission("users.manage");
 
   const role = await prisma.permissionRole.findUnique({
-    where: { id: params.id },
+    where: { id: resolvedParams.id },
   });
 
   if (!role) notFound();

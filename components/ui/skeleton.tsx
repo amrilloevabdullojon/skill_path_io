@@ -6,7 +6,7 @@ export function Skeleton({ className }: { className?: string }) {
 
 export function TrackCardSkeleton() {
   return (
-    <div className="surface-elevated overflow-hidden border border-border/50 bg-card/40 backdrop-blur-md shadow-xl p-5 space-y-4" aria-hidden>
+    <div className="surface-elevated overflow-hidden border border-border/50 bg-card shadow-xl p-5 space-y-4" aria-hidden>
       <div className="flex items-start justify-between gap-3">
         <Skeleton className="h-10 w-10 rounded-xl" />
         <Skeleton className="h-5 w-16 rounded-full" />
@@ -28,7 +28,7 @@ export function TrackCardSkeleton() {
 
 export function DashboardSectionSkeleton({ rows = 3 }: { rows?: number }) {
   return (
-    <div className="surface-elevated overflow-hidden border border-border/50 bg-card/40 backdrop-blur-md shadow-xl space-y-4 p-5" aria-hidden>
+    <div className="surface-elevated overflow-hidden border border-border/50 bg-card shadow-xl space-y-4 p-5" aria-hidden>
       <div className="flex items-center justify-between">
         <Skeleton className="h-6 w-36" />
         <Skeleton className="h-8 w-20 rounded-xl" />
@@ -51,7 +51,7 @@ export function DashboardSectionSkeleton({ rows = 3 }: { rows?: number }) {
 
 export function LeaderboardSkeleton({ rows = 5 }: { rows?: number }) {
   return (
-    <div className="surface-elevated overflow-hidden border border-border/50 bg-card/40 backdrop-blur-md shadow-xl" aria-hidden>
+    <div className="surface-elevated overflow-hidden border border-border/50 bg-card shadow-xl" aria-hidden>
       <div className="border-b border-border/50 bg-muted/20 p-5">
         <Skeleton className="h-6 w-32" />
       </div>
@@ -76,7 +76,7 @@ export function StatsGridSkeleton() {
   return (
     <div className="grid grid-cols-2 gap-4 xl:grid-cols-4" aria-hidden>
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="surface-elevated overflow-hidden border border-border/50 bg-card/40 backdrop-blur-md shadow-lg p-5 space-y-3">
+        <div key={i} className="surface-elevated overflow-hidden border border-border/50 bg-card shadow-lg p-5 space-y-3">
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-9 w-20 rounded-xl" />
           <Skeleton className="h-3 w-28" />
@@ -88,7 +88,7 @@ export function StatsGridSkeleton() {
 
 export function PageHeaderSkeleton() {
   return (
-    <div className="surface-elevated overflow-hidden border border-border/50 bg-card/40 backdrop-blur-md shadow-xl space-y-2 p-5 sm:p-6" aria-hidden>
+    <div className="surface-elevated overflow-hidden border border-border/50 bg-card shadow-xl space-y-2 p-5 sm:p-6" aria-hidden>
       <Skeleton className="h-4 w-24 rounded-full" />
       <Skeleton className="h-9 w-64" />
       <Skeleton className="h-4 w-3/4 max-w-[400px]" />

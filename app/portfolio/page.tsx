@@ -12,10 +12,24 @@ import { PortfolioEntry } from "@/types/personalization";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Портфолио — Levio",
+  title: "Портфолио",
   description: "Ваше профессиональное резюме, построенное на пройденных миссиях и достижениях.",
   robots: { index: false },
 };
+
+function normalizePortfolioSource(source: string): PortfolioEntry["source"] {
+  if (
+    source === "mission" ||
+    source === "module" ||
+    source === "quiz" ||
+    source === "simulation" ||
+    source === "certificate"
+  ) {
+    return source;
+  }
+
+  return "module";
+}
 
 export default async function PortfolioPage() {
   const session = await getServerSession(authOptions);
@@ -51,7 +65,7 @@ export default async function PortfolioPage() {
             description: p.description,
             skillsUsed: p.skillsUsed,
             resultSummary: p.resultSummary,
-            source: (p.source as PortfolioEntry["source"]) ?? "module",
+            source: normalizePortfolioSource(p.source),
             sourceRef: p.sourceRef,
             createdAt: p.createdAt.toISOString(),
           }));
@@ -82,5 +96,4 @@ export default async function PortfolioPage() {
     </section>
   );
 }
-
 

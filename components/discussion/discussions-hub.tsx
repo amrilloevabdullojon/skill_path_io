@@ -1,5 +1,6 @@
 import { MessageCircleMore } from "lucide-react";
 
+import { EmptyState } from "@/components/ui/empty-state";
 import { DiscussionThread } from "@/types/personalization";
 
 export function DiscussionsHub({ threads }: { threads: DiscussionThread[] }) {
@@ -12,32 +13,42 @@ export function DiscussionsHub({ threads }: { threads: DiscussionThread[] }) {
       </header>
 
       <div className="space-y-3">
-        {threads.map((thread) => (
-          <article key={thread.id} className="surface-elevated space-y-3 p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold text-foreground">{thread.title}</p>
-                <p className="text-xs text-muted-foreground">{thread.moduleTitle} | {thread.author}</p>
-              </div>
-              <span className="chip-neutral px-2 py-0.5 text-[11px]">
-                {thread.lastActivity}
-              </span>
-            </div>
-
-            <div className="flex flex-wrap gap-1.5">
-              {thread.tags.map((tag) => (
-                <span key={tag} className="chip-neutral px-2 py-0.5 text-[10px]">
-                  {tag}
+        {threads.length === 0 ? (
+          <EmptyState
+            icon={MessageCircleMore}
+            title="Обсуждений пока нет"
+            description="Начни первый разбор: задай вопрос по уроку или поделись находкой из миссии."
+            actionLabel="Открыть треки"
+            actionHref="/tracks"
+          />
+        ) : (
+          threads.map((thread) => (
+            <article key={thread.id} className="surface-elevated space-y-3 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{thread.title}</p>
+                  <p className="text-xs text-muted-foreground">{thread.moduleTitle} | {thread.author}</p>
+                </div>
+                <span className="chip-neutral px-2 py-0.5 text-[11px]">
+                  {thread.lastActivity}
                 </span>
-              ))}
-            </div>
+              </div>
 
-            <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-              <MessageCircleMore className="h-3.5 w-3.5" />
-              {thread.replies} ответов
-            </p>
-          </article>
-        ))}
+              <div className="flex flex-wrap gap-1.5">
+                {thread.tags.map((tag) => (
+                  <span key={tag} className="chip-neutral px-2 py-0.5 text-[10px]">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                <MessageCircleMore className="h-3.5 w-3.5" aria-hidden />
+                {thread.replies} ответов
+              </p>
+            </article>
+          ))
+        )}
       </div>
     </section>
   );

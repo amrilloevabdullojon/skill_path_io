@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Расширенная Аналитика — Levio",
+  title: "Расширенная Аналитика",
   description: "Детальная статистика: тренды завершения, пробелы в навыках и рыночные бенчмарки.",
   robots: { index: false },
 };

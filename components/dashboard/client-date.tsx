@@ -1,22 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { CalendarDays } from "lucide-react";
 
+import { useIsClient } from "@/hooks/use-is-client";
+
 export function ClientDate() {
-  const [formattedDate, setFormattedDate] = useState<string>("");
+  const isClient = useIsClient();
 
-  useEffect(() => {
-    setFormattedDate(
-      new Intl.DateTimeFormat("ru-RU", {
-        weekday: "short",
-        month: "long",
-        day: "numeric",
-      }).format(new Date())
-    );
-  }, []);
+  if (!isClient) return null;
 
-  if (!formattedDate) return null;
+  const formattedDate = new Intl.DateTimeFormat("ru-RU", {
+    weekday: "short",
+    month: "long",
+    day: "numeric",
+  }).format(new Date());
 
   return (
     <span className="topbar-info-pill">

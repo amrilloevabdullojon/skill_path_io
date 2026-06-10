@@ -15,9 +15,9 @@ export function TeamLearningHub({ team, isLocked, upgradePlanId }: TeamLearningH
 
   if (isLocked || !team) {
     return (
-      <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-6 sm:p-8 rounded-[24px]">
+      <section className="surface-elevated border border-border/50 bg-card space-y-4 p-6 sm:p-8 rounded-2xl">
         <p className="kicker text-emerald-400">Корпоративное Обучение (B2B)</p>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Командная аналитика недоступна</h1>
+        <h1 className="page-title tracking-tight text-foreground">Командная аналитика недоступна</h1>
         <p className="rounded-xl border border-amber-400/35 bg-amber-500/10 px-4 py-3 text-sm text-amber-100 font-medium">
           Режим команды доступен только в корпоративных тарифах. Перейдите на тариф {upgradePlanId ?? "TEAM"}, чтобы открывать приглашения, раздавать доступы и отслеживать успеваемость своей команды.
         </p>
@@ -34,18 +34,18 @@ export function TeamLearningHub({ team, isLocked, upgradePlanId }: TeamLearningH
 
   return (
     <section className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 surface-hero border border-emerald-500/20 bg-card/40 backdrop-blur-md p-6 sm:p-8 rounded-[24px]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 surface-hero border border-emerald-500/20 bg-card p-6 sm:p-8 rounded-2xl">
         <div className="space-y-2 relative z-10">
           <p className="kicker text-emerald-400 uppercase tracking-widest font-semibold flex items-center gap-2">
             <ShieldCheck className="w-4 h-4" /> B2B Дашборд
           </p>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">{team.teamName}</h1>
+          <h1 className="page-title tracking-tight text-foreground">{team.teamName}</h1>
           <p className="text-sm text-foreground/70 max-w-2xl">
             Назначайте треки обучения, отслеживайте прогресс сотрудников и оптимизируйте командную скорость (Velocity).
           </p>
         </div>
         <div className="relative z-10">
-          <button className="btn-primary inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)] border-emerald-400 font-bold px-6 py-2.5 rounded-full whitespace-nowrap">
+          <button className="btn-success-base focus-ring inline-flex items-center gap-2 whitespace-nowrap rounded-full px-6 py-2.5 text-sm font-semibold">
             <UserPlus className="w-5 h-5" />
             Пригласить сотрудника
           </button>
@@ -59,16 +59,16 @@ export function TeamLearningHub({ team, isLocked, upgradePlanId }: TeamLearningH
           { label: "Скорость (Velocity)", value: team.averageVelocity, desc: "XP в неделю на юзера" },
           { label: "Кластеры компетенций", value: team.skillDistribution.length, desc: "Уникальных навыков" },
         ].map((stat, idx) => (
-          <article key={idx} className="surface-elevated border border-border/50 bg-card/60 backdrop-blur-md p-5 rounded-2xl relative overflow-hidden group hover:border-emerald-500/30 transition-colors">
+          <article key={idx} className="surface-elevated border border-border/50 bg-card p-5 rounded-2xl relative overflow-hidden group hover:border-emerald-500/30 transition-colors">
             <div className="absolute top-0 right-0 w-[100px] h-[100px] bg-emerald-500/5 blur-[40px] pointer-events-none rounded-full" />
             <p className="text-xs uppercase tracking-wider font-semibold text-foreground/60">{stat.label}</p>
-            <p className="mt-2 text-3xl font-extrabold text-foreground tracking-tight">{stat.value}</p>
+            <p className="mt-2 metric-value text-foreground tracking-tight">{stat.value}</p>
             <p className="mt-1 text-[11px] text-emerald-400/80 font-medium">{stat.desc}</p>
           </article>
         ))}
       </div>
 
-      <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-5 p-6 sm:p-8 rounded-[24px]">
+      <section className="surface-elevated border border-border/50 bg-card space-y-5 p-6 sm:p-8 rounded-2xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h2 className="text-xl font-bold text-foreground inline-flex items-center gap-2">
             <BarChart className="w-5 h-5 text-emerald-400" />
@@ -112,7 +112,7 @@ export function TeamLearningHub({ team, isLocked, upgradePlanId }: TeamLearningH
           {filteredMembers.map((member) => {
             const isLagging = member.progressPercent <= 20 || member.velocity === 0;
             return (
-              <article key={member.userId} className="relative group surface-subtle bg-card/60 border border-border/40 hover:border-emerald-500/30 transition-all p-5 rounded-xl space-y-3">
+              <article key={member.userId} className="relative group surface-subtle bg-card/60 border border-border-subtle hover:border-emerald-500/30 transition-all p-5 rounded-xl space-y-3">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 shrink-0 rounded-full bg-gradient-to-br from-emerald-500/20 to-indigo-500/20 border border-emerald-500/30 flex items-center justify-center font-bold text-emerald-200">
@@ -168,11 +168,11 @@ export function TeamLearningHub({ team, isLocked, upgradePlanId }: TeamLearningH
         </div>
       </section>
 
-      <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-5 p-6 sm:p-8 rounded-[24px]">
+      <section className="surface-elevated border border-border/50 bg-card space-y-5 p-6 sm:p-8 rounded-2xl">
         <h2 className="text-xl font-bold text-foreground">Матрица навыков команды</h2>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {team.skillDistribution.map((item) => (
-            <article key={item.skill} className="surface-subtle bg-card/60 border border-border/40 p-4 rounded-xl flex items-center justify-between transition-colors hover:border-emerald-500/20">
+            <article key={item.skill} className="surface-subtle bg-card/60 border border-border-subtle p-4 rounded-xl flex items-center justify-between transition-colors hover:border-emerald-500/20">
               <p className="text-sm font-bold text-foreground/90">{item.skill}</p>
               <span className="flex items-center justify-center min-w-[24px] h-6 px-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-bold text-emerald-400">
                 {item.members} чел

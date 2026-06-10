@@ -377,7 +377,7 @@ export function ModulesTable({ groups: initialGroups }: { groups: TrackGroup[] }
               {groups.map((group) => (
                 <Fragment key={group.trackId}>
                   {/* ── Track group header ───────────────────── */}
-                  <tr className="border-t-2 border-border/60 bg-card/60">
+                  <tr className="border-t-2 border-border bg-card/60">
                     <td colSpan={COL_COUNT} className="px-4 py-2">
                       <div className="flex items-center gap-2.5">
                         <span

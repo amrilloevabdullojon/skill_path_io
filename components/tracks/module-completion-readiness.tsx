@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 import { CheckCircle2, ClipboardCheck, FileCheck2, RefreshCw } from "lucide-react";
 
-import { readPortfolioEntriesFromLocal } from "@/lib/portfolio/local-portfolio";
+import { PORTFOLIO_STORAGE_KEY } from "@/lib/portfolio/local-portfolio";
 import { buildModuleCompletionGate, buildModuleSubmissionBrief } from "@/lib/tracks/artifact-readiness";
 import { cn } from "@/lib/utils";
 
@@ -34,9 +34,8 @@ const artifactFieldViews: Array<{
   { key: "decision", label: "Вывод", fallback: "Что делать дальше" },
 ];
 
-function readArtifactDraft(moduleId: string): StoredArtifactDraft {
+function parseArtifactDraft(raw: string | null): StoredArtifactDraft {
   try {
-    const raw = window.localStorage.getItem(`levio:module-artifact:${moduleId}`);
     if (!raw) {
       return {};
     }
@@ -44,6 +43,16 @@ function readArtifactDraft(moduleId: string): StoredArtifactDraft {
     return JSON.parse(raw) as StoredArtifactDraft;
   } catch {
     return {};
+  }
+}
+
+function hasPortfolioEntry(raw: string | null, moduleId: string) {
+  try {
+    if (!raw) return false;
+    const entries = JSON.parse(raw) as Array<{ sourceRef?: string }>;
+    return Array.isArray(entries) && entries.some((entry) => entry.sourceRef === moduleId);
+  } catch {
+    return false;
   }
 }
 
@@ -64,35 +73,45 @@ function previewArtifactValue(value: string | undefined, fallback: string) {
 }
 
 export function ModuleCompletionReadiness({ moduleId, isCompleted }: ModuleCompletionReadinessProps) {
-  const [artifactDraft, setArtifactDraft] = useState<StoredArtifactDraft>({});
-  const [hasPortfolioEntry, setHasPortfolioEntry] = useState(false);
-
-  const refresh = useCallback(() => {
-    setArtifactDraft(readArtifactDraft(moduleId));
-    setHasPortfolioEntry(readPortfolioEntriesFromLocal().some((entry) => entry.sourceRef === moduleId));
-  }, [moduleId]);
-
-  useEffect(() => {
-    refresh();
-    window.addEventListener("focus", refresh);
-    window.addEventListener("storage", refresh);
-    window.addEventListener(artifactUpdatedEventName, refresh);
+  const artifactKey = `levio:module-artifact:${moduleId}`;
+  const subscribe = useCallback((onStoreChange: () => void) => {
+    window.addEventListener("focus", onStoreChange);
+    window.addEventListener("storage", onStoreChange);
+    window.addEventListener(artifactUpdatedEventName, onStoreChange);
 
     return () => {
-      window.removeEventListener("focus", refresh);
-      window.removeEventListener("storage", refresh);
-      window.removeEventListener(artifactUpdatedEventName, refresh);
+      window.removeEventListener("focus", onStoreChange);
+      window.removeEventListener("storage", onStoreChange);
+      window.removeEventListener(artifactUpdatedEventName, onStoreChange);
     };
-  }, [refresh]);
+  }, []);
+
+  const storageSnapshot = useSyncExternalStore(
+    subscribe,
+    () =>
+      JSON.stringify({
+        artifact: window.localStorage.getItem(artifactKey),
+        portfolio: window.localStorage.getItem(PORTFOLIO_STORAGE_KEY),
+      }),
+    () => JSON.stringify({ artifact: null, portfolio: null }),
+  );
+
+  const { artifactDraft, hasPortfolioEntry: hasEntry } = useMemo(() => {
+    const snapshot = JSON.parse(storageSnapshot) as { artifact: string | null; portfolio: string | null };
+    return {
+      artifactDraft: parseArtifactDraft(snapshot.artifact),
+      hasPortfolioEntry: hasPortfolioEntry(snapshot.portfolio, moduleId),
+    };
+  }, [moduleId, storageSnapshot]);
 
   const filledFields = useMemo(() => countArtifactFilledFields(artifactDraft), [artifactDraft]);
   const gate = useMemo(
-    () => buildModuleCompletionGate({ filledFields, hasPortfolioEntry, isCompleted }),
-    [filledFields, hasPortfolioEntry, isCompleted],
+    () => buildModuleCompletionGate({ filledFields, hasPortfolioEntry: hasEntry, isCompleted }),
+    [filledFields, hasEntry, isCompleted],
   );
   const submissionBrief = useMemo(
-    () => buildModuleSubmissionBrief({ filledFields, hasPortfolioEntry, isCompleted }),
-    [filledFields, hasPortfolioEntry, isCompleted],
+    () => buildModuleSubmissionBrief({ filledFields, hasPortfolioEntry: hasEntry, isCompleted }),
+    [filledFields, hasEntry, isCompleted],
   );
 
   return (
@@ -111,7 +130,7 @@ export function ModuleCompletionReadiness({ moduleId, isCompleted }: ModuleCompl
         </div>
         <button
           type="button"
-          onClick={refresh}
+          onClick={() => window.dispatchEvent(new CustomEvent(artifactUpdatedEventName))}
           className="btn-secondary inline-flex shrink-0 items-center justify-center gap-2 px-3 py-2 text-xs"
         >
           <RefreshCw className="h-3.5 w-3.5" />
@@ -186,7 +205,7 @@ export function ModuleCompletionReadiness({ moduleId, isCompleted }: ModuleCompl
               const done = typeof value === "string" && value.trim().length > 0;
 
               return (
-                <div key={field.key} className="flex items-start gap-2 rounded-xl border border-border/40 bg-background/35 px-3 py-2">
+                <div key={field.key} className="flex items-start gap-2 rounded-xl border border-border-subtle bg-background/35 px-3 py-2">
                   <FileCheck2 className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", done ? "text-emerald-500" : "text-muted-foreground/45")} />
                   <div className="min-w-0">
                     <p className={cn("text-xs font-medium", done ? "text-foreground" : "text-muted-foreground")}>{field.label}</p>

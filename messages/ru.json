@@ -33,6 +33,10 @@
   },
   "nav": {
     "menu": "Меню",
+    "today": "Сегодня",
+    "study": "Учёба",
+    "practice": "Практика",
+    "progress": "Прогресс",
     "overview": "Обзор",
     "tracks": "Треки",
     "missions": "Миссии",
@@ -67,7 +71,7 @@
     "saas": "SaaS",
     "community": "Сообщество",
     "quickTip": "Быстрая подсказка",
-    "quickTipText": "Нажмите Cmd/Ctrl + K для поиска уроков, миссий, вакансий и сущностей администратора.",
+    "quickTipText": "Ищите уроки, миссии, прогресс и портфолио из одного места.",
     "quickTipDismiss": "Понятно",
     "focusMode": "Режим фокусного обучения",
     "exitFocusMode": "Выйти",
@@ -77,7 +81,7 @@
     "adminPanel": "Панель администратора",
     "quickActions": "Быстрые действия",
     "openCommandPalette": "Открыть палитру команд",
-    "searchPlaceholder": "Поиск модулей, миссий, вакансий… (Cmd/Ctrl + K)",
+    "searchPlaceholder": "Поиск модулей, миссий, прогресса…",
     "cmdK": "Cmd + K",
     "notifications": "Уведомления",
     "openNavigation": "Открыть навигацию",
@@ -373,6 +377,8 @@
       }
     },
     "tabs": {
+      "today": "Сегодня",
+      "progress": "Прогресс",
       "overview": "Обзор",
       "skills": "Навыки",
       "career": "Карьера"

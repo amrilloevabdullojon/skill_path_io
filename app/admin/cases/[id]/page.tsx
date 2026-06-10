@@ -24,12 +24,13 @@ const STATUS_BADGE: Record<string, string> = {
 export default async function EditCasePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const resolvedParams = await params;
   await requireAdminPermission("courses.write");
 
   const caseStudy = await prisma.caseStudy.findUnique({
-    where: { id: params.id },
+    where: { id: resolvedParams.id },
     include: {
       module: {
         select: {

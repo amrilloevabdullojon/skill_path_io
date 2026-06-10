@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { X } from "lucide-react";
 
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 import { cn } from "@/lib/utils";
 
 type DrawerProps = {
@@ -15,6 +16,8 @@ type DrawerProps = {
 };
 
 export function Drawer({ open, onClose, title, side = "right", className, children }: DrawerProps) {
+  const containerRef = useFocusTrap<HTMLElement>(open);
+
   useEffect(() => {
     if (!open) return;
     function onKeyDown(event: KeyboardEvent) {
@@ -31,9 +34,10 @@ export function Drawer({ open, onClose, title, side = "right", className, childr
   }
 
   return (
-    <div className="fixed inset-0 z-[90]" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-drawer" role="dialog" aria-modal="true">
       <button type="button" className="overlay-backdrop-drawer absolute inset-0" onClick={onClose} aria-label="Close drawer" />
       <aside
+        ref={containerRef}
         className={cn(
           "surface-elevated absolute bottom-0 top-0 w-[min(92vw,25rem)] p-4 transition-transform duration-300 ease-smooth",
           side === "right" ? "right-0" : "left-0",

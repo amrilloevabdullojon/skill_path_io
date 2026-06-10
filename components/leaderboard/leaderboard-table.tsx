@@ -147,6 +147,8 @@ export function LeaderboardTable({ grouped, rows, compact }: LeaderboardTablePro
                icon={Trophy}
                title={`${LEAGUES.find(l => l.id === activeLeague)?.label} лига пуста`}
                description="В этой лиге пока никого нет. Стань первым, набирая XP и удерживая Огненную Серию!"
+               actionLabel="Начать набирать XP"
+               actionHref="/missions"
              />
           ) : (
             currentRows.map((row) => (

@@ -109,7 +109,7 @@ function BlockCard({
   className?: string;
 }) {
   return (
-    <section className={`surface-subtle space-y-3 p-4 sm:p-5 border border-border/20 bg-card/40 backdrop-blur-md rounded-2xl shadow-sm ${className ?? ""}`}>
+    <section className={`surface-subtle space-y-3 p-4 sm:p-5 border border-border/20 bg-card rounded-2xl shadow-sm ${className ?? ""}`}>
       {title ? <h3 className="section-heading text-foreground">{title}</h3> : null}
       {children}
     </section>
@@ -206,7 +206,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
   return (
     <div className="space-y-4">
       {lessonPanels.length > 1 ? (
-        <nav className="sticky top-16 z-20 -mx-1 overflow-x-auto rounded-2xl border border-border/40 bg-background/85 p-2 shadow-lg shadow-black/5 backdrop-blur-xl">
+        <nav className="sticky top-16 z-20 -mx-1 overflow-x-auto rounded-2xl border border-border-subtle bg-background/85 p-2 shadow-lg shadow-black/5 backdrop-blur-md">
           <div className="flex min-w-max items-center gap-2">
             {lessonPanels.map((block) => {
               const memory = lessonDecisionState[block.id];
@@ -223,7 +223,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                       ? "border-emerald-500/35 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
                       : memory
                         ? "border-sky-500/35 bg-sky-500/10 text-sky-700 dark:text-sky-300"
-                        : "border-border/40 bg-card/55 text-muted-foreground",
+                        : "border-border-subtle bg-card/55 text-muted-foreground",
                   )}
                 >
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-background/55 text-[11px]">
@@ -331,14 +331,13 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
           const selectedDecision = lesson.decisionOptions.find((option) => option.id === selectedDecisionId);
           const transferredSelectedDecision = Boolean(decisionMemory?.transferredAt && decisionMemory.decisionId === selectedDecision?.id);
 
-          return (
+          const lessonPanelIndex = lessonPanelIds.indexOf(block.id);
+          const panelArticle = (
             <article
-              key={block.id}
               id={block.id}
-              className="scroll-mt-28 overflow-hidden rounded-[28px] border border-emerald-500/25 bg-card/35 shadow-xl shadow-black/5 backdrop-blur-md"
+              className="scroll-mt-28 overflow-hidden rounded-3xl border border-emerald-500/25 bg-card/35 shadow-xl shadow-black/5 backdrop-blur-md"
             >
-              <header className="relative isolate overflow-hidden border-b border-border/40 bg-emerald-500/8 p-4 sm:p-6">
-                <div className="absolute right-[-5rem] top-[-6rem] h-48 w-48 rounded-full bg-emerald-500/15 blur-3xl" />
+              <header className="relative isolate overflow-hidden border-b border-border-subtle bg-emerald-500/8 p-4 sm:p-6">
                 <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                   <div className="space-y-3">
                     <div className="flex flex-wrap items-center gap-2">
@@ -357,7 +356,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                       ) : null}
                     </div>
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600/80 dark:text-emerald-300/80">
+                      <p className="text-xs font-semibold uppercase tracking-kicker text-emerald-600/80 dark:text-emerald-300/80">
                         {lesson.focus}
                       </p>
                       <h3 className="mt-2 break-words text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
@@ -367,14 +366,14 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                   </div>
 
                   <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2 lg:w-[26rem]">
-                    <div className="rounded-2xl border border-border/40 bg-background/45 p-3">
+                    <div className="rounded-2xl border border-border-subtle bg-background/45 p-3">
                       <p className="inline-flex items-center gap-1.5 font-semibold text-foreground">
                         <Target className="h-3.5 w-3.5 text-emerald-500" />
                         Миссия
                       </p>
                       <p className="mt-1 leading-5">{lesson.mission}</p>
                     </div>
-                    <div className="rounded-2xl border border-border/40 bg-background/45 p-3">
+                    <div className="rounded-2xl border border-border-subtle bg-background/45 p-3">
                       <p className="inline-flex items-center gap-1.5 font-semibold text-foreground">
                         <FileText className="h-3.5 w-3.5 text-emerald-500" />
                         Что сдаёте
@@ -385,10 +384,10 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                 </div>
               </header>
 
-              <div className="border-b border-border/40 bg-background/20 p-4 sm:p-5">
+              <div className="border-b border-border-subtle bg-background/20 p-4 sm:p-5">
                 <div className="grid gap-3 md:grid-cols-3">
                   {lesson.shiftPlan.map((item, index) => (
-                    <div key={item} className="rounded-2xl border border-border/40 bg-background/45 p-3">
+                    <div key={item} className="rounded-2xl border border-border-subtle bg-background/45 p-3">
                       <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-300">
                         Шаг {index + 1}
                       </p>
@@ -496,7 +495,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                       ))}
                     </ul>
                   </div>
-                  <div className="rounded-2xl border border-border/40 bg-background/45 p-4">
+                  <div className="rounded-2xl border border-border-subtle bg-background/45 p-4">
                     <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
                       <ClipboardCheck className="h-4 w-4 text-emerald-500" />
                       Чекпоинт
@@ -507,6 +506,26 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
                 </aside>
               </div>
             </article>
+          );
+          if (lessonPanelIndex <= 0) {
+            return <div key={block.id}>{panelArticle}</div>;
+          }
+          return (
+            <details
+              key={block.id}
+              className="group overflow-hidden rounded-3xl border border-border/50 bg-card/35"
+            >
+              <summary className="flex cursor-pointer select-none items-center justify-between gap-3 p-4 text-sm transition-colors hover:bg-card/55 sm:p-5">
+                <span className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-kicker text-emerald-600 dark:text-emerald-300">
+                    Урок {lesson.order} из {lesson.total}
+                  </span>
+                  <span className="text-base font-semibold text-foreground">{lesson.title}</span>
+                </span>
+                <span className="text-xs text-muted-foreground transition-transform group-open:rotate-180" aria-hidden>▾</span>
+              </summary>
+              <div className="border-t border-border/40 p-2 sm:p-3">{panelArticle}</div>
+            </details>
           );
         }
 
@@ -592,7 +611,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
         if (block.type === "code_block") {
           return (
             <BlockCard key={block.id} title={block.title}>
-              <pre className="overflow-x-auto rounded-xl border border-border/40 bg-black/40 backdrop-blur-lg p-4 text-sm text-slate-300 shadow-inner">
+              <pre className="overflow-x-auto rounded-xl border border-border-subtle bg-black/40 backdrop-blur-lg p-4 text-sm text-slate-300 shadow-inner">
                 <code>{block.code?.value || ""}</code>
               </pre>
             </BlockCard>
@@ -784,7 +803,7 @@ export function LessonBlockRenderer({ blocks }: LessonBlockRendererProps) {
 
         if (block.type === "summary") {
           return (
-            <BlockCard key={block.id} title={block.title} className="border-border/50 bg-card/40 backdrop-blur-md">
+            <BlockCard key={block.id} title={block.title} className="border-border/50 bg-card">
               {block.content ? <p className="text-sm text-foreground">{block.content}</p> : null}
               {(block.items || []).length > 0 ? (
                 <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">

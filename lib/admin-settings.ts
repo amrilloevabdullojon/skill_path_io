@@ -30,7 +30,7 @@ export const DEFAULT_SETTINGS: AdminSettings = {
   analyticsEnabled: true,
   defaultUserRole: "STUDENT",
   maxUploadSizeMb: 10,
-  supportEmail: "support@skillpath.io",
+  supportEmail: "support@levio.app",
   aiEnabled: true,
   aiRateLimit: 5,
   codeTinderEnabled: true,

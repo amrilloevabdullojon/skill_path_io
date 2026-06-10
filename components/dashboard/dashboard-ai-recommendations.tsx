@@ -24,12 +24,20 @@ function recommendationIcon(tag: DashboardRecommendation["tag"]) {
   return <Lightbulb className="h-4 w-4 text-amber-300" />;
 }
 
+const TAG_LABELS_RU: Record<DashboardRecommendation["tag"], string> = {
+  Quiz: "Тест",
+  Simulation: "Симуляция",
+  Skill: "Навык",
+  Career: "Карьера",
+  Mentor: "Ментор",
+};
+
 export function DashboardAiRecommendationsSection({ recommendations }: DashboardAiRecommendationsProps) {
   return (
     <DashboardSection
       id="ai"
-      title="AI Recommendations"
-      description="Adaptive guidance based on your progress, quiz performance, and skill gaps."
+      title="Рекомендации ИИ"
+      description="Адаптивные подсказки на основе вашего прогресса, результатов тестов и пробелов в навыках."
     >
       <div className="grid gap-3">
         {recommendations.map((item) => (
@@ -43,7 +51,7 @@ export function DashboardAiRecommendationsSection({ recommendations }: Dashboard
                 <p className="text-xs text-muted-foreground">{item.description}</p>
               </div>
               <span className="chip-neutral px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-                {item.tag}
+                {TAG_LABELS_RU[item.tag]}
               </span>
             </div>
 
@@ -51,8 +59,8 @@ export function DashboardAiRecommendationsSection({ recommendations }: Dashboard
               href={item.href}
               className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-indigo-300 transition-colors hover:text-indigo-200"
             >
-              Open recommendation
-              <ArrowUpRight className="h-3.5 w-3.5" />
+              Открыть рекомендацию
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
             </Link>
           </article>
         ))}

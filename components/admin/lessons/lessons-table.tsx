@@ -124,7 +124,7 @@ export function LessonsTable({ groups: initialGroups }: { groups: LessonGroup[] 
             {groups.map((group) => (
               <Fragment key={group.moduleId}>
                 {/* Group header row */}
-                <tr className="border-t-2 border-border/60 bg-card/60">
+                <tr className="border-t-2 border-border bg-card/60">
                   <td className="px-3 py-2">
                     {(() => {
                       const groupIds = group.lessons.map((l) => l.id);

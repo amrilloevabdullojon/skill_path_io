@@ -39,7 +39,7 @@ export function TrackStickyProgress({
           : "translate-y-4 opacity-0 pointer-events-none",
       )}
     >
-      <div className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background/95 px-4 py-2.5 shadow-xl shadow-black/30 backdrop-blur-md">
+      <div className="flex items-center gap-3 rounded-2xl border border-border bg-background/95 px-4 py-2.5 shadow-xl shadow-black/30 backdrop-blur-md">
         {/* Progress info */}
         <div className="min-w-0 flex-1 space-y-1.5">
           <div className="flex items-center justify-between text-xs">

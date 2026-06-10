@@ -1,7 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { Briefcase, CheckCircle2, CircleAlert, Sparkles, Building2, MapPin, ChevronRight } from "lucide-react";
+import { useMemo, useState } from "react";
+import {
+  ArrowRight,
+  Briefcase,
+  BriefcaseBusiness,
+  CheckCircle2,
+  CircleAlert,
+  ClipboardCheck,
+  Filter,
+  MapPin,
+  MessageSquareText,
+  Search,
+  Sparkles,
+  Target,
+} from "lucide-react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 import { JobMatchResult } from "@/types/personalization";
@@ -18,8 +32,41 @@ function matchGlow(percent: number) {
   return "bg-rose-500/5 hover:bg-rose-500/10 border-rose-500/20";
 }
 
+type JobFilter = "all" | "ready" | "almost" | "gap";
+
+const filterOptions: Array<{ label: string; value: JobFilter }> = [
+  { label: "Все", value: "all" },
+  { label: "Можно откликаться", value: "ready" },
+  { label: "Почти готов", value: "almost" },
+  { label: "Есть пробелы", value: "gap" },
+];
+
+function getFilterBucket(percent: number): Exclude<JobFilter, "all"> {
+  if (percent >= 80) return "ready";
+  if (percent >= 60) return "almost";
+  return "gap";
+}
+
 export function JobMatchingBoard({ jobs }: { jobs: JobMatchResult[] }) {
   const reduced = useReducedMotion();
+  const [activeFilter, setActiveFilter] = useState<JobFilter>("all");
+  const [query, setQuery] = useState("");
+
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredJobs = useMemo(
+    () =>
+      jobs.filter((job) => {
+        const matchesFilter = activeFilter === "all" || getFilterBucket(job.matchPercent) === activeFilter;
+        const matchesQuery = normalizedQuery
+          ? `${job.title} ${job.level} ${job.location} ${job.description} ${job.requiredSkills.join(" ")}`.toLowerCase().includes(normalizedQuery)
+          : true;
+        return matchesFilter && matchesQuery;
+      }),
+    [activeFilter, jobs, normalizedQuery],
+  );
+  const readyCount = jobs.filter((job) => job.matchPercent >= 80).length;
+  const almostCount = jobs.filter((job) => job.matchPercent >= 60 && job.matchPercent < 80).length;
+  const gapCount = jobs.filter((job) => job.matchPercent < 60).length;
 
   const containerVariants: Variants = {
     hidden: { opacity: reduced ? 1 : 0 },
@@ -36,18 +83,77 @@ export function JobMatchingBoard({ jobs }: { jobs: JobMatchResult[] }) {
 
   return (
     <section className="space-y-6">
-      <header className="surface-elevated relative overflow-hidden space-y-3 p-6 sm:p-8 border-indigo-500/20 shadow-xl shadow-indigo-500/5">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none -z-10" />
-        
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-indigo-400/30 bg-indigo-500/10 text-indigo-400 text-xs font-bold uppercase tracking-widest mb-2">
-          <Briefcase className="h-4 w-4" />
-          Job Matching
+      <header className="surface-elevated space-y-5 p-6 sm:p-8 border-indigo-500/20">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-indigo-400/30 bg-indigo-500/10 text-indigo-400 text-xs font-bold uppercase tracking-widest">
+              <Briefcase className="h-4 w-4" />
+              Job Matching
+            </div>
+            <h1 className="page-title text-foreground">Вакансии и готовность к отклику</h1>
+            <p className="text-muted-foreground/80 font-medium max-w-2xl text-lg">
+              Смотрите не только процент совпадения, но и что приложить к отклику: портфолио, интервью-ответы и пробелы, которые лучше закрыть до отправки.
+            </p>
+          </div>
+          <Link href="/portfolio" className="btn-primary inline-flex items-center justify-center gap-2 rounded-lg">
+            <ClipboardCheck className="h-4 w-4" />
+            Подготовить портфолио
+          </Link>
         </div>
-        <h1 className="text-3xl font-extrabold text-foreground">Подходящие вакансии</h1>
-        <p className="text-muted-foreground/80 font-medium max-w-2xl text-lg">
-          Мы подобрали роли, соответствующие вашему текущему уровню навыков и опыту в симуляциях.
-        </p>
+
+        <div className="grid gap-3 md:grid-cols-4">
+          <div className="rounded-xl border border-border bg-background/60 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Можно откликаться</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">{readyCount}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-background/60 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Почти готов</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">{almostCount}</p>
+          </div>
+          <div className="rounded-xl border border-border bg-background/60 p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Нужно усилить</p>
+            <p className="mt-1 text-2xl font-bold text-foreground">{gapCount}</p>
+          </div>
+          <Link href="/interview" className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-3 transition-colors hover:bg-indigo-500/15">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-indigo-300">Перед откликом</p>
+            <p className="mt-1 inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+              Пройти интервью
+              <MessageSquareText className="h-4 w-4" />
+            </p>
+          </Link>
+        </div>
       </header>
+
+      <section className="surface-elevated grid gap-3 p-4 lg:grid-cols-[1fr_auto]">
+        <label htmlFor="job-search" className="relative">
+          <span className="sr-only">Поиск по вакансиям</span>
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            id="job-search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            className="input-base pl-9"
+            placeholder="Найти по роли, навыку или локации"
+          />
+        </label>
+        <div className="flex flex-wrap items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          {filterOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => setActiveFilter(option.value)}
+              className={`rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
+                activeFilter === option.value
+                  ? "border-indigo-500/40 bg-indigo-500/15 text-indigo-200"
+                  : "border-border bg-background/60 text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </section>
 
       <motion.div 
         variants={containerVariants}
@@ -55,8 +161,9 @@ export function JobMatchingBoard({ jobs }: { jobs: JobMatchResult[] }) {
         animate="show"
         className="grid gap-6 xl:grid-cols-2"
       >
-        {jobs.map((job) => {
+        {filteredJobs.map((job) => {
           const isHighMatch = job.matchPercent >= 80;
+          const isAlmostReady = job.matchPercent >= 60 && job.matchPercent < 80;
           return (
             <motion.article 
               variants={itemVariants}
@@ -71,7 +178,7 @@ export function JobMatchingBoard({ jobs }: { jobs: JobMatchResult[] }) {
                 <div className="space-y-1">
                   <p className="text-xl font-bold text-foreground leading-tight">{job.title}</p>
                   <div className="flex items-center gap-3 text-sm text-muted-foreground font-medium">
-                    <span className="flex items-center gap-1.5"><Building2 className="h-4 w-4" /> {job.level}</span>
+                    <span className="flex items-center gap-1.5"><BriefcaseBusiness className="h-4 w-4" /> {job.level}</span>
                     <span className="flex items-center gap-1.5"><MapPin className="h-4 w-4" /> {job.location}</span>
                   </div>
                 </div>
@@ -95,7 +202,7 @@ export function JobMatchingBoard({ jobs }: { jobs: JobMatchResult[] }) {
                         key={skill} 
                         className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-colors ${
                           isMissing
-                            ? "border-border/40 bg-card/40 text-muted-foreground/50 line-through decoration-rose-500/40"
+                            ? "border-border-subtle bg-card/40 text-muted-foreground/50 line-through decoration-rose-500/40"
                             : "border-indigo-400/30 bg-indigo-500/10 text-indigo-300"
                         }`}
                       >
@@ -144,18 +251,31 @@ export function JobMatchingBoard({ jobs }: { jobs: JobMatchResult[] }) {
                   <Sparkles className="h-4 w-4" />
                   {job.recommendation}
                 </p>
-                <Link
-                  href="/career"
-                  title="Анализ пробелов в навыках"
-                  className="p-2 rounded-full border border-border bg-card hover:bg-muted text-foreground transition-colors group"
-                >
-                  <ChevronRight className="h-5 w-5 group-hover:translate-x-0.5 transition-transform" />
+              </div>
+
+              <div className="z-10 grid gap-2 border-t border-border/30 pt-4 sm:grid-cols-3">
+                <Link href="/portfolio" className="btn-secondary inline-flex items-center justify-center gap-2 rounded-lg">
+                  <ClipboardCheck className="h-4 w-4" />
+                  Артефакты
+                </Link>
+                <Link href={isHighMatch ? "/interview" : "/review"} className="btn-secondary inline-flex items-center justify-center gap-2 rounded-lg">
+                  {isHighMatch ? <MessageSquareText className="h-4 w-4" /> : <Target className="h-4 w-4" />}
+                  {isHighMatch ? "Репетиция" : "Закрыть gap"}
+                </Link>
+                <Link href={isHighMatch || isAlmostReady ? "/career" : "/missions"} className="btn-primary inline-flex items-center justify-center gap-2 rounded-lg">
+                  {isHighMatch ? "План отклика" : isAlmostReady ? "План усиления" : "В практику"}
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
 
             </motion.article>
           )
         })}
+        {filteredJobs.length === 0 ? (
+          <div className="xl:col-span-2 rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+            По этому фильтру вакансий нет. Сбросьте поиск или вернитесь к карьерному плану.
+          </div>
+        ) : null}
       </motion.div>
     </section>
   );

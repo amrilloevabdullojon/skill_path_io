@@ -4,16 +4,17 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WifiOff, Wifi } from "lucide-react";
 
+import { useIsClient } from "@/hooks/use-is-client";
+
 export function NetworkStatus() {
   // Assume online by default during SSR to avoid hydration mismatch
-  const [isOnline, setIsOnline] = useState<boolean>(true);
+  const [isOnline, setIsOnline] = useState<boolean>(() =>
+    typeof navigator === "undefined" ? true : navigator.onLine,
+  );
   const [showBackOnline, setShowBackOnline] = useState<boolean>(false);
-  const [hasHydrated, setHasHydrated] = useState(false);
+  const hasHydrated = useIsClient();
 
   useEffect(() => {
-    setHasHydrated(true);
-    setIsOnline(navigator.onLine);
-
     let hideTimerId: ReturnType<typeof setTimeout> | null = null;
 
     const handleOnline = () => {

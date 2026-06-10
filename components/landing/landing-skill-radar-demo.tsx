@@ -61,7 +61,7 @@ export function LandingSkillRadarDemo() {
         </div>
 
         <div className="content-card mt-4 h-[20rem] min-w-0 p-2 sm:p-3">
-          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={240}>
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={240} initialDimension={{ width: 0, height: 240 }}>
             <RadarChart data={chartData} margin={{ top: 20, right: 30, left: 30, bottom: 20 }}>
               <PolarGrid stroke="#334155" strokeOpacity={0.7} />
               <PolarAngleAxis dataKey="skill" tick={{ fill: "#94A3B8", fontSize: 12 }} tickLine={false} axisLine={false} />
@@ -121,4 +121,3 @@ export function LandingSkillRadarDemo() {
     </section>
   );
 }
-

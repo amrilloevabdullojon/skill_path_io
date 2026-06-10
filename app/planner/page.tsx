@@ -7,7 +7,7 @@ import { PersonalLearningPlanner } from "@/components/planner/personal-learning-
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Планировщик обучения — Levio",
+  title: "Планировщик обучения",
   description: "Планируйте ваше расписание на неделю отслеживайте прогресс.",
   robots: { index: false },
 };
@@ -19,7 +19,7 @@ import { parseQuizAccuracy } from "@/lib/utils/parse";
 export const dynamic = "force-dynamic";
 
 export default async function PlannerPage() {
-  const profile = getOnboardingProfileFromCookie();
+  const profile = await getOnboardingProfileFromCookie();
   const session = await getServerSession(authOptions);
   const dashboard = await getDashboardData({
     preferredEmail: session?.user?.email,
@@ -59,4 +59,3 @@ export default async function PlannerPage() {
     </section>
   );
 }
-

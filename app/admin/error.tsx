@@ -23,7 +23,7 @@ export default function AdminError({
       <div>
         <h2 className="text-lg font-semibold text-foreground">Something went wrong</h2>
         <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-          {error.message || "An unexpected error occurred in the admin panel."}
+          An unexpected error occurred in the admin panel.
         </p>
         {error.digest && (
           <p className="mt-1 font-mono text-xs text-muted-foreground/60">

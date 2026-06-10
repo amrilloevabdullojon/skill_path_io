@@ -16,6 +16,11 @@ type AIQuizReviewProps = {
   lessonContext: string;
 };
 
+function answerLabels(item: QuizWrongAnswer, answerIds: string[]) {
+  const optionById = new Map(item.options.map((option) => [option.id, option.text]));
+  return answerIds.map((id) => optionById.get(id) ?? id);
+}
+
 export function AIQuizReview({ wrongAnswers, lessonContext }: AIQuizReviewProps) {
   const [isLoadingId, setIsLoadingId] = useState<string | null>(null);
   const [reviewsByQuestionId, setReviewsByQuestionId] = useState<Record<string, ReviewResponse>>({});
@@ -34,8 +39,8 @@ export function AIQuizReview({ wrongAnswers, lessonContext }: AIQuizReviewProps)
           payload: {
             question: item.question,
             options: item.options.map((option) => option.text),
-            userAnswers: item.userAnswers,
-            correctAnswers: item.correctAnswers,
+            userAnswers: answerLabels(item, item.userAnswers),
+            correctAnswers: answerLabels(item, item.correctAnswers),
             lessonContext,
           },
         }),
@@ -45,7 +50,7 @@ export function AIQuizReview({ wrongAnswers, lessonContext }: AIQuizReviewProps)
         | { source: "quiz" | "exercise"; result: ReviewResponse; error?: string }
         | { error?: string };
       if (!response.ok) {
-        throw new Error("error" in data ? data.error || "AI review failed" : "AI review failed");
+        throw new Error("error" in data ? data.error || "Не удалось выполнить AI-разбор." : "Не удалось выполнить AI-разбор.");
       }
 
       setReviewsByQuestionId((prev) => ({
@@ -83,20 +88,22 @@ export function AIQuizReview({ wrongAnswers, lessonContext }: AIQuizReviewProps)
         {wrongAnswers.map((item, index) => {
           const review = reviewsByQuestionId[item.questionId];
           const isLoading = isLoadingId === item.questionId;
+          const userAnswerLabels = answerLabels(item, item.userAnswers);
+          const correctAnswerLabels = answerLabels(item, item.correctAnswers);
 
           return (
             <article key={item.questionId} className="rounded-xl border border-rose-400/30 bg-rose-500/5 p-4">
               <p className="text-sm font-semibold text-foreground">
-                Q{index + 1}. {item.question}
+                Вопрос {index + 1}. {item.question}
               </p>
               <div className="mt-2 space-y-1 text-xs">
                 <p className="inline-flex items-center gap-2 text-rose-600 dark:text-rose-300">
                   <AlertCircle className="h-4 w-4" />
-                  Ваш ответ: {item.userAnswers.join(", ") || "Нет ответа"}
+                  Ваш ответ: {userAnswerLabels.join(", ") || "Нет ответа"}
                 </p>
                 <p className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-300">
                   <CheckCircle2 className="h-4 w-4" />
-                  Правильный ответ: {item.correctAnswers.join(", ")}
+                  Правильный ответ: {correctAnswerLabels.join(", ")}
                 </p>
               </div>
 

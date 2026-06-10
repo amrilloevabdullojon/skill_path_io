@@ -16,12 +16,12 @@ export const metadata: Metadata = {
 const PAGE_SIZE = 25;
 
 type CertificatesAdminPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string | string[];
     contentId?: string | string[];
     trackId?: string | string[];
     page?: string | string[];
-  };
+  }>;
 };
 
 function paramValue(value: string | string[] | undefined) {
@@ -32,16 +32,17 @@ function paramValue(value: string | string[] | undefined) {
 export default async function CertificatesAdminPage({ searchParams }: CertificatesAdminPageProps) {
   await requireAdminPermission("certificates.manage");
 
-  const query = paramValue(searchParams?.q);
-  const legacyTrackIdFilter = paramValue(searchParams?.trackId);
-  const contentIdFilter = paramValue(searchParams?.contentId) || (legacyTrackIdFilter ? `track:${legacyTrackIdFilter}` : "");
+  const resolvedSearchParams = await searchParams;
+  const query = paramValue(resolvedSearchParams?.q);
+  const legacyTrackIdFilter = paramValue(resolvedSearchParams?.trackId);
+  const contentIdFilter = paramValue(resolvedSearchParams?.contentId) || (legacyTrackIdFilter ? `track:${legacyTrackIdFilter}` : "");
   const [contentKind, rawContentId] = contentIdFilter.includes(":")
     ? contentIdFilter.split(":", 2)
     : ["track", contentIdFilter];
   const trackIdFilter = contentKind === "track" ? rawContentId : "";
   const courseIdFilter = contentKind === "course" ? rawContentId : "";
 
-  const page = Math.max(1, parseInt(paramValue(searchParams?.page) || "1", 10));
+  const page = Math.max(1, parseInt(paramValue(resolvedSearchParams?.page) || "1", 10));
   const skip = (page - 1) * PAGE_SIZE;
 
   const certWhere = {

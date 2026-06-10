@@ -17,11 +17,11 @@ export const metadata: Metadata = {
 const PAGE_SIZE = 25;
 
 type UsersAdminPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string | string[];
     role?: string | string[];
     page?: string | string[];
-  };
+  }>;
 };
 
 function paramValue(value: string | string[] | undefined) {
@@ -32,12 +32,13 @@ function paramValue(value: string | string[] | undefined) {
 export default async function UsersAdminPage({ searchParams }: UsersAdminPageProps) {
   await requireAdminPermission("users.manage");
 
-  const query = paramValue(searchParams?.q);
-  const roleParam = paramValue(searchParams?.role);
+  const resolvedSearchParams = await searchParams;
+  const query = paramValue(resolvedSearchParams?.q);
+  const roleParam = paramValue(resolvedSearchParams?.role);
   const isValidRole = Object.values(UserRole).includes(roleParam as UserRole);
   const roleFilter = isValidRole ? roleParam : "ALL";
 
-  const page = Math.max(1, parseInt(paramValue(searchParams?.page) || "1", 10));
+  const page = Math.max(1, parseInt(paramValue(resolvedSearchParams?.page) || "1", 10));
   const skip = (page - 1) * PAGE_SIZE;
 
   const where = {

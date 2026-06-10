@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Lock } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -17,78 +17,98 @@ type AccordionSectionProps = {
   children: React.ReactNode;
 };
 
-export function AccordionSection({ title, description, icon, defaultOpen = false, isLocked = false, lockedMessage, unlockHint, children }: AccordionSectionProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen && !isLocked);
+export function AccordionSection({
+  title,
+  description,
+  icon,
+  defaultOpen = false,
+  isLocked = false,
+  lockedMessage,
+  unlockHint,
+  children,
+}: AccordionSectionProps) {
+  // Locked sections always render content (with overlay). Unlocked sections respect defaultOpen.
+  const [isOpen, setIsOpen] = useState(defaultOpen || isLocked);
 
   return (
-    <div className={cn(
-      "overflow-hidden rounded-[28px] border bg-card/40 backdrop-blur-md transition-all duration-300 relative",
-      isOpen && !isLocked ? "border-indigo-500/20 shadow-[0_8px_30px_rgba(99,102,241,0.05)]" : "border-border/50 hover:border-border/80",
-      isLocked && "opacity-75 grayscale-[20%]"
-    )}>
-      {isOpen && !isLocked && (
-        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-500/5 blur-[100px] pointer-events-none rounded-full" />
+    <div
+      className={cn(
+        "surface-elevated overflow-hidden transition-colors",
+        isOpen && !isLocked && "border-indigo-500/25",
       )}
-      
+    >
       <button
         onClick={() => !isLocked && setIsOpen(!isOpen)}
         aria-disabled={isLocked || undefined}
-        aria-expanded={isLocked ? undefined : isOpen}
-        className={cn("flex w-full items-center justify-between p-5 sm:p-6 text-left outline-none group relative z-10", isLocked && "cursor-not-allowed")}
+        aria-expanded={isOpen}
+        className={cn(
+          "group flex w-full items-center justify-between gap-3 p-5 text-left sm:p-6",
+          isLocked && "cursor-default",
+        )}
       >
-        <div className="flex items-center gap-4">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-4">
           {icon && (
-            <div className={cn(
-              "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border transition-colors",
-              isOpen
-                ? "bg-indigo-500/10 border-indigo-500/20 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.1)]"
-                : "bg-muted/50 border-border/50 text-foreground group-hover:bg-muted"
-            )}>
+            <div
+              className={cn(
+                "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors",
+                isOpen && !isLocked
+                  ? "border-indigo-500/25 bg-indigo-500/10 text-indigo-400"
+                  : "border-border bg-muted/50 text-muted-foreground",
+              )}
+            >
               {icon}
             </div>
           )}
-          <div>
-            <h3 className={cn(
-              "text-xl sm:text-2xl font-bold transition-colors",
-              isOpen ? "text-foreground drop-shadow-sm" : "text-foreground/90 group-hover:text-foreground"
-            )}>
+          <div className="min-w-0">
+            <h3 className="section-title flex flex-wrap items-center gap-2">
               {title}
+              {isLocked && (
+                <span className="badge-warning inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px]">
+                  <Lock className="h-3 w-3" />
+                  {lockedMessage ?? "Locked"}
+                </span>
+              )}
             </h3>
             {description && (
-              <p className="mt-1 text-sm text-foreground/60 font-medium max-w-xl">
-                {isLocked && lockedMessage ? <span className="text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded-md mr-2">🔒 {lockedMessage}</span> : null}
-                {description}
-              </p>
-            )}
-            {isLocked && unlockHint && (
-              <p className="mt-1.5 text-xs font-semibold text-amber-500/80 flex items-center gap-1">
-                <span>↑</span> {unlockHint}
-              </p>
+              <p className="mt-1 max-w-xl text-sm text-muted-foreground">{description}</p>
             )}
           </div>
         </div>
-        <div className={cn(
-          "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all duration-300 border shadow-sm",
-          isOpen && !isLocked
-            ? "rotate-180 bg-background border-border text-foreground" 
-            : "bg-background/50 border-border/50 text-muted-foreground group-hover:bg-background/80 group-hover:text-foreground"
-        )}>
-          <ChevronDown className="h-5 w-5" />
-        </div>
+        {!isLocked && (
+          <ChevronDown
+            className={cn(
+              "h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 group-hover:text-foreground",
+              isOpen && "rotate-180",
+            )}
+          />
+        )}
       </button>
 
       <AnimatePresence initial={false}>
-        {isOpen && !isLocked && (
+        {isOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden relative z-10"
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
           >
-            <div className="p-5 sm:p-6 pt-0 space-y-6">
-              <div className="h-px w-full bg-border/50 mb-6" />
-              {children}
+            <div className="relative space-y-6 p-5 pt-0 sm:p-6 sm:pt-0">
+              <div className="h-px w-full bg-border" />
+              <div className={cn(isLocked && "pointer-events-none select-none blur-[2px]")}>
+                {children}
+              </div>
+              {isLocked && (
+                <div className="absolute inset-0 flex items-center justify-center bg-background/55 p-6 backdrop-blur-sm">
+                  <div className="surface-subtle max-w-sm space-y-2 p-5 text-center">
+                    <Lock className="mx-auto h-6 w-6 text-amber-400" />
+                    <p className="text-sm font-semibold text-foreground">
+                      {lockedMessage ?? "Раздел временно недоступен"}
+                    </p>
+                    {unlockHint && <p className="text-xs text-muted-foreground">{unlockHint}</p>}
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         )}

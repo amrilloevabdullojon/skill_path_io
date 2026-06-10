@@ -38,7 +38,7 @@ export function EmptyState({
     >
       <div
         className={cn(
-          "mb-4 flex items-center justify-center rounded-2xl border border-border/60 bg-card/50",
+          "mb-4 flex items-center justify-center rounded-2xl border border-border bg-card/50",
           size === "sm" && "h-10 w-10",
           size === "md" && "h-14 w-14",
           size === "lg" && "h-18 w-18",

@@ -59,7 +59,7 @@ export function TrackSkillsEditor({
 
   return (
     <div className="space-y-2">
-      <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+      <span className="text-xs uppercase tracking-widest text-muted-foreground">
         {label}
       </span>
 

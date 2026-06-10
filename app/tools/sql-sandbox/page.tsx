@@ -74,7 +74,7 @@ export default function SqlSandboxPage() {
     <div className="max-w-6xl mx-auto space-y-6 pt-6 h-[calc(100vh-100px)] flex flex-col">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shrink-0">
         <div>
-          <h1 className="text-2xl font-bold text-foreground inline-flex items-center gap-2">
+          <h1 className="page-title text-foreground inline-flex items-center gap-2">
             <span className="p-2 rounded-xl bg-violet-500/10 text-violet-400 border border-violet-500/20 shadow-[0_0_15px_rgba(139,92,246,0.1)]">
               <DatabaseZap className="h-5 w-5" />
             </span>
@@ -89,7 +89,7 @@ export default function SqlSandboxPage() {
       <div className="flex gap-6 flex-1 min-h-0">
         {/* SIDEBAR: SCHEMAS */}
         <div className="w-64 shrink-0 overflow-y-auto space-y-4 pr-2">
-          <div className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-2xl p-4 shadow-sm">
+          <div className="surface-elevated border border-border/50 bg-card rounded-2xl p-4 shadow-sm">
             <h3 className="text-[10px] font-bold text-foreground/50 uppercase tracking-widest flex items-center gap-1.5 mb-4">
               <Database className="h-3.5 w-3.5 text-violet-400" />
               Схема БД (Mock)
@@ -121,13 +121,13 @@ export default function SqlSandboxPage() {
         {/* EDITOR AND RESULTS */}
         <div className="flex-1 flex flex-col gap-4 min-w-0">
           {/* EDITOR */}
-          <div className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-2xl overflow-hidden shadow-sm flex flex-col h-[250px] shrink-0">
+          <div className="surface-elevated border border-border/50 bg-card rounded-2xl overflow-hidden shadow-sm flex flex-col h-[250px] shrink-0">
             <div className="flex items-center justify-between border-b border-border/50 bg-background/30 px-4 py-3">
               <div className="flex items-center gap-2 text-xs font-bold text-foreground/50 uppercase tracking-widest">
                 <Layers className="h-3.5 w-3.5 text-violet-400" />
                 Query Editor
               </div>
-              <Button onClick={handleRun} disabled={isLoading} className="bg-violet-500 hover:bg-violet-400 text-white rounded-lg h-8 px-4 font-bold tracking-wide shadow-[0_0_15px_rgba(139,92,246,0.3)]">
+              <Button onClick={handleRun} disabled={isLoading} className="bg-violet-500 hover:bg-violet-400 text-primary-foreground rounded-lg h-8 px-4 font-bold tracking-wide shadow-[0_0_15px_rgba(139,92,246,0.3)]">
                 {isLoading ? <Clock className="h-4 w-4 animate-spin" /> : <><Play className="h-3.5 w-3.5 mr-1.5" /> RUN</>}
               </Button>
             </div>
@@ -140,7 +140,7 @@ export default function SqlSandboxPage() {
           </div>
 
           {/* RESULTS */}
-          <div className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-2xl overflow-hidden shadow-sm flex flex-col flex-1 min-h-0">
+          <div className="surface-elevated border border-border/50 bg-card rounded-2xl overflow-hidden shadow-sm flex flex-col flex-1 min-h-0">
              <div className="flex border-b border-border/50 bg-background/40 px-4 py-3 items-center min-h-[57px]">
                 <p className="text-xs font-bold text-foreground/50 uppercase tracking-widest mr-auto">Результаты</p>
                 {result && (

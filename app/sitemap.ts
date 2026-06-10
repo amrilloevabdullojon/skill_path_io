@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { resolveRuntimeCatalog } from "@/lib/learning/runtime-content";
 
-const BASE_URL = "https://skillpath.io";
+const BASE_URL = "https://levio.app";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const catalog = await resolveRuntimeCatalog({ includeCourseEntities: false });

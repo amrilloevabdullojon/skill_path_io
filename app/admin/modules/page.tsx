@@ -1,20 +1,12 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
+import { ModulesTable, type TrackGroup } from "@/components/admin/modules/modules-table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
-import type { TrackGroup } from "@/components/admin/modules/modules-table";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { getModuleListData } from "@/lib/admin/modules/queries";
-
-const ModulesTable = dynamic(
-  () =>
-    import("@/components/admin/modules/modules-table").then((m) => ({
-      default: m.ModulesTable,
-    })),
-  { ssr: false, loading: () => <div className="h-40 animate-pulse rounded-xl bg-card" /> },
-);
 
 export const metadata: Metadata = {
   title: "Modules — Admin",
@@ -22,10 +14,10 @@ export const metadata: Metadata = {
 };
 
 type ModulesAdminPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string | string[];
     trackId?: string | string[];
-  };
+  }>;
 };
 
 function paramValue(value: string | string[] | undefined) {
@@ -37,8 +29,9 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
   await requireAdminPermission("courses.read");
   const t = await getTranslations("admin.modules");
 
-  const query = paramValue(searchParams?.q);
-  const trackIdFilter = paramValue(searchParams?.trackId);
+  const resolvedSearchParams = await searchParams;
+  const query = paramValue(resolvedSearchParams?.q);
+  const trackIdFilter = paramValue(resolvedSearchParams?.trackId);
 
   const [tracks, modules] = await getModuleListData({ query, trackId: trackIdFilter });
 
@@ -99,9 +92,9 @@ export default async function ModulesAdminPage({ searchParams }: ModulesAdminPag
               {t("list.apply")}
             </button>
             {(query || trackIdFilter) && (
-              <a href="/admin/modules" className="btn-secondary text-muted-foreground">
+              <Link href="/admin/modules" className="btn-secondary text-muted-foreground">
                 {t("list.reset")}
-              </a>
+              </Link>
             )}
           </div>
         </form>

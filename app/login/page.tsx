@@ -6,7 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { isDemoModeEnabled } from "@/lib/config/runtime-mode";
 
 export const metadata: Metadata = {
-  title: "Sign In — Levio",
+  title: "Sign In",
   description: "Sign in to your Levio account to continue learning.",
   robots: { index: false },
 };

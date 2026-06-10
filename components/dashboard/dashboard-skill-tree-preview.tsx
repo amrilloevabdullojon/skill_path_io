@@ -10,9 +10,9 @@ type DashboardSkillTreePreviewProps = {
 };
 
 const categoryChip: Record<TrackCategory, string> = {
-  QA: "border-emerald-400/35 bg-emerald-500/15 text-emerald-200",
-  BA: "border-orange-400/35 bg-orange-500/15 text-orange-200",
-  DA: "border-violet-400/35 bg-violet-500/15 text-violet-200",
+  QA: "track-badge-qa",
+  BA: "track-badge-ba",
+  DA: "track-badge-da",
 };
 
 export function DashboardSkillTreePreviewSection({ skillTree }: DashboardSkillTreePreviewProps) {

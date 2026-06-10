@@ -10,7 +10,7 @@ export async function getQuizDetail(id: string) {
         select: {
           id: true,
           title: true,
-          track: { select: { title: true } },
+          track: { select: { title: true, slug: true } },
         },
       },
       questions: { orderBy: { id: "asc" } },

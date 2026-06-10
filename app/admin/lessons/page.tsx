@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
+import Link from "next/link";
 import { LessonType } from "@prisma/client"; // still needed for the type filter <select> options
 
+import { LessonsTable, type LessonGroup } from "@/components/admin/lessons/lessons-table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { Pagination } from "@/components/ui/pagination";
-import type { LessonGroup } from "@/components/admin/lessons/lessons-table";
 import { requireAdminPermission } from "@/lib/admin-auth";
 import { getLessonListData } from "@/lib/admin/lessons/queries";
 
@@ -14,21 +14,13 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-const LessonsTable = dynamic(
-  () =>
-    import("@/components/admin/lessons/lessons-table").then((m) => ({
-      default: m.LessonsTable,
-    })),
-  { ssr: false, loading: () => <div className="h-40 animate-pulse rounded-xl bg-card" /> },
-);
-
 type LessonsAdminPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string | string[];
     moduleId?: string | string[];
     type?: string | string[];
     page?: string | string[];
-  };
+  }>;
 };
 
 function paramValue(value: string | string[] | undefined) {
@@ -39,12 +31,13 @@ function paramValue(value: string | string[] | undefined) {
 export default async function LessonsAdminPage({ searchParams }: LessonsAdminPageProps) {
   await requireAdminPermission("courses.read");
 
-  const query = paramValue(searchParams?.q);
-  const moduleIdFilter = paramValue(searchParams?.moduleId);
-  const typeFilter = paramValue(searchParams?.type);
+  const resolvedSearchParams = await searchParams;
+  const query = paramValue(resolvedSearchParams?.q);
+  const moduleIdFilter = paramValue(resolvedSearchParams?.moduleId);
+  const typeFilter = paramValue(resolvedSearchParams?.type);
   const hasFilter = !!(query || moduleIdFilter || typeFilter);
 
-  const page = Math.max(1, parseInt(paramValue(searchParams?.page) || "1", 10));
+  const page = Math.max(1, parseInt(paramValue(resolvedSearchParams?.page) || "1", 10));
 
   const { modules, lessons, total, pageSize } = await getLessonListData({
     query,
@@ -119,9 +112,9 @@ export default async function LessonsAdminPage({ searchParams }: LessonsAdminPag
               Apply
             </button>
             {hasFilter && (
-              <a href="/admin/lessons" className="btn-secondary text-muted-foreground">
+              <Link href="/admin/lessons" className="btn-secondary text-muted-foreground">
                 Reset
-              </a>
+              </Link>
             )}
           </div>
         </form>

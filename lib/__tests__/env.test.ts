@@ -105,7 +105,7 @@ describe("validateEnv", () => {
   });
 
   it("accepts valid NEXT_PUBLIC_APP_URL", () => {
-    process.env.NEXT_PUBLIC_APP_URL = "https://skillpath.io";
+    process.env.NEXT_PUBLIC_APP_URL = "https://levio.app";
     expect(() => validateEnv()).not.toThrow();
   });
 

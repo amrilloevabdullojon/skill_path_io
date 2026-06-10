@@ -7,6 +7,22 @@ import { LearningMission } from "@/types/personalization";
 
 type ChatMsg = { role: "ai" | "user"; text: string };
 
+function buildFallbackReply(mission: LearningMission, latestUserMessage: string) {
+  const lowerMessage = latestUserMessage.toLowerCase();
+
+  if (lowerMessage.includes("шаг") || lowerMessage.includes("воспроиз")) {
+    return "Шаги пока плавают: пользователь открывает форму, меняет данные и после сохранения видит старое значение. Мне нужен от вас короткий план проверки.";
+  }
+  if (lowerMessage.includes("риск") || lowerMessage.includes("крит")) {
+    return "Главный риск в том, что команда починит симптом, но не подтвердит источник проблемы. Зафиксируйте критерий, по которому мы поймём, что инцидент закрыт.";
+  }
+  if (lowerMessage.includes("требован") || lowerMessage.includes("критер")) {
+    return "Минимальный критерий такой: результат должен быть проверяемым, с понятным владельцем и ожидаемым поведением. Запишите это без лишней теории.";
+  }
+
+  return `Я всё ещё в роли: ${mission.roleContext}. Мне нужен конкретный следующий вопрос или ваш черновик решения, чтобы я мог отреагировать по сценарию.`;
+}
+
 function isChatMsg(v: unknown): v is ChatMsg {
   if (!v || typeof v !== "object") return false;
   const m = v as Record<string, unknown>;
@@ -82,7 +98,11 @@ Instructions:
   });
 
   if (!aiResult.ok) {
-    throw Errors.aiUnavailable(aiResult.error || "AI service error");
+    const latestUserMessage = [...history].reverse().find((msg) => msg.role === "user")?.text ?? "";
+    return apiOk({
+      text: buildFallbackReply(mission, latestUserMessage),
+      fallback: true,
+    }, 200);
   }
 
   return apiOk({ text: aiResult.data }, 200);

@@ -37,7 +37,7 @@ const STEPS = [
 
 export function DashboardWelcome({ name }: DashboardWelcomeProps) {
   return (
-    <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-[24px] premium-glow space-y-6 p-6 sm:p-8">
+    <section className="surface-elevated border border-border/50 bg-card rounded-2xl premium-glow space-y-6 p-6 sm:p-8">
       <div className="space-y-1">
         <p className="kicker">Начало работы</p>
         <h1 className="section-title">

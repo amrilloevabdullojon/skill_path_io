@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { BookOpenCheck, BriefcaseBusiness, CalendarClock, ClipboardCheck, Target } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -15,12 +17,59 @@ import {
 import { StudentAnalyticsSnapshot } from "@/types/personalization";
 
 export function StudentAnalyticsDashboard({ snapshot }: { snapshot: StudentAnalyticsSnapshot }) {
+  const primaryWeakSkill = snapshot.weakestSkills[0] ?? "следующий навык";
+  const needsReview = snapshot.averageQuizAccuracy < 70 || snapshot.weakestSkills.length > 0;
+  const nextAction = needsReview
+    ? { label: "Разобрать слабые вопросы", href: "/review", icon: Target }
+    : { label: "Перейти к практике", href: "/missions", icon: ClipboardCheck };
+  const NextActionIcon = nextAction.icon;
+
   return (
     <section className="space-y-5">
-      <header className="surface-elevated space-y-2 p-5 sm:p-6">
-        <p className="kicker">Аналитика студента</p>
-        <h1 className="page-title">Тренды обучения и показатели успеваемости</h1>
-        <p className="section-description">Отслеживай время обучения, точность квизов, выполнение миссий и результаты симуляций.</p>
+      <header className="surface-elevated space-y-5 p-5 sm:p-6">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end">
+          <div className="space-y-2">
+            <p className="kicker">Аналитика решений</p>
+            <h1 className="page-title">Что тормозит прогресс и что делать дальше</h1>
+            <p className="section-description max-w-2xl">
+              Графики здесь нужны не ради графиков: они помогают выбрать следующий шаг между повторением, практикой, планом и карьерной готовностью.
+            </p>
+          </div>
+          <Link href={nextAction.href} className="btn-primary inline-flex items-center justify-center gap-2 rounded-lg">
+            <NextActionIcon className="h-4 w-4" />
+            {nextAction.label}
+          </Link>
+        </div>
+        <div className="grid gap-3 md:grid-cols-4">
+          <Link href="/review" className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-3 transition-colors hover:bg-indigo-500/15">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-indigo-300">Фокус</p>
+            <p className="mt-1 inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+              {primaryWeakSkill}
+              <Target className="h-4 w-4" />
+            </p>
+          </Link>
+          <Link href="/planner" className="rounded-xl border border-border bg-background/60 p-3 transition-colors hover:bg-background/80">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Темп</p>
+            <p className="mt-1 inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+              План недели
+              <CalendarClock className="h-4 w-4" />
+            </p>
+          </Link>
+          <Link href="/missions" className="rounded-xl border border-border bg-background/60 p-3 transition-colors hover:bg-background/80">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Практика</p>
+            <p className="mt-1 inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+              Миссии
+              <ClipboardCheck className="h-4 w-4" />
+            </p>
+          </Link>
+          <Link href="/career" className="rounded-xl border border-border bg-background/60 p-3 transition-colors hover:bg-background/80">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Итог</p>
+            <p className="mt-1 inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+              Карьера
+              <BriefcaseBusiness className="h-4 w-4" />
+            </p>
+          </Link>
+        </div>
       </header>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -46,7 +95,7 @@ export function StudentAnalyticsDashboard({ snapshot }: { snapshot: StudentAnaly
         <article className="surface-elevated p-4">
           <p className="mb-3 text-sm font-semibold text-foreground">Недельный прогресс</p>
           <div className="h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220} initialDimension={{ width: 0, height: 220 }}>
               <AreaChart data={snapshot.weeklyProgress}>
                 <defs>
                   <linearGradient id="analyticsProgress" x1="0" y1="0" x2="0" y2="1">
@@ -67,7 +116,7 @@ export function StudentAnalyticsDashboard({ snapshot }: { snapshot: StudentAnaly
         <article className="surface-elevated p-4">
           <p className="mb-3 text-sm font-semibold text-foreground">Прогресс vs точность по дням</p>
           <div className="h-72 w-full">
-            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220}>
+            <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220} initialDimension={{ width: 0, height: 220 }}>
               <LineChart data={snapshot.trend}>
                 <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" />
                 <XAxis dataKey="label" stroke="#64748b" />
@@ -103,6 +152,16 @@ export function StudentAnalyticsDashboard({ snapshot }: { snapshot: StudentAnaly
             ))}
           </div>
           <p className="mt-3 text-xs text-muted-foreground">Результат симуляций: {snapshot.simulationPerformance}%</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link href="/review" className="btn-secondary inline-flex items-center gap-2 rounded-lg">
+              <Target className="h-4 w-4" />
+              Повторить
+            </Link>
+            <Link href="/tracks" className="btn-secondary inline-flex items-center gap-2 rounded-lg">
+              <BookOpenCheck className="h-4 w-4" />
+              Найти модуль
+            </Link>
+          </div>
         </article>
       </div>
     </section>

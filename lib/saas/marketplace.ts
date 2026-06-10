@@ -7,7 +7,6 @@ import { prisma } from "@/lib/prisma";
 import { CandidateProfile, MarketplaceRole, RoleApplication } from "@/types/saas";
 
 declare global {
-  // eslint-disable-next-line no-var
   var skillPathMarketplaceApplications: RoleApplication[] | undefined;
 }
 

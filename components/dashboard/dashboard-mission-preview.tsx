@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, BriefcaseBusiness, Lock } from "lucide-react";
 
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 type MissionPreviewItem = {
@@ -12,32 +13,44 @@ type MissionPreviewItem = {
   status: string;
 };
 
-function missionStatusMeta(status: string) {
+type StatusMeta = {
+  label: string;
+  variant: BadgeProps["variant"];
+  cardHover: string;
+  cta: string;
+  icon: React.ReactNode;
+  isLocked: boolean;
+};
+
+function missionStatusMeta(status: string): StatusMeta {
   const normalized = status.toLowerCase();
   if (normalized === "in_progress") {
     return {
       label: "В процессе",
-      chip: "border-indigo-500/40 bg-indigo-500/20 text-indigo-300 shadow-[0_0_10px_rgba(99,102,241,0.3)]",
-      card: "border-indigo-500/30 hover:border-indigo-500/50 bg-card/60 backdrop-blur-md shadow-[0_4px_20px_rgba(99,102,241,0.05)]",
+      variant: "default",
+      cardHover: "hover:border-indigo-500/45",
       cta: "Продолжить",
       icon: <BriefcaseBusiness className="h-3.5 w-3.5" />,
+      isLocked: false,
     };
   }
   if (normalized === "locked") {
     return {
       label: "Недоступно",
-      chip: "border-slate-600/40 bg-slate-800/50 text-slate-400",
-      card: "border-border/40 bg-card/40 backdrop-blur-md opacity-80",
+      variant: "secondary",
+      cardHover: "opacity-80",
       cta: "Посмотреть условия",
       icon: <Lock className="h-3.5 w-3.5" />,
+      isLocked: true,
     };
   }
   return {
     label: "Готово к старту",
-    chip: "border-emerald-500/40 bg-emerald-500/20 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.3)]",
-    card: "border-emerald-500/30 hover:border-emerald-500/50 bg-card/60 backdrop-blur-md shadow-[0_4px_20px_rgba(16,185,129,0.05)]",
+    variant: "success",
+    cardHover: "hover:border-emerald-500/45",
     cta: "Начать миссию",
     icon: <BriefcaseBusiness className="h-3.5 w-3.5" />,
+    isLocked: false,
   };
 }
 
@@ -51,43 +64,43 @@ export function DashboardMissionPreviewSection({ missions }: { missions: Mission
       <div className="space-y-3">
         {missions.map((mission) => {
           const statusMeta = missionStatusMeta(mission.status);
-          const isLocked = mission.status.toLowerCase() === "locked";
 
           return (
-            <article 
-              key={mission.id} 
+            <article
+              key={mission.id}
               className={cn(
-                "relative overflow-hidden p-5 rounded-[20px] transition-all duration-300 group hover:-translate-y-0.5", 
-                statusMeta.card
+                "surface-elevated p-5 transition-colors",
+                statusMeta.cardHover,
               )}
             >
-              {!isLocked && (
-                <div className="absolute top-0 right-[-10%] w-[100px] h-[100px] rounded-full blur-[30px] pointer-events-none transition-opacity opacity-30 group-hover:opacity-70 bg-indigo-500/20" />
-              )}
-
-              <div className="flex items-start justify-between gap-4 relative z-10">
+              <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 pr-4">
-                  <p className="text-base font-bold text-foreground drop-shadow-sm leading-tight mb-2">{mission.title}</p>
-                  <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-foreground/70">{mission.scenario}</p>
+                  <p className="mb-2 text-base font-semibold leading-tight text-foreground">
+                    {mission.title}
+                  </p>
+                  <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                    {mission.scenario}
+                  </p>
                 </div>
-                <span className="shrink-0 rounded-full border border-violet-500/40 bg-violet-500/20 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-violet-300 shadow-[0_0_10px_rgba(139,92,246,0.2)]">
+                <Badge variant="accent" className="shrink-0">
                   +{mission.xpReward} XP
-                </span>
+                </Badge>
               </div>
 
-              <div className="mt-5 flex flex-wrap items-center justify-between gap-3 relative z-10">
-                <p className={cn("inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-widest", statusMeta.chip)}>
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                <Badge variant={statusMeta.variant} className="gap-1.5">
                   {statusMeta.icon}
                   {statusMeta.label}
-                </p>
+                </Badge>
 
                 <Link
                   href="/missions"
-                  className={`inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold transition-colors rounded-lg border ${
-                    isLocked 
-                      ? "text-slate-400 border-slate-700/50 bg-slate-800/30 hover:bg-slate-800/60" 
-                      : "text-indigo-400 border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 hover:text-indigo-300"
-                  }`}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-lg border px-4 py-1.5 text-xs font-semibold transition-colors",
+                    statusMeta.isLocked
+                      ? "border-border bg-muted/40 text-muted-foreground hover:bg-muted/60"
+                      : "border-indigo-500/30 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20",
+                  )}
                 >
                   {statusMeta.cta}
                   <ArrowUpRight className="h-3.5 w-3.5" />

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { BaSimulationForm } from "@/components/simulation/ba-simulation-form";
 
 export const metadata: Metadata = {
-  title: "Симулятор BA — Levio",
+  title: "Симулятор BA",
   description: "Симулятор Бизнес-Аналитика: практикуйтесь в сборе бизнес-требований и общении со стейкхолдерами.",
 };
 

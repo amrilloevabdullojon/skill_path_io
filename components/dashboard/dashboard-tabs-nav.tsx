@@ -3,15 +3,14 @@ import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
-export type DashboardTab = "overview" | "skills" | "career";
+export type DashboardTab = "overview" | "skills";
 
 export async function DashboardTabsNav({ currentTab }: { currentTab: DashboardTab }) {
   const t = await getTranslations("dashboard.tabs");
 
   const tabs: Array<{ id: DashboardTab; label: string }> = [
-    { id: "overview", label: t("overview") },
-    { id: "skills", label: t("skills") },
-    { id: "career", label: t("career") },
+    { id: "overview", label: t("today") },
+    { id: "skills", label: t("progress") },
   ];
 
   return (

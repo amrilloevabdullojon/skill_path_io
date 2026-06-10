@@ -36,29 +36,21 @@ export type CommandRuntimeJob = {
 };
 
 const basePages: CommandItem[] = [
-  { id: "page-dashboard", type: "page", title: "Dashboard", href: "/dashboard", keywords: ["home", "dashboard"] },
-  { id: "page-tracks", type: "page", title: "Tracks", href: "/tracks", keywords: ["tracks", "courses"] },
-  { id: "page-missions", type: "page", title: "Missions", href: "/missions", keywords: ["missions", "practice"] },
-  { id: "page-career", type: "page", title: "Career", href: "/career", keywords: ["career", "roadmap"] },
+  { id: "page-today", type: "page", title: "Today", href: "/dashboard", keywords: ["home", "dashboard", "today"] },
+  { id: "page-study", type: "page", title: "Study", href: "/tracks", keywords: ["tracks", "courses", "study", "learning"] },
+  { id: "page-practice", type: "page", title: "Practice", href: "/missions", keywords: ["missions", "practice"] },
+  { id: "page-progress", type: "page", title: "Progress", href: "/dashboard?tab=skills", keywords: ["progress", "skills", "stats"] },
   { id: "page-portfolio", type: "page", title: "Portfolio", href: "/portfolio", keywords: ["portfolio", "artifacts"] },
-  { id: "page-jobs", type: "page", title: "Jobs", href: "/jobs", keywords: ["jobs", "career"] },
-  { id: "page-marketplace", type: "page", title: "Marketplace", href: "/marketplace", keywords: ["hiring", "marketplace", "roles"] },
-  { id: "page-teams", type: "page", title: "Teams", href: "/teams", keywords: ["team", "b2b", "company"] },
-  { id: "page-billing", type: "page", title: "Billing", href: "/billing", keywords: ["billing", "plans", "subscription"] },
-  { id: "page-advanced-analytics", type: "page", title: "Advanced Analytics", href: "/analytics/advanced", keywords: ["analytics", "advanced", "velocity"] },
-  { id: "page-planner", type: "page", title: "Planner", href: "/planner", keywords: ["planner", "plan"] },
-  { id: "page-analytics", type: "page", title: "Analytics", href: "/analytics", keywords: ["analytics", "stats"] },
-  { id: "page-public-profile", type: "page", title: "Public Profile", href: "/profile/me", keywords: ["profile", "public", "share"] },
 ];
 
 const actionItems: CommandItem[] = [
   {
     id: "action-open-track",
     type: "action",
-    title: "Open track",
+    title: "Open study path",
     subtitle: "Go to tracks catalog",
     href: "/tracks",
-    keywords: ["open track", "start learning", "course"],
+    keywords: ["open track", "start learning", "course", "study"],
   },
   {
     id: "action-start-mission",
@@ -69,20 +61,20 @@ const actionItems: CommandItem[] = [
     keywords: ["start mission", "mission", "practice"],
   },
   {
-    id: "action-open-roadmap",
+    id: "action-review-progress",
     type: "action",
-    title: "Open roadmap",
-    subtitle: "View career readiness and next stages",
-    href: "/career",
-    keywords: ["roadmap", "career path", "readiness"],
+    title: "Review progress",
+    subtitle: "Open your skill progress",
+    href: "/dashboard?tab=skills",
+    keywords: ["progress", "skills", "readiness"],
   },
   {
-    id: "action-open-planner",
+    id: "action-open-portfolio",
     type: "action",
-    title: "Open planner",
-    subtitle: "Review weekly plan",
-    href: "/planner",
-    keywords: ["planner", "plan", "schedule"],
+    title: "Open portfolio",
+    subtitle: "Review saved work artifacts",
+    href: "/portfolio",
+    keywords: ["portfolio", "artifacts", "work"],
   },
   {
     id: "action-ask-ai",
@@ -165,17 +157,6 @@ function buildMissionItems(missions: CommandRuntimeMission[]): CommandItem[] {
   }));
 }
 
-function buildJobItems(jobs: CommandRuntimeJob[]): CommandItem[] {
-  return jobs.map((job) => ({
-    id: job.id,
-    type: "job" as const,
-    title: job.title,
-    subtitle: `${job.level} - ${job.location}`,
-    href: "/jobs",
-    keywords: [job.title.toLowerCase(), job.level.toLowerCase(), job.roleTrack.toLowerCase(), "job"],
-  }));
-}
-
 export function getCommandItems(input?: {
   runtimeTracks?: CommandRuntimeTrack[];
   runtimeMissions?: CommandRuntimeMission[];
@@ -184,7 +165,6 @@ export function getCommandItems(input?: {
   const tracks = input?.runtimeTracks ?? [];
   const { courseItems, moduleItems, lessonItems } = buildTrackItems(tracks);
   const missionItems = buildMissionItems(input?.runtimeMissions ?? []);
-  const jobItems = buildJobItems(input?.runtimeJobs ?? []);
 
   return [
     ...actionItems,
@@ -193,7 +173,6 @@ export function getCommandItems(input?: {
     ...moduleItems,
     ...lessonItems,
     ...missionItems,
-    ...jobItems,
     ...adminUsers,
   ];
 }

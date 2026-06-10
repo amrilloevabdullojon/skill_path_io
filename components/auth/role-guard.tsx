@@ -5,6 +5,8 @@ import { AppRoleEnum } from "@/types/next-auth";
 import { ShieldAlert } from "lucide-react";
 import Link from "next/link";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 interface RoleGuardProps {
   children: React.ReactNode;
   allowedRoles: AppRoleEnum[];
@@ -21,8 +23,8 @@ export function RoleGuard({
   const { data: session, status } = useSession();
 
   if (status === "loading") {
-    // Return empty div to prevent layout shift while checking session
-    return <div className="min-h-[200px] animate-pulse bg-muted rounded-xl"></div>;
+    // Skeleton placeholder to prevent layout shift while checking session
+    return <Skeleton className="min-h-[200px] rounded-xl" />;
   }
 
   // If user has one of the allowed roles, render the content

@@ -33,6 +33,7 @@ type QuizAttemptPayload = {
 
 type QuizAttemptResult = {
   ok: boolean;
+  attemptId?: string;
   score: number;
   passed: boolean;
   passingScore: number;
@@ -104,6 +105,12 @@ function parseQuestionOptions(options: unknown) {
       return null;
     })
     .filter((item): item is { id: string; text: string } => Boolean(item));
+}
+
+function normalizeCorrectAnswerIds(value: unknown, options: Array<{ id: string; text: string }>) {
+  return normalizeAnswerList(value)
+    .map((answer) => options.find((option) => option.id === answer || option.text === answer)?.id ?? answer)
+    .filter(Boolean);
 }
 
 function normalizeAiGeneratedQuestions(value: QuizAttemptPayload["aiGeneratedQuestions"]) {
@@ -264,14 +271,21 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
     text: question.text,
     type: question.type,
     options: parseQuestionOptions(question.options),
-    correctAnswer: normalizeAnswerList(question.correctAnswer),
+    correctAnswer: [] as string[],
+    selectedAnswers: [] as string[],
+    isCorrect: false,
   }));
+  questionsForScoring.forEach((question, index) => {
+    question.correctAnswer = normalizeCorrectAnswerIds(quizQuestions[index]?.correctAnswer, question.options);
+  });
 
   const wrongAnswers: QuizAttemptResult["wrongAnswers"] = [];
   for (const question of questionsForScoring) {
     const selectedAnswers = normalizeAnswerList(payload.answers[question.id] ?? []);
     const expectedAnswers = normalizeAnswerList(question.correctAnswer);
     const isQuestionCorrect = answersMatch(selectedAnswers, expectedAnswers);
+    question.selectedAnswers = selectedAnswers;
+    question.isCorrect = isQuestionCorrect && !(isSingleAnswerQuestion(question.type) && selectedAnswers.length > 1);
 
     if (isSingleAnswerQuestion(question.type) && selectedAnswers.length > 1) {
       wrongAnswers.push({
@@ -299,12 +313,44 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
 
   const score = Math.round((correctAnswers / totalQuestions) * 100);
   const passed = score >= quiz.passingScore;
+  const attempt = await prisma.quizAttempt.create({
+    data: {
+      userId: user.id,
+      source: overriddenTrack.source,
+      trackSlug: overriddenTrack.slug,
+      trackTitle: overriddenTrack.title,
+      moduleId: moduleItem.id,
+      moduleTitle: moduleItem.title,
+      quizId: quiz.id,
+      quizTitle: quiz.title,
+      score,
+      passingScore: quiz.passingScore,
+      passed,
+      totalQuestions,
+      correctAnswers,
+      questionResults: {
+        create: questionsForScoring.map((question) => ({
+          questionId: question.id,
+          questionText: question.text,
+          questionType: String(question.type),
+          options: question.options,
+          selectedAnswerIds: question.selectedAnswers,
+          correctAnswerIds: normalizeAnswerList(question.correctAnswer),
+          isCorrect: question.isCorrect,
+        })),
+      },
+    },
+    select: { id: true },
+  });
 
   const existingProgress = await findRuntimeModuleProgressById({
     userId: user.id,
     moduleId: moduleItem.id,
     source: overriddenTrack.source,
   });
+  const progressScore = existingProgress?.score !== null && existingProgress?.score !== undefined
+    ? Math.max(existingProgress.score, score)
+    : score;
 
   if (passed) {
     await upsertRuntimeModuleProgress({
@@ -312,7 +358,7 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
       moduleId: moduleItem.id,
       source: overriddenTrack.source,
       status: ProgressStatus.COMPLETED,
-      score,
+      score: progressScore,
       completedAt: existingProgress?.completedAt ?? new Date(),
     });
   } else {
@@ -324,7 +370,7 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
         existingProgress?.status === ProgressStatus.COMPLETED
           ? ProgressStatus.COMPLETED
           : ProgressStatus.IN_PROGRESS,
-      score,
+      score: progressScore,
       completedAt: existingProgress?.completedAt ?? null,
     });
   }
@@ -423,9 +469,11 @@ export async function submitQuizAttempt(payload: QuizAttemptPayload): Promise<Qu
   revalidatePath(`/tracks/${payload.trackSlug}/modules/${payload.moduleId}`);
   revalidatePath(`/tracks/${payload.trackSlug}/modules/${payload.moduleId}/quiz`);
   revalidatePath("/dashboard");
+  revalidatePath("/review");
 
   return {
     ok: true,
+    attemptId: attempt.id,
     score,
     passed,
     passingScore: quiz.passingScore,

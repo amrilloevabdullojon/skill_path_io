@@ -7,7 +7,7 @@ import { User } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Profile — Levio",
+  title: "Profile",
   description: "View learner profiles on Levio.",
 };
 

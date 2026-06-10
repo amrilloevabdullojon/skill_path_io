@@ -14,11 +14,12 @@ export const metadata: Metadata = {
 };
 
 type NewTrackPageProps = {
-  searchParams?: { error?: string };
+  searchParams?: Promise<{ error?: string }>;
 };
 
 export default async function NewTrackPage({ searchParams }: NewTrackPageProps) {
   await requireAdminPermission("courses.write");
+  const resolvedSearchParams = await searchParams;
 
   async function handleCreate(formData: FormData) {
     "use server";
@@ -31,12 +32,12 @@ export default async function NewTrackPage({ searchParams }: NewTrackPageProps) 
       <PageHeader kicker="Content" title="New Track" description="Create a new learning track." />
 
       <section className="surface-elevated p-6">
-        {searchParams?.error === "slug_taken" && (
+        {resolvedSearchParams?.error === "slug_taken" && (
           <div className="mb-5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-400">
             A track with this slug already exists. Please choose a different slug.
           </div>
         )}
-        {searchParams?.error === "invalid_slug" && (
+        {resolvedSearchParams?.error === "invalid_slug" && (
           <div className="mb-5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-400">
             Slug must contain only lowercase letters, numbers, and hyphens (e.g. &quot;qa-fundamentals&quot;).
           </div>

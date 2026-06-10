@@ -16,13 +16,14 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-type Props = { params: { id: string } };
+type Props = { params: Promise<{ id: string }> };
 
 export default async function ModuleDetailPage({ params }: Props) {
+  const resolvedParams = await params;
   await requireAdminPermission("courses.write");
   const t = await getTranslations("admin.modules");
 
-  const mod = await getModuleDetail(params.id);
+  const mod = await getModuleDetail(resolvedParams.id);
 
   if (!mod) notFound();
 

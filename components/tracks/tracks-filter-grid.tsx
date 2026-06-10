@@ -87,7 +87,7 @@ export function TracksFilterGrid({ tracks, isAuthenticated }: Props) {
             placeholder="Поиск треков..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-border/60 bg-card/60 pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40 transition-all"
+            className="w-full rounded-xl border border-border bg-card/60 pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/40 transition-all"
           />
         </div>
 
@@ -118,7 +118,7 @@ export function TracksFilterGrid({ tracks, isAuthenticated }: Props) {
         <select
           value={level}
           onChange={(e) => setLevel(e.target.value as FilterLevel)}
-          className="rounded-xl border border-border/60 bg-card/60 px-3 py-2 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
+          className="rounded-xl border border-border bg-card/60 px-3 py-2 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
         >
           {(["ALL", "Junior", "Middle"] as FilterLevel[]).map((l) => (
             <option key={l} value={l}>
@@ -132,7 +132,7 @@ export function TracksFilterGrid({ tracks, isAuthenticated }: Props) {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as FilterStatus)}
-            className="rounded-xl border border-border/60 bg-card/60 px-3 py-2 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
+            className="rounded-xl border border-border bg-card/60 px-3 py-2 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all"
           >
             {(["ALL", "not_started", "in_progress", "completed"] as FilterStatus[]).map((s) => (
               <option key={s} value={s}>

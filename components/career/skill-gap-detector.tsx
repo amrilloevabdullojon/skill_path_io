@@ -1,4 +1,5 @@
-import { Target } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, BookOpenCheck, ClipboardCheck, Target } from "lucide-react";
 
 type SkillGapDetectorProps = {
   targetRole: string;
@@ -17,7 +18,7 @@ export function SkillGapDetector({
   const gaps = requiredSkills.filter((skill) => !normalizedUserSkills.includes(skill.toLowerCase()));
 
   return (
-    <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-[24px] space-y-4 p-5">
+    <section className="surface-elevated border border-border/50 bg-card rounded-2xl space-y-4 p-5">
       <div className="flex items-center justify-between gap-2 mb-2">
         <h2 className="text-lg font-semibold text-foreground">Анализ пробелов в навыках</h2>
         <span className="inline-flex items-center gap-1 rounded-xl border border-indigo-400/20 bg-indigo-500/10 px-3 py-1.5 text-xs font-bold text-indigo-400 uppercase tracking-wider">
@@ -28,7 +29,7 @@ export function SkillGapDetector({
 
       <div className="grid gap-3 md:grid-cols-2">
         <article className="surface-subtle space-y-2 p-3">
-          <p className="text-xs uppercase tracking-[0.14em] font-bold text-muted-foreground">Имеющиеся навыки</p>
+          <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground">Имеющиеся навыки</p>
           <div className="flex flex-wrap gap-1.5">
             {userSkills.map((skill) => (
               <span
@@ -42,7 +43,7 @@ export function SkillGapDetector({
         </article>
 
         <article className="surface-subtle space-y-2 p-3">
-          <p className="text-xs uppercase tracking-[0.14em] font-bold text-muted-foreground">Пробелы</p>
+          <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground">Пробелы</p>
           {gaps.length === 0 ? (
             <p className="text-sm font-bold text-emerald-400">Для этой роли пробелов не найдено.</p>
           ) : (
@@ -61,14 +62,28 @@ export function SkillGapDetector({
       </div>
 
       <article className="surface-subtle space-y-2 p-3">
-        <p className="text-xs uppercase tracking-[0.14em] font-bold text-muted-foreground">Рекомендованные модули</p>
+        <p className="text-xs uppercase tracking-widest font-bold text-muted-foreground">Рекомендованные модули</p>
         <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
           {recommendedModules.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>
       </article>
+
+      <div className="grid gap-2 sm:grid-cols-3">
+        <Link href="/tracks" className="btn-secondary inline-flex items-center justify-center gap-2 rounded-lg">
+          <BookOpenCheck className="h-4 w-4" />
+          Учить пробелы
+        </Link>
+        <Link href="/missions" className="btn-secondary inline-flex items-center justify-center gap-2 rounded-lg">
+          <ClipboardCheck className="h-4 w-4" />
+          Доказать практикой
+        </Link>
+        <Link href="/portfolio" className="btn-primary inline-flex items-center justify-center gap-2 rounded-lg">
+          Обновить профиль
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
     </section>
   );
 }
-

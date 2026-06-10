@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { QuestionType } from "@prisma/client";
 
 import { updateQuizAction } from "@/app/admin/actions";
 import { DeleteQuizButton } from "@/components/admin/quizzes/delete-quiz-button";
-import { DeleteQuestionButton } from "@/components/admin/quizzes/delete-question-button";
+import { QuestionEditorCard } from "@/components/admin/quizzes/question-editor-card";
 import { QuestionForm } from "@/components/admin/quizzes/question-form";
 import { SaveRowButton } from "@/components/admin/save-row-button";
 import { PageHeader } from "@/components/ui/page-header";
@@ -17,17 +16,58 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-const TYPE_BADGE: Record<QuestionType, string> = {
-  SINGLE: "border-sky-500/30 bg-sky-500/10 text-sky-400",
-  MULTI: "border-violet-500/30 bg-violet-500/10 text-violet-400",
-};
+function normalizeQuestionOptions(value: unknown) {
+  if (!Array.isArray(value)) return [];
 
-export default async function EditQuizPage({ params }: { params: { id: string } }) {
+  return value
+    .map((option, index) => {
+      if (typeof option === "string") {
+        return { id: `opt-${index + 1}`, text: option };
+      }
+      if (typeof option === "object" && option !== null) {
+        const raw = option as Record<string, unknown>;
+        const text = typeof raw.text === "string" ? raw.text : "";
+        if (!text.trim()) return null;
+        return {
+          id: typeof raw.id === "string" && raw.id.trim() ? raw.id : `opt-${index + 1}`,
+          text,
+        };
+      }
+      return null;
+    })
+    .filter((option): option is { id: string; text: string } => Boolean(option));
+}
+
+function normalizeCorrectAnswer(value: unknown, options: Array<{ id: string; text: string }>) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      if (typeof item !== "string") return null;
+      return options.find((option) => option.id === item || option.text === item)?.id ?? null;
+    })
+    .filter((item): item is string => Boolean(item));
+}
+
+export default async function EditQuizPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   await requireAdminPermission("courses.write");
 
-  const quiz = await getQuizDetail(params.id);
+  const quiz = await getQuizDetail(resolvedParams.id);
 
   if (!quiz) notFound();
+
+  const normalizedQuestions = quiz.questions.map((question) => {
+    const options = normalizeQuestionOptions(question.options);
+    return {
+      id: question.id,
+      text: question.text,
+      type: question.type,
+      options,
+      correctAnswer: normalizeCorrectAnswer(question.correctAnswer, options),
+    };
+  });
+  const emptyQuestions = normalizedQuestions.filter((question) => question.options.length < 2 || question.correctAnswer.length === 0);
 
   return (
     <section className="page-shell">
@@ -103,10 +143,45 @@ export default async function EditQuizPage({ params }: { params: { id: string } 
               <Link href="/admin/quizzes" className="btn-secondary justify-start text-xs">
                 All quizzes →
               </Link>
+              <Link
+                href={`/tracks/${quiz.module.track.slug}/modules/${quiz.module.id}/quiz`}
+                className="btn-secondary justify-start text-xs"
+              >
+                Preview as student →
+              </Link>
             </div>
             <div className="mt-4 border-t border-border pt-4">
               <DeleteQuizButton quizId={quiz.id} quizTitle={quiz.title} />
             </div>
+          </section>
+
+          <section className="surface-elevated p-5">
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Readiness
+            </h2>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between gap-2 rounded-xl border border-border bg-card/60 px-3 py-2">
+                <span className="text-muted-foreground">Questions</span>
+                <span className="font-semibold text-foreground">{normalizedQuestions.length}</span>
+              </div>
+              <div className="flex items-center justify-between gap-2 rounded-xl border border-border bg-card/60 px-3 py-2">
+                <span className="text-muted-foreground">Valid questions</span>
+                <span className={emptyQuestions.length === 0 ? "font-semibold text-emerald-400" : "font-semibold text-amber-400"}>
+                  {normalizedQuestions.length - emptyQuestions.length}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2 rounded-xl border border-border bg-card/60 px-3 py-2">
+                <span className="text-muted-foreground">Student preview</span>
+                <span className={emptyQuestions.length === 0 ? "font-semibold text-emerald-400" : "font-semibold text-rose-400"}>
+                  {emptyQuestions.length === 0 ? "Ready" : "Needs fixes"}
+                </span>
+              </div>
+            </div>
+            {emptyQuestions.length > 0 ? (
+              <p className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs leading-5 text-amber-700 dark:text-amber-300">
+                Some questions have too few options or no correct answer. Fix them before students use this quiz.
+              </p>
+            ) : null}
           </section>
         </aside>
 
@@ -118,67 +193,15 @@ export default async function EditQuizPage({ params }: { params: { id: string } 
               Questions ({quiz.questions.length})
             </h2>
 
-            {quiz.questions.length === 0 ? (
+            {normalizedQuestions.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 No questions yet. Add the first one below.
               </p>
             ) : (
               <div className="space-y-3">
-                {quiz.questions.map((q, index) => {
-                  const options = q.options as string[];
-                  const correctAnswer = q.correctAnswer as string[];
-
-                  return (
-                    <div
-                      key={q.id}
-                      className="surface-panel rounded-xl p-4 space-y-2"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-start gap-2">
-                          <span className="shrink-0 rounded bg-card px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
-                            {index + 1}
-                          </span>
-                          <p className="text-sm text-foreground">{q.text}</p>
-                        </div>
-                        <div className="flex shrink-0 items-center gap-2">
-                          <span
-                            className={`rounded border px-1.5 py-0.5 text-[10px] font-semibold ${TYPE_BADGE[q.type]}`}
-                          >
-                            {q.type}
-                          </span>
-                          <DeleteQuestionButton
-                            questionId={q.id}
-                            questionText={q.text}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Options */}
-                      <ul className="space-y-1 pl-7">
-                        {options.map((opt, oi) => {
-                          const isCorrect = correctAnswer.includes(opt);
-                          return (
-                            <li
-                              key={oi}
-                              className={`flex items-center gap-2 text-xs ${isCorrect ? "text-emerald-400" : "text-muted-foreground"}`}
-                            >
-                              <span
-                                className={`h-4 w-4 shrink-0 rounded border text-center leading-4 text-[10px] font-bold ${
-                                  isCorrect
-                                    ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-400"
-                                    : "border-border bg-card"
-                                }`}
-                              >
-                                {isCorrect ? "✓" : String.fromCharCode(65 + oi)}
-                              </span>
-                              {opt}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  );
-                })}
+                {normalizedQuestions.map((q, index) => (
+                  <QuestionEditorCard key={q.id} question={q} index={index} />
+                ))}
               </div>
             )}
           </section>

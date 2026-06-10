@@ -7,7 +7,7 @@ const cardVariants = cva("text-card-foreground", {
   variants: {
     variant: {
       default: "surface-panel surface-panel-hover",
-      hero: "surface-elevated premium-glow",
+      hero: "surface-hero",
       module: "surface-subtle surface-panel-hover",
       lesson: "surface-subtle surface-panel-hover",
       mission: "surface-panel surface-panel-hover border-indigo-500/25",

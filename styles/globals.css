@@ -11,6 +11,22 @@
   50% { opacity: 1; transform: scale(1.05); }
 }
 
+/*
+ * ─── Color Policy ────────────────────────────────────────────────────────────
+ * One accent (indigo) for ALL chrome + primary CTAs.
+ * Semantic accents reserved for MEANING, not decoration:
+ *   - emerald → success / completed / unlocked
+ *   - amber   → warning / attention / available
+ *   - rose    → danger / error / destructive
+ *   - sky     → info / in-progress
+ * Category accents reserved for content data identification (DO NOT use for chrome):
+ *   - emerald → QA track
+ *   - orange  → BA track
+ *   - violet  → DA track
+ *   - indigo  → PM track / generic
+ * If a new colour is tempting, ask: is it MEANING or DECORATION? Decoration → indigo.
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
 :root {
   --background-primary: 226 42% 5%;
   --background-secondary: 225 34% 8%;
@@ -103,6 +119,33 @@
   --density-spacious-padding: 2rem;
   --density-spacious-radius: 1.5rem;
   --density-spacious-gap: 1.5rem;
+
+  /* Active density (default = comfortable) — overridden by [data-density] below. */
+  --density-padding: var(--density-comfortable-padding);
+  --density-radius: var(--density-comfortable-radius);
+  --density-gap: var(--density-comfortable-gap);
+
+  /* ─── Z-index scale (use sparingly — prefer stacking context) ─────────── */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 30;
+  --z-overlay: 40;
+  --z-drawer: 50;
+  --z-modal: 60;
+  --z-toast: 70;
+  --z-tooltip: 80;
+}
+
+[data-density="compact"] {
+  --density-padding: var(--density-compact-padding);
+  --density-radius: var(--density-compact-radius);
+  --density-gap: var(--density-compact-gap);
+}
+
+[data-density="spacious"] {
+  --density-padding: var(--density-spacious-padding);
+  --density-radius: var(--density-spacious-radius);
+  --density-gap: var(--density-spacious-gap);
 }
 
 [data-theme="light"] {
@@ -213,6 +256,43 @@ textarea {
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* WCAG 2.4.7 — visible focus indicator on every interactive element.
+   Forced-colors / Windows high-contrast mode: use system Highlight outline. */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+[role="link"]:focus-visible,
+[role="menuitem"]:focus-visible,
+[role="tab"]:focus-visible,
+[tabindex]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 2px hsl(var(--background)),
+    0 0 0 4px hsl(var(--ring));
+}
+
+@media (forced-colors: active) {
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  [role="link"]:focus-visible,
+  [role="menuitem"]:focus-visible,
+  [role="tab"]:focus-visible,
+  [tabindex]:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible {
+    outline: 3px solid Highlight;
+    box-shadow: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
@@ -271,7 +351,14 @@ textarea {
   }
 
   .mobile-bottom-link {
-    @apply focus-ring relative flex flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 text-[11px] font-medium text-slate-400 transition-all duration-fast ease-smooth hover:bg-slate-800/70 hover:text-slate-100 active:scale-95;
+    @apply focus-ring relative flex flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 text-[10px] font-medium leading-tight text-slate-400 transition-all duration-fast ease-smooth hover:bg-slate-800/70 hover:text-slate-100 active:scale-95;
+  }
+
+  /* Hide labels on very narrow screens (<360px) — icons are recognized via aria-label. */
+  @media (max-width: 359px) {
+    .mobile-bottom-link span {
+      @apply sr-only;
+    }
   }
 
   .mobile-bottom-link-active {
@@ -314,6 +401,11 @@ textarea {
     @apply text-sm leading-7 text-muted-foreground sm:text-[15px];
   }
 
+  /* Lede — large lead paragraph after page-title or hero-title. */
+  .lede {
+    @apply text-base leading-relaxed text-muted-foreground sm:text-lg;
+  }
+
   .data-label {
     @apply text-[11px] uppercase tracking-[0.14em] text-muted-foreground;
   }
@@ -354,7 +446,7 @@ textarea {
   }
 
   .surface-panel {
-    @apply rounded-[22px] border border-slate-700/70 bg-gradient-to-b from-slate-950/85 via-slate-950/80 to-slate-900/70 shadow-[var(--shadow-soft)] transition-[border-color,box-shadow] duration-normal;
+    @apply rounded-2xl border border-slate-700/70 bg-gradient-to-b from-slate-950/85 via-slate-950/80 to-slate-900/70 shadow-[var(--shadow-soft)] transition-[border-color,box-shadow] duration-normal;
   }
 
   [data-theme="light"] .surface-panel {
@@ -371,7 +463,7 @@ textarea {
   }
 
   .surface-subtle {
-    @apply rounded-[20px] border border-slate-800/90 bg-slate-900/55;
+    @apply rounded-xl border border-slate-800/90 bg-slate-900/55;
   }
 
   [data-theme="light"] .surface-subtle {
@@ -382,6 +474,7 @@ textarea {
      now plain border+card bg. Use .surface-hero for the premium variant. */
   .surface-elevated {
     @apply rounded-2xl border border-border/60 bg-card/70 shadow-sm transition-[border-color,box-shadow] duration-normal;
+    border-radius: var(--density-radius);
   }
 
   [data-theme="light"] .surface-elevated {
@@ -391,7 +484,7 @@ textarea {
   /* Phase 8: explicit premium hero — gradient + elevated shadow. Use sparingly,
      max 1–2 per page (hero header + primary CTA card). */
   .surface-hero {
-    @apply rounded-[24px] border border-slate-700/80 bg-gradient-to-b from-slate-900/75 to-slate-950/70 shadow-[var(--shadow-elevated)] transition-[border-color,box-shadow] duration-normal;
+    @apply rounded-2xl border border-slate-700/80 bg-gradient-to-b from-slate-900/75 to-slate-950/70 shadow-[var(--shadow-elevated)] transition-[border-color,box-shadow] duration-normal;
   }
 
   [data-theme="light"] .surface-hero {
@@ -400,7 +493,7 @@ textarea {
   }
 
   .surface-glass {
-    @apply rounded-[20px] border border-slate-600/45 bg-slate-900/45 backdrop-blur-md;
+    @apply rounded-xl border border-slate-600/45 bg-slate-900/45 backdrop-blur-md;
   }
 
   [data-theme="light"] .surface-glass {
@@ -420,7 +513,7 @@ textarea {
   }
 
   .kicker {
-    @apply text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground;
+    @apply text-xs font-semibold uppercase tracking-kicker text-muted-foreground;
   }
 
   .section-title {
@@ -435,6 +528,15 @@ textarea {
 
   .section-description {
     @apply text-sm text-muted-foreground;
+  }
+
+  /* Stat / metric value — big prominent number (not a heading). */
+  .metric-value {
+    @apply text-3xl font-bold tracking-tight text-foreground sm:text-4xl;
+  }
+
+  .metric-value-lg {
+    @apply text-4xl font-bold tracking-tight text-foreground sm:text-5xl;
   }
 
   .input-base {
@@ -494,7 +596,7 @@ textarea {
   }
 
   .table-shell {
-    @apply overflow-x-auto rounded-[20px] border border-slate-800 bg-slate-950/65;
+    @apply overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/65;
   }
 
   .table-base {
@@ -758,6 +860,20 @@ textarea {
     @apply border-violet-300 bg-violet-50 text-violet-700 hover:bg-violet-100;
   }
 
+  /* Contrast — inverted CTA (foreground bg + background text). */
+  .btn-contrast-base {
+    @apply bg-foreground text-background hover:-translate-y-0.5 hover:bg-foreground/90;
+  }
+
+  /* Success — emerald CTA for confirm/save/finish-quiz actions. */
+  .btn-success-base {
+    @apply bg-emerald-500 text-primary-foreground shadow-[0_6px_20px_rgba(16,185,129,0.28)] hover:-translate-y-0.5 hover:bg-emerald-400 hover:shadow-[0_10px_28px_rgba(16,185,129,0.35)];
+  }
+
+  [data-theme="light"] .btn-success-base {
+    @apply bg-emerald-600 text-primary-foreground hover:bg-emerald-700;
+  }
+
   .hero-module-progress {
     @apply rounded-xl border border-border bg-muted/20 px-4 py-3;
   }
@@ -896,6 +1012,12 @@ textarea {
 
 .badge-danger    { @apply border-rose-400/40 bg-rose-500/15 text-rose-200; }
 [data-theme="light"] .badge-danger    { @apply border-rose-300 bg-rose-50 text-rose-700; }
+
+.badge-info      { @apply border-sky-400/40 bg-sky-500/15 text-sky-200; }
+[data-theme="light"] .badge-info      { @apply border-sky-300 bg-sky-50 text-sky-700; }
+
+.badge-accent    { @apply border-violet-400/40 bg-violet-500/15 text-violet-200; }
+[data-theme="light"] .badge-accent    { @apply border-violet-300 bg-violet-50 text-violet-700; }
 
 /* ─── Tabs ────────────────────────────────────────────────────────────────── */
 .tab-list { @apply rounded-2xl border border-slate-800 bg-slate-900/70; }
@@ -1056,6 +1178,10 @@ textarea {
 /* ─── Site header logo gradient text ─────────────────────────────────────── */
 .site-header-logo-text { @apply bg-gradient-to-r from-indigo-300 via-violet-300 to-purple-300 bg-clip-text text-transparent; }
 [data-theme="light"] .site-header-logo-text { @apply from-indigo-700 via-violet-700 to-purple-600; }
+
+/* ─── Gradient headline (WCAG-aware: darker stops in light mode) ────────── */
+.gradient-headline { @apply bg-gradient-to-br from-indigo-300 via-violet-300 to-purple-300 bg-clip-text text-transparent; }
+[data-theme="light"] .gradient-headline { @apply from-indigo-700 via-violet-700 to-purple-700; }
 
 /* ─── Track category badges ──────────────────────────────────────────────── */
 .track-badge-qa { @apply border-emerald-400/40 bg-emerald-500/10 text-emerald-300; }

@@ -45,7 +45,7 @@ export function DashboardFlameStreak({
       {/* THE FLAME (Streak Counter) */}
       <motion.div
         whileHover={{ y: -2 }}
-        className="relative col-span-1 border border-orange-500/30 bg-card/60 backdrop-blur-xl p-8 rounded-[32px] flex flex-col items-center justify-center text-center shadow-[0_15px_40px_rgba(249,115,22,0.1)] overflow-hidden"
+        className="relative col-span-1 border border-orange-500/30 bg-card p-8 rounded-4xl flex flex-col items-center justify-center text-center shadow-[0_15px_40px_rgba(249,115,22,0.1)] overflow-hidden"
       >
         <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full blur-[80px] pointer-events-none transition-all duration-700 ${
           streak.isActiveToday ? "bg-orange-500/40" : "bg-slate-500/20"
@@ -64,7 +64,7 @@ export function DashboardFlameStreak({
             }}
             className={`inline-flex items-center justify-center h-28 w-28 rounded-full border-[4px] shadow-[0_0_40px_rgba(249,115,22,0.3)] ${
               streak.isActiveToday 
-                ? "bg-gradient-to-br from-orange-400 to-rose-500 border-orange-500/50 text-white" 
+                ? "bg-gradient-to-br from-orange-400 to-rose-500 border-orange-500/50 text-primary-foreground" 
                 : "bg-slate-800/80 border-slate-700 text-slate-500"
             }`}
           >
@@ -79,7 +79,7 @@ export function DashboardFlameStreak({
         </div>
 
         <div className="mt-6 space-y-1 relative z-10">
-          <h2 className="text-4xl font-extrabold text-foreground tracking-tight drop-shadow-sm">
+          <h2 className="page-title text-foreground tracking-tight drop-shadow-sm">
             {streak.currentStreak} {" "}
             <span className="text-lg font-bold text-foreground/50 uppercase tracking-widest ml-1">Дней</span>
           </h2>
@@ -90,7 +90,7 @@ export function DashboardFlameStreak({
       </motion.div>
 
       {/* DAILY CHALLENGE */}
-      <div className="surface-elevated border border-indigo-500/20 bg-card/60 backdrop-blur-xl rounded-[32px] p-6 sm:p-8 lg:col-span-2 flex flex-col justify-between relative overflow-hidden shadow-[0_8px_30px_rgba(99,102,241,0.08)]">
+      <div className="surface-elevated border border-indigo-500/20 bg-card rounded-4xl p-6 sm:p-8 lg:col-span-2 flex flex-col justify-between relative overflow-hidden shadow-[0_8px_30px_rgba(99,102,241,0.08)]">
         <div className="absolute top-[-50%] right-[-10%] w-[400px] h-[400px] rounded-full bg-indigo-500/10 blur-[100px] pointer-events-none z-0" />
         
         <div className="flex flex-col sm:flex-row gap-6 items-start justify-between relative z-10">
@@ -103,7 +103,7 @@ export function DashboardFlameStreak({
             </div>
             
             <div>
-              <h3 className="text-2xl font-bold text-foreground leading-tight">
+              <h3 className="section-title text-foreground leading-tight">
                 {challenge ? challenge.title : "Нет активного вызова"}
               </h3>
               <p className="text-sm text-foreground/70 mt-1.5 leading-relaxed">
@@ -150,10 +150,7 @@ export function DashboardFlameStreak({
                 <span>Завершено</span>
               </div>
             ) : (
-              <Link 
-                href="/tracks" 
-                className="btn-primary w-full sm:w-auto px-6 py-2.5 bg-indigo-500 hover:bg-indigo-400 border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.2)]"
-              >
+              <Link href="/tracks" className="btn-primary w-full sm:w-auto">
                 Начать обучение
               </Link>
             )}

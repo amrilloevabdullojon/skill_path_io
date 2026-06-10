@@ -3,7 +3,9 @@
 import { useEffect } from "react";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider, useTheme } from "next-themes";
+import { MotionConfig } from "framer-motion";
 
+import { ToastProvider } from "@/components/ui/toast";
 import { useUiStore } from "@/store/use-ui-store";
 
 // Keeps Zustand store in sync with next-themes so that the rest of the app
@@ -21,6 +23,15 @@ function ThemeStoreSync() {
   return null;
 }
 
+// Applies the persisted density attribute on first render to avoid layout flash.
+function DensityInit() {
+  const density = useUiStore((s) => s.density);
+  useEffect(() => {
+    document.documentElement.setAttribute("data-density", density);
+  }, [density]);
+  return null;
+}
+
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
@@ -31,7 +42,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
         storageKey="sp-theme"
       >
         <ThemeStoreSync />
-        {children}
+        <DensityInit />
+        {/* reducedMotion="user" — respects OS-level prefers-reduced-motion globally. */}
+        <MotionConfig reducedMotion="user">
+          <ToastProvider>{children}</ToastProvider>
+        </MotionConfig>
       </ThemeProvider>
     </SessionProvider>
   );

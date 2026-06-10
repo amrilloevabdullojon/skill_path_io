@@ -34,7 +34,7 @@ const KIND_ICON = {
 
 const STATE_CONFIG = {
   locked: {
-    iconBg: "bg-muted/10 border-border/40 backdrop-blur-sm",
+    iconBg: "bg-muted/10 border-border-subtle backdrop-blur-sm",
     iconColor: "text-muted-foreground/50",
     cardBg: "bg-muted/10 border-border/30 opacity-60 backdrop-blur-sm",
     titleColor: "text-muted-foreground/60",
@@ -44,7 +44,7 @@ const STATE_CONFIG = {
   available: {
     iconBg: "bg-card/40 border-border/50 backdrop-blur-md shadow-sm",
     iconColor: "text-muted-foreground",
-    cardBg: "bg-card/40 backdrop-blur-md border border-border/50 hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:shadow-[0_4px_20px_-8px_rgba(99,102,241,0.2)] transition-all",
+    cardBg: "bg-card border border-border/50 hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:shadow-[0_4px_20px_-8px_rgba(99,102,241,0.2)] transition-all",
     titleColor: "text-foreground",
     lineColor: "bg-border/40",
     overlay: false,

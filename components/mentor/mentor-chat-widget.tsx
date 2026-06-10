@@ -6,6 +6,7 @@ import { Bot, Send, Trash2, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 import { OPEN_MENTOR_EVENT } from "@/components/tracks/ask-ai-hint-button";
+import { useBrowserStorageItem } from "@/hooks/use-browser-storage";
 
 type MentorChatWidgetProps = {
   trackSlug: string;
@@ -38,6 +39,17 @@ function createWelcomeMessage(moduleTitle: string): ChatMessage {
   };
 }
 
+function parseStoredMessages(raw: string | null, fallback: ChatMessage[]) {
+  if (!raw) return fallback;
+
+  try {
+    const parsed = JSON.parse(raw) as ChatMessage[];
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export function MentorChatWidget({
   trackSlug,
   moduleId,
@@ -45,34 +57,23 @@ export function MentorChatWidget({
   moduleTitle,
   lessonText,
 }: MentorChatWidgetProps) {
+  const storageKey = useMemo(() => `skillpath:mentor:${trackSlug}:${moduleId}`, [moduleId, trackSlug]);
+  const rawMessages = useBrowserStorageItem("local", storageKey);
+  const rawDismissed = useBrowserStorageItem("session", "mentor:dismissed");
+  const welcomeMessages = useMemo(() => [createWelcomeMessage(moduleTitle)], [moduleTitle]);
+  const persistedMessages = useMemo(() => parseStoredMessages(rawMessages, welcomeMessages), [rawMessages, welcomeMessages]);
+
   const [isOpen, setIsOpen] = useState(false);
+  const [dismissedNow, setDismissedNow] = useState(false);
+  const [dismissCleared, setDismissCleared] = useState(false);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorText, setErrorText] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([createWelcomeMessage(moduleTitle)]);
+  const [localMessages, setLocalMessages] = useState<ChatMessage[] | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-
-  const storageKey = useMemo(() => `skillpath:mentor:${trackSlug}:${moduleId}`, [moduleId, trackSlug]);
-
-  useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(storageKey);
-      if (!raw) {
-        setMessages([createWelcomeMessage(moduleTitle)]);
-        return;
-      }
-
-      const parsed = JSON.parse(raw) as ChatMessage[];
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        setMessages(parsed);
-      } else {
-        setMessages([createWelcomeMessage(moduleTitle)]);
-      }
-    } catch {
-      setMessages([createWelcomeMessage(moduleTitle)]);
-    }
-  }, [moduleTitle, storageKey]);
+  const messages = localMessages ?? persistedMessages;
+  const isDismissed = dismissedNow || (!dismissCleared && rawDismissed === "1");
 
   useEffect(() => {
     window.localStorage.setItem(storageKey, JSON.stringify(messages));
@@ -86,6 +87,13 @@ export function MentorChatWidget({
     function handleOpenMentor(event: Event) {
       const customEvent = event as CustomEvent<{ question?: string }>;
       const question = customEvent.detail?.question?.trim();
+      setDismissedNow(false);
+      setDismissCleared(true);
+      try {
+        window.sessionStorage.removeItem("mentor:dismissed");
+      } catch {
+        // ignore
+      }
       setIsOpen(true);
       if (question) {
         setInput(question);
@@ -97,6 +105,17 @@ export function MentorChatWidget({
       window.removeEventListener(OPEN_MENTOR_EVENT, handleOpenMentor as EventListener);
     };
   }, []);
+
+  function dismissMentor(event: React.MouseEvent) {
+    event.stopPropagation();
+    setDismissedNow(true);
+    setDismissCleared(false);
+    try {
+      window.sessionStorage.setItem("mentor:dismissed", "1");
+    } catch {
+      // ignore
+    }
+  }
 
   async function sendMessage(content: string) {
     const trimmed = content.trim();
@@ -113,7 +132,7 @@ export function MentorChatWidget({
     };
 
     const outgoingMessages = [...messages, userMessage];
-    setMessages(outgoingMessages);
+    setLocalMessages(outgoingMessages);
     setInput("");
     setIsLoading(true);
 
@@ -149,7 +168,7 @@ export function MentorChatWidget({
         createdAt: Date.now(),
       };
 
-      setMessages((prev) => [...prev, mentorMessage]);
+      setLocalMessages((prev) => [...(prev ?? messages), mentorMessage]);
     } catch (error) {
       setErrorText(error instanceof Error ? error.message : "Unknown mentor error.");
     } finally {
@@ -175,7 +194,7 @@ export function MentorChatWidget({
 
   function clearHistory() {
     const welcome = createWelcomeMessage(moduleTitle);
-    setMessages([welcome]);
+    setLocalMessages([welcome]);
     setErrorText(null);
   }
 
@@ -188,18 +207,36 @@ export function MentorChatWidget({
 
   return (
     <>
-      {/* Floating trigger button */}
-      <motion.button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 z-[70] group flex items-center gap-2.5 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-3 text-white shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow sm:bottom-6 sm:right-6"
-        whileHover={{ scale: 1.04 }}
-        whileTap={{ scale: 0.97 }}
-      >
-        <Bot className="h-5 w-5" />
-        <span className="text-[13px] font-semibold">AI Ментор</span>
-        <span className="flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_6px_theme(colors.emerald.400)]" />
-      </motion.button>
+      {/* Floating trigger button — hidden when dismissed for the session */}
+      {!isDismissed && !isOpen && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-4 right-4 z-[70] flex items-center gap-1 sm:bottom-6 sm:right-6"
+        >
+          <motion.button
+            type="button"
+            onClick={() => setIsOpen(true)}
+            className="group flex items-center gap-2.5 rounded-2xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-3 text-primary-foreground shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.97 }}
+            aria-label="Открыть AI-ментор"
+          >
+            <Bot className="h-5 w-5" aria-hidden />
+            <span className="text-[13px] font-semibold">AI Ментор</span>
+            <span aria-hidden className="flex h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_6px_theme(colors.emerald.400)]" />
+          </motion.button>
+          <button
+            type="button"
+            onClick={dismissMentor}
+            className="flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-slate-950/80 text-muted-foreground transition-colors hover:text-foreground"
+            aria-label="Скрыть AI-ментор до конца сессии"
+            title="Скрыть до конца сессии"
+          >
+            <X className="h-3.5 w-3.5" aria-hidden />
+          </button>
+        </motion.div>
+      )}
 
       <AnimatePresence>
         {isOpen && (
@@ -209,14 +246,14 @@ export function MentorChatWidget({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            className="fixed bottom-20 right-4 z-[60] flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950/95 shadow-2xl backdrop-blur-xl sm:bottom-24 sm:right-6"
+            className="fixed bottom-20 right-4 z-[60] flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-slate-950/95 shadow-2xl backdrop-blur-md sm:bottom-24 sm:right-6"
             style={{ width: "min(92vw, 400px)", height: "min(78vh, 580px)" }}
           >
             {/* Header */}
             <div className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
               {/* Animated gradient avatar */}
               <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/20">
-                <Bot className="h-5 w-5 text-white" />
+                <Bot className="h-5 w-5 text-primary-foreground" />
                 {/* Pulse ring when loading */}
                 {isLoading && (
                   <span className="absolute inset-0 animate-ping rounded-xl bg-indigo-400/40" />
@@ -258,11 +295,11 @@ export function MentorChatWidget({
                 return (
                   <div key={message.id} className="flex items-start gap-2 px-4">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 mt-0.5">
-                      <Bot className="h-3.5 w-3.5 text-white" />
+                      <Bot className="h-3.5 w-3.5 text-primary-foreground" />
                     </div>
                     <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-slate-800 border border-white/[0.06] px-3.5 py-2.5 shadow-sm">
                       <p className="text-[11px] font-medium uppercase tracking-wide text-violet-400 mb-1">МЕНТОР</p>
-                      <div className="max-w-none text-[13px] leading-[1.55] text-slate-200 [&_p]:mb-1.5 [&_p:last-child]:mb-0 [&_ul]:mt-1 [&_ul]:pl-4 [&_ul]:list-disc [&_ol]:mt-1 [&_ol]:pl-4 [&_ol]:list-decimal [&_li]:mb-0.5 [&_strong]:font-semibold [&_strong]:text-white [&_em]:italic [&_blockquote]:border-l-2 [&_blockquote]:border-violet-500/50 [&_blockquote]:pl-2.5 [&_blockquote]:text-slate-400 [&_blockquote]:italic [&_code]:rounded [&_code]:bg-white/10 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[11px] [&_code]:font-mono [&_h3]:font-semibold [&_h3]:text-white [&_h3]:mt-2 [&_h3]:mb-1">
+                      <div className="max-w-none text-[13px] leading-[1.55] text-slate-200 [&_p]:mb-1.5 [&_p:last-child]:mb-0 [&_ul]:mt-1 [&_ul]:pl-4 [&_ul]:list-disc [&_ol]:mt-1 [&_ol]:pl-4 [&_ol]:list-decimal [&_li]:mb-0.5 [&_strong]:font-semibold [&_strong]:text-primary-foreground [&_em]:italic [&_blockquote]:border-l-2 [&_blockquote]:border-violet-500/50 [&_blockquote]:pl-2.5 [&_blockquote]:text-slate-400 [&_blockquote]:italic [&_code]:rounded [&_code]:bg-white/10 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[11px] [&_code]:font-mono [&_h3]:font-semibold [&_h3]:text-primary-foreground [&_h3]:mt-2 [&_h3]:mb-1">
                         <ReactMarkdown>{message.content}</ReactMarkdown>
                       </div>
                     </div>
@@ -274,7 +311,7 @@ export function MentorChatWidget({
               {isLoading && (
                 <div className="flex items-start gap-2 px-4 py-2">
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600">
-                    <Bot className="h-3.5 w-3.5 text-white" />
+                    <Bot className="h-3.5 w-3.5 text-primary-foreground" />
                   </div>
                   <div className="flex items-center gap-1 rounded-2xl rounded-tl-sm bg-slate-800/80 px-3 py-2.5">
                     <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-indigo-400 [animation-delay:0ms]" />
@@ -334,7 +371,7 @@ export function MentorChatWidget({
                     type="button"
                     onClick={handleSend}
                     disabled={!input.trim() || isLoading}
-                    className="shrink-0 flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-white transition-all hover:bg-indigo-400 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="shrink-0 flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500 text-primary-foreground transition-all hover:bg-indigo-400 disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     <Send className="h-4 w-4" />
                   </button>

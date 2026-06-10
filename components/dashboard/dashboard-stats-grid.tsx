@@ -77,14 +77,14 @@ export async function DashboardStatsGrid({ stats }: DashboardStatsGridProps) {
     return (
       <article
         key={stat.id}
-        className={`relative overflow-hidden surface-elevated border bg-card/60 backdrop-blur-xl p-6 rounded-3xl transition-all duration-300 group hover:-translate-y-1 shadow-[0_4px_25px_rgba(0,0,0,0.05)] ${glowColors[config.color] ?? glowColors.slate}`}
+        className={`relative overflow-hidden surface-elevated border bg-card p-6 rounded-3xl transition-all duration-300 group hover:-translate-y-1 shadow-[0_4px_25px_rgba(0,0,0,0.05)] ${glowColors[config.color] ?? glowColors.slate}`}
       >
         <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full blur-[30px] opacity-50 ${glowBg[config.color] ?? glowBg.slate} pointer-events-none transition-opacity group-hover:opacity-100`} />
 
         <div className="flex items-start justify-between gap-3 relative z-10">
           <div>
             <p className="text-sm font-semibold capitalize tracking-wide text-foreground/70">{config.label}</p>
-            <p className="mt-3 text-4xl font-extrabold tracking-tight text-foreground drop-shadow-sm">{stat.value}</p>
+            <p className="mt-3 metric-value-lg">{stat.value}</p>
           </div>
           <div className={`p-3 rounded-2xl ${iconBg[config.color] ?? iconBg.slate} border shadow-[inset_0_0_15px_rgba(0,0,0,0.1)] shrink-0`}>
             {config.icon}

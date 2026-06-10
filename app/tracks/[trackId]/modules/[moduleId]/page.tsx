@@ -1,152 +1,54 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { LessonType, ProgressStatus, TrackCategory } from "@prisma/client";
-import { ChevronLeft, ChevronRight, CircleCheckBig, Clock3, Flag, Layers3, Route, Sparkles, Trophy } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 import { getLocale } from "next-intl/server";
+import { ProgressStatus, TrackCategory } from "@prisma/client";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpenCheck,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+  Flag,
+  FolderKanban,
+  GraduationCap,
+  Rocket,
+  Sparkles,
+  Target,
+  Trophy,
+} from "lucide-react";
 
-import { MentorChatWidget } from "@/components/mentor/mentor-chat-widget";
 import { AIExerciseReview } from "@/components/simulation/ai-exercise-review";
-import { LessonBlockRenderer } from "@/components/tracks/lesson-block-renderer";
-import { LearningFlowTree } from "@/components/tracks/learning-flow-tree";
 import { MarkModuleCompleteButton } from "@/components/tracks/mark-module-complete-button";
 import { ModuleArtifactWorkspace } from "@/components/tracks/module-artifact-workspace";
 import { ModuleCompletionReadiness } from "@/components/tracks/module-completion-readiness";
-import { ModuleReadingProgress } from "@/components/tracks/module-reading-progress";
-import { ModuleSidebarNav } from "@/components/tracks/module-sidebar-nav";
-import { QaScenarioLab } from "@/components/tracks/qa-scenario-lab";
-import { QuickSaveBookmarkButton } from "@/components/tracks/quick-save-bookmark-button";
+import { ModuleProgressChecklist } from "@/components/tracks/module-progress-checklist";
+import { ModuleQuickPractice } from "@/components/tracks/module-quick-practice";
+import { ModuleQuizReadiness } from "@/components/tracks/module-quiz-readiness";
+import { ModuleStudySession } from "@/components/tracks/module-study-session";
 import { TrackStickyProgress } from "@/components/tracks/track-sticky-progress";
+import { buttonVariants } from "@/components/ui/button";
 import { authOptions } from "@/lib/auth";
-import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
+import { findRuntimeQuizAttemptSummaries } from "@/lib/learning/quiz-attempts";
 import { findRuntimeModuleProgress } from "@/lib/learning/progress";
+import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
 import { resolveLearningUser } from "@/lib/learning-user";
-import { buildDefaultAdaptiveSignal } from "@/lib/personalization/adaptive-defaults";
-import { getAdaptivePath } from "@/lib/recommendations/adaptive-path";
 import { applyTrackContentOverrides, normalizeLearningLocale } from "@/lib/tracks/content-overrides";
-import { buildLessonBlocks, buildLessonRecommendations } from "@/lib/tracks/lesson-blocks";
 import { buildQaShiftBrief } from "@/lib/tracks/module-brief";
 import { buildModulePrimaryCta } from "@/lib/tracks/module-cta";
-import {
-  LearningPathState,
-  buildTrackProgression,
-  getTrackCareerOutcome,
-  parseModuleContent,
-} from "@/lib/tracks/progression";
-import type { Metadata } from "next";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { buildTrackProgression, parseModuleContent } from "@/lib/tracks/progression";
 import { cn } from "@/lib/utils";
-import { BackToTopButton } from "@/components/tracks/back-to-top-button";
 import { markModuleAsCompleted } from "./actions";
 
-export async function generateMetadata({ params }: ModulePageProps): Promise<Metadata> {
-  const runtimeTrack = await resolveRuntimeCourseBySlug(params.trackId, { includeCourseEntities: true });
-  const moduleItem = runtimeTrack?.modules.find((m) => m.id === params.moduleId);
-  if (!runtimeTrack || !moduleItem) return {};
-  return {
-    title: `${moduleItem.title} — ${runtimeTrack.title} | Levio`,
-    description: moduleItem.description || `${runtimeTrack.category} module: ${moduleItem.title}`,
-    robots: { index: false },
-  };
-}
-
 type ModulePageProps = {
-  params: {
+  params: Promise<{
     trackId: string;
     moduleId: string;
-  };
+  }>;
 };
-
-type TimelineNode = {
-  id: string;
-  title: string;
-  description: string;
-  kind: "lesson" | "mini_challenge" | "quiz" | "simulation" | "final_challenge";
-  state: LearningPathState;
-  href?: string;
-};
-
-const moduleStateView: Record<
-  LearningPathState,
-  {
-    label: string;
-    badge: string;
-    dot: string;
-    panel: string;
-  }
-> = {
-  locked: {
-    label: "Заблокирован",
-    badge: "border-border/40 bg-muted/10 text-muted-foreground",
-    dot: "bg-border",
-    panel: "border-border/80 bg-card/65",
-  },
-  available: {
-    label: "Доступен",
-    badge: "border-amber-400/40 bg-amber-500/10 text-amber-300",
-    dot: "bg-amber-400",
-    panel: "border-amber-400/25 bg-amber-500/8",
-  },
-  in_progress: {
-    label: "В процессе",
-    badge: "border-sky-400/40 bg-sky-500/10 text-sky-300",
-    dot: "bg-sky-400",
-    panel: "border-sky-400/25 bg-sky-500/8",
-  },
-  completed: {
-    label: "Завершён",
-    badge: "border-emerald-400/40 bg-emerald-500/10 text-emerald-300",
-    dot: "bg-emerald-400",
-    panel: "border-emerald-400/25 bg-emerald-500/8",
-  },
-};
-
-const statusView = {
-  [ProgressStatus.NOT_STARTED]: {
-    label: "Не начат",
-    badge: "border border-border/40 bg-muted/10 text-muted-foreground",
-  },
-  [ProgressStatus.IN_PROGRESS]: {
-    label: "В процессе",
-    badge: "border border-sky-400/30 bg-sky-500/10 text-sky-300",
-  },
-  [ProgressStatus.COMPLETED]: {
-    label: "Завершён",
-    badge: "border border-emerald-400/30 bg-emerald-500/10 text-emerald-300",
-  },
-} as const;
-
-function timelineLessonState(state: LearningPathState, lessonIndex: number, totalLessons: number): LearningPathState {
-  if (state === "completed") {
-    return "completed";
-  }
-  if (state === "locked") {
-    return "locked";
-  }
-  if (state === "available") {
-    return lessonIndex === 0 ? "available" : "locked";
-  }
-  if (totalLessons <= 1) {
-    return "in_progress";
-  }
-  if (lessonIndex === 0) {
-    return "completed";
-  }
-  if (lessonIndex === 1) {
-    return "in_progress";
-  }
-  return "available";
-}
-
-function lessonTypeLabel(type: string) {
-  if (type === LessonType.VIDEO || type === "VIDEO") {
-    return "Видео-урок";
-  }
-  if (type === LessonType.TASK || type === "TASK") {
-    return "Практический урок";
-  }
-  return "Текстовый урок";
-}
 
 function toTrackCategory(value: string) {
   if (value === TrackCategory.QA || value === TrackCategory.BA || value === TrackCategory.DA) {
@@ -157,13 +59,86 @@ function toTrackCategory(value: string) {
 
 function formatMinutes(minutes: number) {
   if (minutes < 60) return `${minutes} мин`;
-  const hours = Math.round((minutes / 60) * 10) / 10;
-  return `${hours}ч`;
+  return `${Math.round((minutes / 60) * 10) / 10} ч`;
+}
+
+function progressWidth(value: number) {
+  return `${Math.max(0, Math.min(100, value))}%`;
+}
+
+function lessonPreview(text: string) {
+  return text
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^\|.*\|$/gm, "")
+    .replace(/^-{3,}$/gm, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+    .slice(0, 720);
+}
+
+function statusCopy(status: ProgressStatus) {
+  if (status === ProgressStatus.COMPLETED) {
+    return {
+      label: "Завершён",
+      className: "border-emerald-400/35 bg-emerald-500/10 text-emerald-300",
+      icon: CheckCircle2,
+    };
+  }
+  if (status === ProgressStatus.IN_PROGRESS) {
+    return {
+      label: "В процессе",
+      className: "border-sky-400/35 bg-sky-500/10 text-sky-300",
+      icon: Sparkles,
+    };
+  }
+  return {
+    label: "Не начат",
+    className: "border-border-subtle bg-muted/10 text-muted-foreground",
+    icon: Flag,
+  };
+}
+
+function categoryAccent(category: TrackCategory) {
+  if (category === TrackCategory.QA) {
+    return {
+      progress: "bg-emerald-400",
+      text: "text-emerald-300",
+      soft: "border-emerald-400/25 bg-emerald-500/8",
+    };
+  }
+  if (category === TrackCategory.BA) {
+    return {
+      progress: "bg-orange-400",
+      text: "text-orange-300",
+      soft: "border-orange-400/25 bg-orange-500/8",
+    };
+  }
+  return {
+    progress: "bg-violet-400",
+    text: "text-violet-300",
+    soft: "border-violet-400/25 bg-violet-500/8",
+  };
+}
+
+export async function generateMetadata({ params }: ModulePageProps): Promise<Metadata> {
+  const resolvedParams = await params;
+  const runtimeTrack = await resolveRuntimeCourseBySlug(resolvedParams.trackId, { includeCourseEntities: true });
+  const moduleItem = runtimeTrack?.modules.find((item) => item.id === resolvedParams.moduleId);
+
+  if (!runtimeTrack || !moduleItem) return {};
+
+  return {
+    title: `${moduleItem.title} — ${runtimeTrack.title}`,
+    description: moduleItem.description || `${runtimeTrack.category} module: ${moduleItem.title}`,
+    robots: { index: false },
+  };
 }
 
 export default async function ModulePage({ params }: ModulePageProps) {
+  const resolvedParams = await params;
   const [runtimeTrack, session, localeValue] = await Promise.all([
-    resolveRuntimeCourseBySlug(params.trackId, { includeCourseEntities: true }),
+    resolveRuntimeCourseBySlug(resolvedParams.trackId, { includeCourseEntities: true }),
     getServerSession(authOptions),
     getLocale(),
   ]);
@@ -172,22 +147,16 @@ export default async function ModulePage({ params }: ModulePageProps) {
     ? applyTrackContentOverrides(runtimeTrack, normalizeLearningLocale(localeValue))
     : null;
 
-  if (!track) {
-    notFound();
-  }
+  if (!track) notFound();
 
-  const trackCategory = toTrackCategory(track.category);
-
-  const currentModuleIndex = track.modules.findIndex((moduleItem) => moduleItem.id === params.moduleId);
+  const currentModuleIndex = track.modules.findIndex((moduleItem) => moduleItem.id === resolvedParams.moduleId);
   const currentModule = track.modules[currentModuleIndex];
 
-  if (!currentModule) {
-    notFound();
-  }
+  if (!currentModule) notFound();
 
+  const trackCategory = toTrackCategory(track.category);
+  const accent = categoryAccent(trackCategory);
   const user = await resolveLearningUser(session?.user?.email);
-  const isDemoUser = Boolean(user && (!session?.user?.email || session.user.email !== user.email));
-
   const progressRecords = user
     ? await findRuntimeModuleProgress({
         userId: user.id,
@@ -196,7 +165,6 @@ export default async function ModulePage({ params }: ModulePageProps) {
       })
     : [];
 
-  const progressByModuleId = new Map(progressRecords.map((progress) => [progress.moduleId, progress]));
   const progression = buildTrackProgression({
     category: trackCategory,
     modules: track.modules.map((moduleItem) => ({
@@ -218,568 +186,397 @@ export default async function ModulePage({ params }: ModulePageProps) {
     })),
   });
 
-  const currentModuleCard =
-    progression.modules.find((moduleItem) => moduleItem.id === currentModule.id) ?? progression.modules[0];
+  const progressByModuleId = new Map(progressRecords.map((progress) => [progress.moduleId, progress]));
+  const currentModuleCard = progression.modules.find((moduleItem) => moduleItem.id === currentModule.id) ?? progression.modules[0];
   const currentState = currentModuleCard.state;
-  const currentStatus = progressByModuleId.get(currentModule.id)?.status ?? ProgressStatus.NOT_STARTED;
-  const completedCount = progression.completedCount;
-  const progressPercent = progression.overallProgressPercent;
+  const currentProgress = progressByModuleId.get(currentModule.id);
+  const currentStatus = currentProgress?.status ?? ProgressStatus.NOT_STARTED;
+  const currentScore = currentProgress?.score ?? null;
+  const status = statusCopy(currentStatus);
+  const StatusIcon = status.icon;
 
-  const glowColor =
-    trackCategory === TrackCategory.QA ? "bg-emerald-500" :
-    trackCategory === TrackCategory.BA ? "bg-orange-500" :
-    "bg-violet-500";
-
-  // Sequential unlock enforcement: if the module is locked, redirect the learner
   if (currentModule.order > 1) {
     if (!session) {
-      redirect(`/auth/signin?callbackUrl=/tracks/${params.trackId}/modules/${params.moduleId}`);
+      redirect(`/login?callbackUrl=/tracks/${resolvedParams.trackId}/modules/${resolvedParams.moduleId}`);
     }
     if (currentState === "locked") {
-      redirect(`/tracks/${params.trackId}?locked=true`);
+      redirect(`/tracks/${resolvedParams.trackId}?locked=true`);
     }
   }
 
   const previousModule = currentModuleIndex > 0 ? track.modules[currentModuleIndex - 1] : null;
   const nextModule = currentModuleIndex < track.modules.length - 1 ? track.modules[currentModuleIndex + 1] : null;
-
-  const primaryLesson = currentModule.lessons[0] ?? null;
-  const nextLesson = currentModule.lessons[1] ?? null;
   const parsedContent = parseModuleContent(currentModule.content, trackCategory, currentModule.title, currentModule.order);
-  const resources = parsedContent.resources.length > 0 ? parsedContent.resources : ["Изучить материалы модуля", "Выполнить практическое задание", "Повторить результаты теста"];
-
-  const lessonBlocks = buildLessonBlocks({
-    category: trackCategory,
-    locale: normalizeLearningLocale(localeValue),
-    moduleTitle: currentModule.title,
-    moduleDescription: currentModule.description,
-    moduleOverview: parsedContent.overview,
-    outcomes: parsedContent.outcomes,
-    resources,
-    realWorldExample: parsedContent.realWorldExample,
-    quickChecks: parsedContent.quickChecks,
-    lessons: currentModule.lessons.map((lesson) => ({
-      id: lesson.id,
-      title: lesson.title,
-      body: lesson.body,
-      order: lesson.order,
-    })),
-  });
-
-  const recommendations = buildLessonRecommendations({
-    hasNextLesson: Boolean(nextLesson),
-    nextLessonTitle: nextLesson?.title ?? null,
-    nextModuleTitle: nextModule?.title ?? null,
-  });
-  const remediationSuggestions = getAdaptivePath(buildDefaultAdaptiveSignal({
-    completedModules: progression.completedCount,
-    quizAccuracy: progressByModuleId.get(currentModule.id)?.score ?? undefined,
-    skippedLessons: Math.max(currentModule.lessons.length - 1, 0),
-    timeSpentMinutes: progression.completedCount * 40 + currentModule.lessons.length * 12,
-    simulationPerformance: currentModuleCard.simulationCount > 0 ? 72 : 64,
-    frequentMistakes: [],
-  })).suggestions.slice(0, 3);
-
-  const quizPassed =
-    currentModule.quiz &&
-    (progressByModuleId.get(currentModule.id)?.score ?? 0) >= currentModule.quiz.passingScore;
-
-  const miniChallengeState: LearningPathState =
-    currentState === "locked" ? "locked" : currentState === "completed" ? "completed" : "in_progress";
-  const quizState: LearningPathState =
-    currentState === "locked" ? "locked" : quizPassed ? "completed" : "available";
-  const simulationState: LearningPathState =
-    currentState === "locked" ? "locked" : currentState === "completed" ? "completed" : "available";
-  const finalChallengeState: LearningPathState = currentState === "completed" ? "completed" : currentState;
-
-  const timelineNodes: TimelineNode[] = [
-    ...currentModule.lessons.map((lesson, index) => ({
-      id: `lesson-${lesson.id}`,
-      kind: "lesson" as const,
-      title: `${lesson.order}. ${lesson.title}`,
-      description: lessonTypeLabel(lesson.lessonType),
-      state: timelineLessonState(currentState, index, currentModule.lessons.length),
-    })),
-    {
-      id: `mini-${currentModule.id}`,
-      kind: "mini_challenge" as const,
-      title: "Мини-задание",
-      description: "Практическая контрольная точка внутри урока",
-      state: miniChallengeState,
-    },
-    ...(currentModule.quiz
-      ? [
-          {
-            id: `quiz-${currentModule.quiz.id}`,
-            kind: "quiz" as const,
-            title: currentModule.quiz.title,
-            description: `Проходной балл: ${currentModule.quiz.passingScore}%`,
-            state: quizState,
-            href: `/tracks/${track.slug}/modules/${currentModule.id}/quiz`,
-          },
-        ]
-      : []),
-    ...(currentModuleCard.simulationCount > 0
-      ? [
-          {
-            id: `simulation-${currentModule.id}`,
-            kind: "simulation" as const,
-            title: "Симуляция модуля",
-            description: "Отработка реального рабочего процесса по теме",
-            state: simulationState,
-          },
-        ]
-      : []),
-    {
-      id: `final-${currentModule.id}`,
-      kind: "final_challenge" as const,
-      title: "Финальное задание",
-      description: parsedContent.finalChallenge,
-      state: finalChallengeState,
-    },
-  ];
-
-  const lessonContextText = [
-    primaryLesson?.title ?? currentModule.title,
-    primaryLesson?.body ?? "",
-    parsedContent.overview,
-    parsedContent.finalChallenge,
-    parsedContent.realWorldExample,
-  ]
-    .join("\n\n")
-    .slice(0, 2000);
-  const showQaScenarioLab = trackCategory === TrackCategory.QA;
-  const qaShiftBrief = showQaScenarioLab
+  const resources =
+    parsedContent.resources.length > 0
+      ? parsedContent.resources
+      : ["Прочитать ключевую теорию", "Выполнить практическую задачу", "Собрать итоговый артефакт"];
+  const quizAttempts = user && currentModule.quiz
+    ? await findRuntimeQuizAttemptSummaries({
+        userId: user.id,
+        moduleId: currentModule.id,
+        quizId: currentModule.quiz.id,
+        take: 3,
+      })
+    : [];
+  const qaShiftBrief = trackCategory === TrackCategory.QA
     ? buildQaShiftBrief({
         moduleOrder: currentModule.order,
         lessons: currentModule.lessons.map((lesson) => ({ title: lesson.title })),
         finalChallenge: parsedContent.finalChallenge,
       })
     : null;
-
-  const navLinks = [
-    { id: "module-overview", label: showQaScenarioLab ? "Корни модуля" : "Обзор модуля" },
-    ...(showQaScenarioLab ? [{ id: "scenario-lab", label: "QA симулятор" }] : []),
-    { id: "lessons-timeline", label: "Путь обучения" },
-    { id: "lesson-content", label: "Уроки модуля" },
-    { id: "module-phases", label: "Фазы работы" },
-    { id: "practical-task", label: "Практическое задание" },
-    ...(currentModule.quiz ? [{ id: "module-quiz", label: "Тест" }] : []),
-    ...(currentModuleCard.simulationCount > 0 ? [{ id: "module-simulation", label: "Симуляция" }] : []),
-    { id: "recommendations", label: "Рекомендации" },
-  ];
-
   const modulePrimaryCta = buildModulePrimaryCta({
     isCompleted: currentStatus === ProgressStatus.COMPLETED,
     nextModuleHref: nextModule ? `/tracks/${track.slug}/modules/${nextModule.id}` : null,
   });
+  const theoryItems = currentModule.lessons.length > 0
+    ? currentModule.lessons
+    : [{ id: currentModule.id, order: 1, title: currentModule.title, body: parsedContent.overview || currentModule.description, lessonType: "TEXT" }];
+  const lessonStepState =
+    currentStatus === ProgressStatus.COMPLETED
+      ? "completed"
+      : currentStatus === ProgressStatus.IN_PROGRESS
+        ? "in_progress"
+        : "available";
+  const quizStepState = currentModule.quiz
+    ? currentStatus === ProgressStatus.COMPLETED || (currentScore !== null && currentScore >= currentModule.quiz.passingScore)
+      ? "completed"
+      : currentScore !== null
+        ? "in_progress"
+        : "available"
+    : "locked";
+  const moduleSteps = [
+    {
+      id: "lessons",
+      title: "Понять основу",
+      description: "Прочитайте короткую теорию и выделите, что нужно применить в рабочем сценарии.",
+      state: lessonStepState,
+      href: "#theory",
+      metric: `${theoryItems.length} уроков · ${formatMinutes(currentModule.estimatedDuration)}`,
+    },
+    {
+      id: "practice",
+      title: "Закрепить действием",
+      description: "Разберите практическую задачу и проверьте себя на коротких вопросах.",
+      state: currentStatus === ProgressStatus.COMPLETED ? "completed" : "available",
+      href: "#practice",
+      metric: currentModule.quiz ? `${currentModule.quiz.questions.length} вопросов в quiz` : "Практический сценарий",
+    },
+    {
+      id: "artifact",
+      title: "Собрать артефакт",
+      description: "Заполните рабочий результат, который можно перенести в портфолио.",
+      state: currentStatus === ProgressStatus.COMPLETED ? "completed" : "available",
+      href: "#artifact",
+      metric: "5 веток артефакта",
+    },
+    {
+      id: "quiz",
+      title: "Проверить готовность",
+      description: "Закройте quiz или повторите попытку, если нужно добрать баллы.",
+      state: quizStepState,
+      href: currentModule.quiz ? `/tracks/${track.slug}/modules/${currentModule.id}/quiz` : "#artifact",
+      metric: currentModule.quiz ? `Порог ${currentModule.quiz.passingScore}%` : "Без quiz",
+    },
+  ] as const;
 
   return (
     <>
-      <ModuleReadingProgress />
       <TrackStickyProgress
-        progressPercent={progressPercent}
-        completedCount={completedCount}
+        progressPercent={progression.overallProgressPercent}
+        completedCount={progression.completedCount}
         totalModules={track.modules.length}
         ctaHref={modulePrimaryCta.href}
         ctaLabel={modulePrimaryCta.label}
-        accentProgress="bg-gradient-to-r from-sky-400 to-violet-500"
+        accentProgress={accent.progress}
       />
-      <section className="grid gap-5 xl:grid-cols-[320px_minmax(0,1fr)] sm:gap-6 relative isolate">
-        <div className={cn("absolute top-[-10%] left-[-150px] w-[500px] h-[500px] rounded-full blur-[140px] opacity-[0.15] pointer-events-none -z-10", glowColor)} />
-        <div className={cn("absolute bottom-[10%] right-[-150px] w-[600px] h-[600px] rounded-full blur-[160px] opacity-[0.12] pointer-events-none -z-10", glowColor)} />
 
-        <aside className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-6 p-4 text-foreground sm:p-5 xl:sticky xl:top-20 xl:h-[calc(100vh-6rem)] xl:overflow-y-auto shadow-xl shadow-black/5">
-          <div className="space-y-2">
-            <p className="kicker">Прогресс</p>
-            <h2 className="text-lg font-semibold">{track.title}</h2>
-            <p className="text-sm text-muted-foreground">
-              {completedCount}/{track.modules.length} модулей завершено
-            </p>
-            <div className="progress-track h-2">
-              <div className="h-full rounded-full bg-sky-400 transition-all duration-500" style={{ width: `${progressPercent}%` }} />
-            </div>
-            <p className="text-xs text-muted-foreground">{progressPercent}% выполнено</p>
-            {isDemoUser && user ? <p className="text-xs text-muted-foreground">Демо: {user.email}</p> : null}
-          </div>
+      <section className="page-shell pb-32 lg:pb-8">
+        <header className="surface-elevated overflow-hidden p-0">
+          <div className={cn("h-1 w-full", accent.progress)} />
+          <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_300px]">
+            <div className="space-y-6 p-5 sm:p-7">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <Link href={`/tracks/${track.slug}`} className="btn-secondary inline-flex items-center gap-2 px-3 py-1.5 text-xs">
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                  К треку
+                </Link>
+                <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold", status.className)}>
+                  <StatusIcon className="h-3.5 w-3.5" />
+                  {status.label}
+                </span>
+              </div>
 
-          <div className="space-y-2">
-            <p className="kicker">Модули</p>
-            <div className="space-y-2">
-              {progression.modules.map((moduleItem) => {
-                const stateStyle = moduleStateView[moduleItem.state];
-                const isCurrent = moduleItem.id === currentModule.id;
+              <div className="max-w-3xl space-y-3">
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  <GraduationCap className="h-4 w-4" />
+                  Модуль {currentModule.order} из {track.modules.length}
+                </p>
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{currentModule.title}</h1>
+                <p className="text-sm leading-6 text-muted-foreground sm:text-base">{currentModule.description}</p>
+              </div>
 
-                return (
-                  <Link
-                    key={moduleItem.id}
-                    href={`/tracks/${track.slug}/modules/${moduleItem.id}`}
-                    className={cn(
-                      "surface-panel-hover block rounded-xl border border-border bg-card/80 p-3",
-                      isCurrent && "border-sky-500/60 bg-card",
-                      moduleItem.state === "locked" && "pointer-events-none opacity-60",
-                    )}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-xs text-muted-foreground">Модуль {moduleItem.order}</p>
-                        <p className="break-words text-sm font-medium text-foreground">{moduleItem.title}</p>
-                      </div>
-                      <span className={cn("mt-0.5 h-2.5 w-2.5 rounded-full", stateStyle.dot)} />
-                    </div>
-                    <div className="mt-2 flex items-center gap-2">
-                      <span className={cn("inline-flex rounded-full border px-2 py-0.5 text-[11px] font-medium", stateStyle.badge)}>
-                        {stateStyle.label}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground">{moduleItem.progressPercent}%</span>
-                    </div>
+              <div className="flex flex-wrap gap-3">
+                <a href="#theory" className={cn(buttonVariants({ variant: "contrast", size: "lg" }), "gap-2")}>
+                  Начать сценарий
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+                {currentModule.quiz ? (
+                  <Link href={`/tracks/${track.slug}/modules/${currentModule.id}/quiz`} className={cn(buttonVariants({ variant: "secondary", size: "lg" }), "gap-2")}>
+                    Открыть quiz
+                    <BookOpenCheck className="h-4 w-4" />
                   </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          <nav className="space-y-2">
-            <p className="kicker">Навигация</p>
-            <ModuleSidebarNav links={navLinks} />
-          </nav>
-
-          <div className="space-y-2">
-            <p className="kicker">Действие</p>
-            <Link
-              href={modulePrimaryCta.href}
-              className="btn-primary inline-flex w-full items-center justify-center gap-1.5 text-sm"
-            >
-              {modulePrimaryCta.label}
-              <ChevronRight className="h-4 w-4" />
-            </Link>
-            <p className="text-xs leading-5 text-muted-foreground">{modulePrimaryCta.description}</p>
-            {currentModule.quiz && (
-              <Link
-                href={`/tracks/${track.slug}/modules/${currentModule.id}/quiz`}
-                className="btn-secondary mt-1 inline-flex w-full items-center justify-center gap-1.5 text-sm"
-              >
-                Пройти тест
-              </Link>
-            )}
-          </div>
-        </aside>
-
-        <div className="space-y-6">
-          <header className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-5 sm:p-6 shadow-xl shadow-black/5">
-            <Breadcrumb
-              items={[
-                { label: "Треки", href: "/tracks" },
-                { label: track.title, href: `/tracks/${track.slug}` },
-                { label: currentModule.title },
-              ]}
-            />
-            <p className="kicker">Модуль</p>
-            <div className="space-y-2">
-              <h1 className="break-words text-2xl font-semibold tracking-tight sm:text-3xl">{currentModule.title}</h1>
-              <p className="text-sm text-muted-foreground">{currentModule.description}</p>
-            </div>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <span className="chip-neutral inline-flex items-center gap-1 px-2.5 py-1">
-                <Layers3 className="h-3.5 w-3.5" />
-                Модуль {currentModule.order}/{track.modules.length}
-              </span>
-              <span className="chip-neutral inline-flex items-center gap-1 px-2.5 py-1">
-                <Clock3 className="h-3.5 w-3.5" />
-                {formatMinutes(currentModule.estimatedDuration)}
-              </span>
-              <span className="chip-neutral inline-flex items-center gap-1 px-2.5 py-1">
-                <Flag className="h-3.5 w-3.5" />
-                {currentModule.lessons.length} уроков
-              </span>
-              <span className="chip-neutral inline-flex items-center gap-1 px-2.5 py-1">
-                <Sparkles className="h-3.5 w-3.5" />+{currentModuleCard.xpReward} XP
-              </span>
-              <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-1", statusView[currentStatus].badge)}>
-                <CircleCheckBig className="h-3.5 w-3.5" />
-                {statusView[currentStatus].label}
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <QuickSaveBookmarkButton
-                title={`Module: ${currentModule.title}`}
-                href={`/tracks/${track.slug}/modules/${currentModule.id}`}
-                tag={trackCategory}
-                type="module"
-              />
-              <Link href="/notes" className="btn-secondary px-3 py-2 text-xs">
-                Открыть заметки
-              </Link>
-            </div>
-          </header>
-
-          <section id="module-overview" className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-5">
-            <h2 className="section-title">{showQaScenarioLab ? "Корни модуля" : "Обзор модуля"}</h2>
-            <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-              <article className="surface-subtle space-y-3 p-4">
-                <h3 className="text-base font-semibold text-foreground">{showQaScenarioLab ? "Питательные корни" : "Цели обучения"}</h3>
-                <p className="text-sm text-muted-foreground">{parsedContent.overview || currentModule.description}</p>
-                <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-                  {(parsedContent.objectives.length > 0 ? parsedContent.objectives : parsedContent.outcomes).map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </article>
-              <article className={cn("surface-subtle space-y-3 p-4", moduleStateView[currentState].panel)}>
-                <h3 className="text-base font-semibold text-foreground">{showQaScenarioLab ? "Кольца роста" : "Награды прогресса"}</h3>
-                <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">XP за урок: +{currentModuleCard.lessonXpReward}</p>
-                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">XP за тест: +{currentModuleCard.quizXpReward}</p>
-                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">XP за симуляцию: +{currentModuleCard.simulationXpReward}</p>
-                  <p className="rounded-lg border border-border bg-card/70 px-2 py-1.5">Сложность: {currentModuleCard.difficulty}</p>
-                </div>
-                <p className="text-xs text-muted-foreground">{getTrackCareerOutcome(
-                  trackCategory,
-                  track.careerImpact ?? undefined,
-                )}</p>
-              </article>
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-base font-semibold text-foreground">{showQaScenarioLab ? "Какие ветви вырастут" : "Чему вы научитесь"}</h3>
-              <div className="flex flex-wrap gap-2">
-                {(parsedContent.whatYouWillLearn.length > 0 ? parsedContent.whatYouWillLearn : currentModuleCard.outcomes).map((item) => (
-                  <span key={item} className="skill-tag px-2.5 py-1 text-xs">
-                    {item}
-                  </span>
-                ))}
+                ) : null}
               </div>
             </div>
-          </section>
 
-          {showQaScenarioLab ? (
-            <QaScenarioLab
-              moduleTitle={currentModule.title}
-              moduleOrder={currentModule.order}
-              quizHref={currentModule.quiz ? `/tracks/${track.slug}/modules/${currentModule.id}/quiz` : null}
-            />
-          ) : null}
-
-          <section id="lessons-timeline" className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-5">
-            <h2 className="section-title">Путь обучения</h2>
-            <LearningFlowTree nodes={timelineNodes} />
-          </section>
-
-          <section id="lesson-content" className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-5">
-            <div className="space-y-1">
-              <h2 className="section-title">Уроки модуля</h2>
-              <p className="text-sm text-muted-foreground">
-                Каждый урок оформлен как отдельная рабочая смена: сначала цель, затем материал, затем артефакт для портфолио.
-              </p>
-            </div>
-            {qaShiftBrief ? (
-              <section className="overflow-hidden rounded-3xl border border-emerald-500/25 bg-emerald-500/8">
-                <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_22rem]">
-                  <article className="space-y-4 p-4 sm:p-5">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/35 bg-background/45 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
-                        <Sparkles className="h-3.5 w-3.5" />
-                        Бриф смены
-                      </span>
-                      <span className="rounded-full border border-border/50 bg-card/60 px-3 py-1 text-xs text-muted-foreground">
-                        один кейс на весь модуль
-                      </span>
-                    </div>
-                    <div className="grid gap-3 md:grid-cols-2">
-                      <div className="rounded-2xl border border-border/45 bg-background/45 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Сцена</p>
-                        <p className="mt-2 text-sm leading-6 text-foreground/85">{qaShiftBrief.scene}</p>
-                      </div>
-                      <div className="rounded-2xl border border-border/45 bg-background/45 p-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Ставки</p>
-                        <p className="mt-2 text-sm leading-6 text-foreground/85">{qaShiftBrief.stakes}</p>
-                      </div>
-                    </div>
-                    <div className="rounded-2xl border border-emerald-500/25 bg-background/45 p-4">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Итог смены</p>
-                      <p className="mt-2 text-sm leading-6 text-foreground/85">{qaShiftBrief.artifact}</p>
-                    </div>
-                  </article>
-                  <aside className="border-t border-border/40 bg-background/35 p-4 sm:p-5 lg:border-l lg:border-t-0">
-                    <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
-                      <Route className="h-4 w-4 text-emerald-500" />
-                      Маршрут уроков
-                    </p>
-                    <ol className="mt-3 space-y-2">
-                      {qaShiftBrief.route.map((item) => (
-                        <li key={item} className="rounded-2xl border border-border/45 bg-card/50 px-3 py-2 text-sm leading-6 text-muted-foreground">
-                          {item}
-                        </li>
-                      ))}
-                    </ol>
-                  </aside>
+            <aside className="border-t border-border-subtle bg-background/30 p-5 lg:border-l lg:border-t-0 sm:p-7">
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">Готовность модуля</span>
+                    <span className="font-semibold text-foreground">{currentModuleCard.progressPercent}%</span>
+                  </div>
+                  <div className="progress-track mt-2 h-2.5">
+                    <div className={cn("h-full rounded-full", accent.progress)} style={{ width: progressWidth(currentModuleCard.progressPercent) }} />
+                  </div>
                 </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="mini-stat-box p-3">
+                    <p className="text-muted-foreground">Время</p>
+                    <p className="mt-1 text-lg font-semibold text-foreground">{formatMinutes(currentModule.estimatedDuration)}</p>
+                  </div>
+                  <div className="mini-stat-box p-3">
+                    <p className="text-muted-foreground">XP</p>
+                    <p className="mt-1 text-lg font-semibold text-foreground">{currentModuleCard.xpReward}</p>
+                  </div>
+                  <div className="mini-stat-box p-3">
+                    <p className="text-muted-foreground">Уроки</p>
+                    <p className="mt-1 text-lg font-semibold text-foreground">{currentModule.lessons.length}</p>
+                  </div>
+                  <div className="mini-stat-box p-3">
+                    <p className="text-muted-foreground">Quiz</p>
+                    <p className="mt-1 text-lg font-semibold text-foreground">{currentModule.quiz ? currentModule.quiz.questions.length : "—"}</p>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </header>
+
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+          <main className="min-w-0 space-y-6">
+            <ModuleProgressChecklist
+              moduleTitle={currentModule.title}
+              progressPercent={currentModuleCard.progressPercent}
+              steps={moduleSteps}
+              primaryHref={modulePrimaryCta.href}
+              primaryLabel={modulePrimaryCta.label}
+            />
+
+            <ModuleStudySession
+              moduleTitle={currentModule.title}
+              durationLabel={formatMinutes(currentModule.estimatedDuration)}
+              progressPercent={currentModuleCard.progressPercent}
+              overview={parsedContent.overview || currentModule.description}
+              finalChallenge={parsedContent.finalChallenge}
+              resources={resources}
+              quizHref={currentModule.quiz ? `/tracks/${track.slug}/modules/${currentModule.id}/quiz` : null}
+              quizQuestionCount={currentModule.quiz?.questions.length ?? 0}
+              accentText={accent.text}
+              accentSoft={accent.soft}
+            />
+
+            <section id="theory" className="surface-elevated space-y-5 p-5 sm:p-6">
+              <header>
+                <h2 className="section-heading">Короткая теория</h2>
+                <p className="section-subtext mt-1">Прочитайте основу и сразу переходите к рабочему действию.</p>
+              </header>
+              <div className="space-y-3">
+                {theoryItems.map((lesson) => (
+                  <article key={lesson.id} className="content-card p-4 sm:p-5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="chip-neutral px-2.5 py-1 text-xs">Урок {lesson.order}</span>
+                      <span className="chip-neutral px-2.5 py-1 text-xs">{lesson.lessonType}</span>
+                    </div>
+                    <h3 className="mt-3 text-base font-semibold text-foreground">{lesson.title}</h3>
+                    <p className="mt-2 whitespace-pre-line text-sm leading-6 text-muted-foreground">
+                      {lessonPreview(lesson.body || currentModule.description)}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section id="practice" className="space-y-4">
+              <article className={cn("surface-elevated space-y-4 p-5 sm:p-6", accent.soft)}>
+                <header className="flex items-start gap-3">
+                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-background/50">
+                    <BriefcaseIcon />
+                  </span>
+                  <div>
+                    <h2 className="section-heading">Практическая задача</h2>
+                    <p className="section-subtext mt-1">Сделайте маленькую рабочую deliverable, а не просто прочитайте текст.</p>
+                  </div>
+                </header>
+                {qaShiftBrief ? (
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <div className="content-card p-4">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Сцена</p>
+                      <p className="mt-2 text-sm leading-6 text-foreground">{qaShiftBrief.scene}</p>
+                    </div>
+                    <div className="content-card p-4">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Ставки</p>
+                      <p className="mt-2 text-sm leading-6 text-foreground">{qaShiftBrief.stakes}</p>
+                    </div>
+                  </div>
+                ) : null}
+                <div className="content-card p-4">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Что сделать</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-muted-foreground">
+                    {resources.map((resource) => (
+                      <li key={resource}>{resource}</li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+
+              {currentModule.quiz ? (
+                <>
+                  <ModuleQuizReadiness
+                    quizTitle={currentModule.quiz.title}
+                    quizHref={`/tracks/${track.slug}/modules/${currentModule.id}/quiz`}
+                    questionCount={currentModule.quiz.questions.length}
+                    passingScore={currentModule.quiz.passingScore}
+                    previousScore={currentScore}
+                    isCompleted={currentStatus === ProgressStatus.COMPLETED}
+                    attempts={quizAttempts}
+                  />
+                  <ModuleQuickPractice
+                    moduleTitle={currentModule.title}
+                    quizHref={`/tracks/${track.slug}/modules/${currentModule.id}/quiz`}
+                    questions={currentModule.quiz.questions.map((question) => ({
+                      id: question.id,
+                      text: question.text,
+                      type: question.type,
+                      options: question.options,
+                      correctAnswer: question.correctAnswer,
+                    }))}
+                  />
+                </>
+              ) : null}
+            </section>
+
+            <section id="artifact" className="space-y-4">
+              <ModuleArtifactWorkspace
+                moduleId={currentModule.id}
+                moduleTitle={currentModule.title}
+                trackTitle={track.title}
+                finalChallenge={parsedContent.finalChallenge}
+                skills={(parsedContent.whatYouWillLearn.length > 0 ? parsedContent.whatYouWillLearn : currentModuleCard.outcomes).slice(0, 8)}
+                shiftBrief={qaShiftBrief}
+              />
+              <article className="surface-elevated space-y-4 p-5 sm:p-6">
+                <header>
+                  <h2 className="section-heading">Готовность к завершению</h2>
+                  <p className="section-subtext mt-1">Закрывайте модуль только когда есть понятный рабочий результат.</p>
+                </header>
+                <ModuleCompletionReadiness
+                  moduleId={currentModule.id}
+                  isCompleted={currentStatus === ProgressStatus.COMPLETED}
+                />
+                <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                  <form action={markModuleAsCompleted} className="w-full sm:w-auto">
+                    <input type="hidden" name="trackSlug" value={track.slug} />
+                    <input type="hidden" name="moduleId" value={currentModule.id} />
+                    <MarkModuleCompleteButton isCompleted={currentStatus === ProgressStatus.COMPLETED} />
+                  </form>
+                  {currentModule.quiz ? (
+                    <Link href={`/tracks/${track.slug}/modules/${currentModule.id}/quiz`} className="btn-secondary inline-flex w-full items-center justify-center sm:w-auto">
+                      Пройти quiz
+                    </Link>
+                  ) : null}
+                </div>
+              </article>
+            </section>
+
+            {currentModuleCard.simulationCount > 0 ? (
+              <section id="review">
+                <AIExerciseReview moduleTitle={currentModule.title} trackTitle={track.title} />
               </section>
             ) : null}
-            <div className="grid gap-3 md:grid-cols-3">
-              <article className="rounded-2xl border border-emerald-500/25 bg-emerald-500/8 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-300">Контракт модуля</p>
-                <p className="mt-2 text-sm leading-6 text-foreground/80">
-                  Читайте уроки как рабочий кейс: в каждом нужно оставить след в виде заметки, checklist, finding или test case.
-                </p>
-              </article>
-              <article className="rounded-2xl border border-sky-500/25 bg-sky-500/8 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-sky-600 dark:text-sky-300">Темп</p>
-                <p className="mt-2 text-sm leading-6 text-foreground/80">
-                  Один урок - одна короткая смена на 15-20 минут. Не закрывайте всё чтением, фиксируйте evidence.
-                </p>
-              </article>
-              <article className="rounded-2xl border border-amber-500/25 bg-amber-500/8 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-300">Финиш</p>
-                <p className="mt-2 text-sm leading-6 text-foreground/80">
-                  Итогом модуля должен быть один пригодный для портфолио артефакт и готовность пройти quiz.
-                </p>
-              </article>
-            </div>
-            <LessonBlockRenderer blocks={lessonBlocks} />
-          </section>
 
-          <ModuleArtifactWorkspace
-            moduleId={currentModule.id}
-            moduleTitle={currentModule.title}
-            trackTitle={track.title}
-            finalChallenge={parsedContent.finalChallenge}
-            skills={(parsedContent.whatYouWillLearn.length > 0 ? parsedContent.whatYouWillLearn : currentModuleCard.outcomes).slice(0, 8)}
-            shiftBrief={qaShiftBrief}
-          />
+            <nav className="surface-elevated flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <Link
+                href={previousModule ? `/tracks/${track.slug}/modules/${previousModule.id}` : `/tracks/${track.slug}`}
+                className="btn-secondary inline-flex w-full items-center gap-2 text-left sm:w-auto sm:text-center"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                {previousModule ? "Предыдущий модуль" : "К треку"}
+              </Link>
 
-          <section id="practical-task" className="space-y-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md p-4 sm:p-5">
-            <h2 className="text-xl font-semibold text-emerald-700 dark:text-emerald-300">Практическое задание</h2>
-            <p className="text-sm text-emerald-900/80 dark:text-emerald-100/80">
-              Соберите итоговый рабочий артефакт по модулю. Используйте заметки из уроков выше: миссию, чекпоинты и evidence.
-            </p>
-            <ul className="list-disc space-y-1 pl-5 text-sm text-emerald-800/80 dark:text-emerald-100/80">
-              {resources.map((resource) => (
-                <li key={resource}>{resource}</li>
-              ))}
-            </ul>
-            <p className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-800 dark:text-emerald-200">
-              <span className="font-semibold">Финальное задание:</span> {parsedContent.finalChallenge}
-            </p>
-            <ModuleCompletionReadiness
-              moduleId={currentModule.id}
-              isCompleted={currentStatus === ProgressStatus.COMPLETED}
-            />
-            <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-              <form action={markModuleAsCompleted} className="w-full sm:w-auto">
-                <input type="hidden" name="trackSlug" value={track.slug} />
-                <input type="hidden" name="moduleId" value={currentModule.id} />
-                <MarkModuleCompleteButton isCompleted={currentStatus === ProgressStatus.COMPLETED} />
-              </form>
-              {currentModule.quiz ? (
-                <Link href={`/tracks/${track.slug}/modules/${currentModule.id}/quiz`} id="module-quiz" className="btn-secondary inline-flex w-full items-center justify-center sm:w-auto">
-                  Пройти тест
-                </Link>
-              ) : null}
-            </div>
-          </section>
+              <Link
+                href={
+                  nextModule
+                    ? `/tracks/${track.slug}/modules/${nextModule.id}`
+                    : currentModule.quiz
+                      ? `/tracks/${track.slug}/modules/${currentModule.id}/quiz`
+                      : `/tracks/${track.slug}`
+                }
+                className="btn-primary inline-flex w-full items-center gap-2 text-left sm:w-auto sm:text-center"
+              >
+                {nextModule ? "Следующий модуль" : currentModule.quiz ? "К quiz" : "К треку"}
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+            </nav>
+          </main>
 
-          <section id="module-simulation">
-            <AIExerciseReview moduleTitle={currentModule.title} trackTitle={track.title} />
-          </section>
+          <aside className="space-y-4 lg:sticky lg:top-8 lg:self-start">
+            <section className="surface-elevated space-y-4 p-5">
+              <h2 className="section-heading">Сценарий модуля</h2>
+              <div className="space-y-3">
+                {[
+                  { label: "1. Теория", href: "#theory", icon: FileText },
+                  { label: "2. Практика", href: "#practice", icon: Target },
+                  { label: "3. Артефакт", href: "#artifact", icon: FolderKanban },
+                  { label: "4. Проверка", href: currentModule.quiz ? `/tracks/${track.slug}/modules/${currentModule.id}/quiz` : "#artifact", icon: Trophy },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link key={item.label} href={item.href} className="content-card flex items-center gap-3 p-3 hover:border-indigo-400/40">
+                      <Icon className={cn("h-4 w-4", accent.text)} />
+                      <span className="text-sm font-semibold text-foreground">{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
 
-          <section id="recommendations" className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-5 p-5">
-            <h2 className="section-title">Рекомендации</h2>
-
-            {/* Post-lesson recommendations */}
-            <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">После урока</p>
-              <div className="grid gap-3 md:grid-cols-3">
-                {recommendations.map((item) => (
-                  <article key={item.id} className="surface-subtle space-y-2 p-4">
-                    <p className="text-sm font-semibold text-foreground">{item.title}</p>
-                    <p className="text-xs leading-6 text-muted-foreground">{item.description}</p>
-                  </article>
+            <section className="surface-elevated space-y-4 p-5">
+              <h2 className="section-heading">Навыки</h2>
+              <div className="flex flex-wrap gap-1.5">
+                {currentModuleCard.skills.slice(0, 8).map((skill) => (
+                  <span key={skill} className="skill-tag px-2.5 py-1 text-xs">{skill}</span>
                 ))}
               </div>
-            </div>
-
-            {/* AI adaptive suggestions */}
-            {remediationSuggestions.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">ИИ-адаптация</p>
-                <div className="grid gap-2 md:grid-cols-3">
-                  {remediationSuggestions.map((item) => (
-                    <article key={item.id} className="surface-subtle space-y-1 rounded-xl border border-border/40 p-3">
-                      <p className="text-sm font-semibold text-foreground">{item.title}</p>
-                      <p className="text-xs text-muted-foreground">{item.reason}</p>
-                      <p className="text-xs text-muted-foreground/70">{item.action}</p>
-                    </article>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Navigation actions */}
-            <div className="flex flex-wrap gap-2 pt-1">
-              {nextLesson ? (
-                <a href="#lesson-content" className="btn-secondary">
-                  Продолжить урок
-                </a>
-              ) : null}
-              {nextModule ? (
-                <Link href={`/tracks/${track.slug}/modules/${nextModule.id}`} className="btn-primary inline-flex items-center gap-1.5">
-                  Следующий модуль
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
-              ) : null}
-              <Link href={`/tracks/${track.slug}`} className="btn-secondary">
-                К карте трека
-              </Link>
-            </div>
-          </section>
-
-          <nav className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <Link
-              href={previousModule ? `/tracks/${track.slug}/modules/${previousModule.id}` : `/tracks/${track.slug}`}
-              className="btn-secondary inline-flex w-full items-center gap-2 text-left sm:w-auto sm:text-center"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              {previousModule ? "Назад: предыдущий модуль" : "К треку"}
-            </Link>
-
-            <Link
-              href={
-                nextModule
-                  ? `/tracks/${track.slug}/modules/${nextModule.id}`
-                  : currentModule.quiz
-                    ? `/tracks/${track.slug}/modules/${currentModule.id}/quiz`
-                    : `/tracks/${track.slug}`
-              }
-              className="btn-primary inline-flex w-full items-center gap-2 text-left sm:w-auto sm:text-center"
-            >
-              {nextModule ? "Далее: следующий модуль" : currentModule.quiz ? "Далее: к тесту" : "К треку"}
-              <ChevronRight className="h-4 w-4" />
-            </Link>
-          </nav>
-
-          {progression.isTrackCompleted ? (
-            <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-4 p-5">
-              <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/35 bg-amber-500/12 px-3 py-1 text-xs text-amber-200">
-                <Trophy className="h-4 w-4" />
-                Трек завершён!
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Поздравляем! Вы завершили все модули трека и получили награды за прогресс.
-              </p>
             </section>
-          ) : null}
+
+            <section className="surface-elevated space-y-4 p-5">
+              <h2 className="section-heading">Следующий шаг</h2>
+              <p className="text-sm leading-6 text-muted-foreground">{modulePrimaryCta.description}</p>
+              <Link href={modulePrimaryCta.href} className="btn-primary inline-flex w-full justify-center gap-2 px-4 py-3">
+                {modulePrimaryCta.label}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </section>
+          </aside>
         </div>
       </section>
-
-      <BackToTopButton />
-      <MentorChatWidget
-        trackSlug={track.slug}
-        moduleId={currentModule.id}
-        trackTitle={track.title}
-        moduleTitle={currentModule.title}
-        lessonText={lessonContextText}
-      />
     </>
   );
+}
+
+function BriefcaseIcon() {
+  return <Rocket className="h-5 w-5 text-indigo-300" />;
 }

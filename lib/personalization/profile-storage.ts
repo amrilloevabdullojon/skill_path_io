@@ -11,7 +11,7 @@ function buildDefaultOnboardingProfile(): OnboardingProfile {
     userId: "default-user",
     profession: "QA",
     currentLevel: "FOUNDATION",
-    goal: "Become job-ready with consistent weekly practice",
+    goal: "Готовность к работе с регулярной недельной практикой",
     hoursPerWeek: 6,
     targetMonths: 3,
     interests: ["Testing", "API", "SQL"],
@@ -38,8 +38,8 @@ function isOnboardingProfile(value: unknown): value is OnboardingProfile {
   );
 }
 
-export function getOnboardingProfileFromCookie(): OnboardingProfile {
-  const raw = cookies().get(ONBOARDING_COOKIE_KEY)?.value;
+export async function getOnboardingProfileFromCookie(): Promise<OnboardingProfile> {
+  const raw = (await cookies()).get(ONBOARDING_COOKIE_KEY)?.value;
   if (!raw) {
     return buildDefaultOnboardingProfile();
   }

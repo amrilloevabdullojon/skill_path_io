@@ -1,9 +1,9 @@
 import { TrackTag } from "@/types/personalization";
 
 export function interviewTrackLabel(track: TrackTag) {
-  if (track === "QA") return "QA Interview Trainer";
-  if (track === "BA") return "BA Interview Trainer";
-  return "Data Analyst Interview Trainer";
+  if (track === "QA") return "QA Инженер";
+  if (track === "BA") return "Бизнес-аналитик";
+  return "Data Analyst";
 }
 
 export function interviewNextSteps(score: number, track: TrackTag) {

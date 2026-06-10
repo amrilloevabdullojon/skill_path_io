@@ -10,7 +10,14 @@ type NavLink = { href: string; label: string };
 const NAV_GROUPS: { label: string; hrefs: string[] }[] = [
   {
     label: "Content",
-    hrefs: ["/admin/dashboard", "/admin/courses"],
+    hrefs: [
+      "/admin/dashboard",
+      "/admin/courses",
+      "/admin/tracks",
+      "/admin/modules",
+      "/admin/lessons",
+      "/admin/quizzes",
+    ],
   },
   {
     label: "People",

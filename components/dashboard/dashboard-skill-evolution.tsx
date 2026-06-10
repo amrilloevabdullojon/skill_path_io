@@ -34,7 +34,7 @@ export function DashboardSkillEvolutionSection({ weeklyProgress }: { weeklyProgr
       description="Скорость обучения и тренд роста по неделям."
     >
       <div className="chart-surface h-[19rem] w-full min-w-0">
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={220} initialDimension={{ width: 0, height: 220 }}>
           <LineChart data={data} margin={{ top: 8, right: 12, left: 4, bottom: 2 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.35} />
             <XAxis dataKey="week" tick={{ fill: "#94A3B8", fontSize: 12 }} tickLine={false} axisLine={false} />

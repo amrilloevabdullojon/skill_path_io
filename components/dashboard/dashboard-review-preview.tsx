@@ -6,15 +6,19 @@ import { DashboardSection } from "@/components/dashboard/dashboard-section";
 export function DashboardReviewPreviewSection({
   bookmarkCount,
   noteCount,
+  mistakeCount,
 }: {
   bookmarkCount: number;
   noteCount: number;
+  mistakeCount: number;
 }) {
   return (
     <DashboardSection id="review" title="Повторение" description="Быстрый режим повторения на основе твоих заметок и закладок.">
       <article className="content-card surface-panel-hover p-4">
         <p className="text-sm font-semibold text-foreground">Сохранённые материалы</p>
-        <p className="mt-2 text-xs text-muted-foreground">{bookmarkCount} закладок · {noteCount} заметок</p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {mistakeCount} ошибок · {bookmarkCount} закладок · {noteCount} заметок
+        </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <Link href="/review" className="btn-secondary px-3 py-1.5 text-xs">Открыть повторение</Link>
           <Link href="/bookmarks" className="btn-secondary px-3 py-1.5 text-xs">Закладки</Link>

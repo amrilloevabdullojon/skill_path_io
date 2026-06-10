@@ -66,7 +66,7 @@ export function AIExerciseReview({ moduleTitle, trackTitle }: AIExerciseReviewPr
   }
 
   return (
-    <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-5 p-5 sm:p-7 relative isolate overflow-hidden rounded-[24px]">
+    <section className="surface-elevated border border-border/50 bg-card space-y-5 p-5 sm:p-7 relative isolate overflow-hidden rounded-2xl">
       <div className="absolute top-[-50px] right-[-50px] w-[300px] h-[300px] rounded-full bg-violet-500/10 blur-[100px] pointer-events-none -z-10" />
       <header className="space-y-2">
         <p className="kicker text-violet-400">ИИ-проверка</p>
@@ -80,7 +80,7 @@ export function AIExerciseReview({ moduleTitle, trackTitle }: AIExerciseReviewPr
         <select
           value={exerciseType}
           onChange={(event) => setExerciseType(event.target.value as ExerciseType)}
-          className="select-base bg-card/60 backdrop-blur-sm border-border/40 focus:border-violet-500/50 focus:ring-violet-500/20"
+          className="select-base bg-card/60 backdrop-blur-sm border-border-subtle focus:border-violet-500/50 focus:ring-violet-500/20"
         >
           {exerciseOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -93,7 +93,7 @@ export function AIExerciseReview({ moduleTitle, trackTitle }: AIExerciseReviewPr
           type="button"
           onClick={runReview}
           disabled={isLoading || submission.trim().length < 20}
-          className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-60 bg-violet-500 hover:bg-violet-400 text-white shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] border-violet-400 font-semibold"
+          className="btn-accent gap-2 disabled:opacity-60"
         >
           <Sparkles className="h-5 w-5" />
           {isLoading ? "Оцениваю..." : "Получить подробную оценку"}
@@ -103,7 +103,7 @@ export function AIExerciseReview({ moduleTitle, trackTitle }: AIExerciseReviewPr
       <textarea
         value={submission}
         onChange={(event) => setSubmission(event.target.value)}
-        className="textarea-base min-h-[140px] bg-card/60 backdrop-blur-sm border-border/40 focus:border-violet-500/50 focus:ring-violet-500/20"
+        className="textarea-base min-h-[140px] bg-card/60 backdrop-blur-sm border-border-subtle focus:border-violet-500/50 focus:ring-violet-500/20"
         placeholder="Вставьте вашу практическую работу сюда (отформатируйте текст для лучшего понимания)..."
       />
 

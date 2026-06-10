@@ -2,12 +2,13 @@ import Link from "next/link";
 import { ArrowUpRight, Compass, Flame } from "lucide-react";
 
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { AdaptiveSuggestion } from "@/types/personalization";
 
-function priorityColor(priority: AdaptiveSuggestion["priority"]) {
-  if (priority === "High") return "border-rose-400/30 bg-rose-500/10 text-rose-200";
-  if (priority === "Medium") return "border-amber-400/30 bg-amber-500/10 text-amber-200";
-  return "border-emerald-400/30 bg-emerald-500/10 text-emerald-200";
+function priorityVariant(priority: AdaptiveSuggestion["priority"]): BadgeProps["variant"] {
+  if (priority === "High") return "danger";
+  if (priority === "Medium") return "warning";
+  return "success";
 }
 
 export function DashboardAdaptivePathSection({ suggestions }: { suggestions: AdaptiveSuggestion[] }) {
@@ -27,9 +28,7 @@ export function DashboardAdaptivePathSection({ suggestions }: { suggestions: Ada
                 <p className="text-sm font-semibold text-foreground">{item.title}</p>
                 <p className="text-xs text-muted-foreground">{item.reason}</p>
               </div>
-              <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wide ${priorityColor(item.priority)}`}>
-                {item.priority}
-              </span>
+              <Badge variant={priorityVariant(item.priority)}>{item.priority}</Badge>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">{item.action}</p>
             <Link href={item.href} className="mt-2 inline-flex items-center gap-1 text-xs text-indigo-300 hover:text-indigo-200">

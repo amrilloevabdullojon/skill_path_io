@@ -17,11 +17,11 @@ export const metadata: Metadata = {
 };
 
 type TracksAdminPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string | string[];
     category?: string | string[];
     status?: string | string[];
-  };
+  }>;
 };
 
 function paramValue(value: string | string[] | undefined) {
@@ -44,9 +44,10 @@ const STATUS_BADGE: Record<TrackStatus, string> = {
 export default async function TracksAdminPage({ searchParams }: TracksAdminPageProps) {
   await requireAdminPermission("courses.read");
 
-  const query = paramValue(searchParams?.q);
-  const categoryParam = paramValue(searchParams?.category);
-  const statusParam = paramValue(searchParams?.status);
+  const resolvedSearchParams = await searchParams;
+  const query = paramValue(resolvedSearchParams?.q);
+  const categoryParam = paramValue(resolvedSearchParams?.category);
+  const statusParam = paramValue(resolvedSearchParams?.status);
 
   const { tracks, categoryFilter, statusFilter } = await getTrackListData({
     query,

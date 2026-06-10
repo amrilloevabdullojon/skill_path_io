@@ -69,15 +69,15 @@ export function buildDashboardRecommendations(input: {
     input.lowScoreProgress
       ? {
           id: "repeat-quiz",
-          title: `Repeat ${input.lowScoreProgress.moduleTitle} quiz`,
-          description: `Current score ${input.lowScoreProgress.score}%. Revisit weak points and retake to pass 70%+.`,
+          title: `Пересдайте тест: ${input.lowScoreProgress.moduleTitle}`,
+          description: `Текущий результат ${input.lowScoreProgress.score}%. Проработайте слабые места и пересдайте на 70%+.`,
           tag: "Quiz",
           href: `/tracks/${input.lowScoreProgress.trackSlug}/modules/${input.lowScoreProgress.moduleId}/quiz`,
         }
       : {
           id: "quiz-challenge",
-          title: "Take an advanced quiz round",
-          description: "Your current quiz results are stable. Keep momentum with a challenge module.",
+          title: "Возьмите продвинутый тест",
+          description: "Результаты по тестам стабильны. Поддержите темп сложным модулем.",
           tag: "Quiz",
           href: input.primaryTrack?.nextModuleHref
             ? `${input.primaryTrack.nextModuleHref}/quiz`
@@ -87,16 +87,16 @@ export function buildDashboardRecommendations(input: {
       id: "simulation",
       title:
         input.strongestCategory === TrackCategory.BA
-          ? "Try BA simulation"
+          ? "Попробуйте BA-симуляцию"
           : input.strongestCategory === TrackCategory.DA
-            ? "Practice SQL sandbox"
-            : "Try Bug Tracker Simulation",
+            ? "Практика в SQL-песочнице"
+            : "Симулятор баг-трекера",
       description:
         input.strongestCategory === TrackCategory.BA
-          ? "Strengthen user stories and acceptance criteria with scenario feedback."
+          ? "Закрепите user stories и критерии приёмки через сценарии с обратной связью."
           : input.strongestCategory === TrackCategory.DA
-            ? "Run SQL queries against practice data to improve analytics confidence."
-            : "Simulate Jira-quality bug reporting and sharpen QA execution.",
+            ? "Запускайте SQL-запросы на учебных данных, чтобы укрепить аналитику."
+            : "Симулируйте Jira-уровень баг-репортинга и отточите QA-исполнение.",
       tag: "Simulation",
       href:
         input.strongestCategory === TrackCategory.BA
@@ -107,25 +107,25 @@ export function buildDashboardRecommendations(input: {
     },
     {
       id: "weakest-skill",
-      title: `Improve ${input.skillRadar.weakestSkill}`,
-      description: `Strongest now: ${input.skillRadar.strongestSkill}. Focus one focused session on ${input.skillRadar.weakestSkill}.`,
+      title: `Подтяните: ${input.skillRadar.weakestSkill}`,
+      description: `Сильнее всего: ${input.skillRadar.strongestSkill}. Уделите одну фокусную сессию навыку ${input.skillRadar.weakestSkill}.`,
       tag: "Skill",
       href: input.skillRadar.weakestSkill === "SQL" ? "/sandbox/sql" : "/tracks",
     },
     {
       id: "career",
-      title: `You may fit ${input.focusTrack} pathway`,
+      title: `Возможно, вам подойдёт направление ${input.focusTrack}`,
       description:
         input.categoryTrackTitle
-          ? `Your best momentum is in ${input.categoryTrackTitle}. Map it to your next career stage.`
-          : "Open roadmap and align your strongest skills with career goals.",
+          ? `Ваш лучший темп — в треке ${input.categoryTrackTitle}. Привяжите его к следующему карьерному этапу.`
+          : "Откройте roadmap и сопоставьте сильные навыки с карьерными целями.",
       tag: "Career",
       href: "/career",
     },
     {
       id: "mentor",
-      title: "Ask AI mentor for a weekly plan",
-      description: input.baseRecommendationText ?? "Get an adaptive plan for your next sprint.",
+      title: "Спросите у ИИ-ментора план на неделю",
+      description: input.baseRecommendationText ?? "Получите адаптивный план на следующий спринт.",
       tag: "Mentor",
       href: input.primaryTrack?.nextModuleHref ?? "/tracks",
     },

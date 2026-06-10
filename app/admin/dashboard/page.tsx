@@ -23,9 +23,14 @@ export default async function AdminDashboardPage() {
   let realStats = {
     users: 0,
     tracks: 0,
+    publishedTracks: 0,
+    draftTracks: 0,
     modules: 0,
+    modulesWithoutLessons: 0,
+    modulesWithoutQuiz: 0,
     lessons: 0,
     quizzes: 0,
+    quizzesWithoutQuestions: 0,
     certificates: 0,
     missionSubmissions: 0,
     peerReviews: 0,
@@ -38,6 +43,7 @@ export default async function AdminDashboardPage() {
   try {
     const [
       users, tracks, modules, lessons, quizzes, certificates, courseCertificates,
+      publishedTracks, draftTracks, modulesWithoutLessons, modulesWithoutQuiz, quizzesWithoutQuestions,
       missionSubmissions, peerReviews, aiResumesScanned, aiInterviews,
       recentAiLogs, recentSubmissions, recentReviews
     ] = await prisma.$transaction([
@@ -48,6 +54,11 @@ export default async function AdminDashboardPage() {
       prisma.quiz.count(),
       prisma.certificate.count(),
       prisma.courseCertificate.count(),
+      prisma.track.count({ where: { status: "PUBLISHED" } }),
+      prisma.track.count({ where: { status: "DRAFT" } }),
+      prisma.module.count({ where: { lessons: { none: {} } } }),
+      prisma.module.count({ where: { quiz: null } }),
+      prisma.quiz.count({ where: { questions: { none: {} } } }),
       prisma.missionSubmission.count(),
       prisma.peerReview.count(),
       prisma.aiUsageLog.count({ where: { feature: "RESUME_SCAN" } }),
@@ -70,7 +81,23 @@ export default async function AdminDashboardPage() {
       })
     ]);
 
-    realStats = { users, tracks, modules, lessons, quizzes, certificates: certificates + courseCertificates, missionSubmissions, peerReviews, aiResumesScanned, aiInterviews };
+    realStats = {
+      users,
+      tracks,
+      publishedTracks,
+      draftTracks,
+      modules,
+      modulesWithoutLessons,
+      modulesWithoutQuiz,
+      lessons,
+      quizzes,
+      quizzesWithoutQuestions,
+      certificates: certificates + courseCertificates,
+      missionSubmissions,
+      peerReviews,
+      aiResumesScanned,
+      aiInterviews,
+    };
 
     // Format feed items
     const feedItems: LiveFeedItem[] = [];

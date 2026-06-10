@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Database } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Sandbox — Levio",
+  title: "Sandbox",
   description: "Hands-on coding environments for practising SQL, scripting, and data analysis.",
 };
 

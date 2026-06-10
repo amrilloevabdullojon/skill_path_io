@@ -4,7 +4,7 @@ import { Bug, BriefcaseBusiness } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Симуляции — Levio",
+  title: "Симуляции",
   description: "Практикуйтесь в реальных рабочих процессах QA и BA в интерактивных симуляциях.",
 };
 
@@ -65,7 +65,7 @@ export default function SimulationIndexPage() {
               key={href}
               href={href}
               className={cn(
-                "group relative overflow-hidden rounded-2xl border border-border/50 bg-card/40 backdrop-blur-md p-6 flex flex-col gap-5",
+                "group relative overflow-hidden rounded-2xl border border-border/50 bg-card p-6 flex flex-col gap-5",
                 "transition-all duration-300 hover:-translate-y-1",
                 cls.cardHover
               )}

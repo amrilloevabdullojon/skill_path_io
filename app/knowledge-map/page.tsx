@@ -5,7 +5,7 @@ import { KnowledgeMapView } from "@/components/knowledge-map/knowledge-map-view"
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Knowledge Map — Levio",
+  title: "Knowledge Map",
   description: "Visual map of your acquired skills and remaining learning objectives.",
   robots: { index: false },
 };
@@ -80,23 +80,22 @@ export default async function KnowledgeMapPage() {
   const completedQuota = Math.max(0, Math.min(baseNodes.length, dashboard?.hero.completedModules ?? 0));
   const completedKeys = new Set(baseNodes.slice(0, completedQuota).flatMap((node) => [node.id, node.key]));
 
-  let recommendedAssigned = false;
-  const nodes: KnowledgeNode[] = baseNodes.map((node) => {
+  const recommendedIndex = baseNodes.findIndex((node) => {
     const completed = completedKeys.has(node.id) || completedKeys.has(node.key);
     const locked = node.dependencies.some((dependencyId) => !completedKeys.has(dependencyId));
-    const recommended = !recommendedAssigned && !completed && !locked;
+    return !completed && !locked;
+  });
 
-    if (recommended) {
-      recommendedAssigned = true;
-    }
-
+  const nodes: KnowledgeNode[] = baseNodes.map((node, index) => {
+    const completed = completedKeys.has(node.id) || completedKeys.has(node.key);
+    const locked = node.dependencies.some((dependencyId) => !completedKeys.has(dependencyId));
     return {
       id: node.id,
       title: node.title,
       category: node.category,
       dependencies: node.dependencies,
       completed,
-      recommended,
+      recommended: index === recommendedIndex,
       locked,
     };
   });

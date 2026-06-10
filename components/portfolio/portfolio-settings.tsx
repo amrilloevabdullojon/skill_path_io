@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, ExternalLink, Globe, Lock } from "lucide-react";
+import { CheckCircle2, Copy, ExternalLink, Globe, Lock, Loader2 } from "lucide-react";
+
+import { useToast } from "@/components/ui/toast";
+import { cn } from "@/lib/utils";
 
 export function PortfolioSettings({
   initialSlug,
@@ -14,142 +17,139 @@ export function PortfolioSettings({
   const [isPublic, setIsPublic] = useState(initialIsPublic);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; error: boolean } | null>(null);
+  const { toast } = useToast();
 
-  const publicUrl = typeof window !== "undefined" && slug ? `${window.location.origin}/p/${slug}` : `/p/${slug || "your-slug"}`;
+  const publicUrl =
+    typeof window !== "undefined" && slug ? `${window.location.origin}/p/${slug}` : `/p/${slug || "your-slug"}`;
 
-  async function handleSave(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSave(event: React.FormEvent) {
+    event.preventDefault();
     setLoading(true);
     setMessage(null);
 
     try {
-      const res = await fetch("/api/portfolio", {
+      const response = await fetch("/api/portfolio", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ publicSlug: slug || null, isPublic }),
       });
 
-      const json = (await res.json()) as { error?: string };
-      if (!res.ok) {
-        throw new Error(json.error || "Failed to update settings");
+      const json = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(json.error || "Не удалось сохранить настройки");
       }
 
-      setMessage({ text: "Настройки портфолио обновлены!", error: false });
-    } catch (err) {
-      setMessage({ text: err instanceof Error ? err.message : "Failed to update settings", error: true });
+      const text = isPublic ? "Публичная ссылка обновлена." : "Портфолио скрыто.";
+      setMessage({ text, error: false });
+      toast.success("Настройки сохранены", text);
+    } catch (error) {
+      const text = error instanceof Error ? error.message : "Не удалось сохранить настройки";
+      setMessage({ text, error: true });
+      toast.error("Ошибка сохранения", text);
     } finally {
       setLoading(false);
     }
   }
 
   function handleCopy() {
-    if (typeof window !== "undefined" && slug) {
-      navigator.clipboard.writeText(`${window.location.origin}/p/${slug}`);
-      setMessage({ text: "Ссылка скопирована в буфер обмена!", error: false });
-      setTimeout(() => setMessage(null), 3000);
-    }
+    if (!slug || typeof window === "undefined") return;
+
+    const url = `${window.location.origin}/p/${slug}`;
+    navigator.clipboard.writeText(url);
+    setMessage({ text: "Ссылка скопирована.", error: false });
+    toast.success("Ссылка скопирована", url);
   }
 
   return (
-    <div className="surface-elevated space-y-4 p-5 sm:p-6 mb-8">
-      <header className="space-y-1">
-        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-          <Globe className="h-4 w-4 text-indigo-400" /> Настройки видимости
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Сделайте свое портфолио публичным и делитесь успехами с рекрутерами.
-        </p>
-      </header>
-
-      <form onSubmit={handleSave} className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Пользовательский URL</label>
-            <div className="flex rounded-lg border border-border bg-card focus-within:ring-2 focus-within:ring-indigo-500/20">
-              <span className="flex items-center px-3 text-sm text-muted-foreground border-r border-border bg-muted/30">
-                skillpath.io/p/
-              </span>
-              <input
-                type="text"
-                pattern="[a-zA-Z0-9-]+"
-                title="Only letters, numbers, and hyphens"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                placeholder="alex-qa"
-                className="w-full bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/60 text-foreground"
-              />
-            </div>
-            <p className="text-[11px] text-muted-foreground">
-              Только английские буквы, цифры и дефис.
-            </p>
+    <section className="surface-elevated mb-5 p-4 sm:p-5">
+      <form onSubmit={handleSave} className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Globe className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold text-foreground">Public/share режим</h2>
+            <span
+              className={cn(
+                "rounded-full border px-2 py-0.5 text-xs font-semibold",
+                isPublic
+                  ? "border-emerald-400/35 bg-emerald-500/10 text-emerald-200"
+                  : "border-amber-400/35 bg-amber-500/10 text-amber-200",
+              )}
+            >
+              {isPublic ? "публично" : "скрыто"}
+            </span>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Видимость</label>
-            <div className="flex gap-2">
+          <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px]">
+            <label className="space-y-1.5">
+              <span className="text-xs font-medium text-muted-foreground">Публичный адрес</span>
+              <div className="flex rounded-lg border border-border bg-background focus-within:ring-2 focus-within:ring-primary/20">
+                <span className="flex items-center border-r border-border bg-muted/30 px-3 text-sm text-muted-foreground">
+                  /p/
+                </span>
+                <input
+                  type="text"
+                  pattern="[a-zA-Z0-9-]+"
+                  title="Only letters, numbers, and hyphens"
+                  value={slug}
+                  onChange={(event) => setSlug(event.target.value)}
+                  placeholder="alex-qa"
+                  className="min-w-0 flex-1 bg-transparent px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground/60"
+                />
+              </div>
+            </label>
+
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setIsPublic(false)}
-                className={`flex-1 flex flex-col items-center justify-center p-2 rounded-lg border text-sm transition-colors ${
-                  !isPublic
-                    ? "border-amber-500/40 bg-amber-500/10 text-amber-200"
-                    : "border-border bg-card text-muted-foreground hover:bg-muted/30"
-                }`}
+                aria-pressed={!isPublic}
+                className={cn(
+                  "inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm transition",
+                  !isPublic ? "border-amber-400/40 bg-amber-500/10 text-amber-200" : "border-border bg-background text-muted-foreground",
+                )}
               >
-                <Lock className="h-4 w-4 mb-1" />
+                <Lock className="h-4 w-4" />
                 Скрыто
               </button>
               <button
                 type="button"
                 onClick={() => setIsPublic(true)}
-                className={`flex-1 flex flex-col items-center justify-center p-2 rounded-lg border text-sm transition-colors ${
-                  isPublic
-                    ? "border-indigo-500/40 bg-indigo-500/10 text-indigo-300"
-                    : "border-border bg-card text-muted-foreground hover:bg-muted/30"
-                }`}
+                aria-pressed={isPublic}
+                className={cn(
+                  "inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm transition",
+                  isPublic ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-200" : "border-border bg-background text-muted-foreground",
+                )}
               >
-                <Globe className="h-4 w-4 mb-1" />
-                Публично
+                <Globe className="h-4 w-4" />
+                Public
               </button>
             </div>
           </div>
+
+          {isPublic && slug ? (
+            <div className="flex flex-wrap items-center gap-2 rounded-lg border border-emerald-400/20 bg-emerald-500/5 px-3 py-2">
+              <a href={`/p/${slug}`} target="_blank" rel="noreferrer" className="inline-flex min-w-0 items-center gap-2 text-sm text-emerald-200 hover:underline">
+                <span className="truncate">{publicUrl}</span>
+                <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+              </a>
+              <button type="button" onClick={handleCopy} className="btn-secondary ml-auto inline-flex items-center gap-2 px-3 py-1.5 text-xs">
+                <Copy className="h-3.5 w-3.5" />
+                Копировать
+              </button>
+            </div>
+          ) : null}
         </div>
 
-        {isPublic && slug && (
-          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5">
-            <a
-              href={`/p/${slug}`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm text-emerald-300 flex items-center gap-2 hover:underline truncate"
-            >
-              {publicUrl} <ExternalLink className="h-3 w-3" />
-            </a>
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-500/15 text-emerald-200 hover:bg-emerald-500/25 transition-colors flex items-center gap-1.5"
-            >
-              <Copy className="h-3 w-3" /> Копировать
-            </button>
-          </div>
-        )}
-
-        <div className="flex items-center gap-4 pt-2">
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary"
-          >
-            {loading ? "Сохранение..." : "Сохранить"}
+        <div className="flex flex-wrap items-center gap-3">
+          <button type="submit" disabled={loading} className="btn-primary gap-2">
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+            Сохранить
           </button>
-          {message && (
-            <p className={`text-sm ${message.error ? "text-rose-400" : "text-emerald-400"}`}>
-              {message.text}
-            </p>
-          )}
+          {message ? (
+            <p className={cn("text-sm", message.error ? "text-rose-400" : "text-emerald-400")}>{message.text}</p>
+          ) : null}
         </div>
       </form>
-    </div>
+    </section>
   );
 }

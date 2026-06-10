@@ -47,26 +47,26 @@ export function BaSimulationForm() {
   }
 
   return (
-    <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md space-y-6 p-5 sm:p-7 relative isolate overflow-hidden rounded-[24px]">
+    <section className="surface-elevated border border-border/50 bg-card space-y-6 p-5 sm:p-7 relative isolate overflow-hidden rounded-2xl">
       <div className="absolute top-[-50px] right-[-50px] w-[300px] h-[300px] rounded-full bg-indigo-500/10 blur-[100px] pointer-events-none -z-10" />
       <header className="space-y-2">
         <p className="kicker text-indigo-400">Симуляция BA</p>
-        <h1 className="text-2xl font-bold text-foreground">User Story + Acceptance Criteria</h1>
+        <h1 className="page-title text-foreground">User Story + Acceptance Criteria</h1>
         <p className="text-sm text-foreground/70">
           Составьте реалистичную историю пользователя и получите ревью качества от ИИ.
         </p>
       </header>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <input value={actor} onChange={(event) => setActor(event.target.value)} className="input-base bg-card/60 backdrop-blur-sm border-border/40 focus:border-indigo-500/50 focus:ring-indigo-500/20" placeholder="Как... (As a...)" />
-        <input value={action} onChange={(event) => setAction(event.target.value)} className="input-base bg-card/60 backdrop-blur-sm border-border/40 focus:border-indigo-500/50 focus:ring-indigo-500/20" placeholder="Я хочу... (I want to...)" />
-        <input value={value} onChange={(event) => setValue(event.target.value)} className="input-base bg-card/60 backdrop-blur-sm border-border/40 focus:border-indigo-500/50 focus:ring-indigo-500/20" placeholder="Чтобы... (So that...)" />
+        <input value={actor} onChange={(event) => setActor(event.target.value)} className="input-base bg-card/60 backdrop-blur-sm border-border-subtle focus:border-indigo-500/50 focus:ring-indigo-500/20" placeholder="Как... (As a...)" />
+        <input value={action} onChange={(event) => setAction(event.target.value)} className="input-base bg-card/60 backdrop-blur-sm border-border-subtle focus:border-indigo-500/50 focus:ring-indigo-500/20" placeholder="Я хочу... (I want to...)" />
+        <input value={value} onChange={(event) => setValue(event.target.value)} className="input-base bg-card/60 backdrop-blur-sm border-border-subtle focus:border-indigo-500/50 focus:ring-indigo-500/20" placeholder="Чтобы... (So that...)" />
       </div>
 
       <textarea
         value={acceptanceCriteria}
         onChange={(event) => setAcceptanceCriteria(event.target.value)}
-        className="textarea-base min-h-[160px] bg-card/60 backdrop-blur-sm border-border/40 focus:border-indigo-500/50 focus:ring-indigo-500/20"
+        className="textarea-base min-h-[160px] bg-card/60 backdrop-blur-sm border-border-subtle focus:border-indigo-500/50 focus:ring-indigo-500/20"
         placeholder="Критерии приемки (Given/When/Then)..."
       />
 
@@ -74,7 +74,7 @@ export function BaSimulationForm() {
         type="button"
         onClick={submitStory}
         disabled={isLoading}
-        className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-60 bg-indigo-500 hover:bg-indigo-400 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_25px_rgba(99,102,241,0.5)] border-indigo-400 font-semibold"
+        className="btn-primary gap-2 disabled:opacity-60"
       >
         <ClipboardCheck className="h-5 w-5" />
         {isLoading ? "Анализирую..." : "Проверить User Story"}

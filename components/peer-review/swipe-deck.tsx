@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState, useTransition, useEffect } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { motion, useMotionValue, useTransform, AnimatePresence, type PanInfo } from "framer-motion";
 import Link from "next/link";
 import { Check, X, FileCode2, Loader2, Bot, Sparkles } from "lucide-react";
 import { savePeerReview, askAiReview } from "@/app/peer-review/actions";
+import { useIsClient } from "@/hooks/use-is-client";
 
 type Submission = {
   id: string;
@@ -47,7 +48,7 @@ export function SwipeDeck({ initialSubmissions }: { initialSubmissions: Submissi
         <div className="h-20 w-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-6 z-10 relative">
           <Check className="h-10 w-10" />
         </div>
-        <h2 className="text-2xl font-bold text-foreground z-10 relative">Колода пуста!</h2>
+        <h2 className="section-title text-foreground z-10 relative">Колода пуста!</h2>
         <p className="text-muted-foreground mt-2 max-w-sm mx-auto z-10 relative">
           Вы проверили все доступные работы. Отличная работа, возвращайтесь позже за новыми заданиями.
         </p>
@@ -225,7 +226,7 @@ function Card({
               
               <button 
                 onClick={() => onSwipe(aiVerdict.isApproved ? "right" : "left")}
-                className={`mt-3 w-full py-1.5 rounded-lg text-xs font-semibold ${aiVerdict.isApproved ? "bg-emerald-500 hover:bg-emerald-600 text-white" : "bg-rose-500 hover:bg-rose-600 text-white"}`}
+                className={`mt-3 w-full py-1.5 rounded-lg text-xs font-semibold ${aiVerdict.isApproved ? "bg-emerald-500 hover:bg-emerald-600 text-primary-foreground" : "bg-rose-500 hover:bg-rose-600 text-primary-foreground"}`}
               >
                 Accept AI Decision
               </button>
@@ -290,11 +291,7 @@ function buildConfettiPieces(count: number): ConfettiPiece[] {
 }
 
 function FramerConfetti() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useIsClient();
 
   // Compute random values only once on the client to avoid hydration
   // mismatch and unnecessary re-randomisation on parent re-renders.

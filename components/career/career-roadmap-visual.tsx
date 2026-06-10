@@ -59,10 +59,10 @@ const stages: Stage[] = [
 
 export function CareerRoadmapVisual({ readinessScore }: CareerRoadmapVisualProps) {
   return (
-    <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-[24px] space-y-4 p-5">
+    <section className="surface-elevated border border-border/50 bg-card rounded-2xl space-y-4 p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold text-foreground">Карьерный Трек</h2>
-        <span className="inline-flex items-center gap-1 rounded-xl border border-border/60 bg-muted/30 px-3 py-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+        <span className="inline-flex items-center gap-1 rounded-xl border border-border bg-muted/30 px-3 py-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
           готовность: <span className="text-foreground">{readinessScore}%</span>
         </span>
       </div>

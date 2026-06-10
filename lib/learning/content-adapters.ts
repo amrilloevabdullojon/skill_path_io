@@ -201,6 +201,12 @@ function parseQuizOptions(value: unknown): Array<{ id: string; text: string }> {
     .filter((option): option is { id: string; text: string } => option !== null);
 }
 
+function normalizeCorrectAnswerIds(value: unknown, options: Array<{ id: string; text: string }>) {
+  return toStringArray(value)
+    .map((answer) => options.find((option) => option.id === answer || option.text === answer)?.id ?? answer)
+    .filter(Boolean);
+}
+
 function buildRuntimeQuestion(input: {
   id: string;
   text: string;
@@ -208,12 +214,14 @@ function buildRuntimeQuestion(input: {
   options: unknown;
   correctAnswer: unknown;
 }): RuntimeQuestion {
+  const options = parseQuizOptions(input.options);
+
   return {
     id: input.id,
     text: input.text,
     type: input.type,
-    options: parseQuizOptions(input.options),
-    correctAnswer: toStringArray(input.correctAnswer),
+    options,
+    correctAnswer: normalizeCorrectAnswerIds(input.correctAnswer, options),
   };
 }
 
@@ -592,4 +600,3 @@ export function adaptStudioEntityToRuntimeCourse(entity: CourseStudioEntity): Ru
     source: "studio-course",
   };
 }
-

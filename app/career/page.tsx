@@ -12,10 +12,10 @@ import { getOnboardingProfileFromCookie } from "@/lib/personalization/profile-st
 import { getAdaptivePath } from "@/lib/recommendations/adaptive-path";
 
 export const metadata: Metadata = {
-  title: "Готовность к Карьере — Levio",
+  title: "Готовность к Карьере",
   description: "Отслеживайте свою готовность, находите пробелы в навыках и получите персональную дорожную карту к первому IT офферу.",
   openGraph: {
-    title: "Дашборд Готовности к Карьере — Levio",
+    title: "Дашборд Готовности к Карьере",
     description: "Измерьте свою готовность к ролям Junior QA, BA и Data Analyst.",
     type: "website",
   },
@@ -38,7 +38,7 @@ const requiredSkillsByRole: Record<(typeof roleByTrack)[keyof typeof roleByTrack
 export default async function CareerPage() {
   const [session, profile] = await Promise.all([
     getServerSession(authOptions),
-    Promise.resolve(getOnboardingProfileFromCookie()),
+    getOnboardingProfileFromCookie(),
   ]);
 
   const dashboard = await getDashboardData({
@@ -48,7 +48,7 @@ export default async function CareerPage() {
 
   if (!dashboard) {
     return (
-      <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md p-6 rounded-[24px]">
+      <section className="surface-elevated border border-border/50 bg-card p-6 rounded-2xl">
         <p className="text-sm text-foreground/70">Данные дашборда пока не собраны. Пожалуйста, завершите онбординг.</p>
       </section>
     );
@@ -87,11 +87,7 @@ export default async function CareerPage() {
   const recommendedModules = dashboard.upcomingActions.slice(0, 3).map((item) => item.title);
 
   return (
-    <section className="page-shell relative isolate overflow-hidden">
-      {/* Background Glows for Career Page */}
-      <div className="absolute top-[10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-indigo-500/10 blur-[130px] pointer-events-none -z-10" />
-      <div className="absolute bottom-[20%] right-[-5%] w-[500px] h-[500px] rounded-full bg-sky-500/10 blur-[140px] pointer-events-none -z-10" />
-
+    <section className="page-shell">
       <CareerReadinessDashboard
         role={targetRole}
         readiness={careerSystem.readiness}
@@ -109,21 +105,19 @@ export default async function CareerPage() {
         <CareerRoadmapVisual readinessScore={careerSystem.readiness.score} />
       </div>
 
-      <section className="surface-elevated border border-indigo-500/20 bg-card/40 backdrop-blur-md flex flex-wrap items-center justify-between gap-6 p-6 sm:p-8 rounded-[24px] mt-6 shadow-[0_8px_30px_rgba(99,102,241,0.05)] relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-indigo-500/10 blur-[60px] pointer-events-none rounded-full" />
-        <div className="relative z-10 w-full sm:w-auto flex-1">
-          <p className="kicker text-indigo-400">Портфолио</p>
-          <h3 className="text-lg font-bold text-foreground mt-1 mb-2">Ваши персональные проекты</h3>
-          <p className="text-sm text-foreground/70">
-            Превратите выполненные пет-миссии в артефакты для портфолио. Это ваше главное оружие при поиске работы!
+      <section className="mt-6 flex flex-wrap items-center justify-between gap-6 border-t border-border/60 pt-6">
+        <div className="w-full sm:w-auto flex-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-300">Портфолио</p>
+          <h3 className="mt-2 text-lg font-semibold text-foreground">Ваши персональные проекты</h3>
+          <p className="mt-2 text-sm leading-relaxed text-foreground/70">
+            Превратите выполненные миссии в артефакты для портфолио — главный аргумент при поиске работы.
           </p>
         </div>
-        <Link href="/portfolio" className="btn-primary inline-flex items-center gap-2 bg-indigo-500 hover:bg-indigo-400 text-white shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_25px_rgba(99,102,241,0.5)] border-indigo-400 font-semibold px-6 py-2.5 rounded-full relative z-10 whitespace-nowrap">
+        <Link href="/portfolio" className="btn-primary inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold whitespace-nowrap">
           Открыть портфолио
         </Link>
       </section>
     </section>
   );
 }
-
 

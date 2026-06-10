@@ -2,30 +2,23 @@ import Link from "next/link";
 import { ArrowRight, CircleDot, Rocket, Target, Zap } from "lucide-react";
 
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import type { DashboardUpcomingAction } from "@/lib/dashboard/data";
 
 type DashboardUpcomingActionsProps = {
   actions: DashboardUpcomingAction[];
 };
 
-function priorityClass(priority: DashboardUpcomingAction["priority"]) {
-  if (priority === "High") {
-    return "border-rose-500/40 bg-rose-500/20 text-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.3)]";
-  }
-  if (priority === "Medium") {
-    return "border-amber-500/40 bg-amber-500/20 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.3)]";
-  }
-  return "border-border/50 bg-card/60 text-foreground/70";
+function priorityVariant(priority: DashboardUpcomingAction["priority"]): BadgeProps["variant"] {
+  if (priority === "High") return "danger";
+  if (priority === "Medium") return "warning";
+  return "secondary";
 }
 
-function difficultyClass(difficulty: DashboardUpcomingAction["difficulty"]) {
-  if (difficulty === "High") {
-    return "border-rose-500/40 bg-rose-500/10 text-rose-400";
-  }
-  if (difficulty === "Medium") {
-    return "border-amber-500/40 bg-amber-500/10 text-amber-400";
-  }
-  return "border-emerald-500/40 bg-emerald-500/10 text-emerald-400";
+function difficultyVariant(difficulty: DashboardUpcomingAction["difficulty"]): BadgeProps["variant"] {
+  if (difficulty === "High") return "danger";
+  if (difficulty === "Medium") return "warning";
+  return "success";
 }
 
 function translatePriority(priority: string) {
@@ -63,39 +56,39 @@ export async function DashboardUpcomingActionsSection({ actions }: DashboardUpco
             </div>
 
             {/* Content Card */}
-            <div className="flex-1 surface-elevated border border-border/40 bg-card/60 backdrop-blur-xl rounded-[24px] p-5 sm:p-6 transition-all duration-300 hover:border-indigo-500/30 hover:shadow-[0_8px_30px_rgba(99,102,241,0.1)] relative overflow-hidden">
+            <div className="flex-1 surface-elevated border border-border-subtle bg-card rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:border-indigo-500/30 hover:shadow-[0_8px_30px_rgba(99,102,241,0.1)] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[30px] rounded-full pointer-events-none transition-opacity opacity-50 group-hover:opacity-100" />
               
               <div className="space-y-4 relative z-10">
                 <div>
                   <div className="flex flex-wrap items-center gap-2.5 mb-2">
                     <p className="text-lg font-bold text-foreground">{action.title}</p>
-                    <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-widest ${priorityClass(action.priority)}`}>
-                      ПРИОРИТЕТ: {translatePriority(action.priority)}
-                    </span>
-                    <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase ${difficultyClass(action.difficulty)}`}>
+                    <Badge variant={priorityVariant(action.priority)}>
+                      Приоритет: {translatePriority(action.priority)}
+                    </Badge>
+                    <Badge variant={difficultyVariant(action.difficulty)}>
                       {translateDifficulty(action.difficulty)}
-                    </span>
+                    </Badge>
                   </div>
                   <p className="text-sm text-foreground/70 leading-relaxed">{action.description}</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
-                  <div className="bg-background/40 border border-border/40 rounded-xl px-3 py-2 flex items-center gap-2">
+                  <div className="bg-background/40 border border-border-subtle rounded-xl px-3 py-2 flex items-center gap-2">
                     <CircleDot className="h-3.5 w-3.5 text-indigo-400" />
                     <div>
                       <p className="text-[9px] uppercase font-bold text-foreground/50 tracking-wider">Время</p>
                       <p className="font-semibold text-foreground">{action.eta}</p>
                     </div>
                   </div>
-                  <div className="bg-background/40 border border-border/40 rounded-xl px-3 py-2 flex items-center gap-2">
+                  <div className="bg-background/40 border border-border-subtle rounded-xl px-3 py-2 flex items-center gap-2">
                     <Zap className="h-3.5 w-3.5 text-amber-400" />
                     <div>
                       <p className="text-[9px] uppercase font-bold text-foreground/50 tracking-wider">Награда</p>
                       <p className="font-semibold text-amber-400">+{action.xpReward} XP</p>
                     </div>
                   </div>
-                  <div className="bg-background/40 border border-border/40 rounded-xl px-3 py-2 flex items-center gap-2 sm:col-span-2 lg:col-span-1">
+                  <div className="bg-background/40 border border-border-subtle rounded-xl px-3 py-2 flex items-center gap-2 sm:col-span-2 lg:col-span-1">
                     <Target className="h-3.5 w-3.5 text-emerald-400" />
                     <div className="min-w-0 flex-1">
                       <p className="text-[9px] uppercase font-bold text-foreground/50 tracking-wider">Влияние на навык</p>

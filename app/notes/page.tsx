@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { NotesBoard } from "@/components/notes/notes-board";
 
 export const metadata: Metadata = {
-  title: "Заметки — Levio",
+  title: "Заметки",
   description: "Личные заметки, сделанные во время обучения.",
   robots: { index: false },
 };

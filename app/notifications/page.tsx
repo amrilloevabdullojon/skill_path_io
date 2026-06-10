@@ -44,7 +44,7 @@ export default async function NotificationsPage() {
     <div className="max-w-4xl mx-auto space-y-6 pt-6 pb-20">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/50 pb-6">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
+          <h1 className="page-title tracking-tight text-foreground flex items-center gap-3">
             <span className="p-2 rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20 shadow-[0_0_15px_rgba(56,189,248,0.1)]">
               <Bell className="h-6 w-6" />
             </span>
@@ -67,7 +67,7 @@ export default async function NotificationsPage() {
       </div>
 
       {notifications.length === 0 ? (
-        <div className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-2xl p-12 text-center flex flex-col items-center justify-center">
+        <div className="surface-elevated border border-border/50 bg-card rounded-2xl p-12 text-center flex flex-col items-center justify-center">
             <Bell className="h-12 w-12 text-foreground/20 mb-4" />
             <h3 className="text-lg font-bold text-foreground">Нет уведомлений</h3>
             <p className="text-sm text-foreground/60 mt-1">Здесь будут отображаться ваши новые миссии, награды и достижения.</p>

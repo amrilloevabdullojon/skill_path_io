@@ -10,13 +10,14 @@ function safeFileName(input: string) {
 }
 
 type RouteParams = {
-  params: {
+  params: Promise<{
     certificateId: string;
-  };
+  }>;
 };
 
 export async function GET(_request: Request, { params }: RouteParams) {
-  const certificateId = params.certificateId?.trim();
+  const { certificateId: rawCertificateId } = await params;
+  const certificateId = rawCertificateId?.trim();
   if (!certificateId) {
     return NextResponse.json({ error: "Missing certificateId." }, { status: 400 });
   }

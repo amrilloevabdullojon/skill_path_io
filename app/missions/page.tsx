@@ -10,10 +10,10 @@ import { checkFeatureAccess } from "@/lib/saas/gating";
 import { resolveUserSubscription } from "@/lib/saas/subscriptions";
 
 export const metadata: Metadata = {
-  title: "Missions — Levio",
+  title: "Missions",
   description: "Real-world scenario missions for QA, BA, and DA learners. Practice with AI-backed evaluation.",
   openGraph: {
-    title: "Scenario Missions — Levio",
+    title: "Scenario Missions",
     description: "Practice on real work situations with AI-backed evaluation and recovery hints.",
     type: "website",
   },
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 export default async function MissionsPage() {
   const session = await getServerSession(authOptions);
-  const profile = getOnboardingProfileFromCookie();
+  const profile = await getOnboardingProfileFromCookie();
   const runtimeMissions = await resolveRuntimeMissions();
   const user = await resolveLearningUser(session?.user?.email);
   const subscription = await resolveUserSubscription({

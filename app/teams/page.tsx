@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Обучение Команды — Levio",
+  title: "Обучение Команды",
   description: "Управляйте обучением команды, отслеживайте прогресс и координируйте тренировки (B2B).",
   robots: { index: false },
 };
@@ -23,7 +23,7 @@ export default async function TeamsPage() {
 
   if (!dashboard) {
     return (
-      <section className="page-shell relative isolate overflow-hidden p-6 sm:p-12 border border-border/50 bg-card/40 backdrop-blur-md rounded-[24px]">
+      <section className="page-shell relative isolate overflow-hidden p-6 sm:p-12 border border-border/50 bg-card rounded-2xl">
         <EmptyState
           title="Данные команды недоступны"
           description="Откройте дашборд после загрузки данных пользователей."

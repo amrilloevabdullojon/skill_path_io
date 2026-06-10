@@ -24,14 +24,14 @@ export function AdminSettingsPanel() {
           <h2 className="text-lg font-semibold text-foreground">Studio preferences</h2>
           <div className="grid gap-3">
             <label className="space-y-1">
-              <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Default language</span>
+              <span className="text-xs uppercase tracking-widest text-muted-foreground">Default language</span>
               <select className="select-base" value={defaultLanguage} onChange={(event) => setDefaultLanguage(event.target.value)}>
                 <option value="ru">Russian</option>
                 <option value="en">English</option>
               </select>
             </label>
             <label className="space-y-1">
-              <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Admin AI rate limit (req/min)</span>
+              <span className="text-xs uppercase tracking-widest text-muted-foreground">Admin AI rate limit (req/min)</span>
               <input className="input-base" value={mentorRateLimit} onChange={(event) => setMentorRateLimit(event.target.value)} />
             </label>
             <label className="surface-subtle flex items-center gap-2 p-3 text-sm text-muted-foreground">

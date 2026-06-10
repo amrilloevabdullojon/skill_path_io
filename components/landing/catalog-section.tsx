@@ -150,7 +150,7 @@ function missionStatusColor(status: string) {
   if (status === "В процессе" || status === "in_progress")
     return "border-indigo-400/30 bg-indigo-500/10 text-indigo-300";
   if (status === "Закрыто" || status === "locked")
-    return "border-border/60 bg-card/50 text-muted-foreground";
+    return "border-border bg-card/50 text-muted-foreground";
   return "border-emerald-400/30 bg-emerald-500/10 text-emerald-300";
 }
 
@@ -224,7 +224,7 @@ export async function TracksSection() {
                     <span className={cn("h-2 w-2 rounded-full shrink-0", track.dot)} />
                     <span
                       className={cn(
-                        "text-xs font-semibold uppercase tracking-[0.14em]",
+                        "text-xs font-semibold uppercase tracking-widest",
                         track.iconColor,
                       )}
                     >
@@ -312,7 +312,7 @@ export async function MissionsSection() {
               <div>
                 <div className="mb-2 flex items-center gap-2">
                   <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", mission.dot)} />
-                  <span className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                     {mission.category}
                   </span>
                 </div>

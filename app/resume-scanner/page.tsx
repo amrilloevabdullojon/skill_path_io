@@ -181,7 +181,7 @@ export default function ResumeScannerPage() {
           >
             <Sparkles className="h-3.5 w-3.5" /> Экспериментальный ИИ
           </motion.div>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-foreground drop-shadow-sm">
+          <h1 className="hero-title text-foreground drop-shadow-sm">
             Рентген <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 to-emerald-500">Резюме</span>
           </h1>
           <p className="max-w-2xl mx-auto text-muted-foreground text-lg">
@@ -242,7 +242,7 @@ export default function ResumeScannerPage() {
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-end pt-2">
                 <button 
                   onClick={startScan}
-                  className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-bold shadow-[0_0_20px_rgba(14,165,233,0.4)] hover:scale-105 transition-transform flex items-center gap-2"
+                  className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 text-primary-foreground font-bold shadow-[0_0_20px_rgba(14,165,233,0.4)] hover:scale-105 transition-transform flex items-center gap-2"
                 >
                   <Scan className="h-5 w-5" />
                   Запустить AI Сканирование

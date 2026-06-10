@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
-  title: "Leaderboard — Levio",
+  title: "Leaderboard",
   description: "Global ranking of top students by XP.",
 };
 

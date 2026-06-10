@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Hiring Marketplace — Levio",
+  title: "Hiring Marketplace",
   description: "Connect with companies hiring QA Engineers, Business Analysts, and Data Analysts.",
 };
 import { getDashboardData } from "@/lib/dashboard/data";

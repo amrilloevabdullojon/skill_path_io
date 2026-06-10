@@ -21,7 +21,7 @@ export async function DashboardInsightsPanel({ achievements, weeklyProgress, ran
 
   return (
     <div className="sticky top-24 max-h-[calc(100dvh-7rem)] min-w-0 space-y-4 overflow-y-auto pr-1 overscroll-contain [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5">
-      <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-[24px] surface-panel-hover space-y-3 p-4">
+      <section className="surface-elevated border border-border/50 bg-card rounded-2xl surface-panel-hover space-y-3 p-4">
         <p className="text-sm font-semibold text-foreground">{t("title")}</p>
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div className="mini-stat-box p-2.5">
@@ -52,7 +52,7 @@ export async function DashboardInsightsPanel({ achievements, weeklyProgress, ran
         </Link>
       </section>
 
-      <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-[24px] surface-panel-hover space-y-3 p-4">
+      <section className="surface-elevated border border-border/50 bg-card rounded-2xl surface-panel-hover space-y-3 p-4">
         <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
           <Award className="h-4 w-4 text-emerald-300" />
           {t("achievements")}
@@ -68,7 +68,7 @@ export async function DashboardInsightsPanel({ achievements, weeklyProgress, ran
         </div>
       </section>
 
-      <section className="surface-elevated border border-border/50 bg-card/40 backdrop-blur-md rounded-[24px] surface-panel-hover space-y-3 p-4">
+      <section className="surface-elevated border border-border/50 bg-card rounded-2xl surface-panel-hover space-y-3 p-4">
         <p className="text-sm font-semibold text-foreground">{t("skillProgress")}</p>
         <div className="space-y-2">
           {skillRadar.data.map((item) => (

@@ -74,6 +74,11 @@ export function mapRuntimeCatalogToMissions(catalog: RuntimeCatalog) {
         return "Локализовать сбой в SQL-метриках и согласовать план починки.";
       };
 
+      const missionDifficulty = difficultyByOrder(moduleItem.order, totalModules);
+      const baseXp = moduleItem.xpReward || 100;
+      const xpMultiplier = missionDifficulty === "Hard" ? 1.6 : missionDifficulty === "Medium" ? 1.2 : 1.0;
+      const scaledXp = Math.max(60, Math.round((baseXp * xpMultiplier) / 10) * 10);
+
       missions.push({
         id: missionId,
         title: `Миссия: ${moduleItem.title}`,
@@ -82,9 +87,9 @@ export function mapRuntimeCatalogToMissions(catalog: RuntimeCatalog) {
         objective: getObjective(category),
         steps,
         skillsUsed: categorySkills,
-        expectedResult: "A concise artifact with assumptions, execution steps, and measurable result summary.",
-        difficulty: difficultyByOrder(moduleItem.order, totalModules),
-        xpReward: Math.max(60, moduleItem.xpReward || 100),
+        expectedResult: "Краткий артефакт с допущениями, шагами выполнения и измеримым итогом.",
+        difficulty: missionDifficulty,
+        xpReward: scaledXp,
         aiEvaluation: true,
         category,
         status: statusByOrder(moduleItem.order),

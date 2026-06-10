@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { SqlSandboxPanel } from "@/components/simulation/sql-sandbox-panel";
 
 export const metadata: Metadata = {
-  title: "SQL Sandbox — Levio",
+  title: "SQL Sandbox",
   description: "Practice SQL queries in a live in-browser sandbox environment.",
 };
 

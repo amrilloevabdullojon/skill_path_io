@@ -28,7 +28,6 @@ type SkillOrchardProps = {
   progressPercent: number;
   accent: {
     progress: string;
-    glow: string;
     badge: string;
   };
 };
@@ -58,7 +57,7 @@ function fruitClass(percent: number, state: LearningPathState, isQuiz: boolean) 
     return "border-amber-400/70 bg-amber-400 text-background shadow-[0_0_22px_rgba(251,191,36,0.35)]";
   }
   if (percent >= 100) {
-    return "border-red-300/80 bg-red-500 text-white shadow-[0_0_22px_rgba(248,113,113,0.35)]";
+    return "border-red-300/80 bg-red-500 text-primary-foreground shadow-[0_0_22px_rgba(248,113,113,0.35)]";
   }
   if (percent >= 75) {
     return "border-orange-400/70 bg-orange-400 text-background shadow-[0_0_18px_rgba(251,146,60,0.24)]";
@@ -67,7 +66,7 @@ function fruitClass(percent: number, state: LearningPathState, isQuiz: boolean) 
     return "border-lime-400/70 bg-lime-400 text-background shadow-[0_0_16px_rgba(163,230,53,0.20)]";
   }
   if (percent > 0) {
-    return "border-emerald-300/50 bg-emerald-500/70 text-white shadow-[0_0_14px_rgba(16,185,129,0.18)]";
+    return "border-emerald-300/50 bg-emerald-500/70 text-primary-foreground shadow-[0_0_14px_rgba(16,185,129,0.18)]";
   }
   return "border-emerald-500/35 bg-emerald-500/10 text-emerald-300";
 }
@@ -99,13 +98,13 @@ function stateClass(state: LearningPathState) {
 
 function treeFruitClass(moduleItem: OrchardModule, isNext: boolean) {
   if (moduleItem.state === "locked") {
-    return "border-border/60 bg-muted/40 text-muted-foreground";
+    return "border-border bg-muted/40 text-muted-foreground";
   }
   if (moduleItem.progressPercent >= 100) {
-    return "border-red-400/70 bg-red-500 text-white shadow-[0_0_26px_rgba(248,113,113,0.28)]";
+    return "border-red-400/70 bg-red-500 text-primary-foreground shadow-[0_0_26px_rgba(248,113,113,0.28)]";
   }
   if (isNext) {
-    return "border-emerald-300/80 bg-emerald-500 text-white shadow-[0_0_30px_rgba(16,185,129,0.30)]";
+    return "border-emerald-300/80 bg-emerald-500 text-primary-foreground shadow-[0_0_30px_rgba(16,185,129,0.30)]";
   }
   if (moduleItem.progressPercent > 0) {
     return "border-orange-400/70 bg-orange-400 text-background shadow-[0_0_22px_rgba(251,146,60,0.22)]";
@@ -125,8 +124,7 @@ export function SkillOrchard({
   const activeModules = modules.filter((moduleItem) => moduleItem.state !== "locked").length;
 
   return (
-    <section className="surface-elevated relative isolate overflow-hidden border border-border/60 bg-card/60 p-5 backdrop-blur-md sm:p-6">
-      <div className={cn("pointer-events-none absolute left-[-160px] top-[-160px] h-[360px] w-[360px] rounded-full blur-[120px] opacity-[0.08] -z-10", accent.glow)} />
+    <section className="surface-elevated relative isolate overflow-hidden border border-border bg-card/60 p-5 backdrop-blur-md sm:p-6">
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-emerald-950/12 to-transparent -z-10" />
 
       <div className="flex flex-wrap items-start justify-between gap-5">
@@ -139,9 +137,9 @@ export function SkillOrchard({
               {categoryLabel} • {activeModules}/{modules.length} живых ветвей
             </span>
           </div>
-          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          <h3 className="mt-3 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
             {trackTitle}
-          </h2>
+          </h3>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
             Корни дают базу, ствол ведёт через рабочие ситуации, ветви раскрывают решения, а плодом становится готовый артефакт.
           </p>
@@ -166,7 +164,7 @@ export function SkillOrchard({
         </div>
       </div>
 
-      <div className="relative mt-6 overflow-hidden rounded-[28px] border border-emerald-500/20 bg-background/35 px-4 py-5 sm:px-6">
+      <div className="relative mt-6 overflow-hidden rounded-3xl border border-emerald-500/20 bg-background/35 px-4 py-5 sm:px-6">
         <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_260px] xl:items-center">
           <div className="relative min-h-[360px] sm:min-h-[420px]">
             <svg
@@ -231,7 +229,7 @@ export function SkillOrchard({
             })}
 
             <div className="pointer-events-none absolute bottom-2 left-1/2 w-[min(460px,82%)] -translate-x-1/2 border-t border-emerald-500/25 pt-3 text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-300">корневая система</p>
+              <p className="text-xs font-semibold uppercase tracking-kicker text-emerald-300">корневая система</p>
               <p className="mt-1 text-xs text-muted-foreground">понятия, практика, проверка, итоговый артефакт</p>
             </div>
           </div>
@@ -248,15 +246,15 @@ export function SkillOrchard({
             </div>
             {nextModule ? (
               <Link href={nextModule.href} className="btn-primary inline-flex w-full items-center justify-center gap-2">
-                Растить ветвь
-                <ArrowRight className="h-4 w-4" />
+                Открыть модуль
+                <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             ) : null}
           </div>
         </div>
       </div>
 
-      <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-border/40 py-3 text-xs text-muted-foreground">
+      <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-border-subtle py-3 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> корни: открыто</span>
         <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-orange-400" /> ветвь: закрепляется</span>
         <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-red-500" /> плод: усвоено</span>
@@ -278,7 +276,7 @@ export function SkillOrchard({
               className={cn(
                 "group relative overflow-hidden rounded-2xl border p-4 transition-all sm:p-5",
                 isLocked
-                  ? "border-border/40 bg-muted/20 opacity-75"
+                  ? "border-border-subtle bg-muted/20 opacity-75"
                   : "border-emerald-500/20 bg-background/30 hover:border-emerald-500/40 hover:bg-card/70",
                 isNext && "ring-1 ring-emerald-300/25",
               )}
@@ -365,7 +363,7 @@ export function SkillOrchard({
                     </span>
                   ) : (
                     <Link href={moduleItem.href} className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-300 transition-colors hover:text-foreground">
-                      {moduleItem.state === "completed" ? "Повторить" : "Растить ветвь"}
+                      {moduleItem.state === "completed" ? "Повторить" : "Открыть"}
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                   )}

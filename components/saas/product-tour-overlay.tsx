@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
+import { useBrowserStorageItem } from "@/hooks/use-browser-storage";
+import { useIsClient } from "@/hooks/use-is-client";
 import { ProductTourStep } from "@/types/saas";
 
 type ProductTourOverlayProps = {
@@ -11,17 +13,13 @@ type ProductTourOverlayProps = {
 const STORAGE_KEY = "skillpath:product-tour:v1";
 
 export function ProductTourOverlay({ steps }: ProductTourOverlayProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const isClient = useIsClient();
+  const tourState = useBrowserStorageItem("local", STORAGE_KEY);
+  const [dismissed, setDismissed] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
 
-  useEffect(() => {
-    const done = window.localStorage.getItem(STORAGE_KEY) === "done";
-    if (!done) {
-      setIsOpen(true);
-    }
-  }, []);
-
   const step = useMemo(() => steps[stepIndex] ?? null, [stepIndex, steps]);
+  const isOpen = isClient && tourState !== "done" && !dismissed;
 
   if (!isOpen || !step) {
     return null;
@@ -32,7 +30,7 @@ export function ProductTourOverlay({ steps }: ProductTourOverlayProps) {
   return (
     <div className="fixed bottom-24 left-1/2 z-[200] w-[min(92vw,440px)] -translate-x-1/2 rounded-2xl border border-border bg-background p-4 shadow-2xl lg:bottom-6">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Обзор платформы</p>
+        <p className="text-xs uppercase tracking-widest text-muted-foreground">Обзор платформы</p>
         <p className="text-xs text-muted-foreground font-mono">{stepIndex + 1} / {steps.length}</p>
       </div>
 
@@ -53,7 +51,7 @@ export function ProductTourOverlay({ steps }: ProductTourOverlayProps) {
           className="btn-secondary px-3 py-1.5 text-xs"
           onClick={() => {
             window.localStorage.setItem(STORAGE_KEY, "done");
-            setIsOpen(false);
+            setDismissed(true);
           }}
         >
           Пропустить
@@ -74,7 +72,7 @@ export function ProductTourOverlay({ steps }: ProductTourOverlayProps) {
             onClick={() => {
               if (stepIndex >= steps.length - 1) {
                 window.localStorage.setItem(STORAGE_KEY, "done");
-                setIsOpen(false);
+              setDismissed(true);
                 return;
               }
               setStepIndex((prev) => prev + 1);

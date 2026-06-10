@@ -5,7 +5,7 @@ import { GroupsHub } from "@/components/groups/groups-hub";
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Study Groups — Levio",
+  title: "Study Groups",
   description: "Join or create study groups to learn together and stay accountable.",
 };
 import { prisma } from "@/lib/prisma";

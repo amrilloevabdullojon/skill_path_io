@@ -122,6 +122,12 @@ export function artifactReadinessPercent(items: ArtifactReadinessItem[]) {
   return Math.round((items.filter((item) => item.done).length / items.length) * 100);
 }
 
+function fieldWord(count: number) {
+  if (count % 10 === 1 && count % 100 !== 11) return "поле";
+  if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) return "поля";
+  return "полей";
+}
+
 export function buildReviewGate(input: ReviewGateInput): ReviewGate {
   const minContentLength = input.minContentLength ?? 180;
   const minFields = input.minFields ?? 3;
@@ -140,7 +146,7 @@ export function buildReviewGate(input: ReviewGateInput): ReviewGate {
     return {
       canReview: false,
       title: "AI-review пока закрыт",
-      description: `Заполните ещё ${missingFields} пол. и добавьте примерно ${missingContent} символов содержательного контекста.`,
+      description: `Заполните ещё ${missingFields} ${fieldWord(missingFields)} и добавьте примерно ${missingContent} символов содержательного контекста.`,
     };
   }
 
@@ -148,7 +154,7 @@ export function buildReviewGate(input: ReviewGateInput): ReviewGate {
     return {
       canReview: false,
       title: "Нужно больше веток",
-      description: `Заполните ещё ${missingFields} пол., чтобы AI-review видел не отдельную заметку, а связанный артефакт.`,
+      description: `Заполните ещё ${missingFields} ${fieldWord(missingFields)}, чтобы AI-review видел не отдельную заметку, а связанный артефакт.`,
     };
   }
 
