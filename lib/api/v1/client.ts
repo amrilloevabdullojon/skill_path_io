@@ -11,6 +11,14 @@ import {
   type TokenPairResponse,
 } from "@/lib/contracts/auth";
 import {
+  CreateBookmarkResponseSchema,
+  CreateBookmarkSchema,
+  DeleteBookmarkResponseSchema,
+  ListBookmarksResponseSchema,
+  type Bookmark,
+  type CreateBookmarkInput,
+} from "@/lib/contracts/bookmarks";
+import {
   TracksCatalogSchema,
   type TracksCatalogResponse,
   type TracksQuery,
@@ -47,7 +55,7 @@ export type ApiClientOptions = {
 };
 
 type RequestInitLite<S extends z.ZodTypeAny> = {
-  method: "GET" | "POST";
+  method: "GET" | "POST" | "DELETE";
   path: string;
   schema: S;
   query?: Record<string, unknown>;
@@ -124,6 +132,36 @@ export function createApiClient(options: ApiClientOptions = {}) {
           path: "/api/v1/tracks",
           query: query as Record<string, unknown> | undefined,
           schema: TracksCatalogSchema,
+          auth: true,
+        });
+      },
+    },
+    bookmarks: {
+      async list(): Promise<Bookmark[]> {
+        const { bookmarks } = await request({
+          method: "GET",
+          path: "/api/v1/bookmarks",
+          schema: ListBookmarksResponseSchema,
+          auth: true,
+        });
+        return bookmarks;
+      },
+      async create(input: CreateBookmarkInput): Promise<Bookmark> {
+        const { bookmark } = await request({
+          method: "POST",
+          path: "/api/v1/bookmarks",
+          body: CreateBookmarkSchema.parse(input),
+          schema: CreateBookmarkResponseSchema,
+          auth: true,
+        });
+        return bookmark;
+      },
+      remove(id: string): Promise<{ ok: boolean }> {
+        return request({
+          method: "DELETE",
+          path: "/api/v1/bookmarks",
+          query: { id },
+          schema: DeleteBookmarkResponseSchema,
           auth: true,
         });
       },

@@ -13,6 +13,13 @@ import {
   RefreshRequestSchema,
   TokenPairSchema,
 } from "@/lib/contracts/auth";
+import {
+  CreateBookmarkResponseSchema,
+  CreateBookmarkSchema,
+  DeleteBookmarkQuerySchema,
+  DeleteBookmarkResponseSchema,
+  ListBookmarksResponseSchema,
+} from "@/lib/contracts/bookmarks";
 import { TracksCatalogSchema, TracksQuerySchema } from "@/lib/contracts/tracks";
 
 // Patch zod with the `.openapi()` helper. Safe to call once at module load.
@@ -99,6 +106,60 @@ export function buildOpenApiDocument() {
       200: {
         description: "Runtime catalog",
         content: { "application/json": { schema: TracksCatalogSchema } },
+      },
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/v1/bookmarks",
+    tags: ["bookmarks"],
+    summary: "List the caller's bookmarks",
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: {
+        description: "Bookmarks",
+        content: { "application/json": { schema: ListBookmarksResponseSchema } },
+      },
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/bookmarks",
+    tags: ["bookmarks"],
+    summary: "Create a bookmark (idempotent on title+href)",
+    security: [{ [bearerAuth.name]: [] }],
+    request: {
+      body: { content: { "application/json": { schema: CreateBookmarkSchema } } },
+    },
+    responses: {
+      201: {
+        description: "Created bookmark",
+        content: { "application/json": { schema: CreateBookmarkResponseSchema } },
+      },
+      200: {
+        description: "Existing bookmark",
+        content: { "application/json": { schema: CreateBookmarkResponseSchema } },
+      },
+      400: errorResponse("Validation error"),
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "delete",
+    path: "/api/v1/bookmarks",
+    tags: ["bookmarks"],
+    summary: "Delete one of the caller's bookmarks",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { query: DeleteBookmarkQuerySchema },
+    responses: {
+      200: {
+        description: "Deletion result",
+        content: { "application/json": { schema: DeleteBookmarkResponseSchema } },
       },
       401: errorResponse("Authentication required"),
     },
