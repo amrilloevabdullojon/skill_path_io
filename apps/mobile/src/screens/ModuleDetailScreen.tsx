@@ -1,23 +1,17 @@
-import { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-
-import type { ModuleDetailResponse } from "@/lib/contracts/modules";
+import { useState } from "react";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { api } from "../api";
 import { useNavigation } from "../navigation";
+import { DataState } from "../ui/DataState";
+import { useAsync } from "../ui/useAsync";
 
 export function ModuleDetailScreen({ slug, moduleId }: { slug: string; moduleId: string }) {
   const { goBack, navigate } = useNavigation();
-  const [data, setData] = useState<ModuleDetailResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, loading, error, reload } = useAsync(
+    () => api.tracks.getModule(slug, moduleId),
+    [slug, moduleId],
+  );
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -39,23 +33,6 @@ export function ModuleDetailScreen({ slug, moduleId }: { slug: string; moduleId:
     }
   }
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const result = await api.tracks.getModule(slug, moduleId);
-        if (active) setData(result);
-      } catch {
-        if (active) setError("Could not load this module.");
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, [slug, moduleId]);
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -71,11 +48,13 @@ export function ModuleDetailScreen({ slug, moduleId }: { slug: string; moduleId:
         ) : null}
       </View>
 
-      {loading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} color="#6366f1" />
-      ) : error || !data ? (
-        <Text style={styles.error}>{error ?? "Module not found."}</Text>
-      ) : (
+      <DataState
+        loading={loading}
+        error={error || !data}
+        onRetry={reload}
+        message="Could not load this module."
+      >
+        {data ? (
         <ScrollView contentContainerStyle={styles.body}>
           <Text style={styles.eyebrow}>{data.course.title}</Text>
           <Text style={styles.title}>{data.module.title}</Text>
@@ -148,7 +127,8 @@ export function ModuleDetailScreen({ slug, moduleId }: { slug: string; moduleId:
             </View>
           ) : null}
         </ScrollView>
-      )}
+        ) : null}
+      </DataState>
     </View>
   );
 }

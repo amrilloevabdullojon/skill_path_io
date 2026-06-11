@@ -1,50 +1,28 @@
-import { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import type { TrackCourse } from "@/lib/contracts/tracks";
-import type { TrackProgressResponse } from "@/lib/contracts/track-progress";
 
 import { api } from "../api";
 import { useNavigation } from "../navigation";
+import { DataState } from "../ui/DataState";
+import { useAsync } from "../ui/useAsync";
 
 type Module = TrackCourse["modules"][number];
 
-export function TrackDetailScreen({ slug, title }: { slug: string; title?: string }) {
+export function TrackDetailScreen({ slug }: { slug: string; title?: string }) {
   const { goBack, navigate } = useNavigation();
-  const [course, setCourse] = useState<TrackCourse | null>(null);
-  const [progress, setProgress] = useState<TrackProgressResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const [data, progressData] = await Promise.all([
-          api.tracks.get(slug),
-          api.tracks.progress(slug).catch(() => null),
-        ]);
-        if (active) {
-          setCourse(data);
-          setProgress(progressData);
-        }
-      } catch {
-        if (active) setError("Could not load this track.");
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, [slug]);
+  const { data, loading, error, reload } = useAsync(
+    async () => {
+      const [course, progress] = await Promise.all([
+        api.tracks.get(slug),
+        api.tracks.progress(slug).catch(() => null),
+      ]);
+      return { course, progress };
+    },
+    [slug],
+  );
+  const course = data?.course ?? null;
+  const progress = data?.progress ?? null;
 
   const completedModuleIds = new Set(
     (progress?.modules ?? [])
@@ -60,11 +38,13 @@ export function TrackDetailScreen({ slug, title }: { slug: string; title?: strin
         </TouchableOpacity>
       </View>
 
-      {loading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} color="#6366f1" />
-      ) : error || !course ? (
-        <Text style={styles.error}>{error ?? "Track not found."}</Text>
-      ) : (
+      <DataState
+        loading={loading}
+        error={error || !course}
+        onRetry={reload}
+        message="Could not load this track."
+      >
+        {course ? (
         <ScrollView contentContainerStyle={styles.body}>
           <Text style={styles.title}>{course.title}</Text>
           <Text style={styles.meta}>
@@ -137,7 +117,8 @@ export function TrackDetailScreen({ slug, title }: { slug: string; title?: strin
               ))
           )}
         </ScrollView>
-      )}
+        ) : null}
+      </DataState>
     </View>
   );
 }
