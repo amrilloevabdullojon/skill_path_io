@@ -31,6 +31,17 @@ import {
   type Note,
 } from "@/lib/contracts/notes";
 import {
+  CreateProjectResponseSchema,
+  CreateProjectSchema,
+  DeleteProjectResponseSchema,
+  PortfolioResponseSchema,
+  UpdatePortfolioSchema,
+  type CreateProjectInput,
+  type Portfolio,
+  type PortfolioProject,
+  type UpdatePortfolioInput,
+} from "@/lib/contracts/portfolio";
+import {
   MissionSubmissionResultSchema,
   MissionSubmissionSchema,
   type MissionSubmission,
@@ -103,7 +114,7 @@ export type ApiClientOptions = {
 };
 
 type RequestInitLite<S extends z.ZodTypeAny> = {
-  method: "GET" | "POST" | "DELETE";
+  method: "GET" | "POST" | "PUT" | "DELETE";
   path: string;
   schema: S;
   query?: Record<string, unknown>;
@@ -342,6 +353,46 @@ export function createApiClient(options: ApiClientOptions = {}) {
           path: "/api/v1/notes",
           query: { id },
           schema: DeleteNoteResponseSchema,
+          auth: true,
+        });
+      },
+    },
+    portfolio: {
+      async get(): Promise<Portfolio> {
+        const { portfolio } = await request({
+          method: "GET",
+          path: "/api/v1/portfolio",
+          schema: PortfolioResponseSchema,
+          auth: true,
+        });
+        return portfolio;
+      },
+      async update(input: UpdatePortfolioInput): Promise<Portfolio> {
+        const { portfolio } = await request({
+          method: "PUT",
+          path: "/api/v1/portfolio",
+          body: UpdatePortfolioSchema.parse(input),
+          schema: PortfolioResponseSchema,
+          auth: true,
+        });
+        return portfolio;
+      },
+      async addProject(input: CreateProjectInput): Promise<PortfolioProject> {
+        const { project } = await request({
+          method: "POST",
+          path: "/api/v1/portfolio/projects",
+          body: CreateProjectSchema.parse(input),
+          schema: CreateProjectResponseSchema,
+          auth: true,
+        });
+        return project;
+      },
+      removeProject(id: string): Promise<{ ok: boolean }> {
+        return request({
+          method: "DELETE",
+          path: "/api/v1/portfolio/projects",
+          query: { id },
+          schema: DeleteProjectResponseSchema,
           auth: true,
         });
       },

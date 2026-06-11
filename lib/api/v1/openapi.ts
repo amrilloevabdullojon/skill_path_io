@@ -40,6 +40,14 @@ import {
   DeleteNoteResponseSchema,
   ListNotesResponseSchema,
 } from "@/lib/contracts/notes";
+import {
+  CreateProjectResponseSchema,
+  CreateProjectSchema,
+  DeleteProjectQuerySchema,
+  DeleteProjectResponseSchema,
+  PortfolioResponseSchema,
+  UpdatePortfolioSchema,
+} from "@/lib/contracts/portfolio";
 import { ProgressResponseSchema } from "@/lib/contracts/progress";
 import { TrackProgressSchema } from "@/lib/contracts/track-progress";
 import { QuizAttemptResultSchema, QuizSubmissionSchema } from "@/lib/contracts/quiz";
@@ -391,6 +399,59 @@ export function buildOpenApiDocument() {
     request: { query: DeleteNoteQuerySchema },
     responses: {
       200: { description: "Deletion result", content: { "application/json": { schema: DeleteNoteResponseSchema } } },
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/v1/portfolio",
+    tags: ["portfolio"],
+    summary: "The caller's portfolio with projects",
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: { description: "Portfolio", content: { "application/json": { schema: PortfolioResponseSchema } } },
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "put",
+    path: "/api/v1/portfolio",
+    tags: ["portfolio"],
+    summary: "Update portfolio metadata",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { body: { content: { "application/json": { schema: UpdatePortfolioSchema } } } },
+    responses: {
+      200: { description: "Portfolio", content: { "application/json": { schema: PortfolioResponseSchema } } },
+      400: errorResponse("Validation error"),
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/portfolio/projects",
+    tags: ["portfolio"],
+    summary: "Add a portfolio project",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { body: { content: { "application/json": { schema: CreateProjectSchema } } } },
+    responses: {
+      201: { description: "Created project", content: { "application/json": { schema: CreateProjectResponseSchema } } },
+      400: errorResponse("Validation error"),
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "delete",
+    path: "/api/v1/portfolio/projects",
+    tags: ["portfolio"],
+    summary: "Delete a portfolio project",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { query: DeleteProjectQuerySchema },
+    responses: {
+      200: { description: "Deletion result", content: { "application/json": { schema: DeleteProjectResponseSchema } } },
       401: errorResponse("Authentication required"),
     },
   });
