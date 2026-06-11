@@ -33,6 +33,13 @@ import {
   MissionSubmissionSchema,
 } from "@/lib/contracts/missions";
 import { ModuleDetailSchema, ModuleParamsSchema } from "@/lib/contracts/modules";
+import {
+  CreateNoteResponseSchema,
+  CreateNoteSchema,
+  DeleteNoteQuerySchema,
+  DeleteNoteResponseSchema,
+  ListNotesResponseSchema,
+} from "@/lib/contracts/notes";
 import { ProgressResponseSchema } from "@/lib/contracts/progress";
 import { TrackProgressSchema } from "@/lib/contracts/track-progress";
 import { QuizAttemptResultSchema, QuizSubmissionSchema } from "@/lib/contracts/quiz";
@@ -345,6 +352,45 @@ export function buildOpenApiDocument() {
         description: "Deletion result",
         content: { "application/json": { schema: DeleteBookmarkResponseSchema } },
       },
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/v1/notes",
+    tags: ["notes"],
+    summary: "List the caller's notes",
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: { description: "Notes", content: { "application/json": { schema: ListNotesResponseSchema } } },
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/notes",
+    tags: ["notes"],
+    summary: "Create a note",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { body: { content: { "application/json": { schema: CreateNoteSchema } } } },
+    responses: {
+      201: { description: "Created note", content: { "application/json": { schema: CreateNoteResponseSchema } } },
+      400: errorResponse("Validation error"),
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "delete",
+    path: "/api/v1/notes",
+    tags: ["notes"],
+    summary: "Delete one of the caller's notes",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { query: DeleteNoteQuerySchema },
+    responses: {
+      200: { description: "Deletion result", content: { "application/json": { schema: DeleteNoteResponseSchema } } },
       401: errorResponse("Authentication required"),
     },
   });

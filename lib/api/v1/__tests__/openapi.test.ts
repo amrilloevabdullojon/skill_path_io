@@ -26,6 +26,7 @@ describe("OpenAPI document", () => {
         "/api/v1/tracks/{slug}/modules/{moduleId}/quiz/attempts",
         "/api/v1/tracks/{slug}/modules/{moduleId}/missions/{missionId}/submissions",
         "/api/v1/bookmarks",
+        "/api/v1/notes",
       ]),
     );
   });

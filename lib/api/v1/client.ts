@@ -23,6 +23,14 @@ import {
   type ModuleDetailResponse,
 } from "@/lib/contracts/modules";
 import {
+  CreateNoteResponseSchema,
+  CreateNoteSchema,
+  DeleteNoteResponseSchema,
+  ListNotesResponseSchema,
+  type CreateNoteInput,
+  type Note,
+} from "@/lib/contracts/notes";
+import {
   MissionSubmissionResultSchema,
   MissionSubmissionSchema,
   type MissionSubmission,
@@ -304,6 +312,36 @@ export function createApiClient(options: ApiClientOptions = {}) {
           path: "/api/v1/bookmarks",
           query: { id },
           schema: DeleteBookmarkResponseSchema,
+          auth: true,
+        });
+      },
+    },
+    notes: {
+      async list(): Promise<Note[]> {
+        const { notes } = await request({
+          method: "GET",
+          path: "/api/v1/notes",
+          schema: ListNotesResponseSchema,
+          auth: true,
+        });
+        return notes;
+      },
+      async create(input: CreateNoteInput): Promise<Note> {
+        const { note } = await request({
+          method: "POST",
+          path: "/api/v1/notes",
+          body: CreateNoteSchema.parse(input),
+          schema: CreateNoteResponseSchema,
+          auth: true,
+        });
+        return note;
+      },
+      remove(id: string): Promise<{ ok: boolean }> {
+        return request({
+          method: "DELETE",
+          path: "/api/v1/notes",
+          query: { id },
+          schema: DeleteNoteResponseSchema,
           auth: true,
         });
       },
