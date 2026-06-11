@@ -13,11 +13,13 @@ import type { TracksCatalogResponse } from "@/lib/contracts/tracks";
 
 import { api } from "../api";
 import { useAuth } from "../auth";
+import { useNavigation } from "../navigation";
 
 type Course = TracksCatalogResponse["courses"][number];
 
 export function TracksScreen() {
   const { user, logout } = useAuth();
+  const { navigate } = useNavigation();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -67,7 +69,11 @@ export function TracksScreen() {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           ListEmptyComponent={<Text style={styles.empty}>No published tracks yet.</Text>}
           renderItem={({ item }) => (
-            <View style={[styles.card, { borderLeftColor: item.color || "#6366f1" }]}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigate({ name: "TrackDetail", slug: item.slug, title: item.title })}
+              style={[styles.card, { borderLeftColor: item.color || "#6366f1" }]}
+            >
               <Text style={styles.cardTitle}>{item.title}</Text>
               <Text style={styles.cardMeta}>
                 {item.category} · {item.level} · {item.modules.length} modules
@@ -77,7 +83,7 @@ export function TracksScreen() {
                   {item.shortDescription}
                 </Text>
               ) : null}
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}

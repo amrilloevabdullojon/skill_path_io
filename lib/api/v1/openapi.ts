@@ -20,7 +20,12 @@ import {
   DeleteBookmarkResponseSchema,
   ListBookmarksResponseSchema,
 } from "@/lib/contracts/bookmarks";
-import { TracksCatalogSchema, TracksQuerySchema } from "@/lib/contracts/tracks";
+import {
+  TrackDetailSchema,
+  TrackParamsSchema,
+  TracksCatalogSchema,
+  TracksQuerySchema,
+} from "@/lib/contracts/tracks";
 
 // Patch zod with the `.openapi()` helper. Safe to call once at module load.
 extendZodWithOpenApi(z);
@@ -108,6 +113,23 @@ export function buildOpenApiDocument() {
         content: { "application/json": { schema: TracksCatalogSchema } },
       },
       401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/v1/tracks/{slug}",
+    tags: ["learning"],
+    summary: "A single published track/course with its modules",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { params: TrackParamsSchema, query: TracksQuerySchema },
+    responses: {
+      200: {
+        description: "Track detail",
+        content: { "application/json": { schema: TrackDetailSchema } },
+      },
+      401: errorResponse("Authentication required"),
+      404: errorResponse("Track not found"),
     },
   });
 

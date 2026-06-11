@@ -2,8 +2,22 @@ import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { AuthProvider, useAuth } from "./src/auth";
+import { NavigationProvider, useNavigation } from "./src/navigation";
 import { LoginScreen } from "./src/screens/LoginScreen";
+import { TrackDetailScreen } from "./src/screens/TrackDetailScreen";
 import { TracksScreen } from "./src/screens/TracksScreen";
+
+function Router() {
+  const { route } = useNavigation();
+
+  switch (route.name) {
+    case "TrackDetail":
+      return <TrackDetailScreen slug={route.slug} title={route.title} />;
+    case "Tracks":
+    default:
+      return <TracksScreen />;
+  }
+}
 
 function Root() {
   const { status } = useAuth();
@@ -16,7 +30,15 @@ function Root() {
     );
   }
 
-  return status === "authenticated" ? <TracksScreen /> : <LoginScreen />;
+  if (status !== "authenticated") {
+    return <LoginScreen />;
+  }
+
+  return (
+    <NavigationProvider>
+      <Router />
+    </NavigationProvider>
+  );
 }
 
 export default function App() {

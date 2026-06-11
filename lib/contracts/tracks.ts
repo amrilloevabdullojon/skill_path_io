@@ -132,7 +132,7 @@ const RuntimeModuleSchema = z.object({
   simulations: z.array(RuntimeSimulationSchema),
 });
 
-const RuntimeCourseSchema = z.object({
+export const TrackCourseSchema = z.object({
   id: z.string(),
   slug: z.string(),
   title: z.string(),
@@ -156,12 +156,25 @@ const RuntimeCourseSchema = z.object({
   estimatedWeeks: z.number().nullable().optional(),
 });
 
+export type TrackCourse = z.infer<typeof TrackCourseSchema>;
+
 export const TracksCatalogSchema = z.object({
   source: z.union([RuntimeContentSourceSchema, z.literal("mixed")]),
-  courses: z.array(RuntimeCourseSchema),
+  courses: z.array(TrackCourseSchema),
 });
 
 export type TracksCatalogResponse = z.infer<typeof TracksCatalogSchema>;
+
+// ── Single track (detail) ────────────────────────────────────────────────────
+
+export const TrackParamsSchema = z.object({
+  slug: z.string().min(1, "slug is required"),
+});
+
+export const TrackDetailSchema = z.object({
+  course: TrackCourseSchema,
+});
+export type TrackDetailResponse = z.infer<typeof TrackDetailSchema>;
 
 /**
  * Compile-time guard: the internal RuntimeCatalog must satisfy the published

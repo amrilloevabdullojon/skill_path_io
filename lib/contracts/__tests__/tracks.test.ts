@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { TracksCatalogSchema, TracksQuerySchema } from "@/lib/contracts/tracks";
+import {
+  TrackDetailSchema,
+  TrackParamsSchema,
+  TracksCatalogSchema,
+  TracksQuerySchema,
+} from "@/lib/contracts/tracks";
 
 describe("tracks contract: TracksQuerySchema", () => {
   it("applies defaults when params are absent", () => {
@@ -66,5 +71,37 @@ describe("tracks contract: TracksCatalogSchema", () => {
       courses: [{ category: "PHYSICS" }],
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe("tracks contract: track detail", () => {
+  it("requires a non-empty slug", () => {
+    expect(TrackParamsSchema.safeParse({ slug: "qa-foundations" }).success).toBe(true);
+    expect(TrackParamsSchema.safeParse({ slug: "" }).success).toBe(false);
+    expect(TrackParamsSchema.safeParse({}).success).toBe(false);
+  });
+
+  it("wraps a single course under `course`", () => {
+    const result = TrackDetailSchema.safeParse({
+      course: {
+        id: "c1",
+        slug: "qa-foundations",
+        title: "QA Foundations",
+        shortTitle: "QA",
+        description: "desc",
+        shortDescription: "short",
+        category: "QA",
+        level: "BEGINNER",
+        estimatedDuration: 600,
+        status: "PUBLISHED",
+        visibility: "PUBLIC",
+        source: "prisma-track",
+        tags: [],
+        icon: "shield",
+        color: "#6366f1",
+        modules: [],
+      },
+    });
+    expect(result.success).toBe(true);
   });
 });

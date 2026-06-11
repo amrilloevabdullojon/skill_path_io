@@ -19,7 +19,9 @@ import {
   type CreateBookmarkInput,
 } from "@/lib/contracts/bookmarks";
 import {
+  TrackDetailSchema,
   TracksCatalogSchema,
+  type TrackCourse,
   type TracksCatalogResponse,
   type TracksQuery,
 } from "@/lib/contracts/tracks";
@@ -134,6 +136,15 @@ export function createApiClient(options: ApiClientOptions = {}) {
           schema: TracksCatalogSchema,
           auth: true,
         });
+      },
+      async get(slug: string): Promise<TrackCourse> {
+        const { course } = await request({
+          method: "GET",
+          path: `/api/v1/tracks/${encodeURIComponent(slug)}`,
+          schema: TrackDetailSchema,
+          auth: true,
+        });
+        return course;
       },
     },
     bookmarks: {
