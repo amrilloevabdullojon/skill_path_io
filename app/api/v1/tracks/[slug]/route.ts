@@ -1,7 +1,9 @@
 import { Errors, withErrorHandler } from "@/lib/api/error-handler";
 import { parseQuery, respond } from "@/lib/api/v1/http";
-import { TrackDetailSchema, TrackParamsSchema, TracksQuerySchema } from "@/lib/contracts/tracks";
+import { TrackDetailSchema } from "@/lib/contracts/catalog";
+import { TrackParamsSchema, TracksQuerySchema } from "@/lib/contracts/tracks";
 import { resolveRuntimeCourseBySlug } from "@/lib/learning/content-resolver";
+import { toLearnerCourse } from "@/lib/learning/module-view";
 
 export const runtime = "nodejs";
 
@@ -24,5 +26,5 @@ export const GET = withErrorHandler(async (request: Request, context: RouteConte
     throw Errors.notFound(`Track "${slug}" not found`);
   }
 
-  return respond(TrackDetailSchema, { course });
+  return respond(TrackDetailSchema, { course: toLearnerCourse(course) });
 });

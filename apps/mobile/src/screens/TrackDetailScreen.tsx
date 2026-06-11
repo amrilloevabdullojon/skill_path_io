@@ -1,13 +1,13 @@
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import type { TrackCourse } from "@/lib/contracts/tracks";
+import type { LearnerCourse } from "@/lib/contracts/catalog";
 
 import { api } from "../api";
 import { useNavigation } from "../navigation";
 import { DataState } from "../ui/DataState";
 import { useAsync } from "../ui/useAsync";
 
-type Module = TrackCourse["modules"][number];
+type Module = LearnerCourse["modules"][number];
 
 export function TrackDetailScreen({ slug }: { slug: string; title?: string }) {
   const { goBack, navigate } = useNavigation();

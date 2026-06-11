@@ -1,9 +1,10 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
 
+import { CatalogSchema } from "@/lib/contracts/catalog";
 import { ModuleDetailSchema } from "@/lib/contracts/modules";
-import type { RuntimeModule } from "@/lib/learning/content-types";
-import { toLearnerModule } from "@/lib/learning/module-view";
+import type { RuntimeCourse, RuntimeModule } from "@/lib/learning/content-types";
+import { toLearnerCourse, toLearnerModule } from "@/lib/learning/module-view";
 
 const runtimeModule: RuntimeModule = {
   id: "m1",
@@ -64,6 +65,41 @@ describe("toLearnerModule", () => {
     const result = ModuleDetailSchema.safeParse({
       course: { slug: "qa", title: "QA" },
       module: learner,
+    });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("toLearnerCourse", () => {
+  const course: RuntimeCourse = {
+    id: "c1",
+    slug: "qa-foundations",
+    title: "QA Foundations",
+    shortTitle: "QA",
+    description: "desc",
+    shortDescription: "short",
+    category: "QA",
+    level: "BEGINNER",
+    estimatedDuration: 600,
+    status: "PUBLISHED",
+    visibility: "PUBLIC",
+    source: "prisma-track",
+    tags: [],
+    icon: "shield",
+    color: "#6366f1",
+    modules: [runtimeModule],
+  };
+
+  it("strips quiz answers across all modules", () => {
+    const learnerCourse = toLearnerCourse(course);
+    expect(JSON.stringify(learnerCourse)).not.toContain("correctAnswer");
+    expect(learnerCourse.modules[0].quiz?.questionCount).toBe(1);
+  });
+
+  it("produces a catalog payload that satisfies the published contract", () => {
+    const result = CatalogSchema.safeParse({
+      source: "mixed",
+      courses: [toLearnerCourse(course)],
     });
     expect(result.success).toBe(true);
   });

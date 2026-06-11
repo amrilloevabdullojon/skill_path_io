@@ -36,12 +36,8 @@ import { ModuleDetailSchema, ModuleParamsSchema } from "@/lib/contracts/modules"
 import { ProgressResponseSchema } from "@/lib/contracts/progress";
 import { TrackProgressSchema } from "@/lib/contracts/track-progress";
 import { QuizAttemptResultSchema, QuizSubmissionSchema } from "@/lib/contracts/quiz";
-import {
-  TrackDetailSchema,
-  TrackParamsSchema,
-  TracksCatalogSchema,
-  TracksQuerySchema,
-} from "@/lib/contracts/tracks";
+import { CatalogSchema, TrackDetailSchema } from "@/lib/contracts/catalog";
+import { TrackParamsSchema, TracksQuerySchema } from "@/lib/contracts/tracks";
 
 // Patch zod with the `.openapi()` helper. Safe to call once at module load.
 extendZodWithOpenApi(z);
@@ -184,7 +180,7 @@ export function buildOpenApiDocument() {
     responses: {
       200: {
         description: "Runtime catalog",
-        content: { "application/json": { schema: TracksCatalogSchema } },
+        content: { "application/json": { schema: CatalogSchema } },
       },
       401: errorResponse("Authentication required"),
     },

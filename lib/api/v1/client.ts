@@ -57,12 +57,12 @@ import {
   type QuizSubmission,
 } from "@/lib/contracts/quiz";
 import {
+  CatalogSchema,
   TrackDetailSchema,
-  TracksCatalogSchema,
-  type TrackCourse,
-  type TracksCatalogResponse,
-  type TracksQuery,
-} from "@/lib/contracts/tracks";
+  type CatalogResponse,
+  type LearnerCourse,
+} from "@/lib/contracts/catalog";
+import { type TracksQuery } from "@/lib/contracts/tracks";
 
 /**
  * Typed client SDK for the `/api/v1` API.
@@ -216,16 +216,16 @@ export function createApiClient(options: ApiClientOptions = {}) {
       },
     },
     tracks: {
-      list(query?: Partial<TracksQuery>): Promise<TracksCatalogResponse> {
+      list(query?: Partial<TracksQuery>): Promise<CatalogResponse> {
         return request({
           method: "GET",
           path: "/api/v1/tracks",
           query: query as Record<string, unknown> | undefined,
-          schema: TracksCatalogSchema,
+          schema: CatalogSchema,
           auth: true,
         });
       },
-      async get(slug: string): Promise<TrackCourse> {
+      async get(slug: string): Promise<LearnerCourse> {
         const { course } = await request({
           method: "GET",
           path: `/api/v1/tracks/${encodeURIComponent(slug)}`,

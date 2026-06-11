@@ -9,14 +9,14 @@ import {
   View,
 } from "react-native";
 
-import type { TracksCatalogResponse } from "@/lib/contracts/tracks";
+import type { CatalogResponse } from "@/lib/contracts/catalog";
 
 import { api } from "../api";
 import { useAuth } from "../auth";
 import { useNavigation } from "../navigation";
 import { getOnboardingProfile, type Profession } from "../onboarding";
 
-type Course = TracksCatalogResponse["courses"][number];
+type Course = CatalogResponse["courses"][number];
 
 export function TracksScreen() {
   const { user } = useAuth();

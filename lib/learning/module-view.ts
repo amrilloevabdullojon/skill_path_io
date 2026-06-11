@@ -1,5 +1,6 @@
+import type { LearnerCourse } from "@/lib/contracts/catalog";
 import type { LearnerModule } from "@/lib/contracts/modules";
-import type { RuntimeModule } from "@/lib/learning/content-types";
+import type { RuntimeCourse, RuntimeModule } from "@/lib/learning/content-types";
 
 /**
  * Project a runtime module into the learner-facing module DTO.
@@ -37,5 +38,16 @@ export function toLearnerModule(module: RuntimeModule): LearnerModule {
       : null,
     missions: module.missions,
     simulations: module.simulations,
+  };
+}
+
+/**
+ * Project a runtime course into the learner-facing course DTO, stripping quiz
+ * answers from every module.
+ */
+export function toLearnerCourse(course: RuntimeCourse): LearnerCourse {
+  return {
+    ...course,
+    modules: course.modules.map(toLearnerModule),
   };
 }

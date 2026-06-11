@@ -49,7 +49,7 @@ const RuntimeLevelSchema = z.enum([
   "ADVANCED",
   "UNKNOWN",
 ]);
-const RuntimeContentSourceSchema = z.enum([
+export const RuntimeContentSourceSchema = z.enum([
   "prisma-track",
   "prisma-course",
   "studio-course",
