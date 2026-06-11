@@ -7,6 +7,13 @@ const isProd = process.env.NODE_ENV === "production";
 const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
+  async redirects() {
+    // Consolidate community IA: /community is the hub for groups + discussions.
+    return [
+      { source: "/groups", destination: "/community", permanent: true },
+      { source: "/discussions", destination: "/community", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {
