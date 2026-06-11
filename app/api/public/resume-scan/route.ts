@@ -22,7 +22,7 @@ export const POST = withErrorHandler(async (request: Request) => {
   const session = await getServerSession(authOptions);
   const bucketKey = session?.user?.id ? `resume-scan:user:${session.user.id}` : "public-resume-scan";
 
-  const rateLimit = checkRateLimit({
+  const rateLimit = await checkRateLimit({
     request,
     bucket: bucketKey,
     maxRequests: settings.aiRateLimit,

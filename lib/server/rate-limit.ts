@@ -39,7 +39,7 @@ export type RateLimitResult = {
  * existing call sites require zero changes.
  */
 export interface RateLimiterAdapter {
-  check(options: RateLimitOptions): RateLimitResult;
+  check(options: RateLimitOptions): RateLimitResult | Promise<RateLimitResult>;
 }
 
 // ─── In-memory adapter (default) ─────────────────────────────────────────────
@@ -121,21 +121,78 @@ class InMemoryRateLimiterAdapter implements RateLimiterAdapter {
   }
 }
 
-// ─── Active adapter (swap here to change backend) ────────────────────────────
+// ─── Upstash Redis adapter (distributed, multi-instance) ─────────────────────
 
 /**
- * The active rate-limiter backend.
- * Replace with `new RedisRateLimiterAdapter(redisClient)` to enable
- * distributed rate limiting across multiple Node processes.
+ * Fixed-window counter via a single atomic Upstash REST EVAL.
+ * Falls open to the in-memory adapter if Redis is unreachable, so a Redis
+ * outage degrades to per-instance limiting rather than blocking all traffic.
  */
-export const rateLimiterAdapter: RateLimiterAdapter = new InMemoryRateLimiterAdapter();
+class UpstashRateLimiterAdapter implements RateLimiterAdapter {
+  // INCR the key; set the window TTL on first hit; report count + remaining TTL.
+  private static readonly SCRIPT =
+    'local c = redis.call("INCR", KEYS[1]) ' +
+    'if c == 1 then redis.call("PEXPIRE", KEYS[1], ARGV[1]) end ' +
+    'local t = redis.call("PTTL", KEYS[1]) return {c, t}';
 
-// ─── Public API (unchanged signature — zero call-site changes needed) ─────────
+  constructor(
+    private readonly url: string,
+    private readonly token: string,
+    private readonly fallback: RateLimiterAdapter,
+  ) {}
+
+  async check(options: RateLimitOptions): Promise<RateLimitResult> {
+    const { key, maxRequests, windowMs } = options;
+    const now = Date.now();
+    try {
+      const response = await fetch(this.url, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${this.token}`, "Content-Type": "application/json" },
+        body: JSON.stringify([
+          "EVAL",
+          UpstashRateLimiterAdapter.SCRIPT,
+          "1",
+          key,
+          String(windowMs),
+        ]),
+      });
+      if (!response.ok) throw new Error(`Upstash ${response.status}`);
+      const data = (await response.json()) as { result: [number, number] };
+      const [count, ttl] = data.result;
+      const resetAt = now + (ttl > 0 ? ttl : windowMs);
+      const allowed = count <= maxRequests;
+      return {
+        allowed,
+        limit: maxRequests,
+        remaining: Math.max(maxRequests - count, 0),
+        resetAt,
+        retryAfterMs: allowed ? 0 : Math.max(resetAt - now, 0),
+      };
+    } catch {
+      return this.fallback.check(options);
+    }
+  }
+}
+
+// ─── Active adapter (Redis when configured, else in-memory) ──────────────────
+
+const inMemoryAdapter = new InMemoryRateLimiterAdapter();
+
+export const rateLimiterAdapter: RateLimiterAdapter =
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+    ? new UpstashRateLimiterAdapter(
+        process.env.UPSTASH_REDIS_REST_URL,
+        process.env.UPSTASH_REDIS_REST_TOKEN,
+        inMemoryAdapter,
+      )
+    : inMemoryAdapter;
+
+// ─── Public API ──────────────────────────────────────────────────────────────
 
 /**
- * Apply a rate limit check for the given key.
- * Delegates to `rateLimiterAdapter` so the backend is swappable.
+ * Apply a rate limit check for the given key. Async to support a distributed
+ * backend; resolves immediately for the in-memory adapter.
  */
-export function applyRateLimit(options: RateLimitOptions): RateLimitResult {
+export async function applyRateLimit(options: RateLimitOptions): Promise<RateLimitResult> {
   return rateLimiterAdapter.check(options);
 }

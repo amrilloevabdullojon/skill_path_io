@@ -50,7 +50,7 @@ export const POST = withErrorHandler(async (request: Request) => {
     throw Errors.unauthorized();
   }
 
-  const rateLimit = checkRateLimit({ request, bucket: `mission-chat:${session.user.email}` });
+  const rateLimit = await checkRateLimit({ request, bucket: `mission-chat:${session.user.email}` });
   if (!rateLimit.allowed) {
     throw Errors.rateLimited();
   }
