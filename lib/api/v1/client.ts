@@ -52,6 +52,18 @@ import {
   type JobsMatchResponse,
 } from "@/lib/contracts/jobs";
 import {
+  CreateEdgeResponseSchema,
+  CreateEdgeSchema,
+  ListEdgesResponseSchema,
+  type CreateEdgeInput,
+  type KnowledgeEdge,
+} from "@/lib/contracts/knowledge-graph";
+import {
+  ApplyRequestSchema,
+  ApplyResponseSchema,
+  type ApplyRequest,
+} from "@/lib/contracts/marketplace";
+import {
   MissionSubmissionResultSchema,
   MissionSubmissionSchema,
   type MissionSubmission,
@@ -267,6 +279,38 @@ export function createApiClient(options: ApiClientOptions = {}) {
           path: "/api/v1/interview",
           body: { action: "evaluate", track, answers },
           schema: InterviewEvaluateResponseSchema,
+          auth: true,
+        });
+      },
+    },
+    knowledgeGraph: {
+      async listEdges(): Promise<KnowledgeEdge[]> {
+        const { edges } = await request({
+          method: "GET",
+          path: "/api/v1/knowledge-graph/edges",
+          schema: ListEdgesResponseSchema,
+          auth: true,
+        });
+        return edges;
+      },
+      async addEdge(input: CreateEdgeInput): Promise<KnowledgeEdge> {
+        const { edge } = await request({
+          method: "POST",
+          path: "/api/v1/knowledge-graph/edges",
+          body: CreateEdgeSchema.parse(input),
+          schema: CreateEdgeResponseSchema,
+          auth: true,
+        });
+        return edge;
+      },
+    },
+    marketplace: {
+      apply(input: ApplyRequest) {
+        return request({
+          method: "POST",
+          path: "/api/v1/marketplace/apply",
+          body: ApplyRequestSchema.parse(input),
+          schema: ApplyResponseSchema,
           auth: true,
         });
       },

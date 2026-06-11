@@ -34,6 +34,12 @@ import {
 } from "@/lib/contracts/missions";
 import { InterviewRequestSchema, InterviewResponseSchema } from "@/lib/contracts/interview";
 import { JobsMatchQuerySchema, JobsMatchResponseSchema } from "@/lib/contracts/jobs";
+import {
+  CreateEdgeResponseSchema,
+  CreateEdgeSchema,
+  ListEdgesResponseSchema,
+} from "@/lib/contracts/knowledge-graph";
+import { ApplyRequestSchema, ApplyResponseSchema } from "@/lib/contracts/marketplace";
 import { ModuleDetailSchema, ModuleParamsSchema } from "@/lib/contracts/modules";
 import {
   CreateNoteResponseSchema,
@@ -313,6 +319,47 @@ export function buildOpenApiDocument() {
     request: { body: { content: { "application/json": { schema: InterviewRequestSchema } } } },
     responses: {
       200: { description: "Questions or evaluation", content: { "application/json": { schema: InterviewResponseSchema } } },
+      400: errorResponse("Validation error"),
+      401: errorResponse("Authentication required"),
+      403: errorResponse("Feature not available / usage limit reached"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/v1/knowledge-graph/edges",
+    tags: ["knowledge-graph"],
+    summary: "List knowledge graph edges",
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: { description: "Edges", content: { "application/json": { schema: ListEdgesResponseSchema } } },
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/knowledge-graph/edges",
+    tags: ["knowledge-graph"],
+    summary: "Create or update an edge",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { body: { content: { "application/json": { schema: CreateEdgeSchema } } } },
+    responses: {
+      201: { description: "Edge", content: { "application/json": { schema: CreateEdgeResponseSchema } } },
+      400: errorResponse("Validation error"),
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/marketplace/apply",
+    tags: ["marketplace"],
+    summary: "Apply to a marketplace role",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { body: { content: { "application/json": { schema: ApplyRequestSchema } } } },
+    responses: {
+      201: { description: "Application", content: { "application/json": { schema: ApplyResponseSchema } } },
       400: errorResponse("Validation error"),
       401: errorResponse("Authentication required"),
       403: errorResponse("Feature not available / usage limit reached"),
