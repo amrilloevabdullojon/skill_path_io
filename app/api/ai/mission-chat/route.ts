@@ -3,6 +3,14 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { callAnthropic, checkRateLimit } from "@/lib/ai/ai-service";
 import { apiOk, Errors, withErrorHandler } from "@/lib/api/error-handler";
+import {
+  denyFeature,
+  denyUsage,
+  ensureFeature,
+  ensureUsage,
+  recordMeterUsage,
+  resolveApiSubscriptionContext,
+} from "@/lib/saas/api-access";
 import { LearningMission } from "@/types/personalization";
 
 type ChatMsg = { role: "ai" | "user"; text: string };
@@ -48,6 +56,16 @@ export const POST = withErrorHandler(async (request: Request) => {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     throw Errors.unauthorized();
+  }
+
+  const accessContext = await resolveApiSubscriptionContext();
+  const featureGate = ensureFeature(accessContext, "ai.mentor");
+  if (!featureGate.allowed) {
+    return denyFeature("ai.mentor", featureGate.upgradePlanId);
+  }
+  const usageGate = ensureUsage(accessContext, "aiMentorRequests");
+  if (usageGate.reached) {
+    return denyUsage("aiMentorRequests", usageGate);
   }
 
   const rateLimit = await checkRateLimit({ request, bucket: `mission-chat:${session.user.email}` });
@@ -105,5 +123,6 @@ Instructions:
     }, 200);
   }
 
+  recordMeterUsage(accessContext, "aiMentorRequests");
   return apiOk({ text: aiResult.data }, 200);
 });
