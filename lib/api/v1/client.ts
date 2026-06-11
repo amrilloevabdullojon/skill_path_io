@@ -76,9 +76,17 @@ import {
   type PlannerForecastRequest,
 } from "@/lib/contracts/planner";
 import {
+  CommandResponseSchema,
+  type CommandResponse,
+} from "@/lib/contracts/command";
+import {
   ProgressResponseSchema,
   type ProgressResponse,
 } from "@/lib/contracts/progress";
+import {
+  SubscriptionsResponseSchema,
+  type SubscriptionsResponse,
+} from "@/lib/contracts/subscriptions";
 import {
   BugReportInputSchema,
   BugReviewResultSchema,
@@ -356,6 +364,26 @@ export function createApiClient(options: ApiClientOptions = {}) {
           path: "/api/v1/planner/forecast",
           body: PlannerForecastRequestSchema.parse({ plan }),
           schema: PlannerForecastSchema,
+          auth: true,
+        });
+      },
+    },
+    subscriptions: {
+      get(): Promise<SubscriptionsResponse> {
+        return request({
+          method: "GET",
+          path: "/api/v1/subscriptions",
+          schema: SubscriptionsResponseSchema,
+          auth: true,
+        });
+      },
+    },
+    command: {
+      catalog(): Promise<CommandResponse> {
+        return request({
+          method: "GET",
+          path: "/api/v1/command",
+          schema: CommandResponseSchema,
           auth: true,
         });
       },

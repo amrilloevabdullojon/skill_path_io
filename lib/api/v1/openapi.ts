@@ -57,7 +57,9 @@ import {
   UpdatePortfolioSchema,
 } from "@/lib/contracts/portfolio";
 import { PlannerForecastRequestSchema, PlannerForecastSchema } from "@/lib/contracts/planner";
+import { CommandResponseSchema } from "@/lib/contracts/command";
 import { ProgressResponseSchema } from "@/lib/contracts/progress";
+import { SubscriptionsResponseSchema } from "@/lib/contracts/subscriptions";
 import {
   BugReportInputSchema,
   BugReviewResultSchema,
@@ -417,6 +419,30 @@ export function buildOpenApiDocument() {
     responses: {
       200: { description: "Forecast", content: { "application/json": { schema: PlannerForecastSchema } } },
       400: errorResponse("Validation error"),
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/v1/subscriptions",
+    tags: ["subscriptions"],
+    summary: "The caller's subscription and available plans",
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: { description: "Subscription + plans", content: { "application/json": { schema: SubscriptionsResponseSchema } } },
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/v1/command",
+    tags: ["command"],
+    summary: "Command-palette catalog (tracks, missions, jobs)",
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: { description: "Catalog", content: { "application/json": { schema: CommandResponseSchema } } },
       401: errorResponse("Authentication required"),
     },
   });
