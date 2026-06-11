@@ -21,6 +21,7 @@ import {
   ListBookmarksResponseSchema,
 } from "@/lib/contracts/bookmarks";
 import { ModuleDetailSchema, ModuleParamsSchema } from "@/lib/contracts/modules";
+import { QuizAttemptResultSchema, QuizSubmissionSchema } from "@/lib/contracts/quiz";
 import {
   TrackDetailSchema,
   TrackParamsSchema,
@@ -148,6 +149,27 @@ export function buildOpenApiDocument() {
       },
       401: errorResponse("Authentication required"),
       404: errorResponse("Track or module not found"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/tracks/{slug}/modules/{moduleId}/quiz/attempts",
+    tags: ["learning"],
+    summary: "Submit quiz answers and record a graded attempt",
+    security: [{ [bearerAuth.name]: [] }],
+    request: {
+      params: ModuleParamsSchema,
+      body: { content: { "application/json": { schema: QuizSubmissionSchema } } },
+    },
+    responses: {
+      200: {
+        description: "Graded attempt result",
+        content: { "application/json": { schema: QuizAttemptResultSchema } },
+      },
+      400: errorResponse("Invalid submission"),
+      401: errorResponse("Authentication required"),
+      404: errorResponse("Quiz not found"),
     },
   });
 

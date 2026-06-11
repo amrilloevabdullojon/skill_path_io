@@ -14,7 +14,7 @@ import { api } from "../api";
 import { useNavigation } from "../navigation";
 
 export function ModuleDetailScreen({ slug, moduleId }: { slug: string; moduleId: string }) {
-  const { goBack } = useNavigation();
+  const { goBack, navigate } = useNavigation();
   const [data, setData] = useState<ModuleDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,8 +85,12 @@ export function ModuleDetailScreen({ slug, moduleId }: { slug: string; moduleId:
                 {data.module.quiz.questionCount} questions · pass at{" "}
                 {data.module.quiz.passingScore}%
               </Text>
-              <TouchableOpacity style={styles.quizButton} disabled>
-                <Text style={styles.quizButtonText}>Start quiz (coming soon)</Text>
+              <TouchableOpacity
+                style={styles.quizButton}
+                activeOpacity={0.85}
+                onPress={() => navigate({ name: "Quiz", slug, moduleId })}
+              >
+                <Text style={styles.quizButtonText}>Start quiz</Text>
               </TouchableOpacity>
             </View>
           ) : null}
@@ -126,7 +130,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
     marginTop: 14,
-    opacity: 0.6,
   },
   quizButtonText: { color: "#fff", fontWeight: "700" },
   error: { color: "#fca5a5", textAlign: "center", marginTop: 40 },
