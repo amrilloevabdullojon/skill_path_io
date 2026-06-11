@@ -9,6 +9,7 @@ import {
 } from "react-native";
 
 import type { TrackCourse } from "@/lib/contracts/tracks";
+import type { TrackProgressResponse } from "@/lib/contracts/track-progress";
 
 import { api } from "../api";
 import { useNavigation } from "../navigation";
@@ -18,6 +19,7 @@ type Module = TrackCourse["modules"][number];
 export function TrackDetailScreen({ slug, title }: { slug: string; title?: string }) {
   const { goBack, navigate } = useNavigation();
   const [course, setCourse] = useState<TrackCourse | null>(null);
+  const [progress, setProgress] = useState<TrackProgressResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,8 +27,14 @@ export function TrackDetailScreen({ slug, title }: { slug: string; title?: strin
     let active = true;
     (async () => {
       try {
-        const data = await api.tracks.get(slug);
-        if (active) setCourse(data);
+        const [data, progressData] = await Promise.all([
+          api.tracks.get(slug),
+          api.tracks.progress(slug).catch(() => null),
+        ]);
+        if (active) {
+          setCourse(data);
+          setProgress(progressData);
+        }
       } catch {
         if (active) setError("Could not load this track.");
       } finally {
@@ -37,6 +45,12 @@ export function TrackDetailScreen({ slug, title }: { slug: string; title?: strin
       active = false;
     };
   }, [slug]);
+
+  const completedModuleIds = new Set(
+    (progress?.modules ?? [])
+      .filter((module) => module.status === "COMPLETED")
+      .map((module) => module.moduleId),
+  );
 
   return (
     <View style={styles.container}>
@@ -57,6 +71,22 @@ export function TrackDetailScreen({ slug, title }: { slug: string; title?: strin
             {course.category} · {course.level} · {course.modules.length} modules
           </Text>
           {course.description ? <Text style={styles.desc}>{course.description}</Text> : null}
+
+          {progress && progress.totalModules > 0 ? (
+            <View style={styles.progressWrap}>
+              <View style={styles.progressBarTrack}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    { width: `${Math.round((progress.completedModules / progress.totalModules) * 100)}%` },
+                  ]}
+                />
+              </View>
+              <Text style={styles.progressText}>
+                {progress.completedModules}/{progress.totalModules} modules completed
+              </Text>
+            </View>
+          ) : null}
 
           {course.skills && course.skills.length > 0 ? (
             <View style={styles.tagRow}>
@@ -89,7 +119,11 @@ export function TrackDetailScreen({ slug, title }: { slug: string; title?: strin
                   }
                   style={styles.moduleCard}
                 >
-                  <Text style={styles.moduleIndex}>{String(index + 1).padStart(2, "0")}</Text>
+                  {completedModuleIds.has(module.id) ? (
+                    <Text style={styles.moduleDone}>✓</Text>
+                  ) : (
+                    <Text style={styles.moduleIndex}>{String(index + 1).padStart(2, "0")}</Text>
+                  )}
                   <View style={{ flex: 1 }}>
                     <Text style={styles.moduleTitle}>{module.title}</Text>
                     <Text style={styles.moduleMeta}>
@@ -137,7 +171,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     gap: 14,
   },
+  progressWrap: { marginTop: 16 },
+  progressBarTrack: { height: 8, borderRadius: 999, backgroundColor: "#1b1733", overflow: "hidden" },
+  progressBarFill: { height: 8, borderRadius: 999, backgroundColor: "#22c55e" },
+  progressText: { color: "#86efac", fontSize: 13, fontWeight: "600", marginTop: 8 },
   moduleIndex: { color: "#6366f1", fontSize: 18, fontWeight: "800", width: 28 },
+  moduleDone: { color: "#22c55e", fontSize: 20, fontWeight: "800", width: 28 },
   moduleTitle: { color: "#fff", fontSize: 16, fontWeight: "600" },
   moduleMeta: { color: "#9ca3af", fontSize: 13, marginTop: 3 },
   chevron: { color: "#4b5563", fontSize: 22, fontWeight: "700" },

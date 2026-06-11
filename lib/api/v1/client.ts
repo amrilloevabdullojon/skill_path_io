@@ -33,6 +33,10 @@ import {
   type ProgressResponse,
 } from "@/lib/contracts/progress";
 import {
+  TrackProgressSchema,
+  type TrackProgressResponse,
+} from "@/lib/contracts/track-progress";
+import {
   QuizAttemptResultSchema,
   QuizSubmissionSchema,
   type QuizAttemptResultResponse,
@@ -175,6 +179,14 @@ export function createApiClient(options: ApiClientOptions = {}) {
           auth: true,
         });
         return course;
+      },
+      progress(slug: string): Promise<TrackProgressResponse> {
+        return request({
+          method: "GET",
+          path: `/api/v1/tracks/${encodeURIComponent(slug)}/progress`,
+          schema: TrackProgressSchema,
+          auth: true,
+        });
       },
       getModule(slug: string, moduleId: string): Promise<ModuleDetailResponse> {
         return request({

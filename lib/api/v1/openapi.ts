@@ -27,6 +27,7 @@ import {
 } from "@/lib/contracts/missions";
 import { ModuleDetailSchema, ModuleParamsSchema } from "@/lib/contracts/modules";
 import { ProgressResponseSchema } from "@/lib/contracts/progress";
+import { TrackProgressSchema } from "@/lib/contracts/track-progress";
 import { QuizAttemptResultSchema, QuizSubmissionSchema } from "@/lib/contracts/quiz";
 import {
   TrackDetailSchema,
@@ -135,6 +136,23 @@ export function buildOpenApiDocument() {
       200: {
         description: "Track detail",
         content: { "application/json": { schema: TrackDetailSchema } },
+      },
+      401: errorResponse("Authentication required"),
+      404: errorResponse("Track not found"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/v1/tracks/{slug}/progress",
+    tags: ["learning"],
+    summary: "The caller's per-module progress in a track",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { params: TrackParamsSchema, query: TracksQuerySchema },
+    responses: {
+      200: {
+        description: "Track progress",
+        content: { "application/json": { schema: TrackProgressSchema } },
       },
       401: errorResponse("Authentication required"),
       404: errorResponse("Track not found"),
