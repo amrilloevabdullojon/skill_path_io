@@ -48,6 +48,12 @@ import {
   type MissionSubmissionResult,
 } from "@/lib/contracts/missions";
 import {
+  PlannerForecastRequestSchema,
+  PlannerForecastSchema,
+  type PlannerForecast,
+  type PlannerForecastRequest,
+} from "@/lib/contracts/planner";
+import {
   ProgressResponseSchema,
   type ProgressResponse,
 } from "@/lib/contracts/progress";
@@ -220,6 +226,17 @@ export function createApiClient(options: ApiClientOptions = {}) {
           method: "POST",
           path: "/api/v1/auth/request-email-verification",
           schema: OkResponseSchema,
+          auth: true,
+        });
+      },
+    },
+    planner: {
+      forecast(plan: PlannerForecastRequest["plan"]): Promise<PlannerForecast> {
+        return request({
+          method: "POST",
+          path: "/api/v1/planner/forecast",
+          body: PlannerForecastRequestSchema.parse({ plan }),
+          schema: PlannerForecastSchema,
           auth: true,
         });
       },

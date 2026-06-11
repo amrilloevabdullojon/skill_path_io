@@ -48,6 +48,7 @@ import {
   PortfolioResponseSchema,
   UpdatePortfolioSchema,
 } from "@/lib/contracts/portfolio";
+import { PlannerForecastRequestSchema, PlannerForecastSchema } from "@/lib/contracts/planner";
 import { ProgressResponseSchema } from "@/lib/contracts/progress";
 import { TrackProgressSchema } from "@/lib/contracts/track-progress";
 import { QuizAttemptResultSchema, QuizSubmissionSchema } from "@/lib/contracts/quiz";
@@ -292,6 +293,20 @@ export function buildOpenApiDocument() {
       401: errorResponse("Authentication required"),
       403: errorResponse("Feature not available on plan / usage limit reached"),
       404: errorResponse("Mission not found"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/planner/forecast",
+    tags: ["planner"],
+    summary: "Compute the workload forecast for a learning plan",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { body: { content: { "application/json": { schema: PlannerForecastRequestSchema } } } },
+    responses: {
+      200: { description: "Forecast", content: { "application/json": { schema: PlannerForecastSchema } } },
+      400: errorResponse("Validation error"),
+      401: errorResponse("Authentication required"),
     },
   });
 
