@@ -1,12 +1,15 @@
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { AuthProvider, useAuth } from "./src/auth";
 import { NavigationProvider, useNavigation } from "./src/navigation";
+import { getOnboardingProfile, type OnboardingProfile } from "./src/onboarding";
 import { BookmarksScreen } from "./src/screens/BookmarksScreen";
 import { LoginScreen } from "./src/screens/LoginScreen";
 import { MissionScreen } from "./src/screens/MissionScreen";
 import { ModuleDetailScreen } from "./src/screens/ModuleDetailScreen";
+import { OnboardingScreen } from "./src/screens/OnboardingScreen";
 import { ProfileScreen } from "./src/screens/ProfileScreen";
 import { QuizScreen } from "./src/screens/QuizScreen";
 import { TrackDetailScreen } from "./src/screens/TrackDetailScreen";
@@ -36,26 +39,38 @@ function Router() {
   }
 }
 
-function Root() {
-  const { status } = useAuth();
+function Splash() {
+  return (
+    <View style={styles.splash}>
+      <ActivityIndicator color="#6366f1" size="large" />
+    </View>
+  );
+}
 
-  if (status === "loading") {
-    return (
-      <View style={styles.splash}>
-        <ActivityIndicator color="#6366f1" size="large" />
-      </View>
-    );
-  }
+function AuthedApp() {
+  // undefined = still loading the stored profile; null = needs onboarding.
+  const [profile, setProfile] = useState<OnboardingProfile | null | undefined>(undefined);
 
-  if (status !== "authenticated") {
-    return <LoginScreen />;
-  }
+  useEffect(() => {
+    getOnboardingProfile().then(setProfile);
+  }, []);
+
+  if (profile === undefined) return <Splash />;
+  if (profile === null) return <OnboardingScreen onComplete={setProfile} />;
 
   return (
     <NavigationProvider>
       <Router />
     </NavigationProvider>
   );
+}
+
+function Root() {
+  const { status } = useAuth();
+
+  if (status === "loading") return <Splash />;
+  if (status !== "authenticated") return <LoginScreen />;
+  return <AuthedApp />;
 }
 
 export default function App() {

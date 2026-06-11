@@ -14,6 +14,7 @@ import type { TracksCatalogResponse } from "@/lib/contracts/tracks";
 import { api } from "../api";
 import { useAuth } from "../auth";
 import { useNavigation } from "../navigation";
+import { getOnboardingProfile, type Profession } from "../onboarding";
 
 type Course = TracksCatalogResponse["courses"][number];
 
@@ -21,9 +22,14 @@ export function TracksScreen() {
   const { user } = useAuth();
   const { navigate } = useNavigation();
   const [courses, setCourses] = useState<Course[]>([]);
+  const [recommended, setRecommended] = useState<Profession | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getOnboardingProfile().then((profile) => setRecommended(profile?.profession ?? null));
+  }, []);
 
   const load = useCallback(async () => {
     setError(null);
@@ -74,6 +80,9 @@ export function TracksScreen() {
               onPress={() => navigate({ name: "TrackDetail", slug: item.slug, title: item.title })}
               style={[styles.card, { borderLeftColor: item.color || "#6366f1" }]}
             >
+              {recommended && item.category === recommended ? (
+                <Text style={styles.recommended}>★ Recommended for you</Text>
+              ) : null}
               <Text style={styles.cardTitle}>{item.title}</Text>
               <Text style={styles.cardMeta}>
                 {item.category} · {item.level} · {item.modules.length} modules
@@ -110,6 +119,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
   },
+  recommended: { color: "#fde68a", fontSize: 12, fontWeight: "700", marginBottom: 4 },
   cardTitle: { color: "#fff", fontSize: 17, fontWeight: "700" },
   cardMeta: { color: "#818cf8", fontSize: 13, marginTop: 4 },
   cardDesc: { color: "#9ca3af", fontSize: 14, marginTop: 8 },
