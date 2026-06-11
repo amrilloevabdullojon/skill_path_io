@@ -14,6 +14,7 @@ describe("OpenAPI document", () => {
         "/api/v1/auth/login",
         "/api/v1/auth/refresh",
         "/api/v1/auth/me",
+        "/api/v1/me/quiz-attempts",
         "/api/v1/tracks",
         "/api/v1/tracks/{slug}",
         "/api/v1/tracks/{slug}/modules/{moduleId}",

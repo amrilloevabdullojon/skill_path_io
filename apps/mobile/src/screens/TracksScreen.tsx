@@ -18,7 +18,7 @@ import { useNavigation } from "../navigation";
 type Course = TracksCatalogResponse["courses"][number];
 
 export function TracksScreen() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { navigate } = useNavigation();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,8 +52,8 @@ export function TracksScreen() {
           <Text style={styles.title}>Learning tracks</Text>
           {user ? <Text style={styles.subtitle}>{user.email}</Text> : null}
         </View>
-        <TouchableOpacity onPress={logout}>
-          <Text style={styles.logout}>Sign out</Text>
+        <TouchableOpacity onPress={() => navigate({ name: "Profile" })}>
+          <Text style={styles.logout}>Profile</Text>
         </TouchableOpacity>
       </View>
 

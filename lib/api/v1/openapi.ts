@@ -26,6 +26,7 @@ import {
   MissionSubmissionSchema,
 } from "@/lib/contracts/missions";
 import { ModuleDetailSchema, ModuleParamsSchema } from "@/lib/contracts/modules";
+import { ProgressResponseSchema } from "@/lib/contracts/progress";
 import { QuizAttemptResultSchema, QuizSubmissionSchema } from "@/lib/contracts/quiz";
 import {
   TrackDetailSchema,
@@ -197,6 +198,21 @@ export function buildOpenApiDocument() {
       401: errorResponse("Authentication required"),
       403: errorResponse("Feature not available on plan / usage limit reached"),
       404: errorResponse("Mission not found"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/v1/me/quiz-attempts",
+    tags: ["me"],
+    summary: "The caller's recent quiz attempts and stats",
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: {
+        description: "Progress",
+        content: { "application/json": { schema: ProgressResponseSchema } },
+      },
+      401: errorResponse("Authentication required"),
     },
   });
 

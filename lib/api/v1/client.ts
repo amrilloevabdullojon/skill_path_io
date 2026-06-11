@@ -29,6 +29,10 @@ import {
   type MissionSubmissionResult,
 } from "@/lib/contracts/missions";
 import {
+  ProgressResponseSchema,
+  type ProgressResponse,
+} from "@/lib/contracts/progress";
+import {
   QuizAttemptResultSchema,
   QuizSubmissionSchema,
   type QuizAttemptResultResponse,
@@ -141,6 +145,16 @@ export function createApiClient(options: ApiClientOptions = {}) {
       },
       me(): Promise<MeResponse> {
         return request({ method: "GET", path: "/api/v1/auth/me", schema: MeResponseSchema, auth: true });
+      },
+    },
+    me: {
+      progress(): Promise<ProgressResponse> {
+        return request({
+          method: "GET",
+          path: "/api/v1/me/quiz-attempts",
+          schema: ProgressResponseSchema,
+          auth: true,
+        });
       },
     },
     tracks: {

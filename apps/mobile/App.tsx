@@ -6,6 +6,7 @@ import { NavigationProvider, useNavigation } from "./src/navigation";
 import { LoginScreen } from "./src/screens/LoginScreen";
 import { MissionScreen } from "./src/screens/MissionScreen";
 import { ModuleDetailScreen } from "./src/screens/ModuleDetailScreen";
+import { ProfileScreen } from "./src/screens/ProfileScreen";
 import { QuizScreen } from "./src/screens/QuizScreen";
 import { TrackDetailScreen } from "./src/screens/TrackDetailScreen";
 import { TracksScreen } from "./src/screens/TracksScreen";
@@ -14,6 +15,8 @@ function Router() {
   const { route } = useNavigation();
 
   switch (route.name) {
+    case "Profile":
+      return <ProfileScreen />;
     case "TrackDetail":
       return <TrackDetailScreen slug={route.slug} title={route.title} />;
     case "ModuleDetail":
