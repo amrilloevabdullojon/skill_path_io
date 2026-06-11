@@ -32,6 +32,7 @@ import {
   MissionSubmissionResultSchema,
   MissionSubmissionSchema,
 } from "@/lib/contracts/missions";
+import { JobsMatchQuerySchema, JobsMatchResponseSchema } from "@/lib/contracts/jobs";
 import { ModuleDetailSchema, ModuleParamsSchema } from "@/lib/contracts/modules";
 import {
   CreateNoteResponseSchema,
@@ -293,6 +294,19 @@ export function buildOpenApiDocument() {
       401: errorResponse("Authentication required"),
       403: errorResponse("Feature not available on plan / usage limit reached"),
       404: errorResponse("Mission not found"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/v1/jobs/match",
+    tags: ["jobs"],
+    summary: "Ranked job matches for the caller (gated by the marketplace plan)",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { query: JobsMatchQuerySchema },
+    responses: {
+      200: { description: "Matches", content: { "application/json": { schema: JobsMatchResponseSchema } } },
+      401: errorResponse("Authentication required"),
     },
   });
 

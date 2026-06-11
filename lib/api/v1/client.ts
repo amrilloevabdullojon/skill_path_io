@@ -42,6 +42,10 @@ import {
   type UpdatePortfolioInput,
 } from "@/lib/contracts/portfolio";
 import {
+  JobsMatchResponseSchema,
+  type JobsMatchResponse,
+} from "@/lib/contracts/jobs";
+import {
   MissionSubmissionResultSchema,
   MissionSubmissionSchema,
   type MissionSubmission,
@@ -226,6 +230,20 @@ export function createApiClient(options: ApiClientOptions = {}) {
           method: "POST",
           path: "/api/v1/auth/request-email-verification",
           schema: OkResponseSchema,
+          auth: true,
+        });
+      },
+    },
+    jobs: {
+      match(query?: { track?: "QA" | "BA" | "DA"; skills?: string[] }): Promise<JobsMatchResponse> {
+        const params = new URLSearchParams();
+        if (query?.track) params.set("track", query.track);
+        for (const skill of query?.skills ?? []) params.append("skill", skill);
+        const qs = params.toString();
+        return request({
+          method: "GET",
+          path: `/api/v1/jobs/match${qs ? `?${qs}` : ""}`,
+          schema: JobsMatchResponseSchema,
           auth: true,
         });
       },
