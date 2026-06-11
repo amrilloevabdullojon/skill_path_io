@@ -14,7 +14,10 @@ module.exports = function (api) {
       [
         "module-resolver",
         {
-          alias: { "@": path.resolve(__dirname, "../..") },
+          alias: {
+            "@": path.resolve(__dirname, "../.."),
+            "~": path.resolve(__dirname, "src"),
+          },
           extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
         },
       ],

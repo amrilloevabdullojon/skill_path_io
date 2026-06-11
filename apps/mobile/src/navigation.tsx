@@ -1,16 +1,12 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { useRouter } from "expo-router";
 
 /**
- * Minimal stack navigation with zero native dependencies, kept deliberately
- * small for the first screens. Swap for expo-router / react-navigation once the
- * screen count and deep-linking needs grow.
+ * Compatibility shim over expo-router.
+ *
+ * Screens were written against a small hand-rolled navigator (`navigate(route)`
+ * / `goBack()`). Rather than rewrite every screen, this maps those Route objects
+ * onto expo-router hrefs so the screen components stay unchanged while routing,
+ * deep links and the Android back button are handled by expo-router.
  */
 
 export type Route =
@@ -22,41 +18,33 @@ export type Route =
   | { name: "Quiz"; slug: string; moduleId: string; title?: string }
   | { name: "Mission"; slug: string; moduleId: string; missionId: string; title?: string };
 
-type Navigation = {
-  route: Route;
-  canGoBack: boolean;
-  navigate: (route: Route) => void;
-  goBack: () => void;
-};
-
-const NavigationContext = createContext<Navigation | null>(null);
-
-export function NavigationProvider({ children }: { children: ReactNode }) {
-  const [stack, setStack] = useState<Route[]>([{ name: "Tracks" }]);
-
-  const navigate = useCallback((route: Route) => {
-    setStack((prev) => [...prev, route]);
-  }, []);
-
-  const goBack = useCallback(() => {
-    setStack((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev));
-  }, []);
-
-  const value = useMemo<Navigation>(
-    () => ({
-      route: stack[stack.length - 1],
-      canGoBack: stack.length > 1,
-      navigate,
-      goBack,
-    }),
-    [stack, navigate, goBack],
-  );
-
-  return <NavigationContext.Provider value={value}>{children}</NavigationContext.Provider>;
+function routeToHref(route: Route): string {
+  switch (route.name) {
+    case "Profile":
+      return "/profile";
+    case "Bookmarks":
+      return "/bookmarks";
+    case "TrackDetail":
+      return `/tracks/${encodeURIComponent(route.slug)}`;
+    case "ModuleDetail":
+      return `/tracks/${encodeURIComponent(route.slug)}/modules/${encodeURIComponent(route.moduleId)}`;
+    case "Quiz":
+      return `/tracks/${encodeURIComponent(route.slug)}/modules/${encodeURIComponent(route.moduleId)}/quiz`;
+    case "Mission":
+      return `/tracks/${encodeURIComponent(route.slug)}/modules/${encodeURIComponent(route.moduleId)}/missions/${encodeURIComponent(route.missionId)}`;
+    case "Tracks":
+    default:
+      return "/tracks";
+  }
 }
 
-export function useNavigation(): Navigation {
-  const ctx = useContext(NavigationContext);
-  if (!ctx) throw new Error("useNavigation must be used within a NavigationProvider");
-  return ctx;
+export function useNavigation() {
+  const router = useRouter();
+  return {
+    navigate: (route: Route) => router.push(routeToHref(route) as never),
+    goBack: () => {
+      if (router.canGoBack()) router.back();
+      else router.replace("/tracks" as never);
+    },
+  };
 }
