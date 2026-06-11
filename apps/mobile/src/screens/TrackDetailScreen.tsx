@@ -16,7 +16,7 @@ import { useNavigation } from "../navigation";
 type Module = TrackCourse["modules"][number];
 
 export function TrackDetailScreen({ slug, title }: { slug: string; title?: string }) {
-  const { goBack } = useNavigation();
+  const { goBack, navigate } = useNavigation();
   const [course, setCourse] = useState<TrackCourse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,7 +76,19 @@ export function TrackDetailScreen({ slug, title }: { slug: string; title?: strin
               .slice()
               .sort((a, b) => a.order - b.order)
               .map((module: Module, index: number) => (
-                <View key={module.id} style={styles.moduleCard}>
+                <TouchableOpacity
+                  key={module.id}
+                  activeOpacity={0.8}
+                  onPress={() =>
+                    navigate({
+                      name: "ModuleDetail",
+                      slug: course.slug,
+                      moduleId: module.id,
+                      title: module.title,
+                    })
+                  }
+                  style={styles.moduleCard}
+                >
                   <Text style={styles.moduleIndex}>{String(index + 1).padStart(2, "0")}</Text>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.moduleTitle}>{module.title}</Text>
@@ -86,7 +98,8 @@ export function TrackDetailScreen({ slug, title }: { slug: string; title?: strin
                       {module.missions.length > 0 ? ` · ${module.missions.length} missions` : ""}
                     </Text>
                   </View>
-                </View>
+                  <Text style={styles.chevron}>›</Text>
+                </TouchableOpacity>
               ))
           )}
         </ScrollView>
@@ -127,5 +140,6 @@ const styles = StyleSheet.create({
   moduleIndex: { color: "#6366f1", fontSize: 18, fontWeight: "800", width: 28 },
   moduleTitle: { color: "#fff", fontSize: 16, fontWeight: "600" },
   moduleMeta: { color: "#9ca3af", fontSize: 13, marginTop: 3 },
+  chevron: { color: "#4b5563", fontSize: 22, fontWeight: "700" },
   error: { color: "#fca5a5", textAlign: "center", marginTop: 40 },
 });

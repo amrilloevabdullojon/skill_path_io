@@ -20,6 +20,7 @@ import {
   DeleteBookmarkResponseSchema,
   ListBookmarksResponseSchema,
 } from "@/lib/contracts/bookmarks";
+import { ModuleDetailSchema, ModuleParamsSchema } from "@/lib/contracts/modules";
 import {
   TrackDetailSchema,
   TrackParamsSchema,
@@ -130,6 +131,23 @@ export function buildOpenApiDocument() {
       },
       401: errorResponse("Authentication required"),
       404: errorResponse("Track not found"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/v1/tracks/{slug}/modules/{moduleId}",
+    tags: ["learning"],
+    summary: "A single module's learner view (no quiz answers)",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { params: ModuleParamsSchema, query: TracksQuerySchema },
+    responses: {
+      200: {
+        description: "Module detail",
+        content: { "application/json": { schema: ModuleDetailSchema } },
+      },
+      401: errorResponse("Authentication required"),
+      404: errorResponse("Track or module not found"),
     },
   });
 

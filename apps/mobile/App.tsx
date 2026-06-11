@@ -4,6 +4,7 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { AuthProvider, useAuth } from "./src/auth";
 import { NavigationProvider, useNavigation } from "./src/navigation";
 import { LoginScreen } from "./src/screens/LoginScreen";
+import { ModuleDetailScreen } from "./src/screens/ModuleDetailScreen";
 import { TrackDetailScreen } from "./src/screens/TrackDetailScreen";
 import { TracksScreen } from "./src/screens/TracksScreen";
 
@@ -13,6 +14,8 @@ function Router() {
   switch (route.name) {
     case "TrackDetail":
       return <TrackDetailScreen slug={route.slug} title={route.title} />;
+    case "ModuleDetail":
+      return <ModuleDetailScreen slug={route.slug} moduleId={route.moduleId} />;
     case "Tracks":
     default:
       return <TracksScreen />;

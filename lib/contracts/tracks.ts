@@ -26,14 +26,14 @@ export type TracksQuery = z.infer<typeof TracksQuerySchema>;
 
 // ── Response ─────────────────────────────────────────────────────────────────
 
-const RuntimeStatusSchema = z.enum([
+export const RuntimeStatusSchema = z.enum([
   "DRAFT",
   "IN_REVIEW",
   "PUBLISHED",
   "ARCHIVED",
   "UNKNOWN",
 ]);
-const RuntimeVisibilitySchema = z.enum(["PUBLIC", "PRIVATE", "HIDDEN"]);
+export const RuntimeVisibilitySchema = z.enum(["PUBLIC", "PRIVATE", "HIDDEN"]);
 const RuntimeCategorySchema = z.enum([
   "QA",
   "BA",
@@ -64,7 +64,7 @@ const RuntimeLessonBlockSchema = z.object({
   config: z.record(z.string(), z.unknown()),
 });
 
-const RuntimeLessonSchema = z.object({
+export const RuntimeLessonSchema = z.object({
   id: z.string(),
   moduleId: z.string(),
   order: z.number(),
@@ -95,7 +95,7 @@ const RuntimeQuizSchema = z.object({
   questions: z.array(RuntimeQuestionSchema),
 });
 
-const RuntimeMissionSchema = z.object({
+export const RuntimeMissionSchema = z.object({
   id: z.string(),
   title: z.string(),
   scenario: z.string(),
@@ -105,7 +105,7 @@ const RuntimeMissionSchema = z.object({
   status: RuntimeStatusSchema,
 });
 
-const RuntimeSimulationSchema = z.object({
+export const RuntimeSimulationSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string(),

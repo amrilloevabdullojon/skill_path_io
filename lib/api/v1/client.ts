@@ -19,6 +19,10 @@ import {
   type CreateBookmarkInput,
 } from "@/lib/contracts/bookmarks";
 import {
+  ModuleDetailSchema,
+  type ModuleDetailResponse,
+} from "@/lib/contracts/modules";
+import {
   TrackDetailSchema,
   TracksCatalogSchema,
   type TrackCourse,
@@ -145,6 +149,14 @@ export function createApiClient(options: ApiClientOptions = {}) {
           auth: true,
         });
         return course;
+      },
+      getModule(slug: string, moduleId: string): Promise<ModuleDetailResponse> {
+        return request({
+          method: "GET",
+          path: `/api/v1/tracks/${encodeURIComponent(slug)}/modules/${encodeURIComponent(moduleId)}`,
+          schema: ModuleDetailSchema,
+          auth: true,
+        });
       },
     },
     bookmarks: {
