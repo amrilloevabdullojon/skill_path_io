@@ -13,6 +13,10 @@ export type Route =
   | { name: "Tracks" }
   | { name: "Profile" }
   | { name: "Bookmarks" }
+  | { name: "Interview" }
+  | { name: "Jobs" }
+  | { name: "Subscription" }
+  | { name: "WeeklyReport" }
   | { name: "TrackDetail"; slug: string; title?: string }
   | { name: "ModuleDetail"; slug: string; moduleId: string; title?: string }
   | { name: "Quiz"; slug: string; moduleId: string; title?: string }
@@ -24,6 +28,14 @@ function routeToHref(route: Route): string {
       return "/profile";
     case "Bookmarks":
       return "/bookmarks";
+    case "Interview":
+      return "/interview";
+    case "Jobs":
+      return "/jobs";
+    case "Subscription":
+      return "/subscription";
+    case "WeeklyReport":
+      return "/weekly-report";
     case "TrackDetail":
       return `/tracks/${encodeURIComponent(route.slug)}`;
     case "ModuleDetail":

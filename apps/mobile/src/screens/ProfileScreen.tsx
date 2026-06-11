@@ -77,10 +77,24 @@ export function ProfileScreen() {
                 <Stat label="Avg score" value={`${data?.stats.averageScore ?? 0}%`} />
               </View>
 
-              <TouchableOpacity style={styles.linkRow} onPress={() => navigate({ name: "Bookmarks" })}>
-                <Text style={styles.linkText}>Saved items</Text>
-                <Text style={styles.linkChevron}>›</Text>
-              </TouchableOpacity>
+              {(
+                [
+                  { label: "Saved items", route: { name: "Bookmarks" } as const },
+                  { label: "Interview practice", route: { name: "Interview" } as const },
+                  { label: "Job matches", route: { name: "Jobs" } as const },
+                  { label: "Weekly report", route: { name: "WeeklyReport" } as const },
+                  { label: "Subscription", route: { name: "Subscription" } as const },
+                ]
+              ).map((item) => (
+                <TouchableOpacity
+                  key={item.label}
+                  style={styles.linkRow}
+                  onPress={() => navigate(item.route)}
+                >
+                  <Text style={styles.linkText}>{item.label}</Text>
+                  <Text style={styles.linkChevron}>›</Text>
+                </TouchableOpacity>
+              ))}
 
               {error ? <Text style={styles.error}>{error}</Text> : null}
               <Text style={styles.sectionTitle}>Recent quiz attempts</Text>
