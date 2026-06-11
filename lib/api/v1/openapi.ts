@@ -59,6 +59,7 @@ import {
 import { PlannerForecastRequestSchema, PlannerForecastSchema } from "@/lib/contracts/planner";
 import { CommandResponseSchema } from "@/lib/contracts/command";
 import { ProgressResponseSchema } from "@/lib/contracts/progress";
+import { WeeklyReportResponseSchema } from "@/lib/contracts/reports";
 import { SubscriptionsResponseSchema } from "@/lib/contracts/subscriptions";
 import {
   BugReportInputSchema,
@@ -444,6 +445,19 @@ export function buildOpenApiDocument() {
     responses: {
       200: { description: "Catalog", content: { "application/json": { schema: CommandResponseSchema } } },
       401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/v1/reports/weekly",
+    tags: ["reports"],
+    summary: "The caller's weekly AI report",
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: { description: "Weekly report", content: { "application/json": { schema: WeeklyReportResponseSchema } } },
+      401: errorResponse("Authentication required"),
+      404: errorResponse("No report available"),
     },
   });
 

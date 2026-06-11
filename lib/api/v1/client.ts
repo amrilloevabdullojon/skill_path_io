@@ -84,6 +84,10 @@ import {
   type ProgressResponse,
 } from "@/lib/contracts/progress";
 import {
+  WeeklyReportResponseSchema,
+  type WeeklyReportResponse,
+} from "@/lib/contracts/reports";
+import {
   SubscriptionsResponseSchema,
   type SubscriptionsResponse,
 } from "@/lib/contracts/subscriptions";
@@ -384,6 +388,16 @@ export function createApiClient(options: ApiClientOptions = {}) {
           method: "GET",
           path: "/api/v1/command",
           schema: CommandResponseSchema,
+          auth: true,
+        });
+      },
+    },
+    reports: {
+      weekly(): Promise<WeeklyReportResponse> {
+        return request({
+          method: "GET",
+          path: "/api/v1/reports/weekly",
+          schema: WeeklyReportResponseSchema,
           auth: true,
         });
       },
