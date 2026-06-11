@@ -50,6 +50,8 @@ model User {
   name               String
   email              String                   @unique
   role               UserRole                 @default(STUDENT)
+  passwordHash       String?
+  emailVerified      DateTime?
   createdAt          DateTime                 @default(now())
   progresses         UserProgress[]
   courseProgresses   CourseModuleProgress[]

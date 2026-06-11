@@ -33,6 +33,10 @@ import {
   type ProgressResponse,
 } from "@/lib/contracts/progress";
 import {
+  RegisterRequestSchema,
+  type RegisterRequest,
+} from "@/lib/contracts/register";
+import {
   TrackProgressSchema,
   type TrackProgressResponse,
 } from "@/lib/contracts/track-progress";
@@ -131,6 +135,14 @@ export function createApiClient(options: ApiClientOptions = {}) {
 
   return {
     auth: {
+      register(body: RegisterRequest): Promise<TokenPairResponse> {
+        return request({
+          method: "POST",
+          path: "/api/v1/auth/register",
+          body: RegisterRequestSchema.parse(body),
+          schema: TokenPairSchema,
+        });
+      },
       login(body: LoginRequest): Promise<TokenPairResponse> {
         return request({
           method: "POST",

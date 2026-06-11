@@ -13,6 +13,7 @@ import {
   RefreshRequestSchema,
   TokenPairSchema,
 } from "@/lib/contracts/auth";
+import { RegisterRequestSchema } from "@/lib/contracts/register";
 import {
   CreateBookmarkResponseSchema,
   CreateBookmarkSchema,
@@ -58,6 +59,23 @@ export function buildOpenApiDocument() {
   const errorResponse = (description: string) => ({
     description,
     content: { "application/json": { schema: ErrorSchema } },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/auth/register",
+    tags: ["auth"],
+    summary: "Create a credential account and return tokens",
+    request: {
+      body: { content: { "application/json": { schema: RegisterRequestSchema } } },
+    },
+    responses: {
+      200: {
+        description: "Token pair",
+        content: { "application/json": { schema: TokenPairSchema } },
+      },
+      400: errorResponse("Validation error / email already in use"),
+    },
   });
 
   registry.registerPath({

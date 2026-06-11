@@ -8,6 +8,7 @@ import { getOnboardingProfile, type OnboardingProfile } from "./src/onboarding";
 import { BookmarksScreen } from "./src/screens/BookmarksScreen";
 import { LoginScreen } from "./src/screens/LoginScreen";
 import { MissionScreen } from "./src/screens/MissionScreen";
+import { RegisterScreen } from "./src/screens/RegisterScreen";
 import { ModuleDetailScreen } from "./src/screens/ModuleDetailScreen";
 import { OnboardingScreen } from "./src/screens/OnboardingScreen";
 import { ProfileScreen } from "./src/screens/ProfileScreen";
@@ -65,11 +66,20 @@ function AuthedApp() {
   );
 }
 
+function AuthScreens() {
+  const [mode, setMode] = useState<"login" | "register">("login");
+  return mode === "login" ? (
+    <LoginScreen onShowRegister={() => setMode("register")} />
+  ) : (
+    <RegisterScreen onShowLogin={() => setMode("login")} />
+  );
+}
+
 function Root() {
   const { status } = useAuth();
 
   if (status === "loading") return <Splash />;
-  if (status !== "authenticated") return <LoginScreen />;
+  if (status !== "authenticated") return <AuthScreens />;
   return <AuthedApp />;
 }
 

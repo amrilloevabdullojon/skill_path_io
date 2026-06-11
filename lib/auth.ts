@@ -1,6 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+import { verifyCredentials } from "@/lib/auth/credentials";
 import { getLocalUserByEmail } from "@/lib/auth/local-users";
 import { isDemoModeEnabled } from "@/lib/config/runtime-mode";
 import { prisma } from "@/lib/prisma";
@@ -21,27 +22,21 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!isDemoModeEnabled()) {
+        if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
-        // Guard: demo credentials require the expected demo password token.
-        // The local login panel always sends password: "local"; any other value
-        // (including missing/empty) must be rejected to prevent account enumeration.
-        if (credentials?.password !== "local") {
-          return null;
-        }
-
-        const user = getLocalUserByEmail(credentials?.email);
-        if (!user) {
+        // Unified verification: demo accounts (demo mode + "local" token) and
+        // real accounts (bcrypt password hash) are both handled here.
+        const identity = await verifyCredentials(credentials.email, credentials.password);
+        if (!identity) {
           return null;
         }
 
         return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
+          id: identity.id,
+          email: identity.email,
+          role: identity.role,
         };
       },
     }),

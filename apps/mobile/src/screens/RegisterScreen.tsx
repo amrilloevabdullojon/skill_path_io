@@ -7,30 +7,34 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
 } from "react-native";
 
 import { ApiError } from "@/lib/api/v1/client";
 
 import { useAuth } from "../auth";
 
-export function LoginScreen({ onShowRegister }: { onShowRegister: () => void }) {
-  const { login } = useAuth();
-  const [email, setEmail] = useState("student@levio.local");
-  const [password, setPassword] = useState("local");
+export function RegisterScreen({ onShowLogin }: { onShowLogin: () => void }) {
+  const { register } = useAuth();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   async function onSubmit() {
     setError(null);
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
     setSubmitting(true);
     try {
-      await login(email.trim(), password);
+      await register(name.trim(), email.trim(), password);
     } catch (err) {
-      if (err instanceof ApiError && err.status === 401) {
-        setError("Invalid email or password.");
+      if (err instanceof ApiError && err.status === 400) {
+        setError(err.message || "Could not create the account.");
       } else {
-        setError("Could not sign in. Check the API URL and try again.");
+        setError("Could not create the account. Check the API URL and try again.");
       }
     } finally {
       setSubmitting(false);
@@ -42,14 +46,23 @@ export function LoginScreen({ onShowRegister }: { onShowRegister: () => void }) 
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Text style={styles.brand}>Levio</Text>
-      <Text style={styles.subtitle}>Sign in to continue learning</Text>
+      <Text style={styles.brand}>Create your account</Text>
+      <Text style={styles.subtitle}>Start learning with Levio</Text>
 
+      <TextInput
+        style={styles.input}
+        value={name}
+        onChangeText={setName}
+        placeholder="Name"
+        placeholderTextColor="#6b7280"
+        autoCapitalize="words"
+      />
       <TextInput
         style={styles.input}
         value={email}
         onChangeText={setEmail}
         placeholder="Email"
+        placeholderTextColor="#6b7280"
         autoCapitalize="none"
         keyboardType="email-address"
         autoCorrect={false}
@@ -58,42 +71,36 @@ export function LoginScreen({ onShowRegister }: { onShowRegister: () => void }) 
         style={styles.input}
         value={password}
         onChangeText={setPassword}
-        placeholder="Password"
+        placeholder="Password (min 8 characters)"
+        placeholderTextColor="#6b7280"
         secureTextEntry
       />
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <TouchableOpacity
-        style={[styles.button, submitting && styles.buttonDisabled]}
+        style={[styles.button, (submitting || !name || !email || !password) && styles.buttonDisabled]}
         onPress={onSubmit}
-        disabled={submitting}
+        disabled={submitting || !name || !email || !password}
       >
         {submitting ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.buttonText}>Sign in</Text>
+          <Text style={styles.buttonText}>Create account</Text>
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={onShowRegister} hitSlop={8}>
-        <Text style={styles.link}>New here? Create an account</Text>
+      <TouchableOpacity onPress={onShowLogin} hitSlop={8}>
+        <Text style={styles.link}>Already have an account? Sign in</Text>
       </TouchableOpacity>
-
-      <Text style={styles.hint}>Demo: student@levio.local / local</Text>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0c0a1e",
-    justifyContent: "center",
-    paddingHorizontal: 24,
-  },
-  brand: { color: "#fff", fontSize: 40, fontWeight: "800", textAlign: "center" },
-  subtitle: { color: "#a5b4fc", fontSize: 15, textAlign: "center", marginTop: 4, marginBottom: 32 },
+  container: { flex: 1, backgroundColor: "#0c0a1e", justifyContent: "center", paddingHorizontal: 24 },
+  brand: { color: "#fff", fontSize: 28, fontWeight: "800", textAlign: "center" },
+  subtitle: { color: "#a5b4fc", fontSize: 15, textAlign: "center", marginTop: 4, marginBottom: 28 },
   input: {
     backgroundColor: "#1b1733",
     color: "#fff",
@@ -114,5 +121,4 @@ const styles = StyleSheet.create({
   buttonDisabled: { opacity: 0.6 },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "700" },
   link: { color: "#a5b4fc", fontSize: 14, textAlign: "center", marginTop: 20 },
-  hint: { color: "#6b7280", fontSize: 13, textAlign: "center", marginTop: 12 },
 });

@@ -9,6 +9,7 @@ import { readBearerToken, verifyAccessToken } from "@/lib/auth/tokens";
  */
 const PUBLIC_PREFIXES = [
   "/api/auth/",        // NextAuth own endpoints (signin, signout, callback, session, csrf)
+  "/api/v1/auth/register", // Account creation — no session yet
   "/api/v1/auth/login",   // Token login — issues tokens, no session yet
   "/api/v1/auth/refresh", // Token refresh — authenticated by the refresh token itself
   "/api/v1/openapi.json", // Machine-readable API spec — public for tooling/clients

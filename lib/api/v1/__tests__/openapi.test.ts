@@ -11,6 +11,7 @@ describe("OpenAPI document", () => {
     expect(doc.info.title).toBe("Levio API");
     expect(Object.keys(doc.paths ?? {})).toEqual(
       expect.arrayContaining([
+        "/api/v1/auth/register",
         "/api/v1/auth/login",
         "/api/v1/auth/refresh",
         "/api/v1/auth/me",

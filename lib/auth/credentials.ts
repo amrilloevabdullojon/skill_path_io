@@ -1,4 +1,5 @@
 import { getLocalUserByEmail } from "@/lib/auth/local-users";
+import { verifyPassword } from "@/lib/auth/password";
 import type { TokenIdentity } from "@/lib/auth/tokens";
 import { isDemoModeEnabled } from "@/lib/config/runtime-mode";
 import { prisma } from "@/lib/prisma";
@@ -6,46 +7,50 @@ import { prisma } from "@/lib/prisma";
 /**
  * Verify email/password credentials and return a token identity, or null.
  *
- * This mirrors the NextAuth credentials `authorize` flow so the mobile token
- * login behaves exactly like the web login:
- * - Demo mode: the local panel sends password "local"; any other value is rejected.
- * - Roles are synced from the DB user when one exists.
+ * Supports two account types:
+ * - Demo accounts (only when demo mode is enabled and the demo token "local"
+ *   is sent) — preserves the existing local panel behavior.
+ * - Real accounts — verifies the bcrypt password hash stored on the user.
  *
- * Phase 0 extension point: when real registration lands, verify a hashed
- * password against the Prisma `User` row here for non-demo deployments.
+ * Used by both the mobile token login and (mirrored in) the NextAuth web flow.
  */
 export async function verifyCredentials(
   email: string,
   password: string,
 ): Promise<TokenIdentity | null> {
-  if (!isDemoModeEnabled()) {
-    // Real credential verification (hashed passwords) is implemented in Phase 0.
-    return null;
+  const normalizedEmail = email.trim().toLowerCase();
+
+  // Demo accounts: the local panel always sends password "local".
+  if (isDemoModeEnabled() && password === "local") {
+    const localUser = getLocalUserByEmail(normalizedEmail);
+    if (localUser) {
+      try {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: localUser.email },
+          select: { id: true, role: true },
+        });
+        if (dbUser) {
+          return { id: dbUser.id, email: localUser.email, role: dbUser.role };
+        }
+      } catch {
+        // fall back to the seed identity below
+      }
+      return { id: localUser.id, email: localUser.email, role: localUser.role };
+    }
   }
 
-  // Demo guard: reject any password other than the expected demo token to
-  // avoid account enumeration, matching authOptions.authorize.
-  if (password !== "local") {
-    return null;
-  }
-
-  const localUser = getLocalUserByEmail(email);
-  if (!localUser) {
-    return null;
-  }
-
-  // Prefer the DB user's id/role when present, falling back to the local seed.
+  // Real credential accounts: verify the stored bcrypt hash.
   try {
     const dbUser = await prisma.user.findUnique({
-      where: { email: localUser.email },
-      select: { id: true, role: true },
+      where: { email: normalizedEmail },
+      select: { id: true, email: true, role: true, passwordHash: true },
     });
-    if (dbUser) {
-      return { id: dbUser.id, email: localUser.email, role: dbUser.role };
+    if (dbUser && (await verifyPassword(password, dbUser.passwordHash))) {
+      return { id: dbUser.id, email: dbUser.email, role: dbUser.role };
     }
   } catch {
-    // DB unavailable — fall back to the local seed identity below.
+    // DB unavailable — deny.
   }
 
-  return { id: localUser.id, email: localUser.email, role: localUser.role };
+  return null;
 }

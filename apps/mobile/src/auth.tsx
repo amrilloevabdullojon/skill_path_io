@@ -11,6 +11,7 @@ type AuthState = {
   status: "loading" | "authenticated" | "unauthenticated";
   user: SessionUser | null;
   login: (email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -50,6 +51,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       async login(email, password) {
         const tokens = await api.auth.login({ email, password });
+        await saveTokens(tokens.accessToken, tokens.refreshToken);
+        const me = await api.auth.me();
+        setUser(me.user);
+        setStatus("authenticated");
+      },
+      async register(name, email, password) {
+        const tokens = await api.auth.register({ name, email, password });
         await saveTokens(tokens.accessToken, tokens.refreshToken);
         const me = await api.auth.me();
         setUser(me.user);
