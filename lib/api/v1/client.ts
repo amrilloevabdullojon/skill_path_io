@@ -23,6 +23,12 @@ import {
   type ModuleDetailResponse,
 } from "@/lib/contracts/modules";
 import {
+  MissionSubmissionResultSchema,
+  MissionSubmissionSchema,
+  type MissionSubmission,
+  type MissionSubmissionResult,
+} from "@/lib/contracts/missions";
+import {
   QuizAttemptResultSchema,
   QuizSubmissionSchema,
   type QuizAttemptResultResponse,
@@ -174,6 +180,20 @@ export function createApiClient(options: ApiClientOptions = {}) {
           path: `/api/v1/tracks/${encodeURIComponent(slug)}/modules/${encodeURIComponent(moduleId)}/quiz/attempts`,
           body: QuizSubmissionSchema.parse(submission),
           schema: QuizAttemptResultSchema,
+          auth: true,
+        });
+      },
+      submitMission(
+        slug: string,
+        moduleId: string,
+        missionId: string,
+        submission: MissionSubmission,
+      ): Promise<MissionSubmissionResult> {
+        return request({
+          method: "POST",
+          path: `/api/v1/tracks/${encodeURIComponent(slug)}/modules/${encodeURIComponent(moduleId)}/missions/${encodeURIComponent(missionId)}/submissions`,
+          body: MissionSubmissionSchema.parse(submission),
+          schema: MissionSubmissionResultSchema,
           auth: true,
         });
       },

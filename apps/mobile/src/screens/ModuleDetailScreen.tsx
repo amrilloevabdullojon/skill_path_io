@@ -78,6 +78,32 @@ export function ModuleDetailScreen({ slug, moduleId }: { slug: string; moduleId:
               ))
           )}
 
+          {data.module.missions.length > 0 ? (
+            <>
+              <Text style={styles.sectionTitle}>Missions</Text>
+              {data.module.missions.map((mission) => (
+                <TouchableOpacity
+                  key={mission.id}
+                  activeOpacity={0.8}
+                  onPress={() =>
+                    navigate({ name: "Mission", slug, moduleId, missionId: mission.id })
+                  }
+                  style={styles.lessonCard}
+                >
+                  <Text style={styles.lessonTitle}>{mission.title}</Text>
+                  {mission.objective ? (
+                    <Text style={styles.lessonDesc} numberOfLines={2}>
+                      {mission.objective}
+                    </Text>
+                  ) : null}
+                  <Text style={styles.lessonMeta}>
+                    {mission.difficulty} · {mission.xpReward} XP
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </>
+          ) : null}
+
           {data.module.quiz ? (
             <View style={styles.quizCard}>
               <Text style={styles.quizTitle}>{data.module.quiz.title || "Module quiz"}</Text>

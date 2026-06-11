@@ -20,6 +20,11 @@ import {
   DeleteBookmarkResponseSchema,
   ListBookmarksResponseSchema,
 } from "@/lib/contracts/bookmarks";
+import {
+  MissionParamsSchema,
+  MissionSubmissionResultSchema,
+  MissionSubmissionSchema,
+} from "@/lib/contracts/missions";
 import { ModuleDetailSchema, ModuleParamsSchema } from "@/lib/contracts/modules";
 import { QuizAttemptResultSchema, QuizSubmissionSchema } from "@/lib/contracts/quiz";
 import {
@@ -170,6 +175,28 @@ export function buildOpenApiDocument() {
       400: errorResponse("Invalid submission"),
       401: errorResponse("Authentication required"),
       404: errorResponse("Quiz not found"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/tracks/{slug}/modules/{moduleId}/missions/{missionId}/submissions",
+    tags: ["learning"],
+    summary: "Submit a mission artifact and receive an evaluation",
+    security: [{ [bearerAuth.name]: [] }],
+    request: {
+      params: MissionParamsSchema,
+      body: { content: { "application/json": { schema: MissionSubmissionSchema } } },
+    },
+    responses: {
+      200: {
+        description: "Mission evaluation",
+        content: { "application/json": { schema: MissionSubmissionResultSchema } },
+      },
+      400: errorResponse("Invalid submission"),
+      401: errorResponse("Authentication required"),
+      403: errorResponse("Feature not available on plan / usage limit reached"),
+      404: errorResponse("Mission not found"),
     },
   });
 

@@ -15,10 +15,18 @@ type ApiSubscriptionContext = {
   subscription: Awaited<ReturnType<typeof resolveUserSubscription>>;
 };
 
-async function resolveUserIdentity() {
-  const session = await getServerSession(authOptions);
-  const email = session?.user?.email ?? "guest@levio.local";
-  const role: "ADMIN" | "STUDENT" = session?.user?.role === "ADMIN" ? "ADMIN" : "STUDENT";
+/** Identity override for non-cookie callers (e.g. /api/v1 Bearer-token requests). */
+export type ApiIdentityOverride = { email?: string | null; role?: "ADMIN" | "STUDENT" };
+
+async function resolveUserIdentity(override?: ApiIdentityOverride) {
+  let email = override?.email ?? null;
+  let role: "ADMIN" | "STUDENT" = override?.role ?? "STUDENT";
+
+  if (!email) {
+    const session = await getServerSession(authOptions);
+    email = session?.user?.email ?? "guest@levio.local";
+    role = session?.user?.role === "ADMIN" ? "ADMIN" : "STUDENT";
+  }
 
   let dbUser: { id: string } | null = null;
   try {
@@ -37,8 +45,10 @@ async function resolveUserIdentity() {
   };
 }
 
-export async function resolveApiSubscriptionContext(): Promise<ApiSubscriptionContext> {
-  const identity = await resolveUserIdentity();
+export async function resolveApiSubscriptionContext(
+  override?: ApiIdentityOverride,
+): Promise<ApiSubscriptionContext> {
+  const identity = await resolveUserIdentity(override);
   const subscription = await resolveUserSubscription({
     userId: identity.userId,
     userEmail: identity.userEmail,
