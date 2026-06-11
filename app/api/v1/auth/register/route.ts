@@ -4,6 +4,7 @@ import { registerUser, RegistrationError } from "@/lib/auth/register";
 import { issueTokenPair } from "@/lib/auth/tokens";
 import { TokenPairSchema } from "@/lib/contracts/auth";
 import { RegisterRequestSchema } from "@/lib/contracts/register";
+import { sendVerificationEmail } from "@/lib/email/auth-emails";
 
 export const runtime = "nodejs";
 
@@ -16,6 +17,7 @@ export const POST = withErrorHandler(async (request: Request) => {
 
   try {
     const identity = await registerUser(input);
+    await sendVerificationEmail({ id: identity.id, email: identity.email }).catch(() => {});
     const tokens = await issueTokenPair(identity);
     return respond(TokenPairSchema, tokens);
   } catch (error) {

@@ -13,6 +13,12 @@ import {
   RefreshRequestSchema,
   TokenPairSchema,
 } from "@/lib/contracts/auth";
+import {
+  OkResponseSchema,
+  RequestPasswordResetSchema,
+  ResetPasswordSchema,
+  VerifyEmailSchema,
+} from "@/lib/contracts/account";
 import { RegisterRequestSchema } from "@/lib/contracts/register";
 import {
   CreateBookmarkResponseSchema,
@@ -76,6 +82,47 @@ export function buildOpenApiDocument() {
       },
       400: errorResponse("Validation error / email already in use"),
     },
+  });
+
+  const okJson = {
+    description: "OK",
+    content: { "application/json": { schema: OkResponseSchema } },
+  };
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/auth/request-password-reset",
+    tags: ["auth"],
+    summary: "Email a password-reset link if the account exists",
+    request: { body: { content: { "application/json": { schema: RequestPasswordResetSchema } } } },
+    responses: { 200: okJson },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/auth/reset-password",
+    tags: ["auth"],
+    summary: "Set a new password from a reset token",
+    request: { body: { content: { "application/json": { schema: ResetPasswordSchema } } } },
+    responses: { 200: okJson, 400: errorResponse("Invalid or expired token") },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/auth/verify-email",
+    tags: ["auth"],
+    summary: "Confirm an email from a verification token",
+    request: { body: { content: { "application/json": { schema: VerifyEmailSchema } } } },
+    responses: { 200: okJson, 400: errorResponse("Invalid or expired token") },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/auth/request-email-verification",
+    tags: ["auth"],
+    summary: "Resend the verification email for the current user",
+    security: [{ [bearerAuth.name]: [] }],
+    responses: { 200: okJson, 401: errorResponse("Authentication required") },
   });
 
   registry.registerPath({

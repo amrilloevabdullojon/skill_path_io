@@ -14,7 +14,13 @@ import { ApiError } from "@/lib/api/v1/client";
 
 import { useAuth } from "../auth";
 
-export function LoginScreen({ onShowRegister }: { onShowRegister: () => void }) {
+export function LoginScreen({
+  onShowRegister,
+  onShowForgot,
+}: {
+  onShowRegister: () => void;
+  onShowForgot: () => void;
+}) {
   const { login } = useAuth();
   const [email, setEmail] = useState("student@levio.local");
   const [password, setPassword] = useState("local");
@@ -74,6 +80,10 @@ export function LoginScreen({ onShowRegister }: { onShowRegister: () => void }) 
         ) : (
           <Text style={styles.buttonText}>Sign in</Text>
         )}
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={onShowForgot} hitSlop={8}>
+        <Text style={styles.link}>Forgot password?</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={onShowRegister} hitSlop={8}>

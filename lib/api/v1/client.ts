@@ -33,6 +33,16 @@ import {
   type ProgressResponse,
 } from "@/lib/contracts/progress";
 import {
+  OkResponseSchema,
+  RequestPasswordResetSchema,
+  ResetPasswordSchema,
+  VerifyEmailSchema,
+  type OkResponse,
+  type RequestPasswordReset,
+  type ResetPassword,
+  type VerifyEmail,
+} from "@/lib/contracts/account";
+import {
   RegisterRequestSchema,
   type RegisterRequest,
 } from "@/lib/contracts/register";
@@ -161,6 +171,38 @@ export function createApiClient(options: ApiClientOptions = {}) {
       },
       me(): Promise<MeResponse> {
         return request({ method: "GET", path: "/api/v1/auth/me", schema: MeResponseSchema, auth: true });
+      },
+      requestPasswordReset(body: RequestPasswordReset): Promise<OkResponse> {
+        return request({
+          method: "POST",
+          path: "/api/v1/auth/request-password-reset",
+          body: RequestPasswordResetSchema.parse(body),
+          schema: OkResponseSchema,
+        });
+      },
+      resetPassword(body: ResetPassword): Promise<OkResponse> {
+        return request({
+          method: "POST",
+          path: "/api/v1/auth/reset-password",
+          body: ResetPasswordSchema.parse(body),
+          schema: OkResponseSchema,
+        });
+      },
+      verifyEmail(body: VerifyEmail): Promise<OkResponse> {
+        return request({
+          method: "POST",
+          path: "/api/v1/auth/verify-email",
+          body: VerifyEmailSchema.parse(body),
+          schema: OkResponseSchema,
+        });
+      },
+      requestEmailVerification(): Promise<OkResponse> {
+        return request({
+          method: "POST",
+          path: "/api/v1/auth/request-email-verification",
+          schema: OkResponseSchema,
+          auth: true,
+        });
       },
     },
     me: {

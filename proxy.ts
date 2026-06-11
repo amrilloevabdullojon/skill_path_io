@@ -12,6 +12,9 @@ const PUBLIC_PREFIXES = [
   "/api/v1/auth/register", // Account creation — no session yet
   "/api/v1/auth/login",   // Token login — issues tokens, no session yet
   "/api/v1/auth/refresh", // Token refresh — authenticated by the refresh token itself
+  "/api/v1/auth/request-password-reset", // Recovery — no session
+  "/api/v1/auth/reset-password",          // Token is the credential
+  "/api/v1/auth/verify-email",            // Token is the credential
   "/api/v1/openapi.json", // Machine-readable API spec — public for tooling/clients
   "/api/health",       // Health-check — must stay reachable without a session
   "/api/public/",      // Endpoints that intentionally accept anonymous callers

@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from "./src/auth";
 import { NavigationProvider, useNavigation } from "./src/navigation";
 import { getOnboardingProfile, type OnboardingProfile } from "./src/onboarding";
 import { BookmarksScreen } from "./src/screens/BookmarksScreen";
+import { ForgotPasswordScreen } from "./src/screens/ForgotPasswordScreen";
 import { LoginScreen } from "./src/screens/LoginScreen";
 import { MissionScreen } from "./src/screens/MissionScreen";
 import { RegisterScreen } from "./src/screens/RegisterScreen";
@@ -67,11 +68,14 @@ function AuthedApp() {
 }
 
 function AuthScreens() {
-  const [mode, setMode] = useState<"login" | "register">("login");
-  return mode === "login" ? (
-    <LoginScreen onShowRegister={() => setMode("register")} />
-  ) : (
-    <RegisterScreen onShowLogin={() => setMode("login")} />
+  const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
+  if (mode === "register") return <RegisterScreen onShowLogin={() => setMode("login")} />;
+  if (mode === "forgot") return <ForgotPasswordScreen onShowLogin={() => setMode("login")} />;
+  return (
+    <LoginScreen
+      onShowRegister={() => setMode("register")}
+      onShowForgot={() => setMode("forgot")}
+    />
   );
 }
 
