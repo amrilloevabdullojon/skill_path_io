@@ -14,23 +14,55 @@ This runs production env validation, lint, typecheck, tests, build, and producti
 
 ## Launch Blockers
 
-- `npm audit --omit=dev` currently reports upstream advisories in `next`, `next-auth`, `monaco-editor` / `dompurify`, and related transitive packages. Do not treat the app as production-ready until the upgrade path is tested and applied or the deployment surface is explicitly accepted.
-- Demo mode must be disabled in production:
+- Demo mode must be disabled in production (`validateEnv` enforces this):
   - `ENABLE_DEMO_MODE=false`
   - `NEXT_PUBLIC_ENABLE_DEMO_MODE=false`
 - `NEXTAUTH_SECRET` must be a strong random value with at least 32 characters.
+  If `AUTH_TOKEN_SECRET` is set, it must also be ≥32 characters.
 - `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL` must use `https://` in production.
+- Apply the database migration that adds `User.passwordHash` and
+  `User.emailVerified` before promoting (see Database below).
+
+## Database
+
+The credential-auth columns (`passwordHash`, `emailVerified`) require a schema
+migration. Generate and apply it from the new `prisma/schema.prisma`:
+
+```bash
+# Create the migration (against a dev/shadow DB):
+npx prisma migrate dev --name add_user_credentials
+# In CI/CD, apply committed migrations to the runtime DB:
+npx prisma migrate deploy
+```
+
+## Auth, email & OAuth
+
+- Real accounts use bcrypt password hashes. Registration is `POST /api/v1/auth/register`.
+- Password reset and email verification use stateless action tokens; no extra
+  table is required. Configure email delivery, or links are only logged:
+  - `RESEND_API_KEY`, `EMAIL_FROM` — without a key, emails print to the server log (dev only).
+- OAuth (optional) is enabled per provider when its env pair is set:
+  - `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET`
+  - `GITHUB_ID` + `GITHUB_SECRET`
+  - Redirect URI: `${NEXTAUTH_URL}/api/auth/callback/<provider>`
+
+## Rate limiting
+
+- For multi-instance production set `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`
+  to share limits across instances. Without them, limiting is in-memory per node
+  (`validateEnv` warns). If Redis is unreachable at request time, the limiter
+  fails open to in-memory rather than blocking traffic.
 
 ## Runtime Requirements
 
 - Store all secrets in the deployment provider secret manager. Do not bake `.env`, `.env.local`, or `.env.*.local` into images.
-- Run database migrations before the app is promoted.
+- Run database migrations (`prisma migrate deploy`) before the app is promoted.
 - Use `/api/health` as the readiness check. It returns `503` when the database check fails.
 - Keep `NODE_ENV=production` in the runtime container.
 
 ## Security Notes
 
-- The default rate limiter is in-memory and is suitable for local/demo use. For multi-instance production, replace it with a shared backend such as Redis.
+- The rate limiter uses Upstash Redis when configured (see Rate limiting above) and falls back to in-memory otherwise. In-memory is only safe for single-instance deployments.
 - Public AI endpoints are rate-limited and input-bounded, but they can still consume paid AI quota. Monitor usage and set conservative `ADMIN_AI_RATE_LIMIT_*` / `MENTOR_RATE_LIMIT_*` values.
 - Security headers are configured in `next.config.mjs`, including CSP, HSTS, frame denial, content-type sniffing protection, and permissions policy.
 - Public portfolio pages under `/p/[slug]` are intentionally anonymous. All other app routes are protected by middleware unless explicitly whitelisted.
