@@ -21,6 +21,8 @@ describe("OpenAPI document", () => {
         "/api/v1/me/quiz-attempts",
         "/api/v1/interview",
         "/api/v1/jobs/match",
+        "/api/v1/simulation/ba-review",
+        "/api/v1/simulation/bug-review",
         "/api/v1/planner/forecast",
         "/api/v1/tracks",
         "/api/v1/tracks/{slug}",

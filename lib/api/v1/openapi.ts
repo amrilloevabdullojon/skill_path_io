@@ -52,6 +52,12 @@ import {
 } from "@/lib/contracts/portfolio";
 import { PlannerForecastRequestSchema, PlannerForecastSchema } from "@/lib/contracts/planner";
 import { ProgressResponseSchema } from "@/lib/contracts/progress";
+import {
+  BugReportInputSchema,
+  BugReviewResultSchema,
+  UserStoryInputSchema,
+  UserStoryReviewSchema,
+} from "@/lib/contracts/simulation";
 import { TrackProgressSchema } from "@/lib/contracts/track-progress";
 import { QuizAttemptResultSchema, QuizSubmissionSchema } from "@/lib/contracts/quiz";
 import { CatalogSchema, TrackDetailSchema } from "@/lib/contracts/catalog";
@@ -322,6 +328,34 @@ export function buildOpenApiDocument() {
     request: { query: JobsMatchQuerySchema },
     responses: {
       200: { description: "Matches", content: { "application/json": { schema: JobsMatchResponseSchema } } },
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/simulation/ba-review",
+    tags: ["simulation"],
+    summary: "Score a user story draft",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { body: { content: { "application/json": { schema: UserStoryInputSchema } } } },
+    responses: {
+      200: { description: "Review", content: { "application/json": { schema: UserStoryReviewSchema } } },
+      400: errorResponse("Validation error"),
+      401: errorResponse("Authentication required"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/simulation/bug-review",
+    tags: ["simulation"],
+    summary: "Score a bug report draft",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { body: { content: { "application/json": { schema: BugReportInputSchema } } } },
+    responses: {
+      200: { description: "Review", content: { "application/json": { schema: BugReviewResultSchema } } },
+      400: errorResponse("Validation error"),
       401: errorResponse("Authentication required"),
     },
   });

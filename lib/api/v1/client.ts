@@ -68,6 +68,14 @@ import {
   type ProgressResponse,
 } from "@/lib/contracts/progress";
 import {
+  BugReportInputSchema,
+  BugReviewResultSchema,
+  UserStoryInputSchema,
+  UserStoryReviewSchema,
+  type BugReportInput,
+  type UserStoryInput,
+} from "@/lib/contracts/simulation";
+import {
   OkResponseSchema,
   RequestPasswordResetSchema,
   ResetPasswordSchema,
@@ -273,6 +281,26 @@ export function createApiClient(options: ApiClientOptions = {}) {
           method: "GET",
           path: `/api/v1/jobs/match${qs ? `?${qs}` : ""}`,
           schema: JobsMatchResponseSchema,
+          auth: true,
+        });
+      },
+    },
+    simulation: {
+      reviewUserStory(input: UserStoryInput) {
+        return request({
+          method: "POST",
+          path: "/api/v1/simulation/ba-review",
+          body: UserStoryInputSchema.parse(input),
+          schema: UserStoryReviewSchema,
+          auth: true,
+        });
+      },
+      reviewBug(input: BugReportInput) {
+        return request({
+          method: "POST",
+          path: "/api/v1/simulation/bug-review",
+          body: BugReportInputSchema.parse(input),
+          schema: BugReviewResultSchema,
           auth: true,
         });
       },
