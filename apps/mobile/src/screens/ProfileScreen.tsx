@@ -22,7 +22,7 @@ function formatDate(iso: string): string {
 
 export function ProfileScreen() {
   const { user, logout } = useAuth();
-  const { goBack } = useNavigation();
+  const { goBack, navigate } = useNavigation();
   const [data, setData] = useState<ProgressResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -76,6 +76,11 @@ export function ProfileScreen() {
                 <Stat label="Passed" value={data?.stats.passedAttempts ?? 0} />
                 <Stat label="Avg score" value={`${data?.stats.averageScore ?? 0}%`} />
               </View>
+
+              <TouchableOpacity style={styles.linkRow} onPress={() => navigate({ name: "Bookmarks" })}>
+                <Text style={styles.linkText}>Saved items</Text>
+                <Text style={styles.linkChevron}>›</Text>
+              </TouchableOpacity>
 
               {error ? <Text style={styles.error}>{error}</Text> : null}
               <Text style={styles.sectionTitle}>Recent quiz attempts</Text>
@@ -135,6 +140,18 @@ const styles = StyleSheet.create({
   },
   statValue: { color: "#fff", fontSize: 22, fontWeight: "800" },
   statLabel: { color: "#9ca3af", fontSize: 12, marginTop: 4 },
+  linkRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#1b1733",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    marginTop: 18,
+  },
+  linkText: { color: "#fff", fontSize: 15, fontWeight: "600" },
+  linkChevron: { color: "#4b5563", fontSize: 22, fontWeight: "700" },
   sectionTitle: { color: "#fff", fontSize: 17, fontWeight: "700", marginTop: 26, marginBottom: 12 },
   empty: { color: "#6b7280", marginTop: 8 },
   error: { color: "#fca5a5", marginTop: 12 },

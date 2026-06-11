@@ -3,6 +3,7 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { AuthProvider, useAuth } from "./src/auth";
 import { NavigationProvider, useNavigation } from "./src/navigation";
+import { BookmarksScreen } from "./src/screens/BookmarksScreen";
 import { LoginScreen } from "./src/screens/LoginScreen";
 import { MissionScreen } from "./src/screens/MissionScreen";
 import { ModuleDetailScreen } from "./src/screens/ModuleDetailScreen";
@@ -17,6 +18,8 @@ function Router() {
   switch (route.name) {
     case "Profile":
       return <ProfileScreen />;
+    case "Bookmarks":
+      return <BookmarksScreen />;
     case "TrackDetail":
       return <TrackDetailScreen slug={route.slug} title={route.title} />;
     case "ModuleDetail":

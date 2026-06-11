@@ -16,6 +16,7 @@ import {
 export type Route =
   | { name: "Tracks" }
   | { name: "Profile" }
+  | { name: "Bookmarks" }
   | { name: "TrackDetail"; slug: string; title?: string }
   | { name: "ModuleDetail"; slug: string; moduleId: string; title?: string }
   | { name: "Quiz"; slug: string; moduleId: string; title?: string }

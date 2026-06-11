@@ -18,6 +18,26 @@ export function ModuleDetailScreen({ slug, moduleId }: { slug: string; moduleId:
   const [data, setData] = useState<ModuleDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  async function onSave() {
+    if (!data || saved || saving) return;
+    setSaving(true);
+    try {
+      await api.bookmarks.create({
+        title: data.module.title,
+        href: `/tracks/${slug}/modules/${moduleId}`,
+        type: "module",
+        tag: data.course.title,
+      });
+      setSaved(true);
+    } catch {
+      // non-fatal; leave the button actionable
+    } finally {
+      setSaving(false);
+    }
+  }
 
   useEffect(() => {
     let active = true;
@@ -42,6 +62,13 @@ export function ModuleDetailScreen({ slug, moduleId }: { slug: string; moduleId:
         <TouchableOpacity onPress={goBack} hitSlop={12}>
           <Text style={styles.back}>‹ Back</Text>
         </TouchableOpacity>
+        {data ? (
+          <TouchableOpacity onPress={onSave} disabled={saved || saving} hitSlop={12}>
+            <Text style={[styles.save, saved && styles.saved]}>
+              {saving ? "Saving…" : saved ? "★ Saved" : "☆ Save"}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
 
       {loading ? (
@@ -128,8 +155,16 @@ export function ModuleDetailScreen({ slug, moduleId }: { slug: string; moduleId:
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#0c0a1e", paddingTop: 56 },
-  header: { paddingHorizontal: 20, paddingBottom: 8 },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingBottom: 8,
+  },
   back: { color: "#a5b4fc", fontSize: 16, fontWeight: "600" },
+  save: { color: "#a5b4fc", fontSize: 15, fontWeight: "600" },
+  saved: { color: "#fde68a" },
   body: { paddingHorizontal: 20, paddingBottom: 48 },
   eyebrow: { color: "#818cf8", fontSize: 13, fontWeight: "600", marginTop: 8 },
   title: { color: "#fff", fontSize: 26, fontWeight: "800", marginTop: 4 },
