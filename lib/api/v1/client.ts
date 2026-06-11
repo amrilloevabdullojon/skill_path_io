@@ -42,6 +42,12 @@ import {
   type UpdatePortfolioInput,
 } from "@/lib/contracts/portfolio";
 import {
+  InterviewEvaluateResponseSchema,
+  InterviewStartResponseSchema,
+  type InterviewEvaluateResponse,
+  type InterviewStartResponse,
+} from "@/lib/contracts/interview";
+import {
   JobsMatchResponseSchema,
   type JobsMatchResponse,
 } from "@/lib/contracts/jobs";
@@ -230,6 +236,29 @@ export function createApiClient(options: ApiClientOptions = {}) {
           method: "POST",
           path: "/api/v1/auth/request-email-verification",
           schema: OkResponseSchema,
+          auth: true,
+        });
+      },
+    },
+    interview: {
+      start(track: "QA" | "BA" | "DA"): Promise<InterviewStartResponse> {
+        return request({
+          method: "POST",
+          path: "/api/v1/interview",
+          body: { action: "start", track },
+          schema: InterviewStartResponseSchema,
+          auth: true,
+        });
+      },
+      evaluate(
+        track: "QA" | "BA" | "DA",
+        answers: Array<{ questionId: string; answer: string }>,
+      ): Promise<InterviewEvaluateResponse> {
+        return request({
+          method: "POST",
+          path: "/api/v1/interview",
+          body: { action: "evaluate", track, answers },
+          schema: InterviewEvaluateResponseSchema,
           auth: true,
         });
       },

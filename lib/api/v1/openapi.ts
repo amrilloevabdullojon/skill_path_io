@@ -32,6 +32,7 @@ import {
   MissionSubmissionResultSchema,
   MissionSubmissionSchema,
 } from "@/lib/contracts/missions";
+import { InterviewRequestSchema, InterviewResponseSchema } from "@/lib/contracts/interview";
 import { JobsMatchQuerySchema, JobsMatchResponseSchema } from "@/lib/contracts/jobs";
 import { ModuleDetailSchema, ModuleParamsSchema } from "@/lib/contracts/modules";
 import {
@@ -294,6 +295,21 @@ export function buildOpenApiDocument() {
       401: errorResponse("Authentication required"),
       403: errorResponse("Feature not available on plan / usage limit reached"),
       404: errorResponse("Mission not found"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/interview",
+    tags: ["interview"],
+    summary: "AI interview trainer — start (questions) or evaluate (scoring)",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { body: { content: { "application/json": { schema: InterviewRequestSchema } } } },
+    responses: {
+      200: { description: "Questions or evaluation", content: { "application/json": { schema: InterviewResponseSchema } } },
+      400: errorResponse("Validation error"),
+      401: errorResponse("Authentication required"),
+      403: errorResponse("Feature not available / usage limit reached"),
     },
   });
 
