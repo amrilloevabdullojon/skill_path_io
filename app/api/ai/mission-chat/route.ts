@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth";
 import { callAnthropic, checkRateLimit } from "@/lib/ai/ai-service";
+import { logAiUsage } from "@/lib/ai/usage-log";
 import { apiOk, Errors, withErrorHandler } from "@/lib/api/error-handler";
 import {
   denyFeature,
@@ -124,5 +125,6 @@ Instructions:
   }
 
   recordMeterUsage(accessContext, "aiMentorRequests");
+  await logAiUsage("MISSION_CHAT", accessContext.userId);
   return apiOk({ text: aiResult.data }, 200);
 });

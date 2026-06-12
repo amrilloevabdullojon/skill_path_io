@@ -1,4 +1,5 @@
 import { buildAiRemediation } from "@/lib/ai/remediation";
+import { logAiUsage } from "@/lib/ai/usage-log";
 import { apiOk, Errors, withErrorHandler } from "@/lib/api/error-handler";
 import { buildDefaultAdaptiveSignal } from "@/lib/personalization/adaptive-defaults";
 import {
@@ -29,5 +30,6 @@ export const POST = withErrorHandler(async (request: Request) => {
   const signal = buildDefaultAdaptiveSignal(body);
   const remediation = buildAiRemediation(signal);
   recordMeterUsage(accessContext, "aiMentorRequests");
+  await logAiUsage("AI_REMEDIATION", accessContext.userId);
   return apiOk(remediation);
 });

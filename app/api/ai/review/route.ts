@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { runUnifiedReview } from "@/lib/ai";
+import { logAiUsage } from "@/lib/ai/usage-log";
 import {
   denyFeature,
   denyUsage,
@@ -32,5 +33,6 @@ export async function POST(request: Request) {
   }
 
   recordMeterUsage(accessContext, "aiMentorRequests");
+  await logAiUsage("AI_REVIEW", accessContext.userId);
   return NextResponse.json(result.data, { status: result.status });
 }

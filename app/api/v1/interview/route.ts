@@ -1,4 +1,5 @@
 import { runUnifiedInterview } from "@/lib/ai";
+import { logAiUsage } from "@/lib/ai/usage-log";
 import { Errors, withErrorHandler } from "@/lib/api/error-handler";
 import { requireIdentity } from "@/lib/api/v1/identity";
 import { parseBody, respond } from "@/lib/api/v1/http";
@@ -43,5 +44,6 @@ export const POST = withErrorHandler(async (request: Request) => {
   }
 
   recordMeterUsage(accessContext, "interviewSessions");
+  await logAiUsage("AI_INTERVIEW", accessContext.userId);
   return respond(InterviewResponseSchema, result.data);
 });
