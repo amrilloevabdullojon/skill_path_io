@@ -19,6 +19,8 @@ const PUBLIC_PREFIXES = [
   "/api/health",       // Health-check — must stay reachable without a session
   "/api/public/",      // Endpoints that intentionally accept anonymous callers
   "/login",
+  "/reset-password", // Password reset page — consumes a token, no session
+  "/verify-email",   // Email verification page — consumes a token, no session
   "/p/",          // Public portfolio pages (/p/[slug])
   "/interview-preview",
   "/skill-test",
