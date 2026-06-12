@@ -84,6 +84,11 @@ import {
   type ProgressResponse,
 } from "@/lib/contracts/progress";
 import {
+  PushTokenResponseSchema,
+  RegisterPushTokenSchema,
+  type RegisterPushTokenInput,
+} from "@/lib/contracts/push";
+import {
   WeeklyReportResponseSchema,
   type WeeklyReportResponse,
 } from "@/lib/contracts/reports";
@@ -408,6 +413,15 @@ export function createApiClient(options: ApiClientOptions = {}) {
           method: "GET",
           path: "/api/v1/me/quiz-attempts",
           schema: ProgressResponseSchema,
+          auth: true,
+        });
+      },
+      registerPushToken(input: RegisterPushTokenInput): Promise<{ ok: boolean }> {
+        return request({
+          method: "POST",
+          path: "/api/v1/me/push-token",
+          body: RegisterPushTokenSchema.parse(input),
+          schema: PushTokenResponseSchema,
           auth: true,
         });
       },

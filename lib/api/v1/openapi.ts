@@ -59,6 +59,7 @@ import {
 import { PlannerForecastRequestSchema, PlannerForecastSchema } from "@/lib/contracts/planner";
 import { CommandResponseSchema } from "@/lib/contracts/command";
 import { ProgressResponseSchema } from "@/lib/contracts/progress";
+import { PushTokenResponseSchema, RegisterPushTokenSchema } from "@/lib/contracts/push";
 import { WeeklyReportResponseSchema } from "@/lib/contracts/reports";
 import { SubscriptionsResponseSchema } from "@/lib/contracts/subscriptions";
 import {
@@ -458,6 +459,20 @@ export function buildOpenApiDocument() {
       200: { description: "Weekly report", content: { "application/json": { schema: WeeklyReportResponseSchema } } },
       401: errorResponse("Authentication required"),
       404: errorResponse("No report available"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/me/push-token",
+    tags: ["me"],
+    summary: "Register an Expo push token for the caller",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { body: { content: { "application/json": { schema: RegisterPushTokenSchema } } } },
+    responses: {
+      200: { description: "OK", content: { "application/json": { schema: PushTokenResponseSchema } } },
+      400: errorResponse("Validation error"),
+      401: errorResponse("Authentication required"),
     },
   });
 

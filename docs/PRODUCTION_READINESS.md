@@ -20,8 +20,8 @@ This runs production env validation, lint, typecheck, tests, build, and producti
 - `NEXTAUTH_SECRET` must be a strong random value with at least 32 characters.
   If `AUTH_TOKEN_SECRET` is set, it must also be ≥32 characters.
 - `NEXTAUTH_URL` and `NEXT_PUBLIC_APP_URL` must use `https://` in production.
-- Apply the database migration that adds `User.passwordHash` and
-  `User.emailVerified` before promoting (see Database below).
+- Apply the database migrations that add `User.passwordHash`,
+  `User.emailVerified`, and the `PushToken` model before promoting (see Database below).
 
 ## Database
 

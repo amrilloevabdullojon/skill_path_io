@@ -7,6 +7,10 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
+    "splash": {
+      "backgroundColor": "#0c0a1e",
+      "resizeMode": "contain"
+    },
     "ios": {
       "supportsTablet": true
     },
@@ -23,6 +27,6 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
     },
-    "plugins": ["expo-router"]
+    "plugins": ["expo-router", "expo-notifications"]
   }
 }

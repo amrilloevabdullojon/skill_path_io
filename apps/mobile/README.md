@@ -31,7 +31,8 @@ npm install
 # rewrites the expo-router / react-native-* versions in package.json to the
 # exact SDK-compatible ones):
 npx expo install expo-router react-native-safe-area-context react-native-screens \
-  expo-linking expo-constants react-native-gesture-handler expo-secure-store
+  expo-linking expo-constants react-native-gesture-handler expo-secure-store \
+  expo-notifications expo-device
 
 # Point the app at your running web API (defaults to http://localhost:3000).
 # On a physical device, use your machine's LAN IP, not localhost:
@@ -73,7 +74,17 @@ and `~/…` → `apps/mobile/src`.
 > boots and navigates on a simulator/device, and run `npx expo install` to lock
 > SDK-correct native versions before building.
 
+## Push notifications
+
+After login the app requests notification permission and registers its Expo push
+token with `POST /api/v1/me/push-token` (`src/push.ts`, called from
+`app/(app)/_layout.tsx`). Tokens are stored on the `PushToken` Prisma model.
+On a device, obtaining the token may require an EAS `projectId`; it no-ops on
+simulators. Sending notifications (an Expo push job from the server) is not yet
+wired.
+
 ## Next
 
-- Native: push notifications, offline cache (Phase 3C), EAS store builds (3D).
+- Native: offline cache (react-query + persistence), custom app icon/splash art.
 - Mobile OAuth (expo-auth-session) and reset/verify deep links.
+- EAS store builds (Phase 3D).
