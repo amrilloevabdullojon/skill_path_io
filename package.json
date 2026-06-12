@@ -14,6 +14,7 @@
     "check:env:prod": "node scripts/check-env.mjs --prod",
     "check:release": "npm run check:env:prod && npm run lint && npm run typecheck && npm run test && npm run build && npm audit --omit=dev",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
@@ -30,6 +31,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@monaco-editor/react": "^4.7.0",
     "@prisma/client": "5.22.0",
+    "@sentry/nextjs": "^10.57.0",
     "@types/canvas-confetti": "^1.9.0",
     "bcryptjs": "^3.0.3",
     "canvas-confetti": "^1.9.4",
@@ -57,6 +59,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/bcryptjs": "^2.4.6",

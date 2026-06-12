@@ -72,6 +72,11 @@ export function withErrorHandler<T extends unknown[]>(
       if (process.env.NODE_ENV !== "production") {
         console.error("[API Error]", body.code, body.message, err);
       }
+      // Report unexpected (5xx) errors to Sentry when configured. Loaded lazily
+      // so Sentry never enters bundles unless a DSN is set and an error occurs.
+      if (status >= 500 && process.env.SENTRY_DSN) {
+        void import("@sentry/nextjs").then((Sentry) => Sentry.captureException(err)).catch(() => {});
+      }
       return NextResponse.json(body, { status });
     }
   };
