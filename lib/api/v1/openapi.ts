@@ -40,6 +40,7 @@ import {
   ListEdgesResponseSchema,
 } from "@/lib/contracts/knowledge-graph";
 import { ApplyRequestSchema, ApplyResponseSchema } from "@/lib/contracts/marketplace";
+import { AiUsageResponseSchema } from "@/lib/contracts/ai-usage";
 import { ModuleDetailSchema, ModuleParamsSchema } from "@/lib/contracts/modules";
 import {
   CreateNoteResponseSchema,
@@ -459,6 +460,19 @@ export function buildOpenApiDocument() {
       200: { description: "Weekly report", content: { "application/json": { schema: WeeklyReportResponseSchema } } },
       401: errorResponse("Authentication required"),
       404: errorResponse("No report available"),
+    },
+  });
+
+  registry.registerPath({
+    method: "get",
+    path: "/api/v1/admin/ai-usage",
+    tags: ["admin"],
+    summary: "AI call volume summary for cost monitoring (admin only)",
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: { description: "Usage summary", content: { "application/json": { schema: AiUsageResponseSchema } } },
+      401: errorResponse("Authentication required"),
+      403: errorResponse("Admin only"),
     },
   });
 
