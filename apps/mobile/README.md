@@ -83,8 +83,31 @@ On a device, obtaining the token may require an EAS `projectId`; it no-ops on
 simulators. Sending notifications (an Expo push job from the server) is not yet
 wired.
 
+## Tests
+
+```bash
+npx expo install jest-expo jest @testing-library/react-native react-test-renderer
+npm test
+```
+
+Uses the `jest-expo` preset (`jest.config.js`). `src/ui/__tests__/DataState.test.tsx`
+is a starter component test; add more for screens and `src/navigation` mapping.
+
+## Builds & release (EAS)
+
+`eas.json` defines `development` / `preview` / `production` profiles (each pins
+`EXPO_PUBLIC_API_URL`). With the EAS CLI and an Expo account:
+
+```bash
+npm i -g eas-cli && eas login
+eas build --profile production --platform all
+eas submit --profile production --platform ios   # and android
+```
+
+Set a project id (`npx expo init`-managed or `eas init`) so push tokens resolve.
+
 ## Next
 
 - Native: offline cache (react-query + persistence), custom app icon/splash art.
 - Mobile OAuth (expo-auth-session) and reset/verify deep links.
-- EAS store builds (Phase 3D).
+- Server-side Expo push-send job.
