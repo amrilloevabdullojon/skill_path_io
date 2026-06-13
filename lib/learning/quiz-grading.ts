@@ -10,6 +10,7 @@ import {
 } from "@/lib/learning/progress";
 import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
 import { resolveLearningUser } from "@/lib/learning-user";
+import { notifyCertificateEarned } from "@/lib/notifications/triggers";
 import { prisma } from "@/lib/prisma";
 import { applyTrackContentOverrides, normalizeLearningLocale } from "@/lib/tracks/content-overrides";
 
@@ -375,6 +376,7 @@ export async function gradeAndRecordQuizAttempt(params: {
         data: { certificateUrl: `/api/certificates/${createdCertificate.id}/pdf` },
       });
 
+      await notifyCertificateEarned(user.id, overriddenTrack.title);
       certificateIssued = true;
     }
   }
@@ -402,6 +404,7 @@ export async function gradeAndRecordQuizAttempt(params: {
           data: { certificateUrl: `/api/course-certificates/${createdCertificate.id}/pdf` },
         });
 
+        await notifyCertificateEarned(user.id, overriddenTrack.title);
         certificateIssued = true;
       }
     }
