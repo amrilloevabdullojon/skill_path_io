@@ -10,10 +10,10 @@ import { checkFeatureAccess } from "@/lib/saas/gating";
 import { resolveUserSubscription } from "@/lib/saas/subscriptions";
 
 export const metadata: Metadata = {
-  title: "Missions — SkillPath Academy",
+  title: "Missions",
   description: "Real-world scenario missions for QA, BA, and DA learners. Practice with AI-backed evaluation.",
   openGraph: {
-    title: "Scenario Missions — SkillPath Academy",
+    title: "Scenario Missions",
     description: "Practice on real work situations with AI-backed evaluation and recovery hints.",
     type: "website",
   },
@@ -21,12 +21,12 @@ export const metadata: Metadata = {
 
 export default async function MissionsPage() {
   const session = await getServerSession(authOptions);
-  const profile = getOnboardingProfileFromCookie();
+  const profile = await getOnboardingProfileFromCookie();
   const runtimeMissions = await resolveRuntimeMissions();
   const user = await resolveLearningUser(session?.user?.email);
   const subscription = await resolveUserSubscription({
     userId: user?.id ?? `anon-${session?.user?.email ?? "student"}`,
-    userEmail: user?.email ?? session?.user?.email ?? "student@skillpath.local",
+    userEmail: user?.email ?? session?.user?.email ?? "student@levio.local",
     role: session?.user?.role ?? "STUDENT",
   });
 
@@ -42,7 +42,6 @@ export default async function MissionsPage() {
       <MissionBoard
         missions={visibleMissions}
         isPlanLimited={!missionsUnlimited}
-        upgradeMessage={!missionsUnlimited ? "Free plan has mission limits. Upgrade to Pro for unlimited missions." : null}
       />
     </section>
   );

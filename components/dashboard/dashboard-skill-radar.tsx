@@ -12,8 +12,8 @@ export function DashboardSkillRadarSection({ radar }: DashboardSkillRadarProps) 
   return (
     <DashboardSection
       id="skills"
-      title="Skill Radar"
-      description="Current competency across testing, analytics, communication, and automation."
+      title="Радар навыков"
+      description="Текущий уровень компетенций в тестировании, аналитике, коммуникации и автоматизации."
     >
       <div className="grid min-w-0 gap-4 2xl:grid-cols-[minmax(0,1fr)_minmax(0,15rem)]">
         <div className="min-w-0">
@@ -24,21 +24,21 @@ export function DashboardSkillRadarSection({ radar }: DashboardSkillRadarProps) 
           <div className="content-card min-w-0 p-3">
             <p className="data-label inline-flex items-center gap-2">
               <TrendingUp className="h-3.5 w-3.5 text-emerald-300" />
-              Strongest
+              Сильная сторона
             </p>
             <p className="mt-2 break-words text-sm font-semibold text-foreground">{radar.strongestSkill}</p>
           </div>
           <div className="content-card min-w-0 p-3">
             <p className="data-label inline-flex items-center gap-2">
               <TrendingDown className="h-3.5 w-3.5 text-orange-300" />
-              Weakest
+              Слабая сторона
             </p>
             <p className="mt-2 break-words text-sm font-semibold text-foreground">{radar.weakestSkill}</p>
           </div>
           <div className="content-card min-w-0 p-3">
             <p className="data-label inline-flex items-center gap-2">
-              <ShieldCheck className="h-3.5 w-3.5 text-sky-300" />
-              Next focus
+              <ShieldCheck className="h-3.5 w-3.5 text-indigo-300" />
+              Фокус развития
             </p>
             <p className="mt-2 break-words text-sm font-semibold text-foreground">{radar.nextFocus}</p>
           </div>

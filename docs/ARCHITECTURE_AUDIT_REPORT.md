@@ -1,7 +1,7 @@
 # ARCHITECTURE AUDIT REPORT
 
 Date: 2026-03-15
-Scope: Local SkillPath Academy (Next.js App Router, Prisma, Zustand, Tailwind)
+Scope: Local Levio (Next.js App Router, Prisma, Zustand, Tailwind)
 
 ## 1. Systems In Conflict
 

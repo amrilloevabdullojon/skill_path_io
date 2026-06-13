@@ -12,11 +12,11 @@ import { getOnboardingProfileFromCookie } from "@/lib/personalization/profile-st
 import { getAdaptivePath } from "@/lib/recommendations/adaptive-path";
 
 export const metadata: Metadata = {
-  title: "Career Readiness — SkillPath Academy",
-  description: "Track your career readiness score, identify skill gaps, and get a personalised roadmap to your first tech role.",
+  title: "Готовность к Карьере",
+  description: "Отслеживайте свою готовность, находите пробелы в навыках и получите персональную дорожную карту к первому IT офферу.",
   openGraph: {
-    title: "Career Readiness Dashboard — SkillPath Academy",
-    description: "Measure your readiness for Junior QA, BA, and Data Analyst roles.",
+    title: "Дашборд Готовности к Карьере",
+    description: "Измерьте свою готовность к ролям Junior QA, BA и Data Analyst.",
     type: "website",
   },
 };
@@ -38,7 +38,7 @@ const requiredSkillsByRole: Record<(typeof roleByTrack)[keyof typeof roleByTrack
 export default async function CareerPage() {
   const [session, profile] = await Promise.all([
     getServerSession(authOptions),
-    Promise.resolve(getOnboardingProfileFromCookie()),
+    getOnboardingProfileFromCookie(),
   ]);
 
   const dashboard = await getDashboardData({
@@ -48,8 +48,8 @@ export default async function CareerPage() {
 
   if (!dashboard) {
     return (
-      <section className="surface-elevated p-6">
-        <p className="text-sm text-muted-foreground">No dashboard data found yet. Open your dashboard after onboarding.</p>
+      <section className="surface-elevated border border-border/50 bg-card p-6 rounded-2xl">
+        <p className="text-sm text-foreground/70">Данные дашборда пока не собраны. Пожалуйста, завершите онбординг.</p>
       </section>
     );
   }
@@ -105,17 +105,19 @@ export default async function CareerPage() {
         <CareerRoadmapVisual readinessScore={careerSystem.readiness.score} />
       </div>
 
-      <section className="surface-elevated flex flex-wrap items-center justify-between gap-3 p-5">
-        <div>
-          <p className="kicker">Portfolio</p>
-          <p className="text-sm text-muted-foreground">Turn completed missions into portfolio artifacts for job interviews.</p>
+      <section className="mt-6 flex flex-wrap items-center justify-between gap-6 border-t border-border/60 pt-6">
+        <div className="w-full sm:w-auto flex-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-300">Портфолио</p>
+          <h3 className="mt-2 text-lg font-semibold text-foreground">Ваши персональные проекты</h3>
+          <p className="mt-2 text-sm leading-relaxed text-foreground/70">
+            Превратите выполненные миссии в артефакты для портфолио — главный аргумент при поиске работы.
+          </p>
         </div>
-        <Link href="/portfolio" className="btn-secondary">
-          Open portfolio
+        <Link href="/portfolio" className="btn-primary inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold whitespace-nowrap">
+          Открыть портфолио
         </Link>
       </section>
     </section>
   );
 }
-
 

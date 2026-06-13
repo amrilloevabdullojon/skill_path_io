@@ -19,10 +19,10 @@ const TRACK_BADGE: Record<string, string> = {
 };
 
 type AdminQuizzesPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string | string[];
     moduleId?: string | string[];
-  };
+  }>;
 };
 
 function paramValue(value: string | string[] | undefined) {
@@ -33,8 +33,9 @@ function paramValue(value: string | string[] | undefined) {
 export default async function AdminQuizzesPage({ searchParams }: AdminQuizzesPageProps) {
   await requireAdminPermission("courses.read");
 
-  const query = paramValue(searchParams?.q);
-  const moduleIdFilter = paramValue(searchParams?.moduleId);
+  const resolvedSearchParams = await searchParams;
+  const query = paramValue(resolvedSearchParams?.q);
+  const moduleIdFilter = paramValue(resolvedSearchParams?.moduleId);
 
   const [modules, quizzes] = await getQuizListData({ query, moduleId: moduleIdFilter });
 
@@ -71,9 +72,9 @@ export default async function AdminQuizzesPage({ searchParams }: AdminQuizzesPag
               Apply
             </button>
             {(query || moduleIdFilter) && (
-              <a href="/admin/quizzes" className="btn-secondary text-muted-foreground">
+              <Link href="/admin/quizzes" className="btn-secondary text-muted-foreground">
                 Reset
-              </a>
+              </Link>
             )}
           </div>
         </form>

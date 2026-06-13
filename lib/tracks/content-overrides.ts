@@ -138,36 +138,58 @@ const QA_MANUAL_MODULES: OverrideModule[] = [
           ru: "Чем занимается Manual QA",
         },
         body: {
-          en: `## Role in plain words
+          en: `## Scene: first day on the product team
 
-Manual QA helps the team understand the current quality of a product. The goal is not random clicking. The goal is to reduce release risk and make product behavior visible.
+You join a sprint planning call. The product manager says: "Registration is almost ready. We just need QA to check it quickly." The task sounds small, but nobody has written what "works" means.
 
-## What QA is responsible for
+Your job is not to click every button. Your job is to make risk visible before the team ships.
 
-- reading requirements and finding ambiguity early
-- preparing checks before a feature is considered done
-- validating both expected and unexpected user behavior
-- documenting defects clearly enough for the team to act fast
-- retesting fixes and reporting remaining risk
+## What you inspect first
 
-## What QA is not responsible for
+| Signal | What you ask | Why it matters |
+| --- | --- | --- |
+| User goal | Can a new user create an account without help? | This protects the main product path. |
+| Acceptance criteria | What result counts as success? | Without this, testing becomes opinion. |
+| Failure points | Where can the user get stuck or lose data? | These are release risks. |
+| Evidence | What proof will convince the team? | Evidence turns a feeling into a decision. |
 
-QA does not guarantee zero bugs. A tester provides evidence, coverage, and judgment. Quality is a shared responsibility between product, design, development, and QA.`,
-          ru: `## Роль простыми словами
+## Mini action
 
-Manual QA помогает команде понимать текущее состояние качества продукта. Цель не в хаотичных кликах. Цель в том, чтобы снижать релизные риски и делать поведение продукта прозрачным.
+Write three lines before you test:
 
-## За что отвечает QA
+1. **Observation:** The user tries to create an account with email and password.
+2. **Risk:** unclear validation can block signup or create duplicate accounts.
+3. **Check:** valid signup, invalid email, duplicate email, weak password.
 
-- читает требования и заранее находит неоднозначности
-- готовит проверки до того, как фича считается готовой
-- валидирует ожидаемое и неожиданное поведение пользователя
-- описывает дефекты так, чтобы команда могла быстро среагировать
-- перепроверяет исправления и сообщает об оставшихся рисках
+## Artifact seed
 
-## За что QA не отвечает
+Use this lesson to fill the **Observation** and **Risk** branches of the artifact. A good QA note starts with a fact, then explains why the fact matters.`,
+          ru: `## Сцена: первый день в продуктовой команде
 
-QA не гарантирует полное отсутствие багов. Тестировщик дает evidence, покрытие и обоснованную оценку. Качество - общая ответственность продукта, дизайна, разработки и QA.`,
+Вы подключаетесь к sprint planning. Product manager говорит: "Регистрация почти готова. Нужно, чтобы QA быстро проверил". Задача звучит маленькой, но никто не написал, что именно считается "работает".
+
+Ваша работа - не нажать все кнопки подряд. Ваша работа - сделать риск видимым до релиза.
+
+## Что смотреть первым
+
+| Сигнал | Что спросить | Зачем это важно |
+| --- | --- | --- |
+| Цель пользователя | Может ли новый пользователь создать аккаунт без помощи? | Это защищает главный продуктовый путь. |
+| Acceptance criteria | Какой результат считается успехом? | Без этого тестирование превращается во мнение. |
+| Точки отказа | Где пользователь может застрять или потерять данные? | Это релизные риски. |
+| Evidence | Какое доказательство убедит команду? | Evidence превращает ощущение в решение. |
+
+## Мини-действие
+
+Перед тестированием запишите три строки:
+
+1. **Наблюдение:** пользователь пытается создать аккаунт через email и password.
+2. **Риск:** неясная валидация может заблокировать регистрацию или создать дубли.
+3. **Проверка:** валидная регистрация, неверный email, повторный email, слабый пароль.
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить ветки **Наблюдение** и **Риск**. Хорошая QA-заметка начинается с факта, а потом объясняет, почему факт важен.`,
         },
       },
       {
@@ -176,28 +198,68 @@ QA не гарантирует полное отсутствие багов. Т�
           ru: "Как устроен процесс разработки",
         },
         body: {
-          en: `## SDLC and STLC
+          en: `## Scene: the feature moves through the sprint
 
-Software moves through idea, requirements, design, development, testing, release, and support. Testing is not a last-minute activity. Good QA starts asking questions during requirements and design.
+The signup task starts as a short product idea. Then design adds fields, development builds validation, and QA receives a staging link. If QA only appears at the end, every unclear decision becomes expensive.
 
-## Agile basics
+Think of delivery as a chain:
 
-In Agile teams, work is split into iterations. Common rituals are backlog refinement, sprint planning, daily sync, review, and retrospective. QA is expected to stay close to the team throughout the sprint.
+| Stage | QA move | Output |
+| --- | --- | --- |
+| Idea | Ask what user problem is solved | product risk list |
+| Requirements | Find vague words and missing rules | open questions |
+| Development | Prepare checks before build is done | checklist or test cases |
+| Testing | Compare expected and actual behavior | evidence |
+| Release | Say what is safe, risky, or blocked | release recommendation |
 
-## Practical mindset
+## Micro scenario
 
-When you hear "the task is done", ask what was implemented, what is out of scope, what environments are ready, and what can break around the feature.`,
-          ru: `## SDLC и STLC
+The developer says: "Registration is done on staging." Do not answer "ok, I will test everything." Ask for the minimum inputs:
 
-Продукт проходит этапы идеи, требований, дизайна, разработки, тестирования, релиза и поддержки. Тестирование - не финальная формальность. Хороший QA начинает задавать вопросы уже на стадии требований и дизайна.
+- staging URL and test account rules
+- acceptance criteria
+- known limitations
+- browser/device priority
+- rollback or hotfix contact if signup breaks
 
-## База Agile
+## Mini action
 
-В Agile-командах работа идет итерациями. Частые ритуалы: backlog refinement, sprint planning, daily sync, review и retrospective. От QA ожидается постоянная вовлеченность в команду на протяжении всего спринта.
+Turn the process into a test idea:
 
-## Практический подход
+**Check:** create account with valid email and password.
+**Expected:** account is created once, user sees confirmation, duplicate email is blocked.
+**Evidence:** browser, test data, actual message, screenshot if behavior is wrong.`,
+          ru: `## Сцена: фича проходит через спринт
 
-Когда вы слышите "задача готова", спросите, что именно реализовано, что осталось вне scope, какие среды готовы и что может сломаться рядом с фичей.`,
+Задача регистрации начинается как короткая продуктовая идея. Потом дизайн добавляет поля, разработчик делает валидацию, а QA получает staging-ссылку. Если QA появляется только в конце, каждое неясное решение становится дорогим.
+
+Думайте о delivery как о цепочке:
+
+| Этап | Ход QA | Выход |
+| --- | --- | --- |
+| Идея | Спросить, какую проблему пользователя решаем | список продуктовых рисков |
+| Требования | Найти расплывчатые слова и пропущенные правила | открытые вопросы |
+| Разработка | Подготовить проверки до завершения билда | checklist или test cases |
+| Тестирование | Сравнить expected и actual behavior | evidence |
+| Релиз | Сказать, что безопасно, рискованно или заблокировано | release recommendation |
+
+## Микро-сценарий
+
+Разработчик говорит: "Регистрация готова на staging". Не отвечайте "ок, всё протестирую". Сначала запросите минимальные входные данные:
+
+- staging URL и правила тестовых аккаунтов
+- acceptance criteria
+- известные ограничения
+- приоритетные browser/device
+- контакт для rollback или hotfix, если signup сломается
+
+## Мини-действие
+
+Превратите процесс в test idea:
+
+**Проверка:** создать аккаунт с валидным email и password.
+**Expected:** аккаунт создаётся один раз, пользователь видит подтверждение, повторный email блокируется.
+**Evidence:** browser, test data, actual message, screenshot при неверном поведении.`,
         },
       },
       {
@@ -206,24 +268,68 @@ When you hear "the task is done", ask what was implemented, what is out of scope
           ru: "Практика: карта рисков для регистрации",
         },
         body: {
-          en: `Inspect a simple sign-up flow and produce a short QA note.
+          en: `## Scene: you own the first QA artifact
 
-1. List product risks: missing validation, duplicated accounts, unclear errors.
-2. List UI risks: broken button state, hidden helper text, mobile layout overlap.
-3. List process risks: no test data, unclear acceptance criteria, no rollback plan.
-4. Mark each risk as low, medium, or high impact.
-5. Explain which 3 risks must be discussed before release.
+The team wants to release signup tomorrow. You have 20 minutes to produce something useful. The goal is not a long document. The goal is a risk map that helps the team decide what to fix or clarify.
 
-Expected output: a one-page summary with risks, impact, and questions for the team.`,
-          ru: `Посмотрите на простой сценарий регистрации и подготовьте короткую QA-заметку.
+## Your working brief
 
-1. Перечислите продуктовые риски: нет валидации, создаются дубли аккаунтов, ошибки непонятны.
-2. Перечислите UI-риски: сломанное состояние кнопки, скрытый helper text, наложение верстки на мобильных.
-3. Перечислите процессные риски: нет тестовых данных, acceptance criteria неясны, отсутствует rollback plan.
-4. Отметьте каждый риск как low, medium или high impact.
-5. Объясните, какие 3 риска нужно обсудить с командой до релиза.
+Feature: user signs up with email and password.
+Platforms: desktop Chrome and mobile Safari.
+Known rule: password must be at least 8 characters.
+Unknowns: duplicate email behavior, error text, confirmation screen.
 
-Ожидаемый результат: одностраничное summary с рисками, влиянием и вопросами для команды.`,
+## Build the risk map
+
+| Risk | Impact | First check | Evidence |
+| --- | --- | --- | --- |
+| Weak password accepted | high | try 7 characters | expected/actual message |
+| Duplicate email creates second account | high | register same email twice | account state and response |
+| Error message is unclear | medium | enter invalid email | screenshot and text |
+| Button stays active during submit | medium | double click Sign up | duplicate request or UI lock |
+| Mobile layout hides helper text | medium | open on mobile width | screenshot |
+
+## Final move
+
+Choose three risks that must be discussed before release. For each one, write:
+
+1. what you observed
+2. why it matters
+3. which check proves it
+4. what the team should do next
+
+This is your first portfolio-grade artifact: a small risk map with evidence and a clear decision.`,
+          ru: `## Сцена: вы отвечаете за первый QA-артефакт
+
+Команда хочет выпустить регистрацию завтра. У вас есть 20 минут, чтобы сделать что-то полезное. Цель - не длинный документ. Цель - risk map, который помогает команде решить, что исправить или уточнить.
+
+## Рабочий бриф
+
+Фича: пользователь регистрируется через email и password.
+Платформы: desktop Chrome и mobile Safari.
+Известное правило: password минимум 8 символов.
+Неизвестно: поведение при повторном email, текст ошибки, экран подтверждения.
+
+## Соберите risk map
+
+| Риск | Impact | Первая проверка | Evidence |
+| --- | --- | --- | --- |
+| Слабый password принимается | high | ввести 7 символов | expected/actual message |
+| Повторный email создаёт второй аккаунт | high | зарегистрировать один email дважды | состояние аккаунта и response |
+| Ошибка непонятна пользователю | medium | ввести неверный email | screenshot и текст |
+| Кнопка активна во время submit | medium | дважды нажать Sign up | duplicate request или UI lock |
+| На mobile скрыт helper text | medium | открыть mobile width | screenshot |
+
+## Финальный ход
+
+Выберите три риска, которые нужно обсудить до релиза. Для каждого напишите:
+
+1. что вы наблюдали
+2. почему это важно
+3. какая проверка это доказывает
+4. что команда должна сделать дальше
+
+Это первый артефакт портфолио: маленькая risk map с evidence и понятным решением.`,
         },
       },
     ],
@@ -398,28 +504,62 @@ Expected output: a one-page summary with risks, impact, and questions for the te
           ru: "Читайте требования как тестировщик",
         },
         body: {
-          en: `## Start from ambiguity
+          en: `## Scene: the login story is not testable yet
 
-Requirements often sound complete until you try to test them. Words like "fast", "convenient", "correct", or "secure" are weak unless the team defines what they mean.
+The product manager drops a short story into the sprint:
 
-## Questions that improve quality
+> As a returning user, I want to log in quickly so I can continue my course.
 
-Ask about allowed and forbidden values, user roles, empty and error states, scope by browser and device, and side effects such as analytics or notifications.
+It sounds simple, but a tester cannot verify "quickly" or "continue" until the team defines observable behavior. Your first job is to turn vague language into checks.
 
-## Testable language
+## Ambiguity intake
 
-A requirement becomes stronger when the expected result is observable. "The user should log in quickly" is vague. "The user should reach the dashboard after entering valid credentials" is testable.`,
-          ru: `## Начинайте с неоднозначности
+| Vague phrase | QA question | Testable version |
+| --- | --- | --- |
+| quickly | How many seconds is acceptable? | Dashboard opens within 2 seconds after valid login. |
+| continue course | Which page should open? | User lands on the last active module. |
+| wrong password | What message should appear? | Show a neutral error without revealing whether email exists. |
+| remember me | How long should session persist? | Session remains active for 30 days on the same browser. |
 
-Требования часто кажутся полными, пока вы не попробуете их протестировать. Формулировки вроде "быстро", "удобно", "корректно" или "безопасно" слабы, если команда не определила, что именно они означают.
+## Mini action
 
-## Вопросы, которые повышают качество
+Before writing test cases, create three artifact lines:
 
-Спрашивайте про допустимые и запрещенные значения, роли пользователя, empty и error states, scope по браузерам и устройствам, а также побочные эффекты вроде аналитики или уведомлений.
+- **Observation:** login story has undefined success page and session rule.
+- **Risk:** QA may validate the wrong behavior or miss privacy-sensitive errors.
+- **Decision:** ask PM to confirm redirect target, session duration, and error copy.
 
-## Тестируемый язык
+## Artifact seed
 
-Требование становится сильнее, когда ожидаемый результат наблюдаем. "Пользователь должен быстро войти" - расплывчато. "Пользователь должен попасть на dashboard после ввода валидных credentials" - уже тестируемо.`,
+Use this lesson to strengthen **Observation** and **Decision**. A testable requirement should leave less room for opinion.`,
+          ru: `## Сцена: login story пока нельзя тестировать
+
+Product manager добавляет в sprint короткую story:
+
+> Как returning user, я хочу быстро войти, чтобы продолжить курс.
+
+Звучит просто, но тестировщик не может проверить "быстро" и "продолжить", пока команда не договорится о наблюдаемом поведении. Ваша первая задача - превратить расплывчатый язык в проверки.
+
+## Приём неоднозначностей
+
+| Расплывчатая фраза | Вопрос QA | Тестируемая версия |
+| --- | --- | --- |
+| быстро | Сколько секунд допустимо? | Dashboard открывается за 2 секунды после валидного login. |
+| продолжить курс | Какая страница должна открыться? | Пользователь попадает в последний активный module. |
+| неверный пароль | Какое сообщение должно появиться? | Показать нейтральную ошибку без раскрытия, существует ли email. |
+| remember me | Как долго должна жить session? | Session активна 30 дней в том же браузере. |
+
+## Мини-действие
+
+Перед test cases создайте три строки артефакта:
+
+- **Наблюдение:** login story не определяет success page и правило session.
+- **Риск:** QA может проверить не то поведение или пропустить privacy-sensitive ошибки.
+- **Вывод:** уточнить у PM redirect target, session duration и error copy.
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы усилить **Наблюдение** и **Вывод**. Тестируемое требование оставляет меньше места для мнений.`,
         },
       },
       {
@@ -428,28 +568,80 @@ A requirement becomes stronger when the expected result is observable. "The user
           ru: "Базовые техники тест-дизайна",
         },
         body: {
-          en: `## Positive and negative checks
+          en: `## Scene: build coverage without testing everything
 
-Positive testing confirms that the expected path works. Negative testing confirms that invalid input, missing data, and wrong states are handled safely.
+The login form has email, password, remember me, and forgot password. You have 25 minutes before the build review. Testing every combination is impossible, so you design coverage by risk.
 
-## Equivalence and boundaries
+## Coverage map
 
-If many inputs behave the same way, group them into classes. Then test one representative from each class. Add special attention to edges: for a range 18 to 60, check 17, 18, 60, and 61.
+| Technique | Login example | Why it matters |
+| --- | --- | --- |
+| Positive check | valid email + valid password | Confirms the main path works. |
+| Negative check | valid email + wrong password | Confirms safe failure. |
+| Equivalence class | invalid email formats | Avoids repeating the same kind of invalid input. |
+| Boundary | password length 7, 8, 64, 65 | Finds edge behavior around limits. |
+| State transition | logged out -> login -> dashboard -> refresh | Confirms the user lands and stays in the right state. |
 
-## Think in combinations
+## Decision table
 
-When several conditions affect one result, verify combinations. Each condition may work alone while the combined path fails.`,
-          ru: `## Positive и negative checks
+| Email | Password | Remember me | Expected |
+| --- | --- | --- | --- |
+| valid | valid | off | login succeeds, normal session |
+| valid | valid | on | login succeeds, persistent session |
+| valid | wrong | any | neutral error, no login |
+| empty | any | any | inline validation |
+| invalid format | any | any | email format validation |
 
-Positive testing подтверждает, что ожидаемый сценарий работает. Negative testing проверяет, что невалидные данные, пропущенные значения и неправильные состояния обрабатываются безопасно.
+## Mini action
 
-## Equivalence и boundaries
+Pick one risky field and define classes:
 
-Если много входных данных ведут себя одинаково, объедините их в классы. Затем протестируйте по одному представителю из каждого класса. Особое внимание уделяйте границам: для диапазона 18-60 проверьте 17, 18, 60 и 61.
+- valid email: learner@example.com
+- missing @: learner.example.com
+- empty value: ""
+- long value: 255+ characters
+- uppercase value: LEARNER@EXAMPLE.COM
 
-## Думайте комбинациями
+## Artifact seed
 
-Когда на один результат влияют несколько условий, проверяйте их сочетания. Каждое условие может работать отдельно, а вместе сценарий сломается.`,
+Use this lesson to fill **Test idea**. Good test design explains why these checks were chosen, not just what to click.`,
+          ru: `## Сцена: построить покрытие, не тестируя всё подряд
+
+У login form есть email, password, remember me и forgot password. До build review осталось 25 минут. Проверить все комбинации невозможно, поэтому вы строите покрытие по риску.
+
+## Карта покрытия
+
+| Техника | Пример для login | Зачем это важно |
+| --- | --- | --- |
+| Positive check | valid email + valid password | Подтверждает основной путь. |
+| Negative check | valid email + wrong password | Подтверждает безопасный отказ. |
+| Equivalence class | invalid email formats | Не повторяет один и тот же тип невалидного ввода. |
+| Boundary | password length 7, 8, 64, 65 | Находит поведение на границах лимитов. |
+| State transition | logged out -> login -> dashboard -> refresh | Проверяет, что пользователь попадает и остаётся в правильном состоянии. |
+
+## Decision table
+
+| Email | Password | Remember me | Expected |
+| --- | --- | --- | --- |
+| valid | valid | off | login succeeds, normal session |
+| valid | valid | on | login succeeds, persistent session |
+| valid | wrong | any | neutral error, no login |
+| empty | any | any | inline validation |
+| invalid format | any | any | email format validation |
+
+## Мини-действие
+
+Выберите одно рискованное поле и задайте классы:
+
+- valid email: learner@example.com
+- missing @: learner.example.com
+- empty value: ""
+- long value: 255+ characters
+- uppercase value: LEARNER@EXAMPLE.COM
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Проверку**. Хороший test design объясняет, почему выбраны именно эти проверки, а не только что нужно нажать.`,
         },
       },
       {
@@ -458,38 +650,88 @@ Positive testing подтверждает, что ожидаемый сцена�
           ru: "Практика: checklist и test case для логина",
         },
         body: {
-          en: `Deliver two artifacts for a login page.
+          en: `## Scene: handoff to the team
 
-Checklist:
-- page loads and controls are visible
-- submit button state is correct
-- valid login redirects to the expected page
-- invalid password shows the correct error
-- empty fields are validated
-- remember me affects the next session
+The developer asks: "Can you send the login checks before I finish the fix?" This is where junior QA work becomes useful. You do not send a wall of theory. You send a compact checklist and five reproducible test cases.
 
-Detailed test cases:
-1. successful login
-2. wrong password
-3. empty email
-4. invalid email format
-5. password reset link availability`,
-          ru: `Подготовьте два артефакта для страницы логина.
+## Checklist
 
-Checklist:
-- страница загружается и контролы видны
-- состояние submit button корректно
-- успешный логин ведет на ожидаемую страницу
-- неверный пароль показывает правильную ошибку
-- пустые поля валидируются
-- remember me влияет на следующую сессию
+- page loads and all controls are visible
+- submit is disabled until required fields are valid
+- valid login redirects to the confirmed destination
+- invalid password shows neutral error copy
+- empty email and password show inline validation
+- remember me changes session persistence
+- forgot password opens recovery flow
+- refresh after login keeps the expected state
 
-Подробные test case:
-1. успешный вход
-2. неверный пароль
-3. пустой email
-4. невалидный формат email
-5. доступность password reset link`,
+## Five detailed test cases
+
+1. **Successful login**
+   - Preconditions: registered active user exists.
+   - Steps: enter valid email/password, submit.
+   - Expected: dashboard or last active module opens.
+
+2. **Wrong password**
+   - Steps: enter valid email and wrong password.
+   - Expected: neutral error is shown, user stays logged out.
+
+3. **Empty required fields**
+   - Steps: leave email/password empty and try to submit.
+   - Expected: inline validation appears and no request is sent.
+
+4. **Invalid email format**
+   - Steps: enter learner.example.com and any password.
+   - Expected: email format validation blocks submit.
+
+5. **Forgot password availability**
+   - Steps: open forgot password, enter registered email.
+   - Expected: recovery flow starts with safe confirmation copy.
+
+## Artifact seed
+
+Use this lesson to fill **Evidence** and **Decision**: attach checklist, test case results, and the release recommendation for login readiness.`,
+          ru: `## Сцена: передача команде
+
+Разработчик спрашивает: "Можешь прислать login checks до того, как я закончу fix?" Здесь работа junior QA становится полезной. Вы не отправляете стену теории. Вы отправляете компактный checklist и пять воспроизводимых test case.
+
+## Checklist
+
+- page loads, все контролы видны
+- submit disabled, пока required fields невалидны
+- valid login ведёт в подтверждённое место назначения
+- invalid password показывает нейтральный error copy
+- empty email и password показывают inline validation
+- remember me меняет persistence session
+- forgot password открывает recovery flow
+- refresh после login сохраняет ожидаемое состояние
+
+## Пять подробных test case
+
+1. **Successful login**
+   - Preconditions: существует registered active user.
+   - Steps: ввести valid email/password, submit.
+   - Expected: открывается dashboard или последний активный module.
+
+2. **Wrong password**
+   - Steps: ввести valid email и wrong password.
+   - Expected: показана нейтральная ошибка, user остаётся logged out.
+
+3. **Empty required fields**
+   - Steps: оставить email/password пустыми и попробовать submit.
+   - Expected: появляется inline validation и request не отправляется.
+
+4. **Invalid email format**
+   - Steps: ввести learner.example.com и любой password.
+   - Expected: email format validation блокирует submit.
+
+5. **Forgot password availability**
+   - Steps: открыть forgot password, ввести registered email.
+   - Expected: recovery flow стартует с безопасным confirmation copy.
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Evidence** и **Вывод**: приложите checklist, результаты test case и release recommendation по готовности login.`,
         },
       },
     ],
@@ -664,36 +906,70 @@ Checklist:
           ru: "Формы, состояния и пользовательские сценарии",
         },
         body: {
-          en: `## Start from the user goal
+          en: `## Scene: profile settings after a UI redesign
 
-A good browser test follows user intent. For a profile page, the goal might be to update personal data, upload an avatar, or change password. Each goal creates a small flow with its own success, error, loading, and empty states.
+The team redesigned profile settings. The page now has display name, avatar upload, timezone, password change, and notification toggles. Product says: "It is just settings, quick smoke should be enough." Your job is to prove what is safe and where the user can lose trust.
 
-## Common web checks
+## Flow map
 
-- field validation and inline errors
-- disabled and enabled button states
-- redirects and navigation after submit
-- session behavior after refresh
-- messages after success and failure
+| User goal | Check | Risk if missed |
+| --- | --- | --- |
+| Update display name | save valid, long, empty, special characters | profile shows wrong identity |
+| Upload avatar | valid image, huge file, unsupported type | broken image or failed save |
+| Change timezone | save, refresh, revisit dashboard | schedule appears in wrong time |
+| Change password | current password, new password rules, logout behavior | account security issue |
+| Toggle notifications | save on/off, refresh, verify persisted state | user receives unwanted emails |
 
-## Look beyond the happy path
+## State checklist
 
-Try invalid input, long text, special symbols, empty fields, expired sessions, and double clicks. Many real bugs appear when the user behaves imperfectly, not ideally.`,
-          ru: `## Начинайте с цели пользователя
+- Initial: fields load with current values.
+- Editing: save button enables only when something changed.
+- Loading: duplicate clicks do not create duplicate requests.
+- Success: clear confirmation and persisted state.
+- Error: message explains what failed and keeps user input.
 
-Хорошая browser-проверка опирается на намерение пользователя. Для profile page целью может быть обновление данных, загрузка avatar или смена пароля. Каждая цель создает отдельный flow со своими success, error, loading и empty states.
+## Mini action
 
-## Частые web-проверки
+Write one observation and one risk before touching the page:
 
-- валидация полей и inline-ошибки
-- disabled и enabled состояния кнопок
-- редиректы и навигация после submit
-- поведение сессии после refresh
-- сообщения об успехе и ошибке
+**Observation:** settings has five independent controls, but one shared save action.
+**Risk:** a failed save can make the user believe changes were applied when they were not.
 
-## Смотрите дальше happy path
+## Artifact seed
 
-Пробуйте невалидные данные, длинный текст, специальные символы, пустые поля, истекшие сессии и двойные клики. Многие реальные баги проявляются тогда, когда пользователь ведет себя не идеально, а как в жизни.`,
+Use this lesson to fill **Observation**, **Risk**, and **Test idea** for browser testing.`,
+          ru: `## Сцена: profile settings после UI redesign
+
+Команда переработала profile settings. На странице теперь display name, avatar upload, timezone, password change и notification toggles. Product говорит: "Это просто settings, quick smoke достаточно". Ваша задача - доказать, что безопасно, и где пользователь может потерять доверие.
+
+## Карта flow
+
+| Цель пользователя | Проверка | Риск, если пропустить |
+| --- | --- | --- |
+| Обновить display name | valid, long, empty, special characters | profile показывает неправильную identity |
+| Загрузить avatar | valid image, huge file, unsupported type | broken image или failed save |
+| Изменить timezone | save, refresh, revisit dashboard | расписание отображается в неверном времени |
+| Сменить password | current password, new password rules, logout behavior | account security issue |
+| Переключить notifications | save on/off, refresh, verify persisted state | user получает нежелательные emails |
+
+## Checklist состояний
+
+- Initial: поля загружены с текущими значениями.
+- Editing: save button включается только после изменения.
+- Loading: double click не создаёт duplicate requests.
+- Success: есть понятное confirmation и persisted state.
+- Error: сообщение объясняет сбой и сохраняет user input.
+
+## Мини-действие
+
+Перед проверкой страницы запишите observation и risk:
+
+**Наблюдение:** settings имеет пять независимых controls, но один общий save action.
+**Риск:** failed save может убедить пользователя, что изменения применились, хотя это не так.
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Наблюдение**, **Риск** и **Проверку** для browser testing.`,
         },
       },
       {
@@ -702,28 +978,74 @@ Try invalid input, long text, special symbols, empty fields, expired sessions, a
           ru: "DevTools для Manual QA",
         },
         body: {
-          en: `## Console
+          en: `## Scene: save button does nothing
 
-Console is useful when the UI looks wrong but you need technical clues. JavaScript errors, failed scripts, and warnings often explain why the page stopped responding.
+During the test run, the Save button becomes active, but clicking it shows no success message. Do not guess. Investigate like QA who can separate UI, client, and API signals.
 
-## Network
+## Investigation path
 
-Network tab shows requests, response codes, payloads, timing, and failed resources. If login fails, the problem might be a 401 response, invalid request body, or timeout.
+| Signal | What to inspect | Evidence to capture |
+| --- | --- | --- |
+| UI state | button disabled/loading, visible toast, field values | screenshot before and after click |
+| Console | JavaScript errors or warnings | exact error text and timestamp |
+| Network | request method, URL, status, payload, response body | request/response details |
+| Storage | auth token, stale profile data, feature flags | key/value that explains behavior |
+| Repro scope | browser, viewport, account, environment | environment line in report |
 
-## Storage and cookies
+## Example finding
 
-Cookies, local storage, and session storage help explain why a user stays logged in, loses settings, or sees stale data.`,
-          ru: `## Console
+**Observation:** clicking Save sends PATCH /api/profile and receives 422.
+**Evidence:** response body says timezone is required, but timezone field is hidden on mobile.
+**Risk:** mobile users cannot save profile changes.
+**Decision:** report as functional bug with mobile layout condition.
 
-Console полезна, когда UI выглядит неправильно, а вам нужны технические подсказки. JavaScript-errors, failed scripts и warnings часто объясняют, почему страница перестала отвечать.
+## Mini action
 
-## Network
+Create one DevTools note:
 
-Во вкладке Network видны запросы, response codes, payload, время и неуспешные ресурсы. Если логин не работает, проблема может быть в 401-ответе, некорректном request body или timeout.
+- request URL and method
+- status code
+- request payload
+- response body
+- visible UI behavior
 
-## Storage и cookies
+## Artifact seed
 
-Cookies, local storage и session storage помогают понять, почему пользователь остается залогинен, теряет настройки или видит устаревшие данные.`,
+Use this lesson to fill **Evidence**. DevTools evidence should make the bug reproducible without asking you to explain it live.`,
+          ru: `## Сцена: save button ничего не делает
+
+Во время test run кнопка Save становится активной, но после клика success message не появляется. Не угадывайте. Расследуйте как QA, который умеет разделять UI, client и API signals.
+
+## Путь расследования
+
+| Сигнал | Что смотреть | Какое evidence сохранить |
+| --- | --- | --- |
+| UI state | button disabled/loading, visible toast, field values | screenshot до и после клика |
+| Console | JavaScript errors или warnings | точный error text и timestamp |
+| Network | request method, URL, status, payload, response body | request/response details |
+| Storage | auth token, stale profile data, feature flags | key/value, объясняющий behavior |
+| Repro scope | browser, viewport, account, environment | строка окружения в report |
+
+## Пример finding
+
+**Наблюдение:** click Save отправляет PATCH /api/profile и получает 422.
+**Evidence:** response body говорит timezone is required, но timezone field скрыт на mobile.
+**Риск:** mobile users не могут сохранить profile changes.
+**Вывод:** оформить functional bug с условием mobile layout.
+
+## Мини-действие
+
+Создайте одну DevTools note:
+
+- request URL and method
+- status code
+- request payload
+- response body
+- visible UI behavior
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Evidence**. DevTools evidence должно делать bug воспроизводимым без устного объяснения.`,
         },
       },
       {
@@ -732,24 +1054,72 @@ Cookies, local storage и session storage помогают понять, поч�
           ru: "Практика: browser test run",
         },
         body: {
-          en: `Open one settings or profile page and perform a structured check.
+          en: `## Scene: turn a browser run into a report
 
-1. Validate all visible controls and labels.
-2. Try valid and invalid changes.
-3. Refresh the page and confirm saved state.
-4. Open DevTools and inspect one request.
-5. Resize to mobile width and capture layout findings.
+After 35 minutes of testing profile settings, your raw notes are messy: screenshots, one 422 response, a mobile overlap, and two unclear messages. The team needs a structured report, not a pile of observations.
 
-Expected output: short report with at least 8 findings grouped into UI, validation, and technical observations.`,
-          ru: `Откройте одну страницу settings или profile и выполните структурированную проверку.
+## Test run plan
 
-1. Проверьте все видимые контролы и подписи.
-2. Попробуйте валидные и невалидные изменения.
-3. Обновите страницу и подтвердите сохраненное состояние.
-4. Откройте DevTools и исследуйте один запрос.
-5. Уменьшите ширину до mobile и зафиксируйте layout findings.
+1. Desktop happy path: update display name and timezone.
+2. Desktop negative path: empty name, huge avatar, wrong password.
+3. Mobile layout: profile form, avatar area, save button.
+4. Refresh persistence: save, refresh, revisit dashboard.
+5. DevTools evidence: inspect one failed request.
 
-Ожидаемый результат: короткий отчет минимум с 8 находками, сгруппированными по UI, validation и technical observations.`,
+## Report format
+
+| Group | Finding | Evidence | Decision |
+| --- | --- | --- | --- |
+| UI | Save button overlaps avatar on 375px width | screenshot mobile-375.png | fix before release |
+| Validation | Empty display name allows request | PATCH payload + 422 response | block submit client-side |
+| Data | Timezone does not persist after refresh | before/after screenshots | investigate API/state |
+| Copy | Error message says "Something went wrong" | screenshot + response body | replace with actionable text |
+
+## Final artifact
+
+Write a short browser QA report with:
+
+- 8 findings grouped by UI, validation, network/data, and copy
+- top 3 risks for release
+- recommendation: ready, ready with risks, or not ready
+- one retest checklist after fixes
+
+## Artifact seed
+
+Use this lesson to fill **Decision**: what should block release, what can ship with risk, and what must be retested.`,
+          ru: `## Сцена: превратить browser run в report
+
+После 35 минут проверки profile settings сырые заметки выглядят хаотично: screenshots, один 422 response, mobile overlap и два непонятных сообщения. Команде нужен структурированный report, а не куча наблюдений.
+
+## План test run
+
+1. Desktop happy path: update display name и timezone.
+2. Desktop negative path: empty name, huge avatar, wrong password.
+3. Mobile layout: profile form, avatar area, save button.
+4. Refresh persistence: save, refresh, revisit dashboard.
+5. DevTools evidence: исследовать один failed request.
+
+## Формат report
+
+| Группа | Finding | Evidence | Decision |
+| --- | --- | --- | --- |
+| UI | Save button overlaps avatar на 375px width | screenshot mobile-375.png | fix before release |
+| Validation | Empty display name отправляет request | PATCH payload + 422 response | block submit client-side |
+| Data | Timezone не сохраняется после refresh | before/after screenshots | investigate API/state |
+| Copy | Error message says "Something went wrong" | screenshot + response body | replace with actionable text |
+
+## Финальный артефакт
+
+Напишите короткий browser QA report:
+
+- 8 findings, сгруппированных как UI, validation, network/data и copy
+- top 3 risks для release
+- recommendation: ready, ready with risks или not ready
+- retest checklist после fixes
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Вывод**: что блокирует release, что можно выпустить с риском и что нужно retest.`,
         },
       },
     ],
@@ -924,38 +1294,74 @@ Expected output: short report with at least 8 findings grouped into UI, validati
           ru: "Основы HTTP и JSON",
         },
         body: {
-          en: `## Think in requests and responses
+          en: `## Scene: the UI says "profile cannot be saved"
 
-The client sends a request. The server returns a response. Your task is to understand whether the response matches the contract and the business expectation.
+The browser shows a generic error after the user edits a profile. The designer thinks it is a copy bug, the frontend engineer thinks the API is unstable, and backend says "works on my machine". Your job is to read the request and response like evidence.
 
-## Common methods
+## Request-response map
 
-- GET to read data
-- POST to create
-- PUT or PATCH to update
-- DELETE to remove
+| Question | Where to look | Example clue |
+| --- | --- | --- |
+| What is the app asking for? | method + URL | PATCH /api/profile |
+| Who is asking? | Authorization header | Bearer token present or missing |
+| What changed? | JSON body | {"timezone": "", "displayName": "Maya"} |
+| What did server decide? | status code | 422 validation error |
+| Why did it decide that? | response body | "timezone is required" |
 
-## Status codes you will see often
+## Status code story
 
-- 200, 201, 400, 401, 403, 404, 500
+- 200/201: the action succeeded.
+- 400/422: the client sent invalid data.
+- 401: the user is not authenticated.
+- 403: the user is authenticated but not allowed.
+- 404: the resource does not exist or is hidden.
+- 500: the server failed unexpectedly.
 
-JSON is the structure of the payload. As a tester, you care whether required fields exist, values make sense, and errors are handled consistently.`,
-          ru: `## Думайте запросами и ответами
+## Mini action
 
-Клиент отправляет request. Сервер возвращает response. Ваша задача - понять, соответствует ли ответ контракту и бизнес-ожиданию.
+Turn one API response into a finding:
 
-## Частые методы
+**Observation:** PATCH /api/profile returns 422.
+**Evidence:** response body says timezone is required.
+**Risk:** UI hides timezone on mobile, so mobile users cannot save profile.
 
-- GET для чтения данных
-- POST для создания
-- PUT или PATCH для обновления
-- DELETE для удаления
+## Artifact seed
 
-## Status codes, которые вы будете видеть постоянно
+Use this lesson to fill **Evidence** and **Risk** for an API-backed bug.`,
+          ru: `## Сцена: UI говорит "profile cannot be saved"
 
-- 200, 201, 400, 401, 403, 404, 500
+Браузер показывает generic error после редактирования profile. Designer думает, что это copy bug, frontend engineer подозревает нестабильный API, а backend говорит "works on my machine". Ваша задача - прочитать request и response как evidence.
 
-JSON - это структура payload. Для тестировщика важно, существуют ли обязательные поля, логичны ли значения и одинаково ли система обрабатывает ошибки.`,
+## Карта request-response
+
+| Вопрос | Где смотреть | Example clue |
+| --- | --- | --- |
+| Что app пытается сделать? | method + URL | PATCH /api/profile |
+| Кто делает запрос? | Authorization header | Bearer token есть или отсутствует |
+| Что изменилось? | JSON body | {"timezone": "", "displayName": "Maya"} |
+| Что решил server? | status code | 422 validation error |
+| Почему он так решил? | response body | "timezone is required" |
+
+## История status codes
+
+- 200/201: действие успешно.
+- 400/422: client отправил невалидные данные.
+- 401: user не authenticated.
+- 403: user authenticated, но нет доступа.
+- 404: resource не существует или скрыт.
+- 500: server упал неожиданно.
+
+## Мини-действие
+
+Превратите один API response в finding:
+
+**Наблюдение:** PATCH /api/profile возвращает 422.
+**Evidence:** response body говорит timezone is required.
+**Риск:** UI скрывает timezone на mobile, поэтому mobile users не могут сохранить profile.
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Evidence** и **Риск** для API-backed bug.`,
         },
       },
       {
@@ -964,32 +1370,70 @@ JSON - это структура payload. Для тестировщика важ
           ru: "Workflow в Postman",
         },
         body: {
-          en: `## Basic flow
+          en: `## Scene: build a Postman rescue kit
 
-In Postman, you choose a method, set the URL, add headers or authorization, optionally send a body, and inspect the response.
+The frontend bug is disputed. To avoid guessing, create a tiny Postman collection that reproduces the same behavior outside the UI.
 
-## What to validate
+## Collection setup
 
-- status code
-- response body structure
-- required fields and data types
-- error message on invalid input
-- authorization behavior with missing or expired token
+| Request | Purpose | Must validate |
+| --- | --- | --- |
+| POST /api/login | get token | 200, token exists, user id exists |
+| GET /api/profile | read current data | 200, required profile fields |
+| PATCH /api/profile | save valid update | 200, changed values persist |
+| PATCH /api/profile invalid | trigger validation | 400/422, actionable error |
+| GET /api/profile without token | auth boundary | 401, no private data |
 
-If UI and API disagree, compare the request, response, and visible behavior instead of guessing.`,
-          ru: `## Базовый flow
+## Variables
 
-В Postman вы выбираете метод, задаете URL, добавляете headers или authorization, при необходимости отправляете body и исследуете response.
+- baseUrl: local or staging API URL
+- token: value from login response
+- profileId: id from profile response
 
-## Что проверять
+## Evidence rule
 
-- status code
-- структуру response body
-- обязательные поля и типы данных
-- error message при невалидном вводе
-- поведение authorization при отсутствии или истечении token
+Every request should answer one release question:
 
-Если UI и API противоречат друг другу, сравнивайте request, response и видимое поведение, а не гадайте.`,
+- Can a real user complete the flow?
+- Is invalid data rejected clearly?
+- Is private data protected?
+- Does API behavior match what UI promises?
+
+## Artifact seed
+
+Use this lesson to fill **Test idea** and **Evidence** with request names, statuses, and payload notes.`,
+          ru: `## Сцена: собрать Postman rescue kit
+
+Frontend bug спорный. Чтобы не гадать, создайте маленькую Postman collection, которая воспроизводит то же поведение вне UI.
+
+## Setup коллекции
+
+| Request | Зачем нужен | Что проверить |
+| --- | --- | --- |
+| POST /api/login | получить token | 200, token exists, user id exists |
+| GET /api/profile | прочитать текущие данные | 200, обязательные profile fields |
+| PATCH /api/profile | сохранить valid update | 200, changed values persist |
+| PATCH /api/profile invalid | вызвать validation | 400/422, actionable error |
+| GET /api/profile without token | проверить auth boundary | 401, no private data |
+
+## Variables
+
+- baseUrl: local или staging API URL
+- token: значение из login response
+- profileId: id из profile response
+
+## Evidence rule
+
+Каждый request должен отвечать на один release question:
+
+- Может ли real user завершить flow?
+- Отклоняются ли invalid data понятно?
+- Защищены ли private data?
+- Совпадает ли API behavior с тем, что обещает UI?
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Проверку** и **Evidence**: request names, statuses и payload notes.`,
         },
       },
       {
@@ -998,20 +1442,76 @@ If UI and API disagree, compare the request, response, and visible behavior inst
           ru: "Практика: проверка login и profile API",
         },
         body: {
-          en: `Build a small API check session.
+          en: `## Scene: decide if profile release is blocked
 
-1. Send a valid login request and verify success response.
-2. Send an invalid login request and verify error handling.
-3. Reuse the token for a profile request.
-4. Try the same profile request without token.
-5. Write a short note comparing valid and unauthorized behavior.`,
-          ru: `Проведите небольшую API-check сессию.
+You have one hour before release review. The UI smoke is mixed: desktop works, mobile save fails, and the API returns clear validation errors. Your final job is not just to send requests. It is to turn API checks into a release decision.
 
-1. Отправьте валидный login request и проверьте успешный ответ.
-2. Отправьте невалидный login request и проверьте обработку ошибки.
-3. Используйте token для profile request.
-4. Повторите тот же profile request без token.
-5. Напишите короткую заметку, сравнивающую valid и unauthorized behavior.`,
+## API check session
+
+1. Login with valid credentials and save token evidence.
+2. Login with invalid password and verify no token leaks.
+3. Fetch profile with token and list required fields.
+4. Update profile with valid displayName and timezone.
+5. Update profile with empty timezone and capture validation.
+6. Repeat profile fetch without token and verify 401.
+
+## Decision matrix
+
+| Result | Meaning | Release decision |
+| --- | --- | --- |
+| Valid update works in API and UI | flow healthy | can ship |
+| API works, UI fails | frontend bug | ship only if non-critical or fix UI |
+| API rejects valid data | backend/contract bug | block release |
+| Unauthorized request exposes data | security bug | block release |
+
+## Final artifact
+
+Write a short API QA note:
+
+- endpoints tested
+- highest-risk failure
+- evidence from status/body
+- decision: ready, ready with risk, or blocked
+- one retest step after fix
+
+## Artifact seed
+
+Use this lesson to fill **Decision** and connect API evidence back to user impact.`,
+          ru: `## Сцена: решить, блокирует ли profile release
+
+До release review остался один час. UI smoke смешанный: desktop работает, mobile save fails, а API возвращает понятные validation errors. Ваша финальная задача - не просто отправить requests. Нужно превратить API checks в release decision.
+
+## API check session
+
+1. Login с valid credentials и сохранить token evidence.
+2. Login с invalid password и проверить, что token не leaked.
+3. Fetch profile с token и перечислить required fields.
+4. Update profile с valid displayName и timezone.
+5. Update profile с empty timezone и сохранить validation.
+6. Повторить profile fetch without token и проверить 401.
+
+## Decision matrix
+
+| Result | Meaning | Release decision |
+| --- | --- | --- |
+| Valid update works in API and UI | flow healthy | can ship |
+| API works, UI fails | frontend bug | ship only if non-critical or fix UI |
+| API rejects valid data | backend/contract bug | block release |
+| Unauthorized request exposes data | security bug | block release |
+
+## Финальный артефакт
+
+Напишите короткую API QA note:
+
+- endpoints tested
+- highest-risk failure
+- evidence из status/body
+- decision: ready, ready with risk или blocked
+- один retest step after fix
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Вывод** и связать API evidence с user impact.`,
         },
       },
     ],
@@ -1186,42 +1686,74 @@ If UI and API disagree, compare the request, response, and visible behavior inst
           ru: "Пишите баг-репорты, которыми можно пользоваться",
         },
         body: {
-          en: `## A useful bug report answers three questions
+          en: `## Scene: the bug that blocks release review
 
-1. What is broken?
-2. How can the team reproduce it?
-3. Why does it matter?
+Release review starts in 40 minutes. You found that mobile users cannot save profile settings because timezone is hidden and the API returns 422. A weak ticket says "profile save broken". A useful ticket lets the team reproduce, judge impact, and decide.
 
-## Core structure
+## Build the report from evidence
 
-- title
-- environment
-- preconditions
-- steps to reproduce
-- expected result
-- actual result
-- severity and priority
-- attachments if useful
+| Field | Weak version | Useful version |
+| --- | --- | --- |
+| Title | Save does not work | Mobile profile save fails when timezone field is hidden |
+| Environment | mobile | iPhone 13 viewport 390x844, staging, user role learner |
+| Steps | click save | Open profile, change display name, tap Save on mobile |
+| Expected | save | Profile changes persist and success message appears |
+| Actual | error | Generic error appears; PATCH /api/profile returns 422 timezone required |
+| Impact | bad | Mobile users cannot update account settings |
 
-Write facts, not frustration.`,
-          ru: `## Полезный баг-репорт отвечает на три вопроса
+## Severity vs priority
 
-1. Что сломано?
-2. Как это воспроизвести?
-3. Почему это важно?
+- Severity: how badly the product is broken.
+- Priority: how soon the team should fix it.
 
-## Базовая структура
+A typo in legal copy may be low severity but high priority. A rare visual glitch may be low priority even if it looks ugly.
 
-- title
-- environment
-- preconditions
-- steps to reproduce
-- expected result
-- actual result
-- severity и priority
-- attachments при необходимости
+## Mini action
 
-Пишите факты, а не эмоции.`,
+Write one ticket summary:
+
+**Bug:** mobile profile save fails when timezone is hidden.
+**Evidence:** screenshot + PATCH /api/profile 422 response.
+**Impact:** users on mobile cannot save account changes.
+**Recommendation:** block release until fixed or hide mobile profile editing.
+
+## Artifact seed
+
+Use this lesson to fill **Evidence**, **Risk**, and **Decision** with a bug report the team can act on.`,
+          ru: `## Сцена: bug, который блокирует release review
+
+Release review начнётся через 40 минут. Вы нашли, что mobile users не могут сохранить profile settings, потому что timezone скрыт, а API возвращает 422. Слабый ticket говорит "profile save broken". Полезный ticket помогает команде воспроизвести, оценить impact и принять решение.
+
+## Соберите report из evidence
+
+| Поле | Слабая версия | Полезная версия |
+| --- | --- | --- |
+| Title | Save does not work | Mobile profile save fails when timezone field is hidden |
+| Environment | mobile | iPhone 13 viewport 390x844, staging, user role learner |
+| Steps | click save | Open profile, change display name, tap Save on mobile |
+| Expected | save | Profile changes persist and success message appears |
+| Actual | error | Generic error appears; PATCH /api/profile returns 422 timezone required |
+| Impact | bad | Mobile users cannot update account settings |
+
+## Severity vs priority
+
+- Severity: насколько сильно сломан product.
+- Priority: как срочно команде нужно это исправить.
+
+Typo в legal copy может иметь low severity, но high priority. Редкий visual glitch может иметь low priority, даже если выглядит неприятно.
+
+## Мини-действие
+
+Напишите один ticket summary:
+
+**Bug:** mobile profile save fails when timezone is hidden.
+**Evidence:** screenshot + PATCH /api/profile 422 response.
+**Impact:** users on mobile cannot save account changes.
+**Recommendation:** block release until fixed или hide mobile profile editing.
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Evidence**, **Риск** и **Вывод** баг-репортом, по которому команда может действовать.`,
         },
       },
       {
@@ -1230,36 +1762,68 @@ Write facts, not frustration.`,
           ru: "Smoke, sanity, regression и exploratory testing",
         },
         body: {
-          en: `## Smoke
+          en: `## Scene: choose the right test pass
 
-Smoke confirms the build is stable enough for deeper testing. It covers the most critical paths only.
+The fix for profile save just arrived. You have 25 minutes before the release decision. Checking everything is impossible, so you choose the test pass that fits the risk.
 
-## Sanity
+## Test-pass menu
 
-Sanity focuses on a narrow area, usually after a specific fix.
+| Situation | Best pass | What you check |
+| --- | --- | --- |
+| New build just deployed | Smoke | login, dashboard, profile save, course start |
+| One bug was fixed | Sanity | the fixed profile save path and nearby states |
+| Shared auth code changed | Regression | login, profile, API auth, protected pages |
+| Behavior is unclear | Exploratory | follow clues, vary data, inspect edge cases |
 
-## Regression
+## Time-boxed plan
 
-Regression checks whether old behavior still works after new changes.
+1. Smoke: can the core learner flow still start and finish?
+2. Sanity: does mobile profile save now work?
+3. Regression: did desktop profile save, login, and API auth stay healthy?
+4. Exploratory: try long display name, empty timezone, double tap Save.
 
-## Exploratory
+## Evidence rule
 
-Exploratory testing is purposeful investigation, not random clicking.`,
-          ru: `## Smoke
+Every pass should produce a decision, not just activity:
 
-Smoke подтверждает, что сборка достаточно стабильна для дальнейшего тестирования. Оно покрывает только самые критичные пути.
+- pass: no blocker found
+- fail: blocker or open risk found
+- skip: not enough time, name the risk
 
-## Sanity
+## Artifact seed
 
-Sanity фокусируется на узкой зоне, обычно после конкретного фикса.
+Use this lesson to fill **Test idea** and **Decision** with the exact checks you chose under time pressure.`,
+          ru: `## Сцена: выбрать правильный test pass
 
-## Regression
+Fix для profile save только что приехал. До release decision осталось 25 минут. Проверить всё невозможно, поэтому вы выбираете test pass под главный risk.
 
-Regression проверяет, не сломался ли старый функционал после новых изменений.
+## Меню test-pass
 
-## Exploratory
+| Situation | Best pass | Что проверять |
+| --- | --- | --- |
+| New build just deployed | Smoke | login, dashboard, profile save, course start |
+| One bug was fixed | Sanity | fixed profile save path и nearby states |
+| Shared auth code changed | Regression | login, profile, API auth, protected pages |
+| Behavior is unclear | Exploratory | follow clues, vary data, inspect edge cases |
 
-Exploratory testing - это целенаправленное исследование, а не хаотичные клики.`,
+## Time-boxed plan
+
+1. Smoke: может ли core learner flow стартовать и завершиться?
+2. Sanity: работает ли mobile profile save после fix?
+3. Regression: не сломались ли desktop profile save, login и API auth?
+4. Exploratory: попробуйте long display name, empty timezone, double tap Save.
+
+## Evidence rule
+
+Каждый pass должен давать decision, а не просто активность:
+
+- pass: blocker не найден
+- fail: найден blocker или open risk
+- skip: времени не хватило, risk назван явно
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы заполнить **Проверку** и **Вывод** конкретными проверками, выбранными под ограничение времени.`,
         },
       },
       {
@@ -1268,24 +1832,78 @@ Exploratory testing - это целенаправленное исследова
           ru: "Финальная практика: рекомендация к релизу",
         },
         body: {
-          en: `Test one small web feature and package your work like a junior QA engineer.
+          en: `## Scene: your first release recommendation
 
-Deliver:
-1. at least 5 bug reports
-2. one smoke checklist
-3. one short regression list
-4. one release recommendation: ready, ready with risks, or not ready
+The release owner asks: "Can we ship today?" You cannot answer with feelings. You answer with evidence, blockers, open risks, and a retest plan.
 
-Your recommendation must name the top risks and explain why the team should care.`,
-          ru: `Протестируйте одну небольшую web-фичу и оформите результат как junior QA engineer.
+## Release pack
 
-Подготовьте:
-1. минимум 5 баг-репортов
-2. один smoke-checklist
-3. один короткий regression-list
-4. одну release-рекомендацию: ready, ready with risks или not ready
+| Section | What to include |
+| --- | --- |
+| Scope | profile settings on desktop and mobile |
+| Evidence | screenshots, API statuses, reproduced steps |
+| Bugs | 5 reports grouped by blocker, major, minor |
+| Smoke | core paths checked after latest build |
+| Regression | old behavior that still works |
+| Open risks | skipped checks and uncertain areas |
+| Recommendation | ready, ready with risks, or blocked |
 
-В рекомендации обязательно назовите ключевые риски и объясните, почему команде важно на них смотреть.`,
+## Recommendation examples
+
+- Ready: no blockers, smoke passed, regression around changed area passed.
+- Ready with risks: no blocker, but mobile edge cases were not fully covered.
+- Blocked: mobile profile save still fails or unauthorized data leaks.
+
+## Final artifact
+
+Prepare a release recommendation:
+
+1. top 3 findings
+2. one blocker decision, if any
+3. smoke result
+4. regression result
+5. retest checklist after fixes
+6. final call: ready, ready with risks, or blocked
+
+## Artifact seed
+
+Use this lesson to complete the module artifact: a short QA release note that sounds like a real team document.`,
+          ru: `## Сцена: ваша первая release recommendation
+
+Release owner спрашивает: "Can we ship today?" Нельзя отвечать ощущениями. Нужно ответить evidence, blockers, open risks и retest plan.
+
+## Release pack
+
+| Section | Что включить |
+| --- | --- |
+| Scope | profile settings on desktop and mobile |
+| Evidence | screenshots, API statuses, reproduced steps |
+| Bugs | 5 reports grouped by blocker, major, minor |
+| Smoke | core paths checked after latest build |
+| Regression | old behavior that still works |
+| Open risks | skipped checks and uncertain areas |
+| Recommendation | ready, ready with risks или blocked |
+
+## Примеры recommendation
+
+- Ready: blockers нет, smoke passed, regression around changed area passed.
+- Ready with risks: blocker нет, но mobile edge cases покрыты не полностью.
+- Blocked: mobile profile save всё ещё fails или unauthorized data leaks.
+
+## Финальный артефакт
+
+Подготовьте release recommendation:
+
+1. top 3 findings
+2. blocker decision, если есть
+3. smoke result
+4. regression result
+5. retest checklist after fixes
+6. final call: ready, ready with risks или blocked
+
+## Зерно артефакта
+
+Используйте этот урок, чтобы завершить module artifact: короткую QA release note, которая звучит как реальный командный документ.`,
         },
       },
     ],
@@ -1368,6 +1986,489 @@ Your recommendation must name the top risks and explain why the team should care
   },
 ];
 
+const QA_REAL_WORLD_LABS: Localized<string>[][] = [
+  [
+    {
+      en: `## Workplace artifact: QA intake note
+
+Use this note when a product manager gives you a new feature before development starts.
+
+| Field | Example |
+| --- | --- |
+| Feature | Email sign-up with verification code |
+| User goal | Create an account and confirm ownership of the email |
+| Main risk | User cannot finish registration because the code expires or error text is unclear |
+| First question | What happens after 3 failed code attempts? |
+| Evidence to collect | Requirements link, test data, screenshots, browser, environment |
+
+## Real beginner task
+
+Write a 6-line QA intake note for this feature: "A learner can save a lesson to bookmarks and find it later in Bookmarks."
+
+Your answer should include:
+- one user goal
+- three product or UI risks
+- two questions for the team
+- one environment where you would test first`,
+      ru: `## Рабочий артефакт: QA intake note
+
+Используйте такую заметку, когда product manager приносит новую фичу еще до разработки.
+
+| Поле | Пример |
+| --- | --- |
+| Feature | Регистрация по email с verification code |
+| Цель пользователя | Создать аккаунт и подтвердить владение email |
+| Главный риск | Пользователь не может завершить регистрацию из-за истекшего кода или непонятной ошибки |
+| Первый вопрос | Что происходит после 3 неверных попыток ввода кода? |
+| Evidence | Ссылка на требования, тестовые данные, screenshots, browser, environment |
+
+## Реальная задача для новичка
+
+Напишите QA intake note на 6 строк для фичи: "Студент может сохранить урок в bookmarks и позже найти его в Bookmarks."
+
+В ответе должны быть:
+- одна цель пользователя
+- три продуктовых или UI-риска
+- два вопроса команде
+- одно окружение, где вы проверите фичу первым`,
+    },
+    {
+      en: `## Workplace artifact: sprint QA map
+
+Use this map to understand where QA participates during a sprint.
+
+| Sprint moment | QA action | Output |
+| --- | --- | --- |
+| Backlog refinement | Find unclear requirements | Questions in the ticket |
+| Planning | Confirm scope and test data | Testing notes |
+| Development | Prepare checks before the build | Checklist or test cases |
+| Code review/build ready | Run smoke and focused checks | Findings and blocker status |
+| Before release | Summarize quality and risk | Release recommendation |
+
+## Real beginner task
+
+For a password reset feature, write one QA action for each sprint moment. Keep each action specific: "ask what happens when token expires" is better than "test everything".`,
+      ru: `## Рабочий артефакт: sprint QA map
+
+Эта карта показывает, где QA участвует в спринте.
+
+| Момент спринта | Действие QA | Результат |
+| --- | --- | --- |
+| Backlog refinement | Найти неясные требования | Вопросы в ticket |
+| Planning | Подтвердить scope и test data | Testing notes |
+| Development | Подготовить проверки до сборки | Checklist или test cases |
+| Code review/build ready | Запустить smoke и focused checks | Findings и blocker status |
+| Before release | Суммировать качество и риски | Release recommendation |
+
+## Реальная задача для новичка
+
+Для фичи password reset напишите по одному QA-действию на каждый момент спринта. Делайте формулировки конкретными: "спросить, что происходит после истечения token" лучше, чем "проверить всё".`,
+    },
+    {
+      en: `## Workplace artifact: risk register
+
+| Risk | Impact | Probability | First check |
+| --- | --- | --- | --- |
+| Duplicate accounts are created | High | Medium | Register twice with the same email |
+| Error text does not explain the problem | Medium | High | Submit invalid email and empty password |
+| Mobile keyboard hides the submit button | Medium | Medium | Test on 390px width |
+| Analytics event is missing | Low | Medium | Confirm event in Network/console |
+
+## Real beginner task
+
+Create a risk register for a checkout page with promo code, payment method, and order confirmation. Add at least 5 risks and mark the first check for each.`,
+      ru: `## Рабочий артефакт: risk register
+
+| Риск | Влияние | Вероятность | Первая проверка |
+| --- | --- | --- | --- |
+| Создаются дубли аккаунтов | High | Medium | Зарегистрироваться дважды с одним email |
+| Текст ошибки не объясняет проблему | Medium | High | Отправить invalid email и пустой password |
+| Mobile keyboard закрывает submit button | Medium | Medium | Проверить на ширине 390px |
+| Analytics event не отправляется | Low | Medium | Проверить event в Network/console |
+
+## Реальная задача для новичка
+
+Создайте risk register для checkout page с promo code, payment method и order confirmation. Добавьте минимум 5 рисков и первую проверку для каждого.`,
+    },
+  ],
+  [
+    {
+      en: `## Workplace artifact: requirement review
+
+Weak requirement: "The user should be able to upload a profile image."
+
+QA rewrite:
+- Accepted formats: JPG, PNG, WebP
+- Max size: 5 MB
+- Min dimensions: 256x256
+- Error state: unsupported format, too large file, upload timeout
+- Success state: avatar preview updates without page reload
+- Accessibility: upload control has visible label and keyboard access
+
+## Real beginner task
+
+Rewrite this vague requirement into testable acceptance criteria: "The lesson search should work fast and show relevant results."`,
+      ru: `## Рабочий артефакт: requirement review
+
+Слабое требование: "Пользователь должен иметь возможность загрузить profile image."
+
+QA-переписывание:
+- Accepted formats: JPG, PNG, WebP
+- Max size: 5 MB
+- Min dimensions: 256x256
+- Error state: unsupported format, too large file, upload timeout
+- Success state: avatar preview обновляется без reload
+- Accessibility: upload control имеет видимый label и доступен с клавиатуры
+
+## Реальная задача для новичка
+
+Перепишите это расплывчатое требование в testable acceptance criteria: "Поиск по урокам должен работать быстро и показывать релевантные результаты."`,
+    },
+    {
+      en: `## Workplace artifact: test design matrix
+
+Feature: age field accepts 18-60.
+
+| Technique | Values | Why |
+| --- | --- | --- |
+| Boundary values | 17, 18, 60, 61 | Finds off-by-one mistakes |
+| Equivalence classes | 25, 10, empty, text | Covers valid and invalid groups |
+| Negative checks | -1, 999, "abc" | Confirms safe validation |
+| State checks | submit disabled/enabled | Confirms UI reacts correctly |
+
+## Real beginner task
+
+Build the same matrix for a password field: minimum 8 characters, must include a number, must include a capital letter.`,
+      ru: `## Рабочий артефакт: test design matrix
+
+Feature: поле age принимает 18-60.
+
+| Техника | Значения | Зачем |
+| --- | --- | --- |
+| Boundary values | 17, 18, 60, 61 | Находит off-by-one ошибки |
+| Equivalence classes | 25, 10, empty, text | Покрывает valid и invalid группы |
+| Negative checks | -1, 999, "abc" | Подтверждает безопасную validation |
+| State checks | submit disabled/enabled | Подтверждает реакцию UI |
+
+## Реальная задача для новичка
+
+Постройте такую же matrix для password field: минимум 8 символов, нужна цифра, нужна заглавная буква.`,
+    },
+    {
+      en: `## Workplace artifact: test case sample
+
+**Title:** Login succeeds with valid credentials
+**Preconditions:** User exists and email is verified
+**Data:** student@levio.local / valid password
+**Steps:**
+1. Open login page
+2. Enter valid email
+3. Enter valid password
+4. Click Sign in
+
+**Expected result:** User lands on Dashboard, session is active, no validation errors are shown.
+
+## Real beginner task
+
+Write two test cases in this format:
+- invalid email format
+- correct email with wrong password`,
+      ru: `## Рабочий артефакт: пример test case
+
+**Title:** Login succeeds with valid credentials
+**Preconditions:** User exists and email is verified
+**Data:** student@levio.local / valid password
+**Steps:**
+1. Open login page
+2. Enter valid email
+3. Enter valid password
+4. Click Sign in
+
+**Expected result:** User lands on Dashboard, session is active, validation errors are not shown.
+
+## Реальная задача для новичка
+
+Напишите два test case в таком же формате:
+- invalid email format
+- correct email with wrong password`,
+    },
+  ],
+  [
+    {
+      en: `## Workplace artifact: browser checklist
+
+Feature: edit profile.
+
+| Area | Checks |
+| --- | --- |
+| UI | Labels, required marks, helper text, disabled/enabled button |
+| Validation | Empty name, long name, invalid characters |
+| State | Loading, success, error, refresh after save |
+| Navigation | Cancel, back button, redirect after save |
+| Mobile | 390px layout, keyboard overlap, tap targets |
+
+## Real beginner task
+
+Run this checklist against any settings page in the project and write 5 findings. A finding can be "works as expected" if it includes evidence.`,
+      ru: `## Рабочий артефакт: browser checklist
+
+Feature: edit profile.
+
+| Зона | Проверки |
+| --- | --- |
+| UI | Labels, required marks, helper text, disabled/enabled button |
+| Validation | Empty name, long name, invalid characters |
+| State | Loading, success, error, refresh after save |
+| Navigation | Cancel, back button, redirect after save |
+| Mobile | 390px layout, keyboard overlap, tap targets |
+
+## Реальная задача для новичка
+
+Пройдите этот checklist на любой settings page в проекте и напишите 5 findings. Finding может быть "works as expected", если есть evidence.`,
+    },
+    {
+      en: `## Workplace artifact: DevTools investigation note
+
+Use this note when the UI shows an error but the reason is unclear.
+
+| Signal | What to capture |
+| --- | --- |
+| Console | Error text, file, line, time |
+| Network | URL, method, status code, request body, response body |
+| Storage | Token exists, cookie expiry, stale local storage value |
+| Reproduction | Exact steps and account used |
+
+## Real beginner task
+
+Simulate a failed login and write a DevTools investigation note. If you cannot access the real backend, describe what you would capture.`,
+      ru: `## Рабочий артефакт: DevTools investigation note
+
+Используйте эту заметку, когда UI показывает ошибку, но причина неясна.
+
+| Signal | Что зафиксировать |
+| --- | --- |
+| Console | Error text, file, line, time |
+| Network | URL, method, status code, request body, response body |
+| Storage | Token exists, cookie expiry, stale local storage value |
+| Reproduction | Точные шаги и account |
+
+## Реальная задача для новичка
+
+Сымитируйте failed login и напишите DevTools investigation note. Если нет доступа к реальному backend, опишите, что именно вы бы зафиксировали.`,
+    },
+    {
+      en: `## Workplace artifact: responsive test run
+
+| Viewport | What to inspect |
+| --- | --- |
+| 1440px desktop | Main layout, sidebar/header, spacing |
+| 1024px tablet | Navigation, cards per row, wrapping |
+| 390px mobile | Text overflow, button size, sticky footer, keyboard |
+| 320px narrow mobile | Long words, icons, critical CTA visibility |
+
+## Real beginner task
+
+Pick one module page and inspect it at 1440px, 390px, and 320px. Report at least one observation per viewport.`,
+      ru: `## Рабочий артефакт: responsive test run
+
+| Viewport | Что проверить |
+| --- | --- |
+| 1440px desktop | Main layout, sidebar/header, spacing |
+| 1024px tablet | Navigation, cards per row, wrapping |
+| 390px mobile | Text overflow, button size, sticky footer, keyboard |
+| 320px narrow mobile | Long words, icons, visibility of critical CTA |
+
+## Реальная задача для новичка
+
+Выберите одну module page и проверьте ее на 1440px, 390px и 320px. Зафиксируйте минимум одно observation на каждый viewport.`,
+    },
+  ],
+  [
+    {
+      en: `## Workplace artifact: API contract card
+
+Endpoint: GET /api/bookmarks
+
+| Item | Expected |
+| --- | --- |
+| Auth | Valid session required |
+| Success status | 200 |
+| Response shape | { bookmarks: [{ id, title, href, createdAt }] } |
+| Empty state | bookmarks is [] |
+| Unauthorized | 401 or redirect to login |
+| Data risk | Deleted lesson should not remain in bookmarks |
+
+## Real beginner task
+
+Write an API contract card for POST /api/bookmarks. Include request body, success response, validation error, and unauthorized behavior.`,
+      ru: `## Рабочий артефакт: API contract card
+
+Endpoint: GET /api/bookmarks
+
+| Item | Expected |
+| --- | --- |
+| Auth | Valid session required |
+| Success status | 200 |
+| Response shape | { bookmarks: [{ id, title, href, createdAt }] } |
+| Empty state | bookmarks is [] |
+| Unauthorized | 401 или redirect to login |
+| Data risk | Deleted lesson не должен оставаться в bookmarks |
+
+## Реальная задача для новичка
+
+Напишите API contract card для POST /api/bookmarks. Укажите request body, success response, validation error и unauthorized behavior.`,
+    },
+    {
+      en: `## Workplace artifact: Postman collection plan
+
+| Request | Purpose | Expected |
+| --- | --- | --- |
+| Login valid user | Get session/token | 200 and user object |
+| Login wrong password | Validate auth error | 401 or clear error |
+| Get profile with auth | Confirm protected data | 200 and profile fields |
+| Get profile without auth | Confirm protection | 401/403 |
+| Update profile invalid name | Validate input | 400/422 with field error |
+
+## Real beginner task
+
+Create a 5-request Postman plan for a lesson bookmark API. Name each request and describe the expected status.`,
+      ru: `## Рабочий артефакт: Postman collection plan
+
+| Request | Purpose | Expected |
+| --- | --- | --- |
+| Login valid user | Получить session/token | 200 and user object |
+| Login wrong password | Проверить auth error | 401 или clear error |
+| Get profile with auth | Подтвердить protected data | 200 and profile fields |
+| Get profile without auth | Подтвердить protection | 401/403 |
+| Update profile invalid name | Проверить input validation | 400/422 with field error |
+
+## Реальная задача для новичка
+
+Создайте 5-request Postman plan для lesson bookmark API. Назовите каждый request и опишите expected status.`,
+    },
+    {
+      en: `## Workplace artifact: API finding
+
+**Title:** POST /api/bookmarks accepts empty lessonId
+**Environment:** local, Chrome, student account
+**Request:** POST /api/bookmarks with body { "lessonId": "" }
+**Expected:** 400 or 422 with field-level validation error
+**Actual:** 200 and empty bookmark created
+**Impact:** User can create broken saved items; Bookmarks page may show blank cards
+**Evidence:** request/response body, timestamp, account
+
+## Real beginner task
+
+Write one API finding for unauthorized access to a protected endpoint.`,
+      ru: `## Рабочий артефакт: API finding
+
+**Title:** POST /api/bookmarks accepts empty lessonId
+**Environment:** local, Chrome, student account
+**Request:** POST /api/bookmarks with body { "lessonId": "" }
+**Expected:** 400 or 422 with field-level validation error
+**Actual:** 200 and empty bookmark created
+**Impact:** User can create broken saved items; Bookmarks page may show blank cards
+**Evidence:** request/response body, timestamp, account
+
+## Реальная задача для новичка
+
+Напишите один API finding для unauthorized access к protected endpoint.`,
+    },
+  ],
+  [
+    {
+      en: `## Workplace artifact: strong bug report
+
+**Title:** Save button remains enabled during profile update and creates duplicate requests
+**Environment:** local, Chrome 124, student@levio.local
+**Preconditions:** User is logged in and opens Profile settings
+**Steps:**
+1. Change the display name
+2. Double-click Save quickly
+3. Open Network tab
+
+**Expected:** Button becomes disabled after first click; only one request is sent
+**Actual:** Two update requests are sent
+**Severity:** Medium
+**Priority:** High if duplicate writes can corrupt data
+**Evidence:** Network screenshot with two POST/PATCH requests
+
+## Real beginner task
+
+Write a bug report for this defect: "On mobile, the Continue button overlaps the last quiz option."`,
+      ru: `## Рабочий артефакт: сильный bug report
+
+**Title:** Save button remains enabled during profile update and creates duplicate requests
+**Environment:** local, Chrome 124, student@levio.local
+**Preconditions:** User is logged in and opens Profile settings
+**Steps:**
+1. Change the display name
+2. Double-click Save quickly
+3. Open Network tab
+
+**Expected:** Button becomes disabled after first click; only one request is sent
+**Actual:** Two update requests are sent
+**Severity:** Medium
+**Priority:** High if duplicate writes can corrupt data
+**Evidence:** Network screenshot with two POST/PATCH requests
+
+## Реальная задача для новичка
+
+Напишите bug report для дефекта: "На mobile кнопка Continue перекрывает последний вариант ответа в quiz."`,
+    },
+    {
+      en: `## Workplace artifact: release test strategy
+
+| Test type | When to use | Example |
+| --- | --- | --- |
+| Smoke | Fresh build is deployed | Login, open dashboard, start module |
+| Sanity | One focused fix | Retest bookmark save after fix |
+| Regression | Before release | Login, tracks, module, quiz, certificate |
+| Exploratory | Risk is unclear | Try unusual flows around progress and quiz retry |
+
+## Real beginner task
+
+Prepare a 10-item smoke checklist for releasing the QA learning path.`,
+      ru: `## Рабочий артефакт: release test strategy
+
+| Test type | Когда использовать | Пример |
+| --- | --- | --- |
+| Smoke | Fresh build deployed | Login, open dashboard, start module |
+| Sanity | One focused fix | Retest bookmark save after fix |
+| Regression | Before release | Login, tracks, module, quiz, certificate |
+| Exploratory | Risk is unclear | Try unusual flows around progress and quiz retry |
+
+## Реальная задача для новичка
+
+Подготовьте smoke checklist из 10 пунктов для релиза QA learning path.`,
+    },
+    {
+      en: `## Workplace artifact: release recommendation
+
+**Recommendation:** Ready with risks
+**Coverage completed:** login, QA track page, first module, quiz fallback, dashboard progress
+**Open defects:** mobile overlap in quiz options, Gemini AI returns 403 locally
+**Risk:** Learners can still complete modules, but AI-generated quiz is unavailable until API access is fixed
+**Decision needed:** Release fallback learning flow now or block release until AI key is corrected
+
+## Real beginner task
+
+Write a release recommendation for a build where payment works, course progress works, but certificate PDF generation fails.`,
+      ru: `## Рабочий артефакт: release recommendation
+
+**Recommendation:** Ready with risks
+**Coverage completed:** login, QA track page, first module, quiz fallback, dashboard progress
+**Open defects:** mobile overlap in quiz options, Gemini AI returns 403 locally
+**Risk:** Learners can still complete modules, but AI-generated quiz is unavailable until API access is fixed
+**Decision needed:** Release fallback learning flow now or block release until AI key is corrected
+
+## Реальная задача для новичка
+
+Напишите release recommendation для build, где payment работает, course progress работает, но certificate PDF generation fails.`,
+    },
+  ],
+];
+
 function pickLocalized<T>(value: Localized<T>, locale: LearningLocale): T {
   return value[locale];
 }
@@ -1400,7 +2501,12 @@ function applyQuestionOverride(question: RuntimeQuestion, override: OverrideQues
   };
 }
 
-function applyModuleOverride(module: RuntimeModule, override: OverrideModule | undefined, locale: LearningLocale): RuntimeModule {
+function applyModuleOverride(
+  module: RuntimeModule,
+  override: OverrideModule | undefined,
+  locale: LearningLocale,
+  moduleIndex: number,
+): RuntimeModule {
   if (!override) {
     return module;
   }
@@ -1425,10 +2531,12 @@ function applyModuleOverride(module: RuntimeModule, override: OverrideModule | u
       if (!lessonOverride) {
         return lesson;
       }
+      const realWorldLab = QA_REAL_WORLD_LABS[moduleIndex]?.[index];
+      const lessonBody = pickLocalized(lessonOverride.body, locale);
       return {
         ...lesson,
         title: pickLocalized(lessonOverride.title, locale),
-        body: pickLocalized(lessonOverride.body, locale),
+        body: realWorldLab ? `${lessonBody}\n\n${pickLocalized(realWorldLab, locale)}` : lessonBody,
       };
     }),
     quiz: module.quiz
@@ -1444,7 +2552,7 @@ function applyModuleOverride(module: RuntimeModule, override: OverrideModule | u
 }
 
 export function normalizeLearningLocale(value: string | undefined): LearningLocale {
-  return value === "ru" ? "ru" : "en";
+  return value === "en" ? "en" : "ru";
 }
 
 export function applyTrackContentOverrides(course: RuntimeCourse, locale: LearningLocale): RuntimeCourse {
@@ -1457,7 +2565,7 @@ export function applyTrackContentOverrides(course: RuntimeCourse, locale: Learni
     description: pickLocalized(QA_TRACK_DESCRIPTION, locale),
     shortDescription: pickLocalized(QA_TRACK_DESCRIPTION, locale),
     modules: course.modules.map((moduleItem, index) =>
-      applyModuleOverride(moduleItem, QA_MANUAL_MODULES[index], locale),
+      applyModuleOverride(moduleItem, QA_MANUAL_MODULES[index], locale, index),
     ),
   };
 }

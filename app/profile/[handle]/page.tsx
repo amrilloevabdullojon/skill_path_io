@@ -6,19 +6,20 @@ import { authOptions } from "@/lib/auth";
 import { getDashboardData } from "@/lib/dashboard/data";
 
 type PublicProfilePageProps = {
-  params: {
+  params: Promise<{
     handle: string;
-  };
+  }>;
 };
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: PublicProfilePageProps): Promise<Metadata> {
+  const resolvedParams = await params;
   return {
-    title: `@${params.handle} — SkillPath Academy`,
-    description: `Public learning profile on SkillPath Academy. See skills, badges, and mission outcomes.`,
+    title: `@${resolvedParams.handle}`,
+    description: `Public learning profile on Levio. See skills, badges, and mission outcomes.`,
     openGraph: {
-      title: `@${params.handle} on SkillPath Academy`,
+      title: `@${resolvedParams.handle} on Levio`,
       description: "Learner profile with skills, badges, and career readiness score.",
       type: "profile",
     },
@@ -26,6 +27,7 @@ export async function generateMetadata({ params }: PublicProfilePageProps): Prom
 }
 
 export default async function PublicProfilePage({ params }: PublicProfilePageProps) {
+  const resolvedParams = await params;
   const session = await getServerSession(authOptions);
   const dashboard = await getDashboardData({
     preferredEmail: session?.user?.email,
@@ -42,7 +44,7 @@ export default async function PublicProfilePage({ params }: PublicProfilePagePro
 
   const profile = {
     ...dashboard.publicProfile,
-    handle: params.handle,
+    handle: resolvedParams.handle,
   };
 
   return (

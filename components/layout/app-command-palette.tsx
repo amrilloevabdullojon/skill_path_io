@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -9,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { EmptyState } from "@/components/ui/empty-state";
 import {
-  CommandRuntimeJob,
   CommandRuntimeMission,
   CommandRuntimeTrack,
   getCommandItems,
@@ -31,11 +31,13 @@ function scoreItem(query: string, text: string) {
 
 export function AppCommandPalette({ isAdmin }: AppCommandPaletteProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { isCommandPaletteOpen, openCommandPalette, closeCommandPalette } = useUiStore();
   const [query, setQuery] = useState("");
+  const [activeIndex, setActiveIndex] = useState(0);
+  const listRef = useRef<HTMLUListElement | null>(null);
   const [runtimeTracks, setRuntimeTracks] = useState<CommandRuntimeTrack[] | null>(null);
   const [runtimeMissions, setRuntimeMissions] = useState<CommandRuntimeMission[] | null>(null);
-  const [runtimeJobs, setRuntimeJobs] = useState<CommandRuntimeJob[] | null>(null);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -49,11 +51,16 @@ export function AppCommandPalette({ isAdmin }: AppCommandPaletteProps) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [openCommandPalette]);
 
-  useEffect(() => {
-    if (!isCommandPaletteOpen) {
-      setQuery("");
-    }
-  }, [isCommandPaletteOpen]);
+  function updateQuery(value: string) {
+    setQuery(value);
+    setActiveIndex(0);
+  }
+
+  function handleClose() {
+    closeCommandPalette();
+    setQuery("");
+    setActiveIndex(0);
+  }
 
   useEffect(() => {
     let active = true;
@@ -81,13 +88,6 @@ export function AppCommandPalette({ isAdmin }: AppCommandPaletteProps) {
             title?: string;
             roleContext?: string;
             category?: string;
-          }>;
-          jobs?: Array<{
-            id?: string;
-            title?: string;
-            level?: string;
-            location?: string;
-            roleTrack?: string;
           }>;
         };
         const tracks = Array.isArray(payload.tracks)
@@ -119,22 +119,9 @@ export function AppCommandPalette({ isAdmin }: AppCommandPaletteProps) {
             .filter((mission) => mission.id && mission.title)
           : [];
 
-        const jobs = Array.isArray(payload.jobs)
-          ? payload.jobs
-            .map((job) => ({
-              id: job.id ?? "",
-              title: job.title ?? "",
-              level: job.level ?? "Junior",
-              location: job.location ?? "Remote",
-              roleTrack: job.roleTrack ?? "QA",
-            }))
-            .filter((job) => job.id && job.title)
-          : [];
-
         if (active) {
           setRuntimeTracks(tracks);
           setRuntimeMissions(missions);
-          setRuntimeJobs(jobs);
         }
       } catch {
         // Keep page/action items when runtime API is not available.
@@ -151,7 +138,6 @@ export function AppCommandPalette({ isAdmin }: AppCommandPaletteProps) {
     const source = getCommandItems({
       runtimeTracks: runtimeTracks ?? undefined,
       runtimeMissions: runtimeMissions ?? undefined,
-      runtimeJobs: runtimeJobs ?? undefined,
     }).filter((item) => (item.adminOnly ? isAdmin : true));
     if (!query.trim()) {
       return source.slice(0, 14);
@@ -169,40 +155,71 @@ export function AppCommandPalette({ isAdmin }: AppCommandPaletteProps) {
       .sort((a, b) => b.score - a.score);
 
     return ranked.map((entry) => entry.item).slice(0, 18);
-  }, [isAdmin, query, runtimeJobs, runtimeMissions, runtimeTracks]);
+  }, [isAdmin, query, runtimeMissions, runtimeTracks]);
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setActiveIndex((idx) => Math.min(idx + 1, Math.max(items.length - 1, 0)));
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActiveIndex((idx) => Math.max(idx - 1, 0));
+    } else if (event.key === "Enter") {
+      const target = items[activeIndex];
+      if (target) {
+        event.preventDefault();
+        handleClose();
+        router.push(target.href);
+      }
+    }
+  }
+
+  // Scroll active item into view on keyboard nav.
+  useEffect(() => {
+    if (!listRef.current) return;
+    const el = listRef.current.querySelector<HTMLElement>(`[data-cmd-index="${activeIndex}"]`);
+    el?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex]);
 
   return (
-    <Modal open={isCommandPaletteOpen} onClose={closeCommandPalette} title="Command palette">
+    <Modal open={isCommandPaletteOpen} onClose={handleClose} title="Поиск по платформе">
       <div className="space-y-3">
         <div className="relative">
-          <Search className="select-chevron pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+          <Search className="select-chevron pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" aria-hidden />
           <Input
             autoFocus
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search courses, modules, lessons, missions, jobs..."
+            onChange={(event) => updateQuery(event.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Поиск треков, модулей, миссий, прогресса…"
             className="pl-9"
-            aria-label="Search platform content"
+            aria-label="Поиск по контенту платформы"
+            aria-controls="cmd-results"
+            aria-activedescendant={items[activeIndex] ? `cmd-item-${items[activeIndex].id}` : undefined}
           />
         </div>
 
-        <p className="text-xs text-muted-foreground">Shortcut: Cmd/Ctrl + K</p>
-
         {items.length === 0 ? (
           <EmptyState
-            title="No results"
-            description="Try another keyword, for example: QA, mission, planner, SQL."
+            title="Ничего не найдено"
+            description="Попробуйте другой запрос: QA, миссия, прогресс или портфолио."
           />
         ) : (
-          <ul className="max-h-[22rem] space-y-1.5 overflow-y-auto pr-1">
-            {items.map((item) => (
-              <li key={item.id}>
+          <ul
+            ref={listRef}
+            id="cmd-results"
+            role="listbox"
+            aria-label="Результаты поиска"
+            className="max-h-[22rem] space-y-1.5 overflow-y-auto pr-1"
+          >
+            {items.map((item, index) => (
+              <li key={item.id} role="option" id={`cmd-item-${item.id}`} aria-selected={index === activeIndex} data-cmd-index={index}>
                 <Link
                   href={item.href}
-                  onClick={closeCommandPalette}
-                  className={`surface-subtle block p-3 transition-colors hover:bg-card/80 ${
-                    pathname === item.href ? "border-border" : ""
-                  }`}
+                  onClick={handleClose}
+                  className={`surface-subtle block p-3 transition-colors ${
+                    index === activeIndex ? "bg-card/80 ring-2 ring-indigo-400/50" : "hover:bg-card/80"
+                  } ${pathname === item.href ? "border-border" : ""}`}
                 >
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-medium text-foreground">{item.title}</p>

@@ -12,7 +12,7 @@ export async function getUserNotifications(userId: string): Promise<Notification
   const items: NotificationItem[] = [];
 
   try {
-    const [recentProgress, certificates, missionSubmissions, newJobs, quests] = await Promise.all([
+    const [recentProgress, recentCourseProgress, certificates, courseCertificates, missionSubmissions, newJobs, quests] = await Promise.all([
       // Recently completed modules
       prisma.userProgress.findMany({
         where: { userId, status: "COMPLETED" },
@@ -20,10 +20,24 @@ export async function getUserNotifications(userId: string): Promise<Notification
         orderBy: { completedAt: "desc" },
         take: 5,
       }),
+      // Recently completed Studio course modules
+      prisma.courseModuleProgress.findMany({
+        where: { userId, status: "COMPLETED" },
+        include: { courseModule: { include: { course: true } } },
+        orderBy: { completedAt: "desc" },
+        take: 5,
+      }),
       // Recently issued certificates
       prisma.certificate.findMany({
         where: { userId },
         include: { track: true },
+        orderBy: { issuedAt: "desc" },
+        take: 3,
+      }),
+      // Recently issued Studio course certificates
+      prisma.courseCertificate.findMany({
+        where: { userId },
+        include: { course: true },
         orderBy: { issuedAt: "desc" },
         take: 3,
       }),
@@ -64,6 +78,18 @@ export async function getUserNotifications(userId: string): Promise<Notification
       });
     }
 
+    for (const cert of courseCertificates) {
+      items.push({
+        id: `course-cert-${cert.id}`,
+        title: "Сертификат получен",
+        body: `Вы завершили курс «${cert.course.title}» и получили сертификат.`,
+        type: "achievement",
+        href: cert.certificateUrl,
+        createdAt: cert.issuedAt.toISOString(),
+        isRead: false,
+      });
+    }
+
     // Recent module completions
     for (const progress of recentProgress) {
       if (!progress.completedAt) continue;
@@ -73,6 +99,19 @@ export async function getUserNotifications(userId: string): Promise<Notification
         body: `«${progress.module.title}» из трека «${progress.module.track.title}»`,
         type: "summary",
         href: `/tracks/${progress.module.track.slug}`,
+        createdAt: progress.completedAt.toISOString(),
+        isRead: false,
+      });
+    }
+
+    for (const progress of recentCourseProgress) {
+      if (!progress.completedAt) continue;
+      items.push({
+        id: `course-progress-${progress.id}`,
+        title: "Модуль завершён",
+        body: `«${progress.courseModule.title}» из курса «${progress.courseModule.course.title}»`,
+        type: "summary",
+        href: `/tracks/${progress.courseModule.course.slug}`,
         createdAt: progress.completedAt.toISOString(),
         isRead: false,
       });

@@ -28,11 +28,11 @@ function actionColor(action: string) {
 }
 
 type ActivityAdminPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string | string[];
     entityType?: string | string[];
     action?: string | string[];
-  };
+  }>;
 };
 
 function paramValue(value: string | string[] | undefined) {
@@ -45,9 +45,10 @@ export default async function ActivityAdminPage({
 }: ActivityAdminPageProps) {
   await requireAdminPermission("analytics.read");
 
-  const q = paramValue(searchParams?.q);
-  const entityTypeFilter = paramValue(searchParams?.entityType);
-  const actionFilter = paramValue(searchParams?.action);
+  const resolvedSearchParams = await searchParams;
+  const q = paramValue(resolvedSearchParams?.q);
+  const entityTypeFilter = paramValue(resolvedSearchParams?.entityType);
+  const actionFilter = paramValue(resolvedSearchParams?.action);
 
   const where = {
     ...(q ? { actorEmail: { contains: q, mode: "insensitive" as const } } : {}),

@@ -23,10 +23,10 @@ const STATUS_BADGE: Record<StudioContentStatus, string> = {
 const STATUS_OPTIONS: StudioContentStatus[] = ["DRAFT", "IN_REVIEW", "PUBLISHED", "ARCHIVED"];
 
 type AdminAssignmentsPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string | string[];
     status?: string | string[];
-  };
+  }>;
 };
 
 function paramValue(value: string | string[] | undefined) {
@@ -37,8 +37,9 @@ function paramValue(value: string | string[] | undefined) {
 export default async function AdminAssignmentsPage({ searchParams }: AdminAssignmentsPageProps) {
   await requireAdminPermission("courses.read");
 
-  const query = paramValue(searchParams?.q);
-  const statusFilter = paramValue(searchParams?.status);
+  const resolvedSearchParams = await searchParams;
+  const query = paramValue(resolvedSearchParams?.q);
+  const statusFilter = paramValue(resolvedSearchParams?.status);
   const validStatus = STATUS_OPTIONS.includes(statusFilter as StudioContentStatus)
     ? (statusFilter as StudioContentStatus)
     : undefined;
@@ -102,9 +103,9 @@ export default async function AdminAssignmentsPage({ searchParams }: AdminAssign
               Apply
             </button>
             {(query || statusFilter) && (
-              <a href="/admin/assignments" className="btn-secondary text-muted-foreground">
+              <Link href="/admin/assignments" className="btn-secondary text-muted-foreground">
                 Reset
-              </a>
+              </Link>
             )}
           </div>
         </form>

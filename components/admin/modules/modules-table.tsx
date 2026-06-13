@@ -104,7 +104,7 @@ function SortableRow({ mod, selected, onToggle }: RowProps) {
     <tr
       ref={setNodeRef}
       style={style}
-      className={cn("table-row align-top", isDragging && "bg-sky-500/5 shadow-lg")}
+      className={cn("table-row align-top", isDragging && "bg-indigo-500/5 shadow-lg")}
     >
       {/* Drag handle */}
       <td className="w-8 px-2 py-3">
@@ -126,7 +126,7 @@ function SortableRow({ mod, selected, onToggle }: RowProps) {
           checked={selected}
           onChange={() => onToggle(mod.id)}
           aria-label={t("list.selectModule", { title: mod.title })}
-          className="h-4 w-4 rounded border-border bg-card accent-sky-400"
+          className="h-4 w-4 rounded border-border bg-card accent-indigo-400"
         />
       </td>
 
@@ -150,7 +150,7 @@ function SortableRow({ mod, selected, onToggle }: RowProps) {
         />
         <Link
           href={`/admin/modules/${mod.id}`}
-          className="mt-1 inline-flex items-center gap-0.5 text-[11px] text-sky-400 hover:underline"
+          className="mt-1 inline-flex items-center gap-0.5 text-[11px] text-indigo-400 hover:underline"
         >
           {t("shared.editDetails")}
           <ChevronRight className="h-3 w-3" />
@@ -211,7 +211,7 @@ function SortableRow({ mod, selected, onToggle }: RowProps) {
           href={`/tracks/${mod.track.slug}/modules/${mod.id}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-sm text-sky-300 hover:underline"
+          className="inline-flex items-center gap-1 text-sm text-indigo-300 hover:underline"
         >
           {t("shared.view")}
           <ExternalLink className="h-3 w-3" />
@@ -359,7 +359,7 @@ export function ModulesTable({ groups: initialGroups }: { groups: TrackGroup[] }
                     checked={allSelected}
                     onChange={toggleAll}
                     aria-label={t("shared.selectAll")}
-                    className="h-4 w-4 rounded border-border bg-card accent-sky-400"
+                    className="h-4 w-4 rounded border-border bg-card accent-indigo-400"
                   />
                 </th>
                 <th className="px-3 py-3 text-left">{t("list.titleAndDescription")}</th>
@@ -377,7 +377,7 @@ export function ModulesTable({ groups: initialGroups }: { groups: TrackGroup[] }
               {groups.map((group) => (
                 <Fragment key={group.trackId}>
                   {/* ── Track group header ───────────────────── */}
-                  <tr className="border-t-2 border-border/60 bg-card/60">
+                  <tr className="border-t-2 border-border bg-card/60">
                     <td colSpan={COL_COUNT} className="px-4 py-2">
                       <div className="flex items-center gap-2.5">
                         <span

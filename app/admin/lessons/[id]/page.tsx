@@ -21,10 +21,11 @@ const TYPE_BADGE: Record<LessonType, string> = {
   TASK: "border-amber-500/30 bg-amber-500/10 text-amber-400",
 };
 
-export default async function EditLessonPage({ params }: { params: { id: string } }) {
+export default async function EditLessonPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   await requireAdminPermission("courses.write");
 
-  const lesson = await getLessonDetail(params.id);
+  const lesson = await getLessonDetail(resolvedParams.id);
 
   if (!lesson) notFound();
 

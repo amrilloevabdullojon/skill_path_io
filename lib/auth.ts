@@ -2,6 +2,9 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import { getLocalUserByEmail } from "@/lib/auth/local-users";
+import { isDemoModeEnabled } from "@/lib/config/runtime-mode";
+import { prisma } from "@/lib/prisma";
+import type { AppRoleEnum } from "@/types/next-auth";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -18,6 +21,10 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        if (!isDemoModeEnabled()) {
+          return null;
+        }
+
         // Guard: demo credentials require the expected demo password token.
         // The local login panel always sends password: "local"; any other value
         // (including missing/empty) must be rejected to prevent account enumeration.
@@ -41,15 +48,42 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
+      // First sign in
       if (user && "role" in user) {
         token.role = user.role;
+        token.id = user.id;
       }
+
+      // Always sync the token role from the DB for subsequent calls
+      if (token.email) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { email: token.email },
+            select: { id: true, role: true }
+          });
+          if (dbUser) {
+            token.role = dbUser.role;
+            token.id = dbUser.id;
+          } else if (!token.id) {
+            // Fallback for old cookies
+            const localUser = isDemoModeEnabled() ? getLocalUserByEmail(token.email) : null;
+            if (localUser) {
+              token.id = localUser.id;
+              token.role = localUser.role;
+            }
+          }
+        } catch {
+          // ignore DB connection errors gracefully during JWT generation
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.name = session.user.name ?? "SkillPath User";
-        session.user.role = token.role === "ADMIN" ? "ADMIN" : "STUDENT";
+        session.user.name = session.user.name ?? "Levio User";
+        session.user.role = (token.role as AppRoleEnum | undefined) ?? "STUDENT";
+        session.user.id = (token.id as string) || "local-student"; // Fallback to never be undefined
       }
       return session;
     },

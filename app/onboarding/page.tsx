@@ -4,13 +4,13 @@ import { SmartOnboardingFlow } from "@/components/onboarding/smart-onboarding-fl
 import { getOnboardingProfileFromCookie } from "@/lib/personalization/profile-storage";
 
 export const metadata: Metadata = {
-  title: "Get Started — SkillPath Academy",
-  description: "Tell us your goals and experience so we can build your personalized learning path.",
+  title: "Добро пожаловать",
+  description: "Расскажите нам о ваших целях, и ИИ соберет для вас индивидуальный путь обучения.",
   robots: { index: false },
 };
 
-export default function OnboardingPage() {
-  const profile = getOnboardingProfileFromCookie();
+export default async function OnboardingPage() {
+  const profile = await getOnboardingProfileFromCookie();
 
   return (
     <section className="page-shell">

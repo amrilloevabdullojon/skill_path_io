@@ -2,21 +2,22 @@ import Link from "next/link";
 import { ArrowUpRight, Compass, Flame } from "lucide-react";
 
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { AdaptiveSuggestion } from "@/types/personalization";
 
-function priorityColor(priority: AdaptiveSuggestion["priority"]) {
-  if (priority === "High") return "border-rose-400/30 bg-rose-500/10 text-rose-200";
-  if (priority === "Medium") return "border-amber-400/30 bg-amber-500/10 text-amber-200";
-  return "border-emerald-400/30 bg-emerald-500/10 text-emerald-200";
+function priorityVariant(priority: AdaptiveSuggestion["priority"]): BadgeProps["variant"] {
+  if (priority === "High") return "danger";
+  if (priority === "Medium") return "warning";
+  return "success";
 }
 
 export function DashboardAdaptivePathSection({ suggestions }: { suggestions: AdaptiveSuggestion[] }) {
   return (
     <DashboardSection
       id="adaptive"
-      title="Adaptive Path"
-      description="Personalized next steps based on quiz mistakes, pace, and simulation outcomes."
-      actionLabel="Open analytics"
+      title="Адаптивный путь"
+      description="Персонализированные следующие шаги на основе ошибок в квизах, темпа и итогов симуляций."
+      actionLabel="Открыть аналитику"
       actionHref="/analytics"
     >
       <div className="space-y-2">
@@ -27,14 +28,12 @@ export function DashboardAdaptivePathSection({ suggestions }: { suggestions: Ada
                 <p className="text-sm font-semibold text-foreground">{item.title}</p>
                 <p className="text-xs text-muted-foreground">{item.reason}</p>
               </div>
-              <span className={`rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wide ${priorityColor(item.priority)}`}>
-                {item.priority}
-              </span>
+              <Badge variant={priorityVariant(item.priority)}>{item.priority}</Badge>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">{item.action}</p>
-            <Link href={item.href} className="mt-2 inline-flex items-center gap-1 text-xs text-sky-300 hover:text-sky-200">
+            <Link href={item.href} className="mt-2 inline-flex items-center gap-1 text-xs text-indigo-300 hover:text-indigo-200">
               <Compass className="h-3.5 w-3.5" />
-              Follow suggestion
+              Следовать рекомендации
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </article>
@@ -43,7 +42,7 @@ export function DashboardAdaptivePathSection({ suggestions }: { suggestions: Ada
 
       <p className="inline-flex items-center gap-2 text-xs text-muted-foreground">
         <Flame className="h-3.5 w-3.5 text-amber-300" />
-        Adaptive engine can switch to acceleration path when consistency improves.
+        Адаптивный движок переключается на ускоренный путь при повышении стабильности.
       </p>
     </DashboardSection>
   );

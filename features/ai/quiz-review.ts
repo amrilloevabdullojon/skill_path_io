@@ -60,7 +60,7 @@ export async function generateAiQuizReview(payload: QuizReviewPayload): Promise<
   const fallback = localQuizReview(payload);
 
   const systemPrompt =
-    "Ты AI-наставник SkillPath Academy. Отвечай на русском языке. Верни только JSON без markdown.";
+    "Ты AI-наставник Levio. Отвечай на русском языке. Верни только JSON без markdown.";
   const userPrompt = [
     "Сделай разбор ошибки в тесте и верни JSON формата:",
     '{"explanation":"...","tips":["..."],"recommendations":["..."]}',

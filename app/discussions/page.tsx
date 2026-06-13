@@ -5,7 +5,7 @@ import { DiscussionsHub } from "@/components/discussion/discussions-hub";
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Discussions — SkillPath Academy",
+  title: "Discussions",
   description: "Ask questions, share insights, and discuss learning topics with your peers.",
 };
 import { prisma } from "@/lib/prisma";
@@ -23,14 +23,14 @@ function formatRelative(date: Date) {
   const diffMs = Math.max(0, now - date.getTime());
   const diffMinutes = Math.floor(diffMs / 60_000);
   if (diffMinutes < 60) {
-    return `${Math.max(1, diffMinutes)}m ago`;
+    return `${Math.max(1, diffMinutes)} мин. назад`;
   }
   const diffHours = Math.floor(diffMinutes / 60);
   if (diffHours < 24) {
-    return `${diffHours}h ago`;
+    return `${diffHours} ч. назад`;
   }
   const diffDays = Math.floor(diffHours / 24);
-  return `${diffDays}d ago`;
+  return `${diffDays} д. назад`;
 }
 
 export const dynamic = "force-dynamic";
@@ -58,7 +58,7 @@ export default async function DiscussionsPage() {
 
   const threads: DiscussionThread[] = rows.map((row) => ({
     id: row.id,
-    moduleTitle: row.moduleRef || row.track || "General discussion",
+    moduleTitle: row.moduleRef || row.track || "Общее обсуждение",
     title: row.title,
     author: row.user.name,
     replies: row._count.comments,

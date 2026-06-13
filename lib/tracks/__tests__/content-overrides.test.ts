@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { TrackCategory } from "@prisma/client";
 
 import { RuntimeCourse } from "@/lib/learning/content-types";
-import { applyTrackContentOverrides } from "@/lib/tracks/content-overrides";
+import { applyTrackContentOverrides, normalizeLearningLocale } from "@/lib/tracks/content-overrides";
 import { buildLessonBlocks } from "@/lib/tracks/lesson-blocks";
 
 function buildRuntimeCourse(): RuntimeCourse {
@@ -72,12 +72,32 @@ function buildRuntimeCourse(): RuntimeCourse {
 }
 
 describe("content overrides", () => {
+  it("defaults learning content to Russian when no locale is set", () => {
+    expect(normalizeLearningLocale(undefined)).toBe("ru");
+    expect(normalizeLearningLocale("")).toBe("ru");
+    expect(normalizeLearningLocale("en")).toBe("en");
+  });
+
   it("localizes QA course content in Russian", () => {
     const course = applyTrackContentOverrides(buildRuntimeCourse(), "ru");
 
     expect(course.description).toContain("ручному тестированию");
     expect(course.modules[0]?.title).toBe("Основы ручного тестирования");
     expect(course.modules[0]?.lessons[0]?.title).toBe("Чем занимается Manual QA");
+    expect(course.modules[0]?.lessons[0]?.body).toContain("Сцена");
+    expect(course.modules[0]?.lessons[2]?.body).toContain("risk map");
+    expect(course.modules[1]?.lessons[0]?.body).toContain("login story");
+    expect(course.modules[1]?.lessons[1]?.body).toContain("Decision table");
+    expect(course.modules[1]?.lessons[2]?.body).toContain("Пять подробных test case");
+    expect(course.modules[2]?.lessons[0]?.body).toContain("profile settings после UI redesign");
+    expect(course.modules[2]?.lessons[1]?.body).toContain("Путь расследования");
+    expect(course.modules[2]?.lessons[2]?.body).toContain("Формат report");
+    expect(course.modules[3]?.lessons[0]?.body).toContain("UI говорит");
+    expect(course.modules[3]?.lessons[1]?.body).toContain("Postman rescue kit");
+    expect(course.modules[3]?.lessons[2]?.body).toContain("Decision matrix");
+    expect(course.modules[4]?.lessons[0]?.body).toContain("bug, который блокирует release review");
+    expect(course.modules[4]?.lessons[1]?.body).toContain("выбрать правильный test pass");
+    expect(course.modules[4]?.lessons[2]?.body).toContain("ваша первая release recommendation");
     expect(course.modules[0]?.quiz?.questions[0]?.options[1]?.text).toContain("Снижать риски");
   });
 
@@ -99,8 +119,22 @@ describe("content overrides", () => {
       ],
     });
 
-    const lessonHeadings = blocks.filter((block) => block.type === "heading" && block.title?.includes("Lesson"));
-    expect(lessonHeadings).toHaveLength(3);
+    const lessonPanels = blocks.filter((block) => block.type === "lesson_panel");
+    expect(lessonPanels).toHaveLength(3);
+    expect(lessonPanels[0]?.lesson?.artifact).toBe("QA intake note or risk list");
+    expect(lessonPanels[0]?.lesson?.shiftPlan).toHaveLength(3);
+    expect(lessonPanels[0]?.lesson?.doneCriteria).toHaveLength(3);
+    expect(lessonPanels[0]?.lesson?.decisionOptions).toHaveLength(3);
+    expect(lessonPanels[0]?.lesson?.decisionOptions.map((option) => option.artifactField)).toEqual([
+      "risk",
+      "evidence",
+      "decision",
+    ]);
+    expect(lessonPanels[0]?.lesson?.decisionPrompt).toContain("Lesson One");
+    expect(lessonPanels[0]?.content).toBe("Body one");
+    expect(blocks.some((block) => block.type === "callout" && block.title === "10-minute mission")).toBe(true);
+    expect(blocks.some((block) => block.type === "list" && block.title === "Beginner step-by-step plan")).toBe(true);
+    expect(blocks.some((block) => block.type === "code_block")).toBe(false);
     expect(blocks.some((block) => block.type === "list" && block.title === "Self-check questions")).toBe(true);
   });
 });

@@ -44,14 +44,14 @@ export function PublicProfileView({ profile }: PublicProfileViewProps) {
 
       <FadeInUp delay={0.14}>
       <section className="surface-elevated space-y-4 p-5">
-        <h2 className="section-title">Skill radar snapshot</h2>
+        <h2 className="section-title">Радар навыков</h2>
         <StaggerList className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
           {profile.skillRadar.map((skill) => (
             <article key={skill.skill} className="surface-subtle space-y-2 p-3">
               <p className="text-xs text-muted-foreground">{skill.skill}</p>
               <p className="text-sm font-semibold text-foreground">{skill.value}%</p>
               <div className="progress-track h-1.5">
-                <div className="h-full rounded-full bg-sky-400" style={{ width: `${skill.value}%` }} />
+                <div className="h-full rounded-full bg-indigo-400" style={{ width: `${skill.value}%` }} />
               </div>
             </article>
           ))}
@@ -61,7 +61,7 @@ export function PublicProfileView({ profile }: PublicProfileViewProps) {
 
       <FadeInUp delay={0.20}>
       <section className="surface-elevated space-y-4 p-5">
-        <h2 className="section-title">Badges</h2>
+        <h2 className="section-title">Значки</h2>
         <div className="flex flex-wrap gap-2">
           {profile.badges.map((badge) => (
             <span
@@ -77,12 +77,12 @@ export function PublicProfileView({ profile }: PublicProfileViewProps) {
 
       <FadeInUp delay={0.26}>
       <section className="surface-elevated space-y-4 p-5">
-        <h2 className="section-title">Mission outcomes</h2>
+        <h2 className="section-title">Результаты миссий</h2>
         <div className="grid gap-3 md:grid-cols-2">
           {profile.missionOutcomes.map((item) => (
             <article key={item.title} className="surface-subtle space-y-1 p-3">
               <p className="text-sm font-semibold text-foreground">{item.title}</p>
-              <p className="text-xs text-muted-foreground">Score: {item.score}%</p>
+              <p className="text-xs text-muted-foreground">Результат: {item.score}%</p>
             </article>
           ))}
         </div>
@@ -91,9 +91,9 @@ export function PublicProfileView({ profile }: PublicProfileViewProps) {
 
       <FadeInUp delay={0.32}>
       <section className="surface-elevated flex flex-wrap items-center justify-between gap-3 p-5">
-        <p className="text-sm text-muted-foreground">Explore full learning workspace and live progress updates.</p>
+        <p className="text-sm text-muted-foreground">Исследуй полное рабочее пространство и актуальный прогресс обучения.</p>
         <Link href="/dashboard" className="btn-secondary">
-          Open dashboard
+          На дашборд
         </Link>
       </section>
       </FadeInUp>

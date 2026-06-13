@@ -1,4 +1,4 @@
-# SkillPath Academy
+# Levio
 
 Next.js 14 App Router learning and career platform with Prisma + PostgreSQL, SaaS feature gating, analytics, marketplace, and admin studio.
 
@@ -48,19 +48,21 @@ Required:
 - `DIRECT_URL`
 - `NEXTAUTH_URL`
 - `NEXTAUTH_SECRET`
-- `DEMO_USER_EMAIL`
-- `DEMO_USER_PASSWORD`
 
 Recommended:
 - `NEXT_PUBLIC_APP_URL`
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `ANTHROPIC_API_KEY`
+- `GEMINI_API_KEY`
+- `ANTHROPIC_API_KEY` (optional secondary provider)
 
 Optional:
 - `ENABLE_DEMO_MODE` (`true`/`false`)
 - `NEXT_PUBLIC_ENABLE_DEMO_MODE` (`true`/`false`)
+- `DEMO_USER_EMAIL` (required only when demo mode is enabled)
+- `DEMO_USER_PASSWORD` (required only when demo mode is enabled)
+- `GEMINI_MODEL` (default: `gemini-2.5-flash`)
 - `ANTHROPIC_MODEL` (default: `claude-3-5-sonnet-latest`)
 - `ANTHROPIC_MAX_TOKENS` (default: `700`)
 - `MENTOR_RATE_LIMIT_MAX_REQUESTS` (default: `20`)

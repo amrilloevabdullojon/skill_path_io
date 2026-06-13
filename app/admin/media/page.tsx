@@ -26,7 +26,7 @@ function formatSize(sizeKb: number): string {
 }
 
 type MediaPageProps = {
-  searchParams?: { q?: string | string[] };
+  searchParams?: Promise<{ q?: string | string[] }>;
 };
 
 function paramValue(value: string | string[] | undefined) {
@@ -37,7 +37,8 @@ function paramValue(value: string | string[] | undefined) {
 export default async function AdminMediaPage({ searchParams }: MediaPageProps) {
   await requireAdminPermission("media.manage");
 
-  const query = paramValue(searchParams?.q);
+  const resolvedSearchParams = await searchParams;
+  const query = paramValue(resolvedSearchParams?.q);
 
   const assets = await prisma.mediaAsset.findMany({
     where: query

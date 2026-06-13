@@ -57,7 +57,6 @@ type UsageBucket = {
 };
 
 declare global {
-  // eslint-disable-next-line no-var
   var skillPathUsageLedger: Map<string, UsageBucket> | undefined;
 }
 

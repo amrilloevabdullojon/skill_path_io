@@ -27,11 +27,16 @@
     "comingSoon": "Скоро"
   },
   "meta": {
-    "title": "SkillPath Academy",
+    "title": "Levio",
     "description": "Платформа обучения для QA-инженеров, бизнес-аналитиков и аналитиков данных.",
-    "titleTemplate": "{page} — SkillPath Academy"
+    "titleTemplate": "{page} — Levio"
   },
   "nav": {
+    "menu": "Меню",
+    "today": "Сегодня",
+    "study": "Учёба",
+    "practice": "Практика",
+    "progress": "Прогресс",
     "overview": "Обзор",
     "tracks": "Треки",
     "missions": "Миссии",
@@ -45,6 +50,9 @@
     "jobs": "Вакансии",
     "marketplace": "Маркетплейс",
     "portfolio": "Портфолио",
+    "resumeScanner": "Рентген Резюме",
+    "interviewPreview": "AI Интервью",
+    "peerReview": "Code Tinder",
     "interview": "Собеседование",
     "review": "Проверка",
     "publicProfile": "Публичный профиль",
@@ -63,9 +71,18 @@
     "saas": "SaaS",
     "community": "Сообщество",
     "quickTip": "Быстрая подсказка",
-    "quickTipText": "Нажмите Cmd/Ctrl + K для поиска уроков, миссий, вакансий и сущностей администратора.",
+    "quickTipText": "Ищите уроки, миссии, прогресс и портфолио из одного места.",
+    "quickTipDismiss": "Понятно",
+    "focusMode": "Режим фокусного обучения",
+    "exitFocusMode": "Выйти",
+    "logout": "Выйти",
+    "login": "Войти",
+    "dashboard": "Панель управления",
+    "adminPanel": "Панель администратора",
     "quickActions": "Быстрые действия",
     "openCommandPalette": "Открыть палитру команд",
+    "searchPlaceholder": "Поиск модулей, миссий, прогресса…",
+    "cmdK": "Cmd + K",
     "notifications": "Уведомления",
     "openNavigation": "Открыть навигацию",
     "home": "Главная",
@@ -85,7 +102,7 @@
       "badge": "Реальные навыки для работы",
       "title": "Запустите карьеру в IT с {highlight} и ИИ-наставником",
       "titleHighlight": "модулями, миссиями,",
-      "description": "SkillPath Academy сочетает практическое обучение, систему прогресса и карьерные инструменты в одном премиум-пространстве.",
+      "description": "Levio сочетает практическое обучение, систему прогресса и карьерные инструменты в одном премиум-пространстве.",
       "ctaStart": "Начать обучение",
       "ctaExplore": "Смотреть треки",
       "ctaDemo": "Попробовать демо"
@@ -204,7 +221,7 @@
     "aiMentor": {
       "kicker": "Онбординг с ИИ-наставником",
       "title": "Персональное руководство с первого дня",
-      "description": "Расскажите SkillPath о целевой роли и недельном времени. ИИ-наставник построит практический путь и адаптирует его по мере прогресса.",
+      "description": "Расскажите Levio о целевой роли и недельном времени. ИИ-наставник построит практический путь и адаптирует его по мере прогресса.",
       "cta": "Спросить ИИ-наставника",
       "chat": [
         { "role": "user", "text": "Хочу стать QA-инженером." },
@@ -282,7 +299,7 @@
         "pricing": "Цены",
         "contact": "Контакты"
       },
-      "copyright": "SkillPath Academy. Локальная версия.",
+      "copyright": "Levio. Локальная версия.",
       "status": "Все системы работают"
     }
   },
@@ -299,7 +316,7 @@
     "noAccount": "Нет аккаунта?",
     "haveAccount": "Уже есть аккаунт?",
     "guest": {
-      "badge": "SkillPath Academy",
+      "badge": "Levio",
       "title": "Учитесь быстрее. Практикуйтесь умнее. Будьте готовы к работе.",
       "description": "Локальный демо-доступ к ролевым учебным процессам с премиум-интерфейсом, ИИ-руководством и прогрессией на основе миссий.",
       "trackProgression": {
@@ -341,7 +358,7 @@
       "stats": {
         "totalXp": "Всего XP",
         "streak": "Серия",
-        "streakUnit": "дней",
+        "streakUnit": "{days, plural, one {# день} few {# дня} other {# дней}}",
         "skillLevel": "Уровень навыков",
         "eta": "Завершение трека"
       },
@@ -359,12 +376,263 @@
         "demo": "Демо"
       }
     },
+    "tabs": {
+      "today": "Сегодня",
+      "progress": "Прогресс",
+      "overview": "Обзор",
+      "skills": "Навыки",
+      "career": "Карьера"
+    },
     "progressSnapshot": {
       "title": "Снимок прогресса",
       "totalCompletion": "Общее завершение",
       "modulesDone": "Модулей завершено",
       "learningStreak": "Серия обучения",
+      "streakUnit": "{days, plural, one {# день} few {# дня} other {# дней}}",
       "estCompletion": "Ожид. завершение"
+    },
+    "insights": {
+      "title": "Аналитика обучения",
+      "yourRank": "Ваш ранг",
+      "weeklyXp": "XP за неделю",
+      "learningVelocity": "Скорость обучения",
+      "velocityThisWeek": "{velocity}% за неделю",
+      "openLeaderboard": "Открыть рейтинг",
+      "achievements": "Достижения",
+      "skillProgress": "Прогресс навыков",
+      "strongest": "Сильнейший",
+      "weakest": "Слабейший",
+      "nextFocus": "Следующий фокус"
+    },
+    "upcomingActions": {
+      "title": "Следующие шаги",
+      "description": "Задачи для поддержания высокой скорости обучения на этой неделе.",
+      "difficulty": "Сложность",
+      "time": "Время",
+      "skillImpact": "Влияние на навык",
+      "start": "Начать"
+    },
+    "weeklyQuests": {
+      "title": "Еженедельные задания",
+      "description": "Короткие испытания для постоянства, наград XP и сохранения серии.",
+      "openMissions": "Открыть миссии",
+      "progress": "{done}/{goal} выполнено",
+      "completedStatus": "Выполнено",
+      "progressIncrement": "Прогресс +1"
+    },
+    "currentTracks": {
+      "title": "Текущие учебные треки",
+      "description": "Живой прогресс, следующий модуль и оценки завершения по активным путям.",
+      "openAllTracks": "Все треки",
+      "modules": "{done}/{total} модулей",
+      "nextModule": "Следующий модуль",
+      "done": "Готово",
+      "estCompletion": "Ожид. завершение",
+      "skillsGained": "Полученные навыки",
+      "careerImpact": "Карьерный эффект",
+      "startHere": "Начать",
+      "continue": "Продолжить"
+    },
+    "data": {
+      "quests": {
+        "lessons": { "title": "Пройти 3 урока", "description": "Завершите не менее 3 учебных единиц за эту неделю." },
+        "quiz": { "title": "Сдать 1 тест на 80%+", "description": "Набери не менее 80% в одном тесте по модулю." },
+        "mission": { "title": "Выполнить 1 миссию", "description": "Завершите одну практическую миссию на этой неделе." },
+        "streak": { "title": "Серия 5 дней", "description": "Учись 5 дней подряд." }
+      },
+      "actions": {
+        "continueModule": "Продолжить текущий модуль",
+        "continueModuleFallback": "Вернитесь к активному треку и сохраняйте темп.",
+        "redoQuiz": "Переделать тест с низким баллом",
+        "takeNextQuiz": "Пройти следующий тест",
+        "redoQuizDescription": "{module}: улучшить результат с {score}%",
+        "takeNextQuizFallback": "Укрепите знания коротким тестом.",
+        "simulation": "Пройти одну симуляцию",
+        "simulationDescription": "Практикуйте реальный рабочий процесс и получайте XP.",
+        "simulationImpact": "Решение реальных задач",
+        "skillUnlock": "Разблокировать следующий узел навыка",
+        "skillUnlockDescription": "Следующая цель: {target}",
+        "skillUnlockFallback": "Все текущие узлы разблокированы. Поддерживайте постоянство.",
+        "skillUnlockImpactFallback": "Глубина дерева навыков",
+        "interview": "Просмотреть обратную связь по собеседованию",
+        "interviewDescription": "Проведите одно mock-собеседование для проверки коммуникаций.",
+        "interviewImpact": "Коммуникация и уверенность",
+        "impactBA": "Качество требований",
+        "impactDA": "Уверенность в аналитике",
+        "impactQA": "Выполнение тестирования",
+        "impactRetention": "Запоминание знаний"
+      },
+      "achievements": {
+        "modulesCompleted": "Модулей завершено",
+        "modulesHint": "из {total}",
+        "quizzesPassed": "Тестов пройдено",
+        "quizzesHint": "результат 70%+",
+        "certificates": "Сертификаты",
+        "certificatesHint": "завершённых треков",
+        "bestScore": "Лучший результат теста",
+        "bestScoreHint": "максимальный балл",
+        "missionXp": "XP за миссии",
+        "missionXpHint": "из {total}"
+      },
+      "activity": {
+        "completedModule": "Модуль завершён: {title}",
+        "completedModuleSub": "{track} — урок пройден",
+        "passedQuiz": "Тест пройден: {title}",
+        "passedQuizScore": "Балл: {score}%",
+        "certificateEarned": "Сертификат получен",
+        "certificateCompleted": "{track} завершён",
+        "skillUnlockTitle": "Открыты новые узлы навыков",
+        "skillUnlockSub": "{unlocked}/{total} навыков открыто",
+        "badgeEarned": "Получен новый значок",
+        "simulationTitle": "Достигнут рубеж симуляции",
+        "simulationSub": "{count} симуляций завершено"
+      },
+      "stats": {
+        "completedLessons": "Пройдено уроков",
+        "completedLessonsHelper": "{count} модулей завершено",
+        "activeTracks": "Активных треков",
+        "activeTracksHelper": "{count} доступных треков",
+        "totalXp": "Всего XP",
+        "totalXpHelper": "{xp} XP на этой неделе",
+        "quizAccuracy": "Точность тестов",
+        "quizAccuracyHelper": "{count} тестов пройдено",
+        "streak": "Серия",
+        "streakValue": "{days, plural, one {# день} few {# дня} other {# дней}}",
+        "streakHelper": "Постоянство обучения",
+        "simulations": "Симуляций пройдено",
+        "simulationsHelper": "Оценка по завершённым модулям"
+      },
+      "notifications": {
+        "missionTitle": "Открыта новая миссия",
+        "summaryTitle": "Итоги недели",
+        "summaryBody": "{completed} еженедельных заданий выполнено, {xp} XP получено.",
+        "recommendationTitle": "Рекомендация ИИ",
+        "jobTitle": "Подобрана вакансия",
+        "achievementTitle": "Достижение разблокировано"
+      },
+      "weeklyReport": {
+        "headline": "Еженедельный отчёт ИИ",
+        "summary": "На этой неделе вы улучшили {skill} на {growth}%. Вы завершили {missions} миссий.",
+        "highlightReadiness": "Текущий показатель готовности: {score}.",
+        "highlightStrongest": "Самый сильный навык за неделю: {skill}.",
+        "highlightMissions": "Выполнено миссий: {missions}."
+      }
+    },
+    "recentActivity": {
+      "title": "Недавняя активность",
+      "description": "Хронология уроков, тестов, навыков, значков и достижений.",
+      "empty": {
+        "title": "Активности пока нет",
+        "description": "Откройте модуль и пройдите урок — здесь появится ваша хронология.",
+        "action": "Смотреть треки"
+      }
+    },
+    "planner": {
+      "title": "Планировщик",
+      "description": "Темп занятий и реалистичный прогноз завершения.",
+      "currentPlan": "Текущий план",
+      "workloadLabel": "Нагрузка",
+      "forecastDateLabel": "Прогноз завершения",
+      "weeklyPaceLabel": "Темп занятий",
+      "confidenceLabel": "Уверенность",
+      "planActive": "Статус плана: активен",
+      "openPlanner": "Открыть планировщик",
+      "paceIntense": "5 занятий в неделю",
+      "paceBalanced": "3–4 занятия в неделю",
+      "paceLight": "2–3 занятия в неделю",
+      "confidenceIntense": "Высокая уверенность",
+      "confidenceBalanced": "В графике",
+      "confidenceLight": "Стабильный темп",
+      "workloadIntense": "Интенсивно",
+      "workloadBalanced": "Сбалансированно",
+      "workloadLight": "Легко"
+    },
+    "interviewPractice": {
+      "title": "Подготовка к собеседованию",
+      "description": "Симулируйте ролевые интервью и получайте структурированную обратную связь от ИИ.",
+      "startAction": "Начать собеседование",
+      "trainerTitle": "Тренажёр для собеседований",
+      "trainerDescription": "Практикуйте вопросы для QA, BA, DA, оценивайте слабые места и получайте следующие модули.",
+      "sessionDuration": "Сессия 10–15 минут",
+      "aiFeedback": "Мгновенный отзыв от ИИ",
+      "openButton": "Открыть тренажёр"
+    },
+    "statsGrid": {
+      "keyMetrics": "Ключевые метрики",
+      "learningProgress": "Прогресс обучения",
+      "completedLessons": { "label": "Завершено уроков", "helper": "Всего успешно пройдено" },
+      "activeTracks": { "label": "Активных треков", "helper": "В процессе изучения" },
+      "totalXp": { "label": "Набрано XP", "helper": "Очки опыта" },
+      "quizAccuracy": { "label": "Точность квизов", "helper": "Средний балл" },
+      "weeklyStreak": { "label": "Огненная серия", "helper": "Дней подряд" },
+      "simulations": { "label": "Симуляции", "helper": "Пройдено ИИ-сценариев" }
+    },
+    "smartPlan": {
+      "label": "Умный план на день",
+      "todayTask": "{name}, ваша задача на сегодня:",
+      "allDone": "План на день выполнен! 🎉",
+      "allDoneDesc": "Отличная работа. Вы можете отдохнуть или повторить пройденный материал.",
+      "startButton": "Начать выполнение",
+      "eta": "Это займёт около {eta}."
+    },
+    "sections": {
+      "focus": {
+        "title": "Фокус обучения",
+        "description": "Ваши текущие треки и следующие логические шаги"
+      },
+      "gamification": {
+        "title": "Игровая механика и Статистика",
+        "description": "Ваши достижения, опыт и ежедневные цели"
+      },
+      "practice": {
+        "title": "Задания и Практика",
+        "description": "Еженедельные квесты, миссии и планировщик",
+        "locked": "Откроется на уровне Explorer (500 XP)",
+        "unlockHint": "Заработайте 500 XP, чтобы открыть этот раздел"
+      },
+      "advanced": {
+        "title": "Дополнительно",
+        "description": "Аналитика, интеллект-отчёты и история активности",
+        "locked": "Откроется на уровне Professional (1200 XP)",
+        "unlockHint": "Заработайте 1200 XP, чтобы открыть этот раздел"
+      }
+    },
+    "weeklyReport": {
+      "nextFocus": "Следующий фокус:"
+    },
+    "subscription": {
+      "title": "Подписка",
+      "manage": "Управление",
+      "plan": "Тариф: {name}",
+      "unlimited": "Без лимита",
+      "meters": {
+        "aiMentorRequests": "ИИ-ментор",
+        "missionSubmissions": "Сдача миссий",
+        "interviewSessions": "Собеседования",
+        "jobApplications": "Отклики на вакансии"
+      }
+    },
+    "skillsTab": {
+      "recommendations": {
+        "title": "Рекомендации",
+        "openAnalytics": "Расширенная аналитика",
+        "open": "Открыть"
+      },
+      "achievements": {
+        "title": "Достижения",
+        "unlocked": "Получено",
+        "locked": "Заблокировано"
+      }
+    },
+    "careerTab": {
+      "marketplace": {
+        "title": "Публичный профиль и маркетплейс",
+        "openButton": "Открыть маркетплейс",
+        "profileUrl": "URL профиля: {url}",
+        "matchPercent": "Совпадение: {percent}%",
+        "missingSkills": "Не хватает: {skills}",
+        "noMissingSkills": "Нет"
+      }
     },
     "empty": {
       "title": "Данные дашборда отсутствуют",
@@ -512,5 +780,48 @@
     "en": "English",
     "ru": "Русский",
     "current": "Текущий язык"
+  },
+  "missionsPage": {
+    "board": {
+      "kicker": "Обучение на практике",
+      "title": "Сценарные миссии в реальном рабочем контексте",
+      "description": "Учитесь, решая конкретные рабочие задачи с оценкой ИИ и советами по исправлению ошибок.",
+      "upgrade": {
+        "message": "Бесплатный план ограничивает миссии. Перейдите на Pro для безлимитного доступа.",
+        "button": "Перейти на Pro"
+      },
+      "empty": {
+        "title": "Миссии недоступны",
+        "description": "Миссии подбираются под ваш трек. Пройдите больше уроков, чтобы их открыть.",
+        "action": "Перейти к трекам"
+      },
+      "objective": "Цель миссии",
+      "submission": "Ответ на миссию",
+      "submissionPlaceholder": "Опишите ваш результат, решения и итоговый вывод...",
+      "submitButton": "Оценить с ИИ",
+      "result": "Результат: {verdict} ({score}%)",
+      "strengths": "Сильные стороны",
+      "improvements": "Что улучшить",
+      "recoveryPlan": "План исправления",
+      "addToPortfolio": "Добавить в портфолио",
+      "savedPortfolio": "Сохранено. Открыть /portfolio",
+      "difficulty": {
+        "Easy": "Лёгкая",
+        "Medium": "Средняя",
+        "Hard": "Сложная"
+      },
+      "chatGreeting": "Я отыгрываю роль: {role}. Привет! Напишите мне в чат, чтобы начать разбор задачи.",
+      "chatPlaceholder": "Напишите ваш ответ стейкхолдеру… (Enter для отправки)",
+      "submitChat": "Сдать диалог на оценку",
+      "tooShort": "Вы написали слишком мало для оценки. Продолжайте диалог со стейкхолдером!",
+      "chatError": "Не удалось получить ответ ИИ.",
+      "retryError": "Ошибка связи с ИИ.",
+      "missionBriefing": "Брифинг миссии",
+      "yourGoal": "ВАША ЦЕЛЬ",
+      "availableMissions": "ДОСТУПНЫЕ МИССИИ",
+      "analysisResult": "Чат проанализирован: {verdict} ({score}%)",
+      "savePortfolio": "Сохранить в портфолио",
+      "retryMission": "Пройти заново"
+    }
   }
 }

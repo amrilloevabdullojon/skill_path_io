@@ -53,26 +53,27 @@ export function BugReportSimulation() {
   }
 
   return (
-    <section className="surface-elevated space-y-5 p-5 sm:p-6">
+    <section className="surface-elevated border border-border/50 bg-card space-y-6 p-5 sm:p-7 relative isolate overflow-hidden rounded-2xl">
+      <div className="absolute top-[-50px] right-[-50px] w-[300px] h-[300px] rounded-full bg-emerald-500/10 blur-[100px] pointer-events-none -z-10" />
       <header className="space-y-2">
-        <p className="kicker">QA Simulation</p>
-        <h1 className="text-2xl font-semibold text-foreground">Bug Tracker Simulation</h1>
-        <p className="text-sm text-muted-foreground">
-          Create a Jira-style bug report and receive AI quality review.
+        <p className="kicker">Симуляция QA</p>
+        <h1 className="page-title text-foreground">Симулятор баг-трекера (Jira)</h1>
+        <p className="text-sm text-foreground/70">
+          Создайте баг-репорт в стиле Jira и получите автоматическую оценку качества от ИИ.
         </p>
       </header>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <input
           value={title}
           onChange={(event) => setTitle(event.target.value)}
-          className="input-base"
-          placeholder="Bug title"
+          className="input-base bg-card/60 backdrop-blur-sm border-border-subtle focus:border-emerald-500/50 focus:ring-emerald-500/20"
+          placeholder="Краткое описание (Title)..."
         />
-        <select value={severity} onChange={(event) => setSeverity(event.target.value as BugSeverity)} className="select-base">
+        <select value={severity} onChange={(event) => setSeverity(event.target.value as BugSeverity)} className="select-base bg-card/60 backdrop-blur-sm border-border-subtle focus:border-emerald-500/50 focus:ring-emerald-500/20">
           {severityValues.map((value) => (
             <option key={value} value={value}>
-              Severity: {value}
+              Серьезность: {value}
             </option>
           ))}
         </select>
@@ -81,55 +82,56 @@ export function BugReportSimulation() {
       <textarea
         value={stepsToReproduce}
         onChange={(event) => setStepsToReproduce(event.target.value)}
-        className="textarea-base min-h-[110px]"
-        placeholder="Steps to reproduce..."
+        className="textarea-base min-h-[110px] bg-card/60 backdrop-blur-sm border-border-subtle focus:border-emerald-500/50 focus:ring-emerald-500/20"
+        placeholder="Шаги для воспроизведения (Steps to reproduce)..."
       />
       <textarea
         value={expectedResult}
         onChange={(event) => setExpectedResult(event.target.value)}
-        className="textarea-base min-h-[80px]"
-        placeholder="Expected result..."
+        className="textarea-base min-h-[80px] bg-card/60 backdrop-blur-sm border-border-subtle focus:border-emerald-500/50 focus:ring-emerald-500/20"
+        placeholder="Ожидаемый результат (Expected result)..."
       />
       <textarea
         value={actualResult}
         onChange={(event) => setActualResult(event.target.value)}
-        className="textarea-base min-h-[80px]"
-        placeholder="Actual result..."
+        className="textarea-base min-h-[80px] bg-card/60 backdrop-blur-sm border-border-subtle focus:border-emerald-500/50 focus:ring-emerald-500/20"
+        placeholder="Фактический результат (Actual result)..."
       />
 
       <button
         type="button"
         onClick={submitForReview}
         disabled={isLoading}
-        className="btn-primary inline-flex items-center gap-2 disabled:opacity-60"
+        className="btn-primary gap-2 disabled:opacity-60"
       >
-        <Bug className="h-4 w-4" />
-        {isLoading ? "Reviewing..." : "Review bug report"}
+        <Bug className="h-5 w-5" />
+        {isLoading ? "Анализирую..." : "Проверить баг-репорт с ИИ"}
       </button>
 
       {review && (
-        <article className="surface-subtle space-y-3 p-4">
-          <p className="text-sm font-semibold text-foreground">Quality score: {review.qualityScore}/100</p>
-          <div className="grid gap-3 md:grid-cols-3">
-            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-100">
-              <p className="font-semibold uppercase tracking-wide text-emerald-200">Strengths</p>
-              <ul className="mt-2 list-disc space-y-1 pl-4">
+        <article className="surface-subtle border border-emerald-500/30 bg-card/50 backdrop-blur-md space-y-4 p-5 rounded-2xl relative isolate overflow-hidden mt-6">
+          <div className="absolute top-[-50px] left-[-50px] w-[200px] h-[200px] rounded-full bg-emerald-500/10 blur-[80px] pointer-events-none -z-10" />
+          <p className="text-lg font-bold text-foreground">Оценка качества: <span className="text-emerald-400">{review.qualityScore}/100</span></p>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md p-4 text-xs text-emerald-100 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+              <p className="font-semibold uppercase tracking-wide text-emerald-300">Сильные стороны</p>
+              <ul className="mt-2 list-disc space-y-1.5 pl-4">
                 {review.strengths.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-100">
-              <p className="font-semibold uppercase tracking-wide text-rose-200">Issues</p>
-              <ul className="mt-2 list-disc space-y-1 pl-4">
+            <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 backdrop-blur-md p-4 text-xs text-rose-100 shadow-[0_0_15px_rgba(244,63,94,0.1)]">
+              <p className="font-semibold uppercase tracking-wide text-rose-300">Ошибки / Замечания</p>
+              <ul className="mt-2 list-disc space-y-1.5 pl-4">
                 {review.issues.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
             </div>
-            <div className="rounded-xl border border-sky-500/30 bg-sky-500/10 p-3 text-xs text-sky-100">
-              <p className="font-semibold uppercase tracking-wide text-sky-200">Suggestions</p>
-              <ul className="mt-2 list-disc space-y-1 pl-4">
+            <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 backdrop-blur-md p-4 text-xs text-indigo-100 shadow-[0_0_15px_rgba(99,102,241,0.1)]">
+              <p className="font-semibold uppercase tracking-wide text-indigo-300">Рекомендации</p>
+              <ul className="mt-2 list-disc space-y-1.5 pl-4">
                 {review.suggestions.map((item) => (
                   <li key={item}>{item}</li>
                 ))}

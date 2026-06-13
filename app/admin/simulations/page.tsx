@@ -29,10 +29,10 @@ const DIFFICULTY_BADGE: Record<string, string> = {
 const STATUS_OPTIONS: StudioContentStatus[] = ["DRAFT", "IN_REVIEW", "PUBLISHED", "ARCHIVED"];
 
 type AdminSimulationsPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string | string[];
     status?: string | string[];
-  };
+  }>;
 };
 
 function paramValue(value: string | string[] | undefined) {
@@ -43,8 +43,9 @@ function paramValue(value: string | string[] | undefined) {
 export default async function AdminSimulationsPage({ searchParams }: AdminSimulationsPageProps) {
   await requireAdminPermission("courses.read");
 
-  const query = paramValue(searchParams?.q);
-  const statusFilter = paramValue(searchParams?.status);
+  const resolvedSearchParams = await searchParams;
+  const query = paramValue(resolvedSearchParams?.q);
+  const statusFilter = paramValue(resolvedSearchParams?.status);
   const validStatus = STATUS_OPTIONS.includes(statusFilter as StudioContentStatus)
     ? (statusFilter as StudioContentStatus)
     : undefined;
@@ -109,9 +110,9 @@ export default async function AdminSimulationsPage({ searchParams }: AdminSimula
               Apply
             </button>
             {(query || statusFilter) && (
-              <a href="/admin/simulations" className="btn-secondary text-muted-foreground">
+              <Link href="/admin/simulations" className="btn-secondary text-muted-foreground">
                 Reset
-              </a>
+              </Link>
             )}
           </div>
         </form>

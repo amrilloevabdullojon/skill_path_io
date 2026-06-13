@@ -5,3 +5,4 @@ out
 .env.local
 coverage
 *.log
+.claude/settings.local.json

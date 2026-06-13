@@ -32,7 +32,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-gray-900">Критическая ошибка</h1>
+          <h1 className="page-title text-gray-900">Критическая ошибка</h1>
           <p className="max-w-md text-sm text-gray-600">
             Приложение не смогло загрузиться. Пожалуйста, обновите страницу.
           </p>
@@ -43,7 +43,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
 
         <button
           onClick={reset}
-          className="rounded-lg bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          className="rounded-lg bg-blue-600 px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-blue-700"
         >
           Перезагрузить
         </button>

@@ -3,27 +3,20 @@ import { getServerSession } from "next-auth";
 
 import { JobMatchingBoard } from "@/components/jobs/job-matching-board";
 import { authOptions } from "@/lib/auth";
-
-export const metadata: Metadata = {
-  title: "Job Matches — SkillPath Academy",
-  description: "Browse job listings matched to your current skill level and track progression.",
-};
 import { buildCareerSystem } from "@/lib/career/system";
 import { getDashboardData } from "@/lib/dashboard/data";
 import { getOnboardingProfileFromCookie } from "@/lib/personalization/profile-storage";
+import { parseQuizAccuracy } from "@/lib/utils/parse";
+
+export const metadata: Metadata = {
+  title: "Подбор Вакансий",
+  description: "Изучите вакансии, которые подходят вашему уровню навыков и отслеживайте прогресс.",
+};
 
 export const dynamic = "force-dynamic";
 
-function parseQuizAccuracy(value: string | undefined) {
-  if (!value) {
-    return 0;
-  }
-  const parsed = Number.parseInt(value.replace("%", ""), 10);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
 export default async function JobsPage() {
-  const profile = getOnboardingProfileFromCookie();
+  const profile = await getOnboardingProfileFromCookie();
   const session = await getServerSession(authOptions);
   const dashboard = await getDashboardData({
     preferredEmail: session?.user?.email,
@@ -57,4 +50,3 @@ export default async function JobsPage() {
     </section>
   );
 }
-

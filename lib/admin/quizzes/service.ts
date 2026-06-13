@@ -24,7 +24,7 @@ export async function questionCreate(data: {
   quizId: string;
   text: string;
   type: QuestionType;
-  options: string[];
+  options: Array<{ id: string; text: string }>;
   correctAnswer: string[];
 }) {
   return prisma.question.create({ data });
@@ -32,7 +32,7 @@ export async function questionCreate(data: {
 
 export async function questionUpdate(
   id: string,
-  data: { text: string; type: QuestionType; options: string[]; correctAnswer: string[] },
+  data: { text: string; type: QuestionType; options: Array<{ id: string; text: string }>; correctAnswer: string[] },
 ) {
   return prisma.question.update({
     where: { id },

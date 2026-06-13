@@ -14,6 +14,8 @@ const badgeVariants = cva(
         success: "badge-success",
         warning: "badge-warning",
         danger: "badge-danger",
+        info: "badge-info",
+        accent: "badge-accent",
       },
     },
     defaultVariants: {

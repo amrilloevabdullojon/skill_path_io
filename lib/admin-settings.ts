@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 
+import { UserRole } from "@prisma/client";
+
 const SETTINGS_FILE = path.join(process.cwd(), "data", "admin-settings.json");
 
 export type AdminSettings = {
@@ -10,13 +12,17 @@ export type AdminSettings = {
   requireEmailVerification: boolean;
   maintenanceMode: boolean;
   analyticsEnabled: boolean;
-  defaultUserRole: "STUDENT" | "ADMIN";
+  defaultUserRole: UserRole;
   maxUploadSizeMb: number;
   supportEmail: string;
+  // --- Gamification & AI ---
+  aiEnabled: boolean;
+  aiRateLimit: number;
+  codeTinderEnabled: boolean;
 };
 
 export const DEFAULT_SETTINGS: AdminSettings = {
-  siteName: "SkillPath Academy",
+  siteName: "Levio",
   siteDescription: "Professional skills learning platform",
   allowRegistration: true,
   requireEmailVerification: false,
@@ -24,7 +30,10 @@ export const DEFAULT_SETTINGS: AdminSettings = {
   analyticsEnabled: true,
   defaultUserRole: "STUDENT",
   maxUploadSizeMb: 10,
-  supportEmail: "support@skillpath.io",
+  supportEmail: "support@levio.app",
+  aiEnabled: true,
+  aiRateLimit: 5,
+  codeTinderEnabled: true,
 };
 
 export function readAdminSettings(): AdminSettings {

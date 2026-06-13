@@ -56,17 +56,40 @@ export function mapRuntimeCatalogToMissions(catalog: RuntimeCatalog) {
             "Summarize key learning output",
           ];
 
+      const getRoleContext = (cat: string) => {
+        if (cat === "QA") return "Ваш Менеджер Проекта";
+        if (cat === "BA") return "Агрессивный Заказчик";
+        return "Lead Data Engineer";
+      };
+
+      const getScenario = (title: string, cat: string) => {
+        if (cat === "QA") return `В продакшене найден критический баг, связанный с темой "${title}". Проджект-менеджер в панике. Выясните подробности и локализуйте проблему.`;
+        if (cat === "BA") return `Бизнес требует фичу по теме "${title}" к завтрашнему дню. У вас нет ни одного требования. Проведите интервью в чате и выбейте детали.`;
+        return `Дашборд по теме "${title}" упал. Инженер на связи, но он не знает бизнес-логику. Выясните, что сломалось, и предложите решение в чате.`;
+      };
+      
+      const getObjective = (cat: string) => {
+        if (cat === "QA") return "Допросить менеджера, узнать шаги воспроизведения, браузер и составить мини-баг-репорт прямо в чате.";
+        if (cat === "BA") return "Снять 3 ключевых требования, определить целевую аудиторию и успокоить заказчика.";
+        return "Локализовать сбой в SQL-метриках и согласовать план починки.";
+      };
+
+      const missionDifficulty = difficultyByOrder(moduleItem.order, totalModules);
+      const baseXp = moduleItem.xpReward || 100;
+      const xpMultiplier = missionDifficulty === "Hard" ? 1.6 : missionDifficulty === "Medium" ? 1.2 : 1.0;
+      const scaledXp = Math.max(60, Math.round((baseXp * xpMultiplier) / 10) * 10);
+
       missions.push({
         id: missionId,
-        title: `${moduleItem.title} Mission`,
-        scenario: moduleItem.description || `Apply concepts from ${moduleItem.title} in a practical scenario.`,
-        roleContext: `${course.title} learner`,
-        objective: `Produce a practical result for module "${moduleItem.title}" and document outcomes.`,
+        title: `Миссия: ${moduleItem.title}`,
+        scenario: getScenario(moduleItem.title, category),
+        roleContext: getRoleContext(category),
+        objective: getObjective(category),
         steps,
         skillsUsed: categorySkills,
-        expectedResult: "A concise artifact with assumptions, execution steps, and measurable result summary.",
-        difficulty: difficultyByOrder(moduleItem.order, totalModules),
-        xpReward: Math.max(60, moduleItem.xpReward || 100),
+        expectedResult: "Краткий артефакт с допущениями, шагами выполнения и измеримым итогом.",
+        difficulty: missionDifficulty,
+        xpReward: scaledXp,
         aiEvaluation: true,
         category,
         status: statusByOrder(moduleItem.order),

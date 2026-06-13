@@ -7,7 +7,7 @@ import { getCommunityDiscussions, getPeerFeedbackQueue } from "@/lib/saas/commun
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Community — SkillPath Academy",
+  title: "Community",
   description: "Collaborate with peers, join study groups, and share your learning journey.",
 };
 

@@ -26,5 +26,5 @@ export type AdminAiRequest = {
 export type AdminAiResponse = {
   result: string;
   suggestions: string[];
-  source: "mock" | "anthropic";
+  source: "mock" | "gemini";
 };

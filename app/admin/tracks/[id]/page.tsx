@@ -25,12 +25,13 @@ const STATUS_BADGE: Record<TrackStatus, string> = {
     "inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide border-red-500/40 bg-red-500/10 text-red-400",
 };
 
-type Props = { params: { id: string } };
+type Props = { params: Promise<{ id: string }> };
 
 export default async function TrackDetailPage({ params }: Props) {
+  const resolvedParams = await params;
   await requireAdminPermission("courses.write");
 
-  const result = await getTrackDetail(params.id);
+  const result = await getTrackDetail(resolvedParams.id);
   if (!result) notFound();
 
   const { track, enrolledCount, completedCount } = result;
@@ -56,7 +57,7 @@ export default async function TrackDetailPage({ params }: Props) {
 
             {/* Title */}
             <div className="space-y-1.5">
-              <label htmlFor="track-title" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              <label htmlFor="track-title" className="text-xs uppercase tracking-widest text-muted-foreground">
                 Title <span className="text-rose-400">*</span>
               </label>
               <input
@@ -71,7 +72,7 @@ export default async function TrackDetailPage({ params }: Props) {
 
             {/* Slug (read-only) */}
             <div className="space-y-1.5">
-              <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              <span className="text-xs uppercase tracking-widest text-muted-foreground">
                 Slug
               </span>
               <input
@@ -86,7 +87,7 @@ export default async function TrackDetailPage({ params }: Props) {
 
             {/* Description */}
             <div className="space-y-1.5">
-              <label htmlFor="track-desc" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              <label htmlFor="track-desc" className="text-xs uppercase tracking-widest text-muted-foreground">
                 Description <span className="text-rose-400">*</span>
               </label>
               <textarea
@@ -102,7 +103,7 @@ export default async function TrackDetailPage({ params }: Props) {
 
             {/* Icon */}
             <div className="space-y-1.5">
-              <label htmlFor="track-icon" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              <label htmlFor="track-icon" className="text-xs uppercase tracking-widest text-muted-foreground">
                 Icon
               </label>
               <input
@@ -118,7 +119,7 @@ export default async function TrackDetailPage({ params }: Props) {
 
             {/* Color */}
             <div className="space-y-1.5">
-              <span className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              <span className="text-xs uppercase tracking-widest text-muted-foreground">
                 Color <span className="text-rose-400">*</span>
               </span>
               <div className="flex items-center gap-3">
@@ -146,7 +147,7 @@ export default async function TrackDetailPage({ params }: Props) {
             <div className="grid grid-cols-2 gap-4">
               {/* Category */}
               <div className="space-y-1.5">
-                <label htmlFor="track-category" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                <label htmlFor="track-category" className="text-xs uppercase tracking-widest text-muted-foreground">
                   Category <span className="text-rose-400">*</span>
                 </label>
                 <select
@@ -164,7 +165,7 @@ export default async function TrackDetailPage({ params }: Props) {
 
               {/* Status */}
               <div className="space-y-1.5">
-                <label htmlFor="track-status" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+                <label htmlFor="track-status" className="text-xs uppercase tracking-widest text-muted-foreground">
                   Status
                 </label>
                 <select
@@ -182,7 +183,7 @@ export default async function TrackDetailPage({ params }: Props) {
 
             {/* Estimated Weeks */}
             <div className="space-y-1.5">
-              <label htmlFor="track-weeks" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              <label htmlFor="track-weeks" className="text-xs uppercase tracking-widest text-muted-foreground">
                 Estimated Weeks
               </label>
               <input
@@ -227,7 +228,7 @@ export default async function TrackDetailPage({ params }: Props) {
           <section className="surface-elevated space-y-4 p-5">
             <h2 className="section-title">Career Impact</h2>
             <div className="space-y-1.5">
-              <label htmlFor="track-career" className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+              <label htmlFor="track-career" className="text-xs uppercase tracking-widest text-muted-foreground">
                 Career Impact
               </label>
               <textarea

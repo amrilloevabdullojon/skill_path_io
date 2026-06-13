@@ -75,7 +75,7 @@ export async function generateExerciseReview(input: ExerciseReviewInput) {
   const fallback = localExerciseReview(input);
 
   const systemPrompt =
-    "Ты старший ментор SkillPath Academy. Оцени практическую работу и верни только JSON без markdown.";
+    "Ты старший ментор Levio. Оцени практическую работу и верни только JSON без markdown.";
   const userPrompt = [
     "Формат JSON:",
     '{"score":0-100,"accuracy":0-100,"completeness":0-100,"logic":0-100,"feedback":["..."],"nextSteps":["..."]}',

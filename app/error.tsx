@@ -33,7 +33,7 @@ export default function Error({ error, reset }: ErrorProps) {
       <div className="space-y-2">
         <h2 className="text-xl font-semibold text-foreground">Что-то пошло не так</h2>
         <p className="max-w-md text-sm text-muted-foreground">
-          {error.message || "Произошла непредвиденная ошибка. Попробуйте обновить страницу."}
+          Произошла непредвиденная ошибка. Попробуйте обновить страницу.
         </p>
         {error.digest && (
           <p className="text-xs text-muted-foreground/60">Код ошибки: {error.digest}</p>

@@ -6,8 +6,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { authOptions } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "Team Learning — SkillPath Academy",
-  description: "Manage team learning plans, track progress, and coordinate training across your organization.",
+  title: "Обучение Команды",
+  description: "Управляйте обучением команды, отслеживайте прогресс и координируйте тренировки (B2B).",
   robots: { index: false },
 };
 import { getDashboardData } from "@/lib/dashboard/data";
@@ -23,11 +23,11 @@ export default async function TeamsPage() {
 
   if (!dashboard) {
     return (
-      <section className="page-shell">
+      <section className="page-shell relative isolate overflow-hidden p-6 sm:p-12 border border-border/50 bg-card rounded-2xl">
         <EmptyState
-          title="Team data unavailable"
-          description="Open dashboard after user/content data is available."
-          actionLabel="Open dashboard"
+          title="Данные команды недоступны"
+          description="Откройте дашборд после загрузки данных пользователей."
+          actionLabel="Панель управления"
           actionHref="/dashboard"
         />
       </section>
@@ -35,7 +35,11 @@ export default async function TeamsPage() {
   }
 
   return (
-    <section className="page-shell">
+    <section className="page-shell relative isolate overflow-hidden">
+      {/* Background Neon Orbs for Teams Page */}
+      <div className="absolute top-[0%] left-[10%] w-[450px] h-[450px] rounded-full bg-emerald-500/10 blur-[130px] pointer-events-none -z-10" />
+      <div className="absolute bottom-[10%] right-[5%] w-[400px] h-[400px] rounded-full bg-sky-500/10 blur-[120px] pointer-events-none -z-10" />
+
       <TeamLearningHub
         team={dashboard.teamLearning}
         isLocked={!dashboard.subscription.gates.teamDashboard.allowed}

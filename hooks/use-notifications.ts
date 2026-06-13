@@ -27,6 +27,30 @@ export function useNotifications(): NotificationState & {
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectAttempts = useRef(0);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const connectRef = useRef<() => void>(() => {});
+
+  const fetchOnce = useCallback(async () => {
+    try {
+      const res = await fetch("/api/notifications");
+      if (res.ok) {
+        const data = (await res.json()) as { notifications: NotificationItem[] };
+        setNotifications(data.notifications ?? []);
+      }
+    } catch {
+      // Silently ignore
+    }
+  }, []);
+
+  const scheduleReconnect = useCallback(() => {
+    if (reconnectAttempts.current >= MAX_RECONNECT_ATTEMPTS) {
+      // Fall back to REST
+      fetchOnce();
+      return;
+    }
+    reconnectAttempts.current += 1;
+    const delay = RECONNECT_DELAY_MS * reconnectAttempts.current;
+    reconnectTimer.current = setTimeout(() => connectRef.current(), delay);
+  }, [fetchOnce]);
 
   const connect = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -58,30 +82,7 @@ export function useNotifications(): NotificationState & {
       es.close();
       scheduleReconnect();
     };
-  }, []);
-
-  const scheduleReconnect = useCallback(() => {
-    if (reconnectAttempts.current >= MAX_RECONNECT_ATTEMPTS) {
-      // Fall back to REST
-      fetchOnce();
-      return;
-    }
-    reconnectAttempts.current += 1;
-    const delay = RECONNECT_DELAY_MS * reconnectAttempts.current;
-    reconnectTimer.current = setTimeout(connect, delay);
-  }, [connect]);
-
-  const fetchOnce = useCallback(async () => {
-    try {
-      const res = await fetch("/api/notifications");
-      if (res.ok) {
-        const data = (await res.json()) as { notifications: NotificationItem[] };
-        setNotifications(data.notifications ?? []);
-      }
-    } catch {
-      // Silently ignore
-    }
-  }, []);
+  }, [scheduleReconnect]);
 
   const markAllRead = useCallback(() => {
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
@@ -92,6 +93,7 @@ export function useNotifications(): NotificationState & {
   }, [fetchOnce]);
 
   useEffect(() => {
+    connectRef.current = connect;
     connect();
     return () => {
       eventSourceRef.current?.close();

@@ -17,7 +17,7 @@ type ApiSubscriptionContext = {
 
 async function resolveUserIdentity() {
   const session = await getServerSession(authOptions);
-  const email = session?.user?.email ?? "guest@skillpath.local";
+  const email = session?.user?.email ?? "guest@levio.local";
   const role: "ADMIN" | "STUDENT" = session?.user?.role === "ADMIN" ? "ADMIN" : "STUDENT";
 
   let dbUser: { id: string } | null = null;

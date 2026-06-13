@@ -140,6 +140,37 @@ function validateEnum<T extends string>(
     : null;
 }
 
+function parseQuestionOptionPayload(formData: FormData) {
+  const optionIds = formData.getAll("optionId").map(String);
+  const optionTexts = formData.getAll("optionText").map(String);
+
+  if (optionTexts.length > 0) {
+    const options = optionTexts
+      .map((text, index) => ({
+        id: (optionIds[index] || `opt-${index + 1}`).trim(),
+        text: text.trim(),
+      }))
+      .filter((option) => option.id && option.text);
+    const optionIdSet = new Set(options.map((option) => option.id));
+    const correctAnswer = formData
+      .getAll("correct")
+      .map(String)
+      .map((item) => item.trim())
+      .filter((item) => optionIdSet.has(item));
+
+    return { options, correctAnswer };
+  }
+
+  const legacyOptions = formData.getAll("option").map(String).map((item) => item.trim()).filter(Boolean);
+  const options = legacyOptions.map((text, index) => ({ id: `opt-${index + 1}`, text }));
+  const correctRaw = formData.getAll("correct").map(String).map((item) => item.trim()).filter(Boolean);
+  const correctAnswer = correctRaw
+    .map((item) => options.find((option) => option.id === item || option.text === item)?.id)
+    .filter((item): item is string => Boolean(item));
+
+  return { options, correctAnswer };
+}
+
 // ─── User actions ─────────────────────────────────────────────────────────────
 
 export async function updateUserAction(formData: FormData): Promise<ActionResult> {
@@ -547,16 +578,19 @@ export async function createQuestionAction(formData: FormData): Promise<ActionRe
   const quizId = stringValue(formData, "quizId");
   const text = stringValue(formData, "text");
   const type = stringValue(formData, "type");
-  const options = formData.getAll("option").map(String).filter(Boolean);
-  const correct = formData.getAll("correct").map(String).filter(Boolean);
+  const { options, correctAnswer } = parseQuestionOptionPayload(formData);
 
   if (!quizId || !text) return actionErr("quizId and text are required", "createQuestionAction");
   if (options.length < 2) return actionErr("At least 2 options are required", "createQuestionAction");
+  if (correctAnswer.length === 0) return actionErr("Mark at least one correct answer", "createQuestionAction");
   const typedType = validateEnum(type, QuestionType);
   if (!typedType) return actionErr(`Invalid question type: ${type}`, "createQuestionAction");
+  if (typedType === QuestionType.SINGLE && correctAnswer.length !== 1) {
+    return actionErr("Single-answer questions must have exactly one correct answer", "createQuestionAction");
+  }
 
   try {
-    await questionCreate({ quizId, text, type: typedType, options, correctAnswer: correct });
+    await questionCreate({ quizId, text, type: typedType, options, correctAnswer });
 
     revalidatePath("/admin/quizzes");
     revalidatePath(`/admin/quizzes/${quizId}`);
@@ -573,20 +607,23 @@ export async function updateQuestionAction(formData: FormData): Promise<ActionRe
   const questionId = stringValue(formData, "questionId");
   const text = stringValue(formData, "text");
   const type = stringValue(formData, "type");
-  const options = formData.getAll("option").map(String).filter(Boolean);
-  const correct = formData.getAll("correct").map(String).filter(Boolean);
+  const { options, correctAnswer } = parseQuestionOptionPayload(formData);
 
   if (!questionId || !text) return actionErr("questionId and text are required", "updateQuestionAction");
   if (options.length < 2) return actionErr("At least 2 options are required", "updateQuestionAction");
+  if (correctAnswer.length === 0) return actionErr("Mark at least one correct answer", "updateQuestionAction");
   const typedType = validateEnum(type, QuestionType);
   if (!typedType) return actionErr(`Invalid question type: ${type}`, "updateQuestionAction");
+  if (typedType === QuestionType.SINGLE && correctAnswer.length !== 1) {
+    return actionErr("Single-answer questions must have exactly one correct answer", "updateQuestionAction");
+  }
 
   try {
     const question = await questionUpdate(questionId, {
       text,
       type: typedType,
       options,
-      correctAnswer: correct,
+      correctAnswer,
     });
 
     revalidatePath("/admin/quizzes");
@@ -1114,16 +1151,24 @@ export async function updateCertificateAction(formData: FormData): Promise<Actio
 
   const certificateId = stringValue(formData, "certificateId");
   const certificateUrl = stringValue(formData, "certificateUrl");
+  const certificateKind = stringValue(formData, "certificateKind") || "track";
 
   if (!certificateId || !certificateUrl) {
     return actionErr("certificateId and certificateUrl are required", "updateCertificateAction");
   }
 
   try {
-    await prisma.certificate.update({
-      where: { id: certificateId },
-      data: { certificateUrl },
-    });
+    if (certificateKind === "course") {
+      await prisma.courseCertificate.update({
+        where: { id: certificateId },
+        data: { certificateUrl },
+      });
+    } else {
+      await prisma.certificate.update({
+        where: { id: certificateId },
+        data: { certificateUrl },
+      });
+    }
 
     revalidatePath("/admin/certificates");
     return actionOk();
@@ -1144,14 +1189,21 @@ export async function saveAdminSettingsAction(formData: FormData): Promise<Actio
       key === "maintenanceMode" ||
       key === "allowRegistration" ||
       key === "requireEmailVerification" ||
-      key === "analyticsEnabled"
+      key === "analyticsEnabled" ||
+      key === "aiEnabled" ||
+      key === "codeTinderEnabled"
     ) {
       settings[key] = value === "true";
     } else if (key === "maxUploadSizeMb") {
       const parsed = Number(value);
-      // Reject out-of-range values instead of silently defaulting.
       if (!Number.isFinite(parsed) || parsed <= 0 || parsed > 500) {
         return actionErr("maxUploadSizeMb must be between 1 and 500", "saveAdminSettingsAction");
+      }
+      settings[key] = parsed;
+    } else if (key === "aiRateLimit") {
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed) || parsed < 0) {
+        return actionErr("aiRateLimit must be a positive number", "saveAdminSettingsAction");
       }
       settings[key] = parsed;
     } else {

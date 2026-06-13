@@ -9,15 +9,16 @@ import { submitPeerReviewAction } from "../actions";
 import { CriteriaSliders } from "./criteria-sliders";
 
 export const metadata: Metadata = {
-  title: "Write Review — SkillPath Academy",
+  title: "Write Review",
   description: "Submit your peer review for a mission submission.",
 };
 
 interface ReviewPageProps {
-  params: { submissionId: string };
+  params: Promise<{ submissionId: string }>;
 }
 
 export default async function ReviewPage({ params }: ReviewPageProps) {
+  const resolvedParams = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) redirect("/login");
 
@@ -28,7 +29,7 @@ export default async function ReviewPage({ params }: ReviewPageProps) {
   if (!currentUser) redirect("/login");
 
   const submission = await prisma.missionSubmission.findUnique({
-    where: { id: params.submissionId },
+    where: { id: resolvedParams.submissionId },
     include: {
       mission: {
         select: {

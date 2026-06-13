@@ -28,11 +28,11 @@ const rolePermissions: Record<AdminRole, AdminPermission[]> = {
 };
 
 const defaultLocalAdminRoleMap: Record<string, AdminRole> = {
-  "admin@skillpath.local": "SUPER_ADMIN",
-  "content.admin@skillpath.local": "CONTENT_ADMIN",
-  "editor@skillpath.local": "COURSE_EDITOR",
-  "reviewer@skillpath.local": "REVIEWER",
-  "analytics@skillpath.local": "ANALYTICS_MANAGER",
+  "admin@levio.local": "SUPER_ADMIN",
+  "content.admin@levio.local": "CONTENT_ADMIN",
+  "editor@levio.local": "COURSE_EDITOR",
+  "reviewer@levio.local": "REVIEWER",
+  "analytics@levio.local": "ANALYTICS_MANAGER",
 };
 
 function parseLocalAdminRoleOverrides() {

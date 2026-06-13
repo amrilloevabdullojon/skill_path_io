@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, Clock3 } from "lucide-react";
+import { ArrowUpRight, Clock3, Rocket } from "lucide-react";
 import { ProgressStatus, TrackCategory } from "@prisma/client";
 
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
@@ -12,42 +12,47 @@ type DashboardCurrentTracksProps = {
 
 const categoryStyle: Record<TrackCategory, { chip: string; progress: string; border: string }> = {
   QA: {
-    chip: "border-emerald-400/35 bg-emerald-500/15 text-emerald-200",
-    progress: "bg-emerald-400",
-    border: "border-emerald-400/25",
+    chip: "track-badge-qa",
+    progress: "bg-gradient-to-r from-emerald-500 to-teal-400",
+    border: "hover:border-emerald-500/45",
   },
   BA: {
-    chip: "border-orange-400/35 bg-orange-500/15 text-orange-200",
-    progress: "bg-orange-400",
-    border: "border-orange-400/25",
+    chip: "track-badge-ba",
+    progress: "bg-gradient-to-r from-orange-500 to-amber-400",
+    border: "hover:border-orange-500/45",
   },
   DA: {
-    chip: "border-violet-400/35 bg-violet-500/15 text-violet-200",
-    progress: "bg-violet-400",
-    border: "border-violet-400/25",
+    chip: "track-badge-da",
+    progress: "bg-gradient-to-r from-violet-500 to-fuchsia-400",
+    border: "hover:border-violet-500/45",
   },
 };
 
 function moduleStatusClass(status: ProgressStatus) {
   if (status === ProgressStatus.COMPLETED) {
-    return "bg-emerald-400";
+    return "bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]";
   }
   if (status === ProgressStatus.IN_PROGRESS) {
-    return "bg-sky-400";
+    return "bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.5)]";
   }
-  return "bg-muted";
+  return "bg-slate-700/50 border border-slate-600/50";
 }
 
-export function DashboardCurrentTracks({ tracks }: DashboardCurrentTracksProps) {
+export async function DashboardCurrentTracks({ tracks }: DashboardCurrentTracksProps) {
   return (
     <DashboardSection
       id="tracks"
-      title="Current Learning Tracks"
-      description="Live progress, next module, and completion estimates for your active pathways."
-      actionLabel="Open all tracks"
+      title="Текущие треки"
+      description="Продолжайте изучение и закрывайте модули шаг за шагом."
+      actionLabel="Все треки"
       actionHref="/tracks"
     >
-      <div className="grid gap-4 xl:grid-cols-3">
+      <div className={cn(
+        "grid gap-6",
+        tracks.length === 1 ? "grid-cols-1 max-w-[450px]" :
+        tracks.length === 2 ? "grid-cols-1 lg:grid-cols-2 max-w-[900px]" :
+        "grid-cols-1 lg:grid-cols-2 xl:grid-cols-3"
+      )}>
         {tracks.map((track, i) => {
           const style = categoryStyle[track.category];
           const isFirstUntouched = i === 0 && track.progressPercent === 0 && track.completedModules === 0;
@@ -55,19 +60,19 @@ export function DashboardCurrentTracks({ tracks }: DashboardCurrentTracksProps) 
             <article
               key={track.id}
               className={cn(
-                "group surface-panel-hover flex h-full min-w-0 flex-col rounded-2xl border bg-card/70 p-4 sm:p-5",
+                "surface-elevated group flex h-full min-w-0 flex-col p-6 transition-colors sm:p-7",
                 style.border,
-                isFirstUntouched && "ring-2 ring-sky-400/40",
+                isFirstUntouched && "ring-2 ring-indigo-400/40",
               )}
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0 space-y-1">
-                  <h3 className="truncate text-lg font-semibold text-foreground">{track.title}</h3>
-                  <p className="line-clamp-2 text-xs leading-5 text-muted-foreground">{track.description}</p>
+                <div className="min-w-0 space-y-1.5">
+                  <h3 className="card-title truncate">{track.title}</h3>
+                  <p className="line-clamp-2 text-xs leading-relaxed text-muted-foreground">{track.description}</p>
                 </div>
                 <span
                   className={cn(
-                    "inline-flex shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide",
+                    "inline-flex shrink-0 rounded-full border px-2.5 py-1 text-xs font-semibold tracking-wide",
                     style.chip,
                   )}
                 >
@@ -75,56 +80,63 @@ export function DashboardCurrentTracks({ tracks }: DashboardCurrentTracksProps) 
                 </span>
               </div>
 
-              <div className="mt-4 space-y-1.5">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{track.completedModules}/{track.totalModules} modules</span>
-                  <span>{track.progressPercent}%</span>
+              <div className="mt-6 space-y-2 relative z-10">
+                <div className="flex items-center justify-between text-[11px] font-bold text-foreground/60 uppercase tracking-widest">
+                  <span>{track.completedModules} из {track.totalModules} модулей</span>
+                  <span className="text-foreground">{track.progressPercent}%</span>
                 </div>
-                <div className="progress-track h-1.5">
-                  <div className={cn("h-full rounded-full transition-all duration-500", style.progress)} style={{ width: `${track.progressPercent}%` }} />
+                <div className="progress-track h-2 bg-slate-800/50 border border-slate-700/50 rounded-full overflow-hidden">
+                  <div className={cn("h-full rounded-full transition-all duration-1000", style.progress)} style={{ width: `${track.progressPercent}%` }} />
                 </div>
               </div>
 
-              <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                <div className="track-info-box min-w-0 px-2.5 py-2">
-                  <p className="track-info-label">Next module</p>
-                  <p className="track-info-value mt-1 truncate">{track.nextModuleTitle ?? "Done"}</p>
+              <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs relative z-10">
+                <div className="bg-background/40 border border-border-subtle rounded-xl px-3 py-2.5">
+                  <p className="text-[10px] uppercase font-bold text-foreground/50 tracking-wider">Следующий модуль</p>
+                  <p className="font-semibold text-foreground mt-1 truncate">{track.nextModuleTitle ?? "Завершено ✨"}</p>
                 </div>
-                <div className="track-info-box min-w-0 px-2.5 py-2">
-                  <p className="track-info-label">Est. completion</p>
-                  <p className="track-info-value mt-1 inline-flex items-center gap-1 truncate">
-                    <Clock3 className="track-info-label h-3.5 w-3.5" />
+                <div className="bg-background/40 border border-border-subtle rounded-xl px-3 py-2.5 min-w-0">
+                  <p className="text-[10px] uppercase font-bold text-foreground/50 tracking-wider truncate">Осталось времени</p>
+                  <p className="font-semibold text-foreground mt-1 inline-flex items-center gap-1.5 truncate">
+                    <Clock3 className="h-3.5 w-3.5 text-indigo-400" />
                     {track.estimatedCompletion}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-3">
-                <p className="module-order-label">Skills gained</p>
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
+              <div className="mt-5 relative z-10">
+                <p className="text-[10px] uppercase font-bold text-foreground/50 tracking-wider mb-2">Навыки</p>
+                <div className="flex flex-wrap gap-1.5">
                   {track.skillsGained.slice(0, 4).map((skill) => (
-                    <span key={skill} className="skill-tag inline-flex px-2 py-0.5 text-[11px]">
+                    <span key={skill} className="skill-tag inline-flex px-2 py-1 text-[10px] font-semibold">
                       {skill}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="mt-4 flex items-center gap-1.5">
+              <div className="mt-5 flex items-center gap-1.5 relative z-10 bg-background/20 p-2 rounded-lg border border-border/20 w-fit">
                 {track.modulePreview.map((moduleItem) => (
-                  <span key={moduleItem.id} className={cn("h-2 w-2 rounded-full", moduleStatusClass(moduleItem.status))} title={moduleItem.title} />
+                  <span key={moduleItem.id} className={cn("h-2.5 w-2.5 rounded-full transition-colors", moduleStatusClass(moduleItem.status))} title={moduleItem.title} />
                 ))}
               </div>
 
-              <p className="mt-3 line-clamp-2 text-xs leading-5 text-muted-foreground">Career impact: {track.careerImpact}</p>
-
-              <Link
-                href={track.nextModuleHref}
-                className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-semibold text-sky-300 transition-all group-hover:translate-x-0.5 hover:text-sky-200"
-              >
-                {isFirstUntouched ? "Start here" : "Continue"}
-                <ArrowUpRight className="h-4 w-4" />
-              </Link>
+              <div className="mt-auto pt-6 relative z-10">
+                <Link
+                  href={track.nextModuleHref}
+                  className="inline-flex items-center justify-center w-full gap-2 px-4 py-3 bg-indigo-500 hover:bg-indigo-400 border border-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.2)] text-primary-foreground font-bold rounded-xl transition-all group-hover:-translate-y-0.5"
+                >
+                  {isFirstUntouched ? (
+                    <>
+                      <Rocket className="h-4 w-4" /> Начать первый урок
+                    </>
+                  ) : (
+                    <>
+                      Продолжить <ArrowUpRight className="h-4 w-4" />
+                    </>
+                  )}
+                </Link>
+              </div>
             </article>
           );
         })}

@@ -3,13 +3,16 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
 enum UserRole {
   STUDENT
+  PRO_STUDENT
+  MENTOR
+  RECRUITER
   ADMIN
 }
 
@@ -49,12 +52,14 @@ model User {
   role               UserRole                 @default(STUDENT)
   createdAt          DateTime                 @default(now())
   progresses         UserProgress[]
+  courseProgresses   CourseModuleProgress[]
   certificates       Certificate[]
+  courseCertificates CourseCertificate[]
   userProfile        UserProfile?
   onboardingProfile  OnboardingProfile?
   careerGoals        CareerGoal[]
   missionSubmissions MissionSubmission[]
-  peerReviewsGiven   PeerReview[]         @relation("ReviewsGiven")
+  peerReviewsGiven   PeerReview[]             @relation("ReviewsGiven")
   learningPlans      LearningPlan[]
   notes              UserNote[]
   bookmarks          UserBookmark[]
@@ -63,6 +68,9 @@ model User {
   discussionComments DiscussionComment[]
   skillGapSnapshots  SkillGapSnapshot[]
   readinessSnapshots ReadinessScoreSnapshot[]
+  userStreak         UserStreak?
+  dailyChallenges    DailyChallenge[]
+  quizAttempts       QuizAttempt[]
 }
 
 model Track {
@@ -132,6 +140,8 @@ model Question {
   options       Json
   correctAnswer Json
   quiz          Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
 }
 
 model UserProgress {
@@ -149,6 +159,68 @@ model UserProgress {
   @@index([status])
 }
 
+model CourseModuleProgress {
+  id             String         @id @default(cuid())
+  userId         String
+  courseModuleId String
+  status         ProgressStatus @default(NOT_STARTED)
+  score          Int?
+  completedAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseModule   CourseModule   @relation(fields: [courseModuleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseModuleId])
+  @@index([userId])
+  @@index([courseModuleId])
+  @@index([status])
+}
+
+model QuizAttempt {
+  id              String               @id @default(cuid())
+  userId          String
+  source          String
+  trackSlug       String
+  trackTitle      String
+  moduleId        String
+  moduleTitle     String
+  quizId          String
+  quizTitle       String
+  score           Int
+  passingScore    Int
+  passed          Boolean
+  totalQuestions  Int
+  correctAnswers  Int
+  startedAt       DateTime?
+  submittedAt     DateTime             @default(now())
+  durationSeconds Int?
+  user            User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionResults QuizQuestionResult[]
+
+  @@index([userId, submittedAt])
+  @@index([userId, moduleId, submittedAt])
+  @@index([quizId, submittedAt])
+  @@index([passed])
+}
+
+model QuizQuestionResult {
+  id                String      @id @default(cuid())
+  attemptId         String
+  questionId        String
+  questionText      String      @db.Text
+  questionType      String
+  options           Json        @default("[]")
+  selectedAnswerIds Json        @default("[]")
+  correctAnswerIds  Json        @default("[]")
+  isCorrect         Boolean
+  createdAt         DateTime    @default(now())
+  attempt           QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@index([attemptId])
+  @@index([questionId, isCorrect])
+}
+
 model Certificate {
   id             String   @id @default(cuid())
   userId         String
@@ -160,6 +232,20 @@ model Certificate {
 
   @@unique([userId, trackId])
   @@index([userId])
+}
+
+model CourseCertificate {
+  id             String   @id @default(cuid())
+  userId         String
+  courseId       String
+  issuedAt       DateTime @default(now())
+  certificateUrl String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course         Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
 }
 
 enum StudioContentStatus {
@@ -263,9 +349,9 @@ model Course {
   icon               String                    @default("")
   themeColor         String                    @default("#38bdf8")
   estimatedDuration  Int                       @default(0)
-  tags               Json                      @default("[]")
-  outcomes           Json                      @default("[]")
-  requirements       Json                      @default("[]")
+  tags               String[]                  @default([])
+  outcomes           String[]                  @default([])
+  requirements       String[]                  @default([])
   targetAudience     String                    @default("")
   status             StudioContentStatus       @default(DRAFT)
   featured           Boolean                   @default(false)
@@ -285,32 +371,35 @@ model Course {
   versions           CourseVersion[]
   analyticsSnapshots CourseAnalyticsSnapshot[]
   certificateConfig  CertificateConfig?
+  certificates       CourseCertificate[]
 }
 
 model CourseModule {
-  id                String              @id @default(cuid())
+  id                String                 @id @default(cuid())
   courseId          String
   title             String
-  description       String              @default("")
+  description       String                 @default("")
   order             Int
-  estimatedDuration Int                 @default(0)
-  status            StudioContentStatus @default(DRAFT)
-  unlockRule        Json                @default("{}")
-  prerequisiteIds   Json                @default("[]")
-  xpReward          Int                 @default(0)
-  visibility        StudioVisibility    @default(PUBLIC)
-  icon              String              @default("")
-  themeColor        String              @default("#38bdf8")
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  course            Course              @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  estimatedDuration Int                    @default(0)
+  status            StudioContentStatus    @default(DRAFT)
+  unlockRule        Json                   @default("{}")
+  prerequisiteIds   String[]               @default([])
+  xpReward          Int                    @default(0)
+  visibility        StudioVisibility       @default(PUBLIC)
+  icon              String                 @default("")
+  themeColor        String                 @default("#38bdf8")
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  course            Course                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessons           CourseLesson[]
   quizzes           CourseQuiz[]
   assignments       Assignment[]
   simulations       Simulation[]
   caseStudies       CaseStudy[]
+  userProgresses    CourseModuleProgress[]
 
   @@unique([courseId, order])
+  @@index([courseId])
 }
 
 model CourseLesson {
@@ -323,7 +412,7 @@ model CourseLesson {
   status            StudioContentStatus @default(DRAFT)
   xpReward          Int                 @default(0)
   visibility        StudioVisibility    @default(PUBLIC)
-  tags              Json                @default("[]")
+  tags              String[]            @default([])
   draftDirty        Boolean             @default(false)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
@@ -375,10 +464,12 @@ model CourseQuestion {
   explanation          String             @default("")
   hint                 String             @default("")
   difficulty           String             @default("MEDIUM")
-  tags                 Json               @default("[]")
+  tags                 String[]           @default([])
   points               Int                @default(10)
   aiExplanationEnabled Boolean            @default(true)
   quiz                 CourseQuiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
 }
 
 model Assignment {
@@ -430,7 +521,7 @@ model CaseStudy {
   questions        Json                @default("[]")
   expectedApproach String              @default("")
   outcome          String              @default("")
-  tags             Json                @default("[]")
+  tags             String[]            @default([])
   difficulty       String              @default("MEDIUM")
   status           StudioContentStatus @default(DRAFT)
   createdAt        DateTime            @default(now())
@@ -446,7 +537,7 @@ model CourseTemplate {
   sourceCourseId String?
   createdAt      DateTime @default(now())
   blueprint      Json     @default("{}")
-  tags           Json     @default("[]")
+  tags           String[] @default([])
   sourceCourse   Course?  @relation(fields: [sourceCourseId], references: [id], onDelete: SetNull)
 }
 
@@ -471,7 +562,7 @@ model MediaAsset {
   url        String
   uploadedAt DateTime @default(now())
   uploadedBy String?
-  tags       Json     @default("[]")
+  tags       String[] @default([])
 }
 
 model CertificateConfig {
@@ -528,7 +619,7 @@ model PermissionRole {
   id          String             @id @default(cuid())
   email       String             @unique
   role        PermissionRoleType @default(COURSE_EDITOR)
-  permissions Json               @default("[]")
+  permissions String[]           @default([])
   isActive    Boolean            @default(true)
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
@@ -541,8 +632,8 @@ model UserProfile {
   currentLevel        String         @default("BEGINNER")
   weeklyHours         Int            @default(5)
   targetTimelineWeeks Int            @default(12)
-  preferredSkills     Json           @default("[]")
-  goals               Json           @default("[]")
+  preferredSkills     String[]       @default([])
+  goals               String[]       @default([])
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
   user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -556,7 +647,7 @@ model OnboardingProfile {
   goal               String
   hoursPerWeek       Int           @default(5)
   targetMonths       Int           @default(3)
-  interestedSkills   Json          @default("[]")
+  interestedSkills   String[]      @default([])
   roadmap            Json          @default("[]")
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
@@ -584,7 +675,7 @@ model JobRole {
   title          String
   track          TrackCategory?
   level          String
-  requiredSkills Json           @default("[]")
+  requiredSkills String[]       @default([])
   description    String         @default("")
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
@@ -598,8 +689,8 @@ model JobPosting {
   level            String
   company          String              @default("SkillPath Partners")
   location         String              @default("Remote")
-  requiredSkills   Json                @default("[]")
-  responsibilities Json                @default("[]")
+  requiredSkills   String[]            @default([])
+  responsibilities String[]            @default([])
   status           StudioContentStatus @default(PUBLISHED)
   source           String              @default("mock")
   createdAt        DateTime            @default(now())
@@ -691,17 +782,17 @@ model LearningPlan {
 }
 
 model KnowledgeNode {
-  id             String           @id @default(cuid())
-  slug           String           @unique
-  title          String
-  category       String
-  dependencies   Json             @default("[]")
-  difficulty     String           @default("FOUNDATION")
-  track          TrackCategory?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  outgoingEdges  KnowledgeEdge[]  @relation("EdgeFrom")
-  incomingEdges  KnowledgeEdge[]  @relation("EdgeTo")
+  id            String          @id @default(cuid())
+  slug          String          @unique
+  title         String
+  category      String
+  dependencies  Json            @default("[]")
+  difficulty    String          @default("FOUNDATION")
+  track         TrackCategory?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  outgoingEdges KnowledgeEdge[] @relation("EdgeFrom")
+  incomingEdges KnowledgeEdge[] @relation("EdgeTo")
 }
 
 model KnowledgeEdge {
@@ -720,32 +811,32 @@ model KnowledgeEdge {
 }
 
 model Portfolio {
-  id          String           @id @default(cuid())
-  userId      String           @unique
-  headline    String           @default("")
-  summary     String           @default("") @db.Text
-  isPublic    Boolean          @default(false)
-  publicSlug  String?          @unique
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  projects    PortfolioProject[]
+  id         String             @id @default(cuid())
+  userId     String             @unique
+  headline   String             @default("")
+  summary    String             @default("") @db.Text
+  isPublic   Boolean            @default(false)
+  publicSlug String?            @unique
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects   PortfolioProject[]
 }
 
 model PortfolioProject {
-  id           String    @id @default(cuid())
-  portfolioId  String
-  title        String
-  description  String    @default("") @db.Text
-  skillsUsed   Json      @default("[]")
-  source       String    @default("manual")
-  sourceRef    String    @default("")
-  resultSummary String   @default("")
-  isPublic     Boolean   @default(true)
-  order        Int       @default(0)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  portfolio    Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+  id            String    @id @default(cuid())
+  portfolioId   String
+  title         String
+  description   String    @default("") @db.Text
+  skillsUsed    String[]  @default([])
+  source        String    @default("manual")
+  sourceRef     String    @default("")
+  resultSummary String    @default("")
+  isPublic      Boolean   @default(true)
+  order         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  portfolio     Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
 
   @@index([portfolioId])
 }
@@ -757,7 +848,7 @@ model UserNote {
   content   String   @db.Text
   moduleRef String   @default("")
   lessonRef String   @default("")
-  tags      Json     @default("[]")
+  tags      String[] @default([])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -786,7 +877,7 @@ model DiscussionThread {
   moduleRef String              @default("")
   track     TrackCategory?
   body      String              @db.Text
-  tags      Json                @default("[]")
+  tags      String[]            @default([])
   isLocked  Boolean             @default(false)
   createdAt DateTime            @default(now())
   updatedAt DateTime            @updatedAt
@@ -796,6 +887,34 @@ model DiscussionThread {
   @@index([userId])
   @@index([track])
   @@index([createdAt])
+}
+
+model UserStreak {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  currentStreak    Int       @default(0)
+  longestStreak    Int       @default(0)
+  lastActivityDate DateTime?
+  streakFreezes    Int       @default(0)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DailyChallenge {
+  id            String   @id @default(cuid())
+  userId        String
+  challengeType String
+  goal          Int      @default(1)
+  progress      Int      @default(0)
+  isCompleted   Boolean  @default(false)
+  date          DateTime @default(now()) @db.Date
+  xpReward      Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, challengeType, date])
 }
 
 model DiscussionComment {
@@ -836,4 +955,15 @@ model ReadinessScoreSnapshot {
 
   @@index([userId, capturedAt])
   @@index([targetRole])
+}
+
+model AiUsageLog {
+  id        String   @id @default(cuid())
+  feature   String // e.g. "RESUME_SCAN", "AI_INTERVIEW"
+  userId    String? // Optional since some endpoints like Resume Scan are public
+  createdAt DateTime @default(now())
+
+  @@index([feature])
+  @@index([createdAt])
+  @@index([userId])
 }

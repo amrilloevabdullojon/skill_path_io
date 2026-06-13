@@ -29,37 +29,49 @@ export async function generateCertificatePdf({
   const regularFont = await pdf.embedFont(StandardFonts.Helvetica);
   const boldFont = await pdf.embedFont(StandardFonts.HelveticaBold);
 
+  // Deep Midnight Background
   page.drawRectangle({
     x: 0,
     y: 0,
     width,
     height,
-    color: rgb(0.02, 0.05, 0.11),
+    color: rgb(0.02, 0.04, 0.08),
   });
 
+  // Outer Neon Grid Border
   page.drawRectangle({
-    x: 26,
-    y: 26,
-    width: width - 52,
-    height: height - 52,
-    borderColor: rgb(0.22, 0.39, 0.78),
-    borderWidth: 2,
+    x: 30,
+    y: 30,
+    width: width - 60,
+    height: height - 60,
+    borderColor: rgb(0.05, 0.65, 0.85), // Cyan neon line
+    borderWidth: 1,
   });
 
-  page.drawText("SkillPath Academy", {
+  // Inner Elegant Border
+  page.drawRectangle({
+    x: 45,
+    y: 45,
+    width: width - 90,
+    height: height - 90,
+    borderColor: rgb(0.15, 0.25, 0.4),
+    borderWidth: 1,
+  });
+
+  page.drawText("Levio", {
     x: 90,
     y: height - 120,
-    size: 32,
+    size: 28,
     font: boldFont,
-    color: rgb(0.74, 0.85, 1),
+    color: rgb(0.4, 0.6, 0.9), // Soft blue
   });
 
-  page.drawText("Certificate of Completion", {
+  page.drawText("CERTIFICATE OF COMPLETION", {
     x: 90,
     y: height - 180,
-    size: 46,
+    size: 42,
     font: boldFont,
-    color: rgb(0.95, 0.97, 1),
+    color: rgb(1, 1, 1), // Pure white
   });
 
   page.drawText("This certificate is proudly awarded to", {
@@ -73,32 +85,41 @@ export async function generateCertificatePdf({
   page.drawText(studentName, {
     x: 90,
     y: height - 305,
-    size: 48,
+    size: 52,
     font: boldFont,
-    color: rgb(0.59, 0.84, 0.96),
+    color: rgb(0.05, 0.85, 0.65), // Emerald Neon
   });
 
-  page.drawText("for successful completion of the learning track", {
+  page.drawText("for successful completion of the learning track:", {
     x: 90,
-    y: height - 360,
-    size: 21,
+    y: height - 365,
+    size: 18,
     font: regularFont,
-    color: rgb(0.76, 0.83, 0.93),
+    color: rgb(0.6, 0.7, 0.8),
   });
 
   page.drawText(trackTitle, {
     x: 90,
-    y: height - 415,
-    size: 36,
+    y: height - 425,
+    size: 32,
     font: boldFont,
-    color: rgb(0.96, 0.88, 0.56),
+    color: rgb(0.9, 0.8, 0.4), // Golden Amber
+  });
+
+  // Neon divider
+  page.drawRectangle({
+    x: 90,
+    y: Math.floor(height) - 480,
+    width: 120,
+    height: 4,
+    color: rgb(0.05, 0.65, 0.85),
   });
 
   page.drawLine({
-    start: { x: 90, y: 160 },
-    end: { x: width - 90, y: 160 },
+    start: { x: 90, y: 150 },
+    end: { x: width - 90, y: 150 },
     thickness: 1,
-    color: rgb(0.19, 0.27, 0.39),
+    color: rgb(0.15, 0.25, 0.4),
   });
 
   page.drawText(`Issued: ${formatDate(issuedAt)}`, {

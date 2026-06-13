@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { BookmarksBoard } from "@/components/bookmarks/bookmarks-board";
 
 export const metadata: Metadata = {
-  title: "Bookmarks — SkillPath Academy",
+  title: "Bookmarks",
   description: "Saved lessons, modules, and quizzes for quick access.",
   robots: { index: false },
 };

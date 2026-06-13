@@ -28,11 +28,12 @@ const DIFFICULTY_BADGE: Record<string, string> = {
   HARD: "border-rose-500/30 bg-rose-500/10 text-rose-400",
 };
 
-export default async function EditSimulationPage({ params }: { params: { id: string } }) {
+export default async function EditSimulationPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   await requireAdminPermission("courses.write");
 
   const simulation = await prisma.simulation.findUnique({
-    where: { id: params.id },
+    where: { id: resolvedParams.id },
     include: {
       module: {
         select: {

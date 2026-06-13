@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 140" width="480" height="140">
+  <defs>
+    <linearGradient id="levio-icon" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient id="levio-text" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4338ca"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <filter id="levio-shadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#6366f1" flood-opacity="0.4"/>
+    </filter>
+    <filter id="spark-glow">
+      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#fbbf24" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+
+  <!-- Icon background: rounded square with slight tilt -->
+  <rect x="8" y="8" width="124" height="124" rx="30" fill="url(#levio-icon)" filter="url(#levio-shadow)"/>
+
+  <!-- Level bars (ascending) -->
+  <!-- Bar 1 -->
+  <rect x="24" y="86" width="16" height="26" rx="4" fill="white" opacity="0.4"/>
+  <!-- Bar 2 -->
+  <rect x="46" y="68" width="16" height="44" rx="4" fill="white" opacity="0.6"/>
+  <!-- Bar 3 -->
+  <rect x="68" y="50" width="16" height="62" rx="4" fill="white" opacity="0.8"/>
+  <!-- Bar 4 (tallest) -->
+  <rect x="90" y="32" width="16" height="80" rx="4" fill="white"/>
+
+  <!-- Star/spark at top of bar 4 -->
+  <g filter="url(#spark-glow)">
+    <polygon points="98,18 101,26 110,26 103,31 106,39 98,34 90,39 93,31 86,26 95,26"
+      fill="#fbbf24"/>
+  </g>
+
+  <!-- Wordmark: levio -->
+  <text x="152" y="93"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif"
+    font-size="70"
+    font-weight="800"
+    fill="url(#levio-text)"
+    letter-spacing="-2">levio</text>
+
+  <!-- Tagline -->
+  <text x="155" y="120"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif"
+    font-size="13.5"
+    font-weight="500"
+    fill="#6366f1"
+    letter-spacing="4.5">LEVEL UP YOUR CAREER</text>
+</svg>

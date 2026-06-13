@@ -19,6 +19,10 @@ const buttonVariants = cva(
         destructive: "btn-destructive-base",
         /** Violet accent — AI / special actions */
         accent: "btn-accent-base",
+        /** Inverted — high-emphasis hero CTA (foreground bg + background text) */
+        contrast: "btn-contrast-base",
+        /** Emerald — confirm / submit / finish actions */
+        success: "btn-success-base",
       },
       size: {
         default: "h-10 px-4 py-2",

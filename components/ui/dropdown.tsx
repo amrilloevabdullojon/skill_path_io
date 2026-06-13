@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { useIsClient } from "@/hooks/use-is-client";
 import { cn } from "@/lib/utils";
 
 type DropdownItem = {
@@ -11,6 +12,7 @@ type DropdownItem = {
   onSelect?: () => void;
   href?: string;
   destructive?: boolean;
+  icon?: React.ReactNode;
 };
 
 type DropdownProps = {
@@ -25,12 +27,8 @@ export function Dropdown({ trigger, items, align = "right", className }: Dropdow
   const rootRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useIsClient();
   const [position, setPosition] = useState({ top: 0, left: 0 });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -120,7 +118,10 @@ export function Dropdown({ trigger, items, align = "right", className }: Dropdow
                 if (item.href) {
                   return (
                     <a key={item.id} href={item.href} className={itemClassName} onClick={() => setOpen(false)}>
-                      {item.label}
+                      <span className="flex items-center gap-2 w-full">
+                        {item.icon}
+                        {item.label}
+                      </span>
                     </a>
                   );
                 }
@@ -135,7 +136,10 @@ export function Dropdown({ trigger, items, align = "right", className }: Dropdow
                       setOpen(false);
                     }}
                   >
-                    {item.label}
+                    <span className="flex items-center gap-2 w-full">
+                      {item.icon}
+                      {item.label}
+                    </span>
                   </button>
                 );
               })}

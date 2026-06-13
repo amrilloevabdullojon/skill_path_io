@@ -42,8 +42,8 @@ function baseCourse(overrides: Partial<Course>): Course {
     createdAt: overrides.createdAt ?? now,
     updatedAt: overrides.updatedAt ?? now,
     publishedAt: overrides.publishedAt ?? null,
-    createdBy: overrides.createdBy ?? "admin@skillpath.local",
-    updatedBy: overrides.updatedBy ?? "admin@skillpath.local",
+    createdBy: overrides.createdBy ?? "admin@levio.local",
+    updatedBy: overrides.updatedBy ?? "admin@levio.local",
     version: overrides.version ?? 1,
     visibility: overrides.visibility ?? "PUBLIC",
     difficulty: overrides.difficulty ?? "MEDIUM",
@@ -53,7 +53,7 @@ function baseCourse(overrides: Partial<Course>): Course {
       enabled: true,
       certificateTitle: `${title} Certificate`,
       certificateTemplate: "modern-dark",
-      signatoryName: "SkillPath Academy",
+      signatoryName: "Levio",
       signatoryRole: "Head of Learning",
       logoUrl: "",
       certificateText: "Awarded for successful course completion.",
@@ -249,7 +249,7 @@ function createCourseEntity(input: {
     {
       id: createId("version"),
       version: 1,
-      updatedBy: "admin@skillpath.local",
+      updatedBy: "admin@levio.local",
       updatedAt: nowIso(),
       changelogNote: "Initial course scaffolding created in Academy Studio.",
       snapshot: {
@@ -386,7 +386,7 @@ export function buildSeedActivityLog(): AdminActivityLog[] {
   return [
     {
       id: createId("act"),
-      actorEmail: "admin@skillpath.local",
+      actorEmail: "admin@levio.local",
       actorRole: "SUPER_ADMIN",
       action: "create",
       entityType: "course",

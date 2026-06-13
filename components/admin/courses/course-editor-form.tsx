@@ -92,7 +92,7 @@ export function CourseEditorForm({ courseId }: CourseEditorFormProps) {
 
       <div className="grid gap-3 md:grid-cols-2">
         <div className="surface-subtle p-4">
-          <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Publishing workflow</p>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">Publishing workflow</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {statusOptions.map((item) => (
               <button
@@ -100,7 +100,7 @@ export function CourseEditorForm({ courseId }: CourseEditorFormProps) {
                 type="button"
                 onClick={() => setCourseStatus(courseId, item)}
                 className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${
-                  item === course.status ? "border-sky-400/45 bg-sky-500/15 text-sky-200" : "chip-neutral"
+                  item === course.status ? "border-indigo-400/45 bg-indigo-500/15 text-indigo-200" : "chip-neutral"
                 }`}
               >
                 {item}
@@ -109,7 +109,7 @@ export function CourseEditorForm({ courseId }: CourseEditorFormProps) {
           </div>
         </div>
         <div className="surface-subtle p-4">
-          <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Version history</p>
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">Version history</p>
           <input className="input-base mt-3" value={versionNote} onChange={(event) => setVersionNote(event.target.value)} placeholder="Changelog note" />
           <Button className="mt-2 w-full gap-2" onClick={() => addVersion(courseId, versionNote)}>
             <Save className="h-4 w-4" />

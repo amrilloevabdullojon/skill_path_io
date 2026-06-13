@@ -24,13 +24,14 @@ export function FadeInUp({ delay = 0, duration = 0.4, children, ...props }: Fade
 }
 
 type StaggerListProps = {
-  children: React.ReactNode[];
+  children: React.ReactNode;
   staggerDelay?: number;
   className?: string;
 };
 
 export function StaggerList({ children, staggerDelay = 0.07, className }: StaggerListProps) {
   const reduced = useReducedMotion();
+  const items = Array.isArray(children) ? children : [children];
   return (
     <motion.div
       className={className}
@@ -41,7 +42,7 @@ export function StaggerList({ children, staggerDelay = 0.07, className }: Stagge
         visible: { transition: { staggerChildren: reduced ? 0 : staggerDelay } },
       }}
     >
-      {children.map((child, i) => (
+      {items.map((child, i) => (
         <motion.div
           key={i}
           variants={

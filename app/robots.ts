@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin/", "/api/", "/onboarding"],
       },
     ],
-    sitemap: "https://skillpath.io/sitemap.xml",
+    sitemap: "https://levio.app/sitemap.xml",
   };
 }

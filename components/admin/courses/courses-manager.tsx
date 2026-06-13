@@ -194,7 +194,7 @@ export function CoursesManager() {
                       type="checkbox"
                       checked={selectedIds.includes(entity.course.id)}
                       onChange={() => toggleSelection(entity.course.id)}
-                      className="h-4 w-4 accent-sky-400"
+                      className="h-4 w-4 accent-indigo-400"
                     />
                   </td>
                   <td>

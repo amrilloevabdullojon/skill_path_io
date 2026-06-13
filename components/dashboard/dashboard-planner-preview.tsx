@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Activity, ArrowUpRight, CalendarClock, Gauge, Timer } from "lucide-react";
+import { Activity, ArrowUpRight, CalendarClock, Gauge, Timer, Focus } from "lucide-react";
+import { getLocale } from "next-intl/server";
 
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
 
-export function DashboardPlannerPreviewSection({
+export async function DashboardPlannerPreviewSection({
   goal,
   workload,
   forecastDate,
@@ -12,63 +13,92 @@ export function DashboardPlannerPreviewSection({
   workload: string;
   forecastDate: string;
 }) {
+  const locale = await getLocale();
+
   const normalizedWorkload = workload.toLowerCase();
   const weeklyPace =
     normalizedWorkload === "intense"
-      ? "5 focused sessions / week"
+      ? "~12+ часов/нед"
       : normalizedWorkload === "balanced"
-        ? "3-4 focused sessions / week"
-        : "2-3 focused sessions / week";
+        ? "~6-10 часов/нед"
+        : "~2-4 часов/нед";
+        
   const confidence =
-    normalizedWorkload === "intense" ? "High confidence" : normalizedWorkload === "balanced" ? "On track" : "Steady pace";
+    normalizedWorkload === "intense"
+      ? "ВЫСОКАЯ 🚀"
+      : normalizedWorkload === "balanced"
+        ? "ОПТИМАЛЬНО"
+        : "НИЗКАЯ 🐌";
+        
+  const workloadLabel =
+    normalizedWorkload === "intense"
+      ? "Интенсив"
+      : normalizedWorkload === "balanced"
+        ? "Сбалансированная"
+        : "Легкая";
+
+  const formattedDate = new Date(forecastDate).toLocaleDateString(locale, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   return (
-    <DashboardSection id="planner" title="Planner Preview" description="Weekly pace and realistic completion forecast.">
-      <article className="content-card surface-panel-hover p-4">
-        <p className="module-order-label">Current plan</p>
-        <p className="mt-1 line-clamp-2 text-sm font-semibold leading-6 text-foreground">{goal}</p>
-
-        <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
-          <div className="track-info-box px-2.5 py-2">
-            <p className="track-info-label inline-flex items-center gap-1">
-              <Timer className="h-3.5 w-3.5" />
-              Workload
-            </p>
-            <p className="track-info-value mt-1">{workload}</p>
+    <DashboardSection id="planner" title="Умное планирование" description="ИИ прогнозирует дату завершения вашего трека.">
+      <article className="relative overflow-hidden surface-elevated border border-indigo-500/30 bg-card rounded-xl p-5 lg:p-6 transition-all duration-300 shadow-[0_8px_30px_rgba(99,102,241,0.08)] group hover:border-indigo-500/50">
+        <div className="absolute top-[-20%] left-[-20%] w-[200px] h-[200px] rounded-full blur-[50px] pointer-events-none transition-opacity opacity-20 group-hover:opacity-60 bg-indigo-500/30" />
+        
+        <div className="relative z-10 flex items-start gap-4">
+          <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400">
+            <Focus className="h-5 w-5" />
           </div>
-          <div className="track-info-box px-2.5 py-2">
-            <p className="track-info-label inline-flex items-center gap-1">
-              <CalendarClock className="h-3.5 w-3.5" />
-              Forecast date
-            </p>
-            <p className="track-info-value mt-1">{new Date(forecastDate).toLocaleDateString()}</p>
-          </div>
-          <div className="track-info-box px-2.5 py-2">
-            <p className="track-info-label inline-flex items-center gap-1">
-              <Activity className="h-3.5 w-3.5" />
-              Weekly pace
-            </p>
-            <p className="track-info-value mt-1">{weeklyPace}</p>
-          </div>
-          <div className="track-info-box px-2.5 py-2">
-            <p className="track-info-label inline-flex items-center gap-1">
-              <Gauge className="h-3.5 w-3.5" />
-              Confidence
-            </p>
-            <p className="track-info-value mt-1">{confidence}</p>
+          <div>
+            <p className="text-[10px] uppercase font-bold tracking-widest text-indigo-400 mb-1">Фокус обучения</p>
+            <p className="line-clamp-2 text-base font-bold leading-relaxed text-foreground drop-shadow-sm">{goal}</p>
           </div>
         </div>
 
-        <div className="mt-3 flex items-center justify-between gap-2">
-          <span className="rounded-full border border-emerald-400/25 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-200">
-            Plan status: active
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 relative z-10">
+          <div className="bg-background/40 border border-border-subtle px-3 py-2.5 rounded-xl transition-all group-hover:bg-background/60">
+            <p className="text-[9px] uppercase font-bold text-foreground/50 tracking-wider flex items-center gap-1.5 mb-1">
+              <Timer className="h-3 w-3 text-indigo-400" />
+              Твоя нагрузка
+            </p>
+            <p className="text-sm font-semibold text-foreground tracking-wide mt-0.5">{workloadLabel}</p>
+          </div>
+          <div className="bg-background/40 border border-border-subtle px-3 py-2.5 rounded-xl transition-all group-hover:bg-background/60">
+            <p className="text-[9px] uppercase font-bold text-foreground/50 tracking-wider flex items-center gap-1.5 mb-1">
+              <CalendarClock className="h-3 w-3 text-amber-400" />
+              Прогноз завершения
+            </p>
+            <p className="text-sm font-semibold text-amber-400 tracking-wide mt-0.5">{formattedDate}</p>
+          </div>
+          <div className="bg-background/40 border border-border-subtle px-3 py-2.5 rounded-xl transition-all group-hover:bg-background/60">
+            <p className="text-[9px] uppercase font-bold text-foreground/50 tracking-wider flex items-center gap-1.5 mb-1">
+              <Activity className="h-3 w-3 text-emerald-400" />
+              Темп в неделю
+            </p>
+            <p className="text-sm font-semibold text-foreground tracking-wide mt-0.5">{weeklyPace}</p>
+          </div>
+          <div className="bg-background/40 border border-border-subtle px-3 py-2.5 rounded-xl transition-all group-hover:bg-background/60">
+            <p className="text-[9px] uppercase font-bold text-foreground/50 tracking-wider flex items-center gap-1.5 mb-1">
+              <Gauge className="h-3 w-3 text-violet-400" />
+              Уверенность ИИ
+            </p>
+            <p className="text-sm font-bold text-foreground tracking-wide mt-0.5">{confidence}</p>
+          </div>
+        </div>
+
+        <div className="mt-5 flex items-center justify-between gap-3 relative z-10">
+          <span className="inline-flex rounded-full border border-emerald-500/40 bg-emerald-500/20 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+            Активный план
           </span>
           <Link
             href="/planner"
-            className="data-pill inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-sky-300 transition-colors hover:text-sky-200"
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 border border-indigo-500/40 bg-indigo-500/10 hover:bg-indigo-500/20 rounded-lg text-xs font-bold text-indigo-300 transition-colors"
           >
-            Open planner
-            <ArrowUpRight className="h-3.5 w-3.5" />
+            Открыть планер
+            <ArrowUpRight className="h-4 w-4" />
           </Link>
         </div>
       </article>

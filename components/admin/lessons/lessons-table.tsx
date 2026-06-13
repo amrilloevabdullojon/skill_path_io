@@ -25,7 +25,7 @@ export type LessonGroup = {
 };
 
 const TYPE_BADGE: Record<LessonType, string> = {
-  TEXT: "border-sky-500/30 bg-sky-500/10 text-sky-400",
+  TEXT: "border-indigo-500/30 bg-indigo-500/10 text-indigo-400",
   VIDEO: "border-violet-500/30 bg-violet-500/10 text-violet-400",
   TASK: "border-amber-500/30 bg-amber-500/10 text-amber-400",
 };
@@ -107,7 +107,7 @@ export function LessonsTable({ groups: initialGroups }: { groups: LessonGroup[] 
               <th className="px-3 py-3 text-left">
                 <input
                   type="checkbox"
-                  className="h-3.5 w-3.5 rounded accent-sky-500"
+                  className="h-3.5 w-3.5 rounded accent-indigo-500"
                   checked={allIds.length > 0 && selected.size === allIds.length}
                   onChange={(e) => toggleAll(e.target.checked)}
                 />
@@ -124,7 +124,7 @@ export function LessonsTable({ groups: initialGroups }: { groups: LessonGroup[] 
             {groups.map((group) => (
               <Fragment key={group.moduleId}>
                 {/* Group header row */}
-                <tr className="border-t-2 border-border/60 bg-card/60">
+                <tr className="border-t-2 border-border bg-card/60">
                   <td className="px-3 py-2">
                     {(() => {
                       const groupIds = group.lessons.map((l) => l.id);
@@ -134,7 +134,7 @@ export function LessonsTable({ groups: initialGroups }: { groups: LessonGroup[] 
                         <input
                           type="checkbox"
                           aria-label={`Select all lessons in ${group.moduleTitle}`}
-                          className="h-3.5 w-3.5 rounded accent-sky-500"
+                          className="h-3.5 w-3.5 rounded accent-indigo-500"
                           checked={allChecked}
                           ref={(el) => {
                             if (el) el.indeterminate = someChecked && !allChecked;
@@ -166,7 +166,7 @@ export function LessonsTable({ groups: initialGroups }: { groups: LessonGroup[] 
                     <td className="px-3 py-2">
                       <input
                         type="checkbox"
-                        className="h-3.5 w-3.5 rounded accent-sky-500"
+                        className="h-3.5 w-3.5 rounded accent-indigo-500"
                         checked={selected.has(lesson.id)}
                         onChange={(e) => toggleOne(lesson.id, e.target.checked)}
                       />

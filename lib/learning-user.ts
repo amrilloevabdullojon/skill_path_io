@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
 export async function resolveLearningUser(preferredEmail?: string | null) {
-  const candidates = [preferredEmail, "student@skillpath.local", "admin@skillpath.local"];
+  const candidates = [preferredEmail, "student@levio.local", "admin@levio.local"];
 
   for (const email of candidates) {
     if (!email) {

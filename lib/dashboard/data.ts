@@ -1,6 +1,7 @@
 import "server-only";
 
 import { Prisma, ProgressStatus, TrackCategory, UserRole } from "@prisma/client";
+import { getTranslations } from "next-intl/server";
 
 import type { HeatmapCell } from "@/features/analytics/learning-heatmap";
 import { buildLeaderboard, type LeaderboardRow } from "@/features/gamification/leaderboard";
@@ -48,7 +49,6 @@ import { buildSmartRecommendations } from "@/lib/saas/recommendations";
 import { buildStreakSummary } from "@/lib/saas/streaks";
 import { resolveUserSubscription } from "@/lib/saas/subscriptions";
 import { buildTeamAnalytics } from "@/lib/saas/teams";
-import { buildWeeklyAiReport } from "@/lib/saas/weekly-report";
 import {
   AdvancedLearningAnalytics,
   Achievement as SaasAchievement,
@@ -67,7 +67,7 @@ import {
   WeeklyAiReport,
 } from "@/types/saas";
 
-type SessionRole = "ADMIN" | "STUDENT" | undefined;
+type SessionRole = "ADMIN" | "STUDENT" | "PRO_STUDENT" | "MENTOR" | "RECRUITER" | undefined;
 
 export type DashboardSectionNavItem = {
   id: string;
@@ -241,6 +241,7 @@ export type DashboardData = {
   reviewPreview: {
     bookmarkCount: number;
     noteCount: number;
+    mistakeCount: number;
   };
   portfolioPreview: {
     totalEntries: number;
@@ -274,6 +275,20 @@ export type DashboardData = {
   saasGamification: {
     achievements: SaasAchievement[];
     badges: Badge[];
+    streakMeta: {
+      currentStreak: number;
+      longestStreak: number;
+      streakFreezes: number;
+      isActiveToday: boolean;
+    };
+    dailyChallenge: {
+      challengeType: string;
+      title: string;
+      goal: number;
+      progress: number;
+      isCompleted: boolean;
+      xpReward: number;
+    } | null;
   };
   streaks: StreakSummary;
   smartRecommendations: SmartRecommendation[];
@@ -335,6 +350,16 @@ const userInclude = {
       track: true,
     },
   },
+  courseCertificates: {
+    include: {
+      course: true,
+    },
+  },
+  userStreak: true,
+  dailyChallenges: {
+    orderBy: { date: "desc" },
+    take: 1,
+  },
 } satisfies Prisma.UserInclude;
 
 function formatDateKey(date: Date) {
@@ -358,7 +383,36 @@ async function resolveDashboardUser(preferredEmail?: string | null) {
     });
 
     if (user) {
-      return user;
+      // Ensure UserStreak and DailyChallenge exist/upsert
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // We explicitly upsert the UserStreak in the Dashboard just to guarantee the dashboard never crashes if a new user visits it.
+      // In production, this would be part of a signup hook.
+      let userStreak = await prisma.userStreak.findUnique({ where: { userId: user.id } });
+      if (!userStreak) {
+        userStreak = await prisma.userStreak.create({
+          data: { userId: user.id, currentStreak: 1, lastActivityDate: new Date() }
+        });
+      }
+
+      // Check for an active daily challenge today
+      let dailyChallenge = await prisma.dailyChallenge.findFirst({
+        where: { userId: user.id, date: { gte: today } }
+      });
+      if (!dailyChallenge) {
+        dailyChallenge = await prisma.dailyChallenge.create({
+          data: {
+            userId: user.id,
+            challengeType: "COMPLETE_LESSON",
+            goal: 3,
+            xpReward: 100,
+            date: today,
+          }
+        });
+      }
+
+      return { ...user, userStreak, dailyChallenges: [dailyChallenge] };
     }
   }
 
@@ -484,32 +538,57 @@ export async function getDashboardData(params: {
   const preferredEmail = params.preferredEmail ?? null;
   const sessionRole = params.sessionRole;
 
-  const [user, runtimeCatalog, leaderboardUsers] = await Promise.all([
-    resolveDashboardUser(preferredEmail),
-    resolveRuntimeCatalog({ includeCourseEntities: true }),
-    prisma.user.findMany({
-      // Cap leaderboard to avoid full-table scans as the user base grows.
-      // Top-N ranking is sufficient for motivational display purposes.
-      take: MAX_LEADERBOARD_USERS,
-      orderBy: { certificates: { _count: "desc" } },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        progresses: {
-          select: {
-            status: true,
-            score: true,
+  const td = await getTranslations("dashboard.data");
+
+  let user: Awaited<ReturnType<typeof resolveDashboardUser>>;
+  let runtimeCatalog: Awaited<ReturnType<typeof resolveRuntimeCatalog>>;
+  let leaderboardUsers: Array<{
+    id: string;
+    name: string | null;
+    email: string;
+    progresses: Array<{ status: ProgressStatus; score: number | null }>;
+    _count: { certificates: number; courseCertificates: number };
+    userStreak: { currentStreak: number } | null;
+  }>;
+
+  try {
+    [user, runtimeCatalog, leaderboardUsers] = await Promise.all([
+      resolveDashboardUser(preferredEmail),
+      resolveRuntimeCatalog({ includeCourseEntities: true }),
+      prisma.user.findMany({
+        // Cap leaderboard to avoid full-table scans as the user base grows.
+        // Top-N ranking is sufficient for motivational display purposes.
+        take: MAX_LEADERBOARD_USERS,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          progresses: {
+            select: {
+              status: true,
+              score: true,
+            },
+          },
+          _count: {
+            select: {
+              certificates: true,
+              courseCertificates: true,
+            },
+          },
+          userStreak: {
+            select: {
+              currentStreak: true,
+            },
           },
         },
-        _count: {
-          select: {
-            certificates: true,
-          },
-        },
-      },
-    }),
-  ]);
+      }),
+    ]);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[dashboard] Failed to resolve dashboard bootstrap data", error);
+    }
+    return null;
+  }
 
   if (!user) {
     return null;
@@ -539,6 +618,7 @@ export async function getDashboardData(params: {
     weeklyQuestRows,
     noteCount,
     bookmarkCount,
+    quizReviewRows,
     activeLearningPlan,
   ] = await Promise.all([
     withOptionalTableFallback(
@@ -613,6 +693,20 @@ export async function getDashboardData(params: {
         where: { userId: user.id },
       }),
       0,
+    ),
+    withOptionalTableFallback(
+      prisma.quizQuestionResult.findMany({
+        where: {
+          attempt: { userId: user.id },
+        },
+        orderBy: { createdAt: "desc" },
+        take: 500,
+        select: {
+          questionId: true,
+          isCorrect: true,
+        },
+      }),
+      [] as Array<{ questionId: string; isCorrect: boolean }>,
     ),
     withOptionalTableFallback(
       prisma.learningPlan.findFirst({
@@ -715,12 +809,14 @@ export async function getDashboardData(params: {
   const completedLessons = trackSummaries.reduce((sum, track) => sum + track.completedLessons, 0);
   const simulationsCompletedEstimate = Math.floor(completedModules / 2);
 
+  const certificateCount = user.certificates.length + user.courseCertificates.length;
+
   const xpBreakdown = calculateXpFromProgress(
     user.progresses.map((progress) => ({
       status: progress.status,
       score: progress.score,
     })),
-    user.certificates.length,
+    certificateCount,
     completedLessons,
     simulationsCompletedEstimate,
   );
@@ -747,18 +843,27 @@ export async function getDashboardData(params: {
   const career = buildCareerSummary(xpBreakdown.totalXp, skillRadar);
   const heatmap = buildHeatmapFromCompletedAt(completedDates, 84);
 
-  const leaderboardRows = buildLeaderboard(
+  const groupedLeaderboard = buildLeaderboard(
     leaderboardUsers.map((item) => ({
       id: item.id,
-      name: item.name,
+      name: item.name ?? "Levio User",
       email: item.email,
       progresses: item.progresses,
-      certificates: item._count.certificates,
+      certificates: item._count.certificates + item._count.courseCertificates,
+      streak: item.userStreak,
     })),
   );
+
+  const flatLeaderboardRows = [
+    ...groupedLeaderboard.Diamond,
+    ...groupedLeaderboard.Gold,
+    ...groupedLeaderboard.Silver,
+    ...groupedLeaderboard.Bronze,
+  ].sort((a, b) => a.rank - b.rank);
+
   const leaderboard = {
-    rows: leaderboardRows.slice(0, 5),
-    currentUserRank: leaderboardRows.find((row) => row.userId === user.id)?.rank ?? null,
+    rows: flatLeaderboardRows.slice(0, 5),
+    currentUserRank: flatLeaderboardRows.find((row) => row.userId === user.id)?.rank ?? null,
     earnedXpThisWeek,
   };
 
@@ -767,7 +872,7 @@ export async function getDashboardData(params: {
     completedModules >= 5 ? "Consistent learner" : null,
     quizAccuracy >= 80 ? "Quiz precision" : null,
     streak >= 5 ? "Focus streak" : null,
-    user.certificates.length >= 1 ? "Certified specialist" : null,
+    certificateCount >= 1 ? "Certified specialist" : null,
   ].filter((item): item is string => Boolean(item));
 
   const lowScoreProgressRecord = user.progresses
@@ -813,7 +918,7 @@ export async function getDashboardData(params: {
     baseRecommendationText: baseRecommendations[0],
   });
 
-  const onboardingProfile = getOnboardingProfileFromCookie();
+  const onboardingProfile = await getOnboardingProfileFromCookie();
   const adaptiveSignal = {
     quizAccuracy,
     frequentMistakes: lowScoreProgress
@@ -826,44 +931,54 @@ export async function getDashboardData(params: {
   };
   const adaptivePath = getAdaptivePath(adaptiveSignal);
 
+  const questTitleMap: Array<{ match: RegExp; title: string; description: string }> = [
+    { match: /lesson/i, title: td("quests.lessons.title"), description: td("quests.lessons.description") },
+    { match: /quiz/i,   title: td("quests.quiz.title"),    description: td("quests.quiz.description") },
+    { match: /mission|submit/i, title: td("quests.mission.title"), description: td("quests.mission.description") },
+    { match: /streak/i, title: td("quests.streak.title"), description: td("quests.streak.description") },
+  ];
+
   const questTemplates = weeklyQuestRows.length > 0
-    ? weeklyQuestRows.map((quest) => ({
-        id: quest.id,
-        title: quest.title,
-        description: quest.description,
-        goal: quest.goal,
-        progress: 0,
-        rewardXp: quest.rewardXp,
-      }))
+    ? weeklyQuestRows.map((quest) => {
+        const i18n = questTitleMap.find((entry) => entry.match.test(quest.title));
+        return {
+          id: quest.id,
+          title: i18n?.title ?? quest.title,
+          description: i18n?.description ?? quest.description,
+          goal: quest.goal,
+          progress: 0,
+          rewardXp: quest.rewardXp,
+        };
+      })
     : [
         {
           id: "quest-lessons",
-          title: "Complete 3 lessons",
-          description: "Finish at least 3 lesson units this week.",
+          title: td("quests.lessons.title"),
+          description: td("quests.lessons.description"),
           goal: 3,
           progress: 0,
           rewardXp: 90,
         },
         {
           id: "quest-quiz",
-          title: "Pass 1 quiz 80%+",
-          description: "Achieve at least 80% on one module quiz.",
+          title: td("quests.quiz.title"),
+          description: td("quests.quiz.description"),
           goal: 1,
           progress: 0,
           rewardXp: 120,
         },
         {
           id: "quest-simulation",
-          title: "Complete 1 simulation",
-          description: "Finish one real-work simulation.",
+          title: td("quests.mission.title"),
+          description: td("quests.mission.description"),
           goal: 1,
           progress: 0,
           rewardXp: 160,
         },
         {
           id: "quest-streak",
-          title: "Maintain 5-day streak",
-          description: "Log learning activity 5 days in a row.",
+          title: td("quests.streak.title"),
+          description: td("quests.streak.description"),
           goal: 5,
           progress: 0,
           rewardXp: 140,
@@ -923,7 +1038,7 @@ export async function getDashboardData(params: {
       objective: mission.objective,
       steps: parseStringArray(mission.steps),
       skillsUsed: defaultSkillsByTrackTag(category),
-      expectedResult: mission.expectedResult || "Complete objective with a production-style deliverable.",
+      expectedResult: mission.expectedResult || "Закройте цель готовым артефактом продакшн-уровня.",
       difficulty,
       xpReward: mission.xpReward,
       aiEvaluation: mission.aiEvaluationEnabled,
@@ -984,12 +1099,26 @@ export async function getDashboardData(params: {
       missingRequirements: job.missingRequirements,
     }));
 
+  const seenQuizQuestionIds = new Set<string>();
+  let mistakeCount = 0;
+  for (const row of quizReviewRows) {
+    if (seenQuizQuestionIds.has(row.questionId)) {
+      continue;
+    }
+    seenQuizQuestionIds.add(row.questionId);
+    if (!row.isCorrect) {
+      mistakeCount += 1;
+    }
+  }
+
   const reviewPreview = {
     bookmarkCount: bookmarkCount,
     noteCount: noteCount,
+    mistakeCount: mistakeCount,
   };
 
   const now = new Date();
+  const ta = await getTranslations("dashboard.data.activity");
   const activity: DashboardActivityItem[] = [
     ...user.progresses
       .filter((progress) => progress.status === ProgressStatus.COMPLETED && progress.completedAt)
@@ -997,16 +1126,16 @@ export async function getDashboardData(params: {
       .flatMap((progress) => {
         const completion: DashboardActivityItem = {
           id: `lesson-${progress.id}`,
-          title: `Completed module ${progress.module.title}`,
-          description: `${progress.module.track.title} - lesson pack completed`,
+          title: ta("completedModule", { title: progress.module.title }),
+          description: ta("completedModuleSub", { track: progress.module.track.title }),
           kind: "lesson",
           timestamp: progress.completedAt as Date,
         };
         const quiz = (progress.score ?? 0) >= 70
           ? {
               id: `quiz-${progress.id}`,
-              title: `Passed quiz for ${progress.module.title}`,
-              description: `Score ${progress.score}%`,
+              title: ta("passedQuiz", { title: progress.module.title }),
+              description: ta("passedQuizScore", { score: progress.score ?? 0 }),
               kind: "quiz" as const,
               timestamp: progress.completedAt as Date,
             }
@@ -1015,8 +1144,15 @@ export async function getDashboardData(params: {
       }),
     ...user.certificates.map((certificate) => ({
       id: `certificate-${certificate.id}`,
-      title: "Certificate earned",
-      description: `${certificate.track.title} completed`,
+      title: ta("certificateEarned"),
+      description: ta("certificateCompleted", { track: certificate.track.title }),
+      kind: "certificate" as const,
+      timestamp: certificate.issuedAt,
+    })),
+    ...user.courseCertificates.map((certificate) => ({
+      id: `course-certificate-${certificate.id}`,
+      title: ta("certificateEarned"),
+      description: ta("certificateCompleted", { track: certificate.course.title }),
       kind: "certificate" as const,
       timestamp: certificate.issuedAt,
     })),
@@ -1024,8 +1160,8 @@ export async function getDashboardData(params: {
       ? [
           {
             id: "skill-unlock",
-            title: "Unlocked new skill nodes",
-            description: `${skillTree.unlockedCount}/${skillTree.totalCount} skills opened`,
+            title: ta("skillUnlockTitle"),
+            description: ta("skillUnlockSub", { unlocked: skillTree.unlockedCount, total: skillTree.totalCount }),
             kind: "skill" as const,
             timestamp: new Date(now.getTime() - 4 * 60 * 60 * 1000),
           },
@@ -1035,7 +1171,7 @@ export async function getDashboardData(params: {
       ? [
           {
             id: "badge-earned",
-            title: "New badge earned",
+            title: ta("badgeEarned"),
             description: badges[badges.length - 1],
             kind: "badge" as const,
             timestamp: new Date(now.getTime() - 6 * 60 * 60 * 1000),
@@ -1046,8 +1182,8 @@ export async function getDashboardData(params: {
       ? [
           {
             id: "simulation-complete",
-            title: "Simulation milestone reached",
-            description: `${simulationsCompletedEstimate} simulation tasks completed`,
+            title: ta("simulationTitle"),
+            description: ta("simulationSub", { count: simulationsCompletedEstimate }),
             kind: "simulation" as const,
             timestamp: new Date(now.getTime() - 8 * 60 * 60 * 1000),
           },
@@ -1061,7 +1197,7 @@ export async function getDashboardData(params: {
     (item) => item.kind === "lesson" || item.kind === "quiz" || item.kind === "simulation",
   );
   const portfolioPreview = {
-    totalEntries: artifactActivity.length + user.certificates.length,
+    totalEntries: artifactActivity.length + certificateCount,
     missionArtifacts: missionPreview.length,
     recentEntryTitle: artifactActivity[0]?.title ?? null,
   };
@@ -1069,23 +1205,23 @@ export async function getDashboardData(params: {
   const upcomingActions: DashboardUpcomingAction[] = [
     {
       id: "continue-module",
-      title: "Continue current module",
+      title: td("actions.continueModule"),
       description: primaryTrack?.nextModuleTitle
         ? `${primaryTrack.title}: ${primaryTrack.nextModuleTitle}`
-        : "Return to your active track and keep momentum.",
+        : td("actions.continueModuleFallback"),
       href: primaryTrack?.nextModuleHref ?? "/tracks",
       priority: "High",
       difficulty: "High",
       xpReward: 120,
-      skillImpact: primaryTrack?.category === TrackCategory.BA ? "Requirement clarity" : primaryTrack?.category === TrackCategory.DA ? "Analytics confidence" : "Testing execution",
+      skillImpact: primaryTrack?.category === TrackCategory.BA ? td("actions.impactBA") : primaryTrack?.category === TrackCategory.DA ? td("actions.impactDA") : td("actions.impactQA"),
       eta: "15-25 min",
     },
     {
       id: "redo-quiz",
-      title: lowScoreProgress ? "Redo low-score quiz" : "Take the next quiz",
+      title: lowScoreProgress ? td("actions.redoQuiz") : td("actions.takeNextQuiz"),
       description: lowScoreProgress
-        ? `${lowScoreProgress.moduleTitle}: improve score from ${lowScoreProgress.score}%`
-        : "Strengthen retention with a short assessment.",
+        ? td("actions.redoQuizDescription", { module: lowScoreProgress.moduleTitle, score: lowScoreProgress.score })
+        : td("actions.takeNextQuizFallback"),
       href: lowScoreProgress
         ? `/tracks/${lowScoreProgress.trackSlug}/modules/${lowScoreProgress.moduleId}/quiz`
         : primaryTrack?.nextModuleHref
@@ -1094,13 +1230,13 @@ export async function getDashboardData(params: {
       priority: "High",
       difficulty: "Medium",
       xpReward: 80,
-      skillImpact: "Knowledge retention",
+      skillImpact: td("actions.impactRetention"),
       eta: "10-15 min",
     },
     {
       id: "simulation",
-      title: "Complete one simulation",
-      description: "Practice real workflow and earn additional XP.",
+      title: td("actions.simulation"),
+      description: td("actions.simulationDescription"),
       href:
         strongestCategory === TrackCategory.BA
           ? "/simulation/ba"
@@ -1110,31 +1246,31 @@ export async function getDashboardData(params: {
       priority: "Medium",
       difficulty: "High",
       xpReward: 140,
-      skillImpact: "Real-work problem solving",
+      skillImpact: td("actions.simulationImpact"),
       eta: "20-40 min",
     },
     {
       id: "skill-unlock",
-      title: "Unlock next skill node",
+      title: td("actions.skillUnlock"),
       description: skillTree.nextUnlock
-        ? `Next target: ${skillTree.nextUnlock}`
-        : "All current nodes unlocked. Maintain consistency.",
+        ? td("actions.skillUnlockDescription", { target: skillTree.nextUnlock })
+        : td("actions.skillUnlockFallback"),
       href: "/career",
       priority: "Medium",
       difficulty: "Medium",
       xpReward: 60,
-      skillImpact: skillTree.nextUnlock ?? "Skill tree depth",
+      skillImpact: skillTree.nextUnlock ?? td("actions.skillUnlockImpactFallback"),
       eta: "20 min",
     },
     {
       id: "interview",
-      title: "Review interview feedback",
-      description: "Run one mock interview to validate communication and domain knowledge.",
+      title: td("actions.interview"),
+      description: td("actions.interviewDescription"),
       href: "/interview",
       priority: "Low",
       difficulty: "Low",
       xpReward: 50,
-      skillImpact: "Communication and confidence",
+      skillImpact: td("actions.interviewImpact"),
       eta: "15-20 min",
     },
   ];
@@ -1151,33 +1287,33 @@ export async function getDashboardData(params: {
   const achievements: DashboardAchievement[] = [
     {
       id: "modules",
-      label: "Modules completed",
+      label: td("achievements.modulesCompleted"),
       value: String(completedModules),
-      hint: `of ${totalModules}`,
+      hint: td("achievements.modulesHint", { total: totalModules }),
     },
     {
       id: "passed-quizzes",
-      label: "Quizzes passed",
+      label: td("achievements.quizzesPassed"),
       value: String(passedQuizzes),
-      hint: "70%+ score",
+      hint: td("achievements.quizzesHint"),
     },
     {
       id: "certificates",
-      label: "Certificates",
-      value: String(user.certificates.length),
-      hint: "track completions",
+      label: td("achievements.certificates"),
+      value: String(certificateCount),
+      hint: td("achievements.certificatesHint"),
     },
     {
       id: "best-score",
-      label: "Best quiz score",
+      label: td("achievements.bestScore"),
       value: bestScore ? `${bestScore}%` : "N/A",
-      hint: "highest result",
+      hint: td("achievements.bestScoreHint"),
     },
     {
       id: "missions-xp",
-      label: "Mission XP",
+      label: td("achievements.missionXp"),
       value: String(missionXp.earned),
-      hint: `of ${missionXp.total}`,
+      hint: td("achievements.missionXpHint", { total: missionXp.total }),
     },
   ];
 
@@ -1213,7 +1349,44 @@ export async function getDashboardData(params: {
     totalXp: xpBreakdown.totalXp,
     streakDays: streak,
   });
+  // ─────────────────────────────────────────────────────────────────
+  // SAAS GAMIFICATION
+  // ─────────────────────────────────────────────────────────────────
   const saasBadges = toSaasBadges(saasAchievements);
+
+  // Dynamic Gamification Models (Phase 3)
+  const userStreakEntry = user.userStreak || {
+    currentStreak: streak || 0,
+    longestStreak: Math.max(streak, 0),
+    streakFreezes: 0,
+    lastActivityDate: new Date()
+  };
+  
+  const dailyChallengeEntry = user.dailyChallenges.length > 0
+    ? user.dailyChallenges[0]
+    : {
+        challengeType: "COMPLETE_LESSON",
+        goal: 3,
+        progress: weeklyCompleted,
+        isCompleted: weeklyCompleted >= 3,
+        xpReward: 100
+      };
+
+  const streakMeta = {
+    currentStreak: userStreakEntry.currentStreak,
+    longestStreak: userStreakEntry.longestStreak,
+    streakFreezes: userStreakEntry.streakFreezes,
+    isActiveToday: userStreakEntry.lastActivityDate ? new Date(userStreakEntry.lastActivityDate).toDateString() === new Date().toDateString() : false,
+  };
+
+  const formattedDailyChallenge = {
+    challengeType: dailyChallengeEntry.challengeType,
+    title: dailyChallengeEntry.challengeType === "COMPLETE_LESSON" ? "Complete 3 lessons today" : "Daily Challenge",
+    goal: dailyChallengeEntry.goal,
+    progress: dailyChallengeEntry.progress,
+    isCompleted: dailyChallengeEntry.progress >= dailyChallengeEntry.goal || dailyChallengeEntry.isCompleted,
+    xpReward: dailyChallengeEntry.xpReward,
+  };
   const streaks = buildStreakSummary(heatmap.data);
 
   const smartRecommendations = buildSmartRecommendations({
@@ -1258,13 +1431,21 @@ export async function getDashboardData(params: {
     leaderboardRank: leaderboard.currentUserRank,
   });
 
-  const weeklyAiReport = buildWeeklyAiReport({
-    skillGrowthPercent: saasAnalytics.learningVelocity[saasAnalytics.learningVelocity.length - 1]?.value ?? 0,
-    strongestSkill: strongestSkills[0] ?? skillRadar.strongestSkill,
-    completedMissions: missionPreview.length,
+  const twr = await getTranslations("dashboard.data.weeklyReport");
+  const skillGrowthPercent = saasAnalytics.learningVelocity[saasAnalytics.learningVelocity.length - 1]?.value ?? 0;
+  const normalizedGrowth = Math.max(0, Math.min(100, skillGrowthPercent));
+  const reportStrongest = strongestSkills[0] ?? skillRadar.strongestSkill;
+  const reportMissions = missionPreview.length;
+  const weeklyAiReport = {
+    headline: twr("headline"),
+    summary: twr("summary", { skill: reportStrongest, growth: normalizedGrowth, missions: reportMissions }),
+    highlights: [
+      twr("highlightReadiness", { score: Math.max(0, Math.min(100, publicProfile.readinessScore)) }),
+      twr("highlightStrongest", { skill: reportStrongest }),
+      twr("highlightMissions", { missions: reportMissions }),
+    ],
     nextFocus: skillRadar.nextFocus,
-    readinessScore: publicProfile.readinessScore,
-  });
+  };
 
   const marketplaceRoles = await listMarketplaceRoles();
   const jobMarketplaceMatches = buildSaasJobMatches({
@@ -1279,12 +1460,21 @@ export async function getDashboardData(params: {
     readinessScore: publicProfile.readinessScore,
   });
 
+  const tn = await getTranslations("dashboard.data.notifications");
+  const completedQuestCount = weeklyQuests.filter((item) => item.status === "completed").length;
   const notifications = buildDashboardNotifications({
     unlockedMissionTitle: missionPreview[0]?.title ?? null,
-    weeklySummaryText: `${weeklyQuests.filter((item) => item.status === "completed").length} weekly quests completed with ${earnedXpThisWeek} XP.`,
+    weeklySummaryText: tn("summaryBody", { completed: completedQuestCount, xp: earnedXpThisWeek }),
     recommendationTitle: smartRecommendations[0]?.title ?? null,
     topJobTitle: jobMarketplaceMatches[0]?.title ?? null,
     achievementTitle: saasBadges[0]?.label ?? null,
+    labels: {
+      missionTitle: tn("missionTitle"),
+      summaryTitle: tn("summaryTitle"),
+      recommendationTitle: tn("recommendationTitle"),
+      jobTitle: tn("jobTitle"),
+      achievementTitle: tn("achievementTitle"),
+    },
   });
 
   const strongestSkillPool = ["API Testing", "User Stories", "SQL", "Automation", "Communication"];
@@ -1307,7 +1497,7 @@ export async function getDashboardData(params: {
 
     return {
       userId: member.id,
-      name: member.name,
+      name: member.name ?? "Levio User",
       role: index === 0 && role === "ADMIN" ? "MANAGER" : "LEARNER",
       assignedTrack,
       progressPercent: Math.round((memberCompleted / memberTotal) * 100),
@@ -1319,7 +1509,7 @@ export async function getDashboardData(params: {
   const teamLearning = subscriptionGates.teamDashboard.allowed && teamMembers.length > 0
     ? buildTeamAnalytics({
         teamId: "team-default",
-        teamName: "SkillPath Team Workspace",
+        teamName: "Levio Team Workspace",
         members: teamMembers,
       })
     : null;
@@ -1350,39 +1540,39 @@ export async function getDashboardData(params: {
     stats: [
       {
         id: "completed-lessons",
-        label: "Completed lessons",
+        label: td("stats.completedLessons"),
         value: String(completedLessons),
-        helper: `${completedModules} modules fully done`,
+        helper: td("stats.completedLessonsHelper", { count: completedModules }),
       },
       {
         id: "active-tracks",
-        label: "Active tracks",
+        label: td("stats.activeTracks"),
         value: String(activeTrackCount),
-        helper: `${trackSummaries.length} tracks available`,
+        helper: td("stats.activeTracksHelper", { count: trackSummaries.length }),
       },
       {
         id: "total-xp",
-        label: "Total XP",
+        label: td("stats.totalXp"),
         value: `${xpBreakdown.totalXp}`,
-        helper: `${earnedXpThisWeek} XP this week`,
+        helper: td("stats.totalXpHelper", { xp: earnedXpThisWeek }),
       },
       {
         id: "quiz-accuracy",
-        label: "Quiz accuracy",
+        label: td("stats.quizAccuracy"),
         value: `${quizAccuracy}%`,
-        helper: `${passedQuizzes} passed quizzes`,
+        helper: td("stats.quizAccuracyHelper", { count: passedQuizzes }),
       },
       {
         id: "weekly-streak",
-        label: "Weekly streak",
-        value: `${streak} days`,
-        helper: "Learning consistency",
+        label: td("stats.streak"),
+        value: td("stats.streakValue", { days: streak }),
+        helper: td("stats.streakHelper"),
       },
       {
         id: "simulations",
-        label: "Simulations completed",
+        label: td("stats.simulations"),
         value: String(simulationsCompletedEstimate),
-        helper: "Estimated from completed modules",
+        helper: td("stats.simulationsHelper"),
       },
     ],
     tracks: visibleTracks.map((track) => ({
@@ -1401,11 +1591,11 @@ export async function getDashboardData(params: {
         estimatedCompletion: track.estimatedCompletion,
         skillsGained: getTrackSkills(
           track.category,
-          'skills' in track ? (track as unknown as { skills: string[] }).skills : undefined,
+          'skills' in track ? (track as Record<string, unknown>).skills as string[] : undefined,
         ),
         careerImpact: getTrackCareerImpact(
           track.category,
-          'careerImpact' in track ? (track as unknown as { careerImpact?: string }).careerImpact : undefined,
+          'careerImpact' in track ? (track as Record<string, unknown>).careerImpact as string | undefined : undefined,
         ),
         modulePreview: hasFullTrackAccess ? track.modulePreview : track.modulePreview.slice(0, 2),
       })),
@@ -1453,6 +1643,8 @@ export async function getDashboardData(params: {
     saasGamification: {
       achievements: saasAchievements,
       badges: saasBadges,
+      streakMeta,
+      dailyChallenge: formattedDailyChallenge,
     },
     streaks,
     smartRecommendations,

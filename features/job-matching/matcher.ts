@@ -20,8 +20,8 @@ export function matchJobsToSkills(params: {
         missingRequirements: missing,
         recommendation:
           missing.length > 0
-            ? `Focus next on: ${missing.slice(0, 2).join(", ")}`
-            : "You are ready to apply and prepare interview stories.",
+            ? `Сфокусируйтесь на: ${missing.slice(0, 2).join(", ")}`
+            : "Вы готовы. Начинайте готовиться к интервью.",
       };
     })
     .sort((a, b) => b.matchPercent - a.matchPercent);

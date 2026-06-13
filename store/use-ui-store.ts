@@ -3,12 +3,14 @@
 import { create } from "zustand";
 
 type Theme = "dark" | "light";
+type Density = "compact" | "comfortable" | "spacious";
 
 type UiState = {
   isSidebarOpen: boolean;
   isSidebarCollapsed: boolean;
   isCommandPaletteOpen: boolean;
   theme: Theme;
+  density: Density;
   openSidebar: () => void;
   toggleSidebar: () => void;
   closeSidebar: () => void;
@@ -18,13 +20,16 @@ type UiState = {
   toggleCommandPalette: () => void;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
+  setDensity: (density: Density) => void;
 };
 
-function getInitialTheme(): Theme {
-  if (typeof window === "undefined") return "dark";
-  const stored = localStorage.getItem("sp-theme") as Theme | null;
-  if (stored === "light" || stored === "dark") return stored;
-  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+function getInitialDensity(): Density {
+  if (typeof window === "undefined") return "comfortable";
+  const stored = localStorage.getItem("sp-density") as Density | null;
+  if (stored === "compact" || stored === "comfortable" || stored === "spacious") {
+    return stored;
+  }
+  return "comfortable";
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -32,6 +37,7 @@ export const useUiStore = create<UiState>((set) => ({
   isSidebarCollapsed: false,
   isCommandPaletteOpen: false,
   theme: "dark",
+  density: typeof window === "undefined" ? "comfortable" : getInitialDensity(),
   openSidebar: () => set({ isSidebarOpen: true }),
   toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
   closeSidebar: () => set({ isSidebarOpen: false }),
@@ -53,10 +59,9 @@ export const useUiStore = create<UiState>((set) => ({
       document.documentElement.setAttribute("data-theme", next);
       return { theme: next };
     }),
+  setDensity: (density) => {
+    localStorage.setItem("sp-density", density);
+    document.documentElement.setAttribute("data-density", density);
+    set({ density });
+  },
 }));
-
-export function initTheme() {
-  const theme = getInitialTheme();
-  document.documentElement.setAttribute("data-theme", theme);
-  return theme;
-}

@@ -34,35 +34,35 @@ const KIND_ICON = {
 
 const STATE_CONFIG = {
   locked: {
-    iconBg: "bg-muted/20 border-border/40",
+    iconBg: "bg-muted/10 border-border-subtle backdrop-blur-sm",
     iconColor: "text-muted-foreground/50",
-    cardBg: "bg-muted/8 border-border/30 opacity-60",
+    cardBg: "bg-muted/10 border-border/30 opacity-60 backdrop-blur-sm",
     titleColor: "text-muted-foreground/60",
     lineColor: "bg-border/25",
     overlay: true,
   },
   available: {
-    iconBg: "bg-card border-border shadow-sm",
+    iconBg: "bg-card/40 border-border/50 backdrop-blur-md shadow-sm",
     iconColor: "text-muted-foreground",
-    cardBg: "bg-card border-border hover:border-sky-400/40 hover:shadow-md transition-shadow",
+    cardBg: "bg-card border border-border/50 hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:shadow-[0_4px_20px_-8px_rgba(99,102,241,0.2)] transition-all",
     titleColor: "text-foreground",
     lineColor: "bg-border/40",
     overlay: false,
   },
   in_progress: {
-    iconBg: "bg-sky-500/15 border-sky-400",
-    iconColor: "text-sky-500",
-    cardBg: "bg-sky-500/8 border-sky-400/30 ring-1 ring-sky-400/15",
-    titleColor: "text-sky-700 dark:text-sky-400",
-    lineColor: "bg-gradient-to-b from-sky-400/50 to-border/20",
+    iconBg: "bg-indigo-500/15 border border-indigo-400/50 backdrop-blur-md shadow-[0_0_15px_rgba(99,102,241,0.3)]",
+    iconColor: "text-indigo-400",
+    cardBg: "bg-indigo-500/15 border border-indigo-400/30 border-l-2 border-l-indigo-400 ring-1 ring-indigo-400/25 shadow-[0_0_24px_-4px_rgba(99,102,241,0.25)] backdrop-blur-md",
+    titleColor: "text-indigo-400 font-bold",
+    lineColor: "bg-gradient-to-b from-indigo-400/60 to-border/30",
     overlay: false,
   },
   completed: {
-    iconBg: "bg-emerald-500/15 border-emerald-400",
+    iconBg: "bg-emerald-500/15 border border-emerald-400/40 backdrop-blur-md",
     iconColor: "text-emerald-500",
-    cardBg: "bg-emerald-500/8 border-emerald-400/30",
-    titleColor: "text-emerald-700 dark:text-emerald-400",
-    lineColor: "bg-emerald-400/30",
+    cardBg: "bg-emerald-500/10 border border-emerald-400/30 opacity-90 backdrop-blur-md",
+    titleColor: "text-emerald-500",
+    lineColor: "bg-emerald-400/50",
     overlay: false,
   },
 };
@@ -92,9 +92,9 @@ export function LearningFlowTree({ nodes }: { nodes: TimelineNode[] }) {
         const config = isFinalChallenge
           ? {
               ...baseConfig,
-              cardBg: "border-amber-400/40 bg-amber-500/8",
-              titleColor: "text-amber-700 dark:text-amber-400",
-              iconBg: "bg-amber-500/15 border-amber-400",
+              cardBg: "border border-amber-400/40 bg-amber-500/10 backdrop-blur-md",
+              titleColor: "text-amber-500",
+              iconBg: "bg-amber-500/15 border border-amber-400/60 backdrop-blur-md shadow-[0_0_15px_rgba(245,158,11,0.2)]",
               iconColor: "text-amber-500",
             }
           : baseConfig;
@@ -124,7 +124,7 @@ export function LearningFlowTree({ nodes }: { nodes: TimelineNode[] }) {
                 ) : node.state === "in_progress" ? (
                   <>
                     <Icon className={`h-4 w-4 ${config.iconColor}`} />
-                    <span className="absolute inset-[-3px] animate-ping rounded-xl bg-sky-300/30" />
+                    <span className="absolute inset-[-3px] animate-ping rounded-xl bg-indigo-300/30" />
                   </>
                 ) : (
                   <Icon
@@ -202,7 +202,7 @@ function NodeCardContent({
             node.state === "completed"
               ? "text-emerald-600"
               : node.state === "in_progress"
-                ? "text-sky-600"
+                ? "text-indigo-600"
                 : isFinalChallenge
                   ? "text-amber-500/80"
                   : "text-slate-400"
@@ -212,7 +212,7 @@ function NodeCardContent({
         </span>
 
         {node.state === "in_progress" && (
-          <span className="rounded-full border border-sky-400/30 bg-sky-500/10 px-2 py-0.5 text-[10px] font-medium text-sky-600 dark:text-sky-300">
+          <span className="rounded-full border border-indigo-400/30 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-medium text-indigo-600 dark:text-indigo-300">
             В процессе
           </span>
         )}
@@ -240,7 +240,7 @@ function NodeCardContent({
         <div
           className={`mt-2.5 flex items-center gap-1 text-[12px] font-medium ${
             node.state === "in_progress"
-              ? "text-sky-600"
+              ? "text-indigo-600"
               : isFinalChallenge
                 ? "text-amber-600"
                 : "text-slate-500"

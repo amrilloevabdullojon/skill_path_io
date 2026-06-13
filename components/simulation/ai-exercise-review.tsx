@@ -66,17 +66,21 @@ export function AIExerciseReview({ moduleTitle, trackTitle }: AIExerciseReviewPr
   }
 
   return (
-    <section className="surface-subtle space-y-4 p-4 sm:p-5">
-      <header className="space-y-1">
-        <p className="kicker">ИИ-проверка задания</p>
-        <h3 className="text-lg font-semibold text-foreground">Оценить качество практической работы</h3>
+    <section className="surface-elevated border border-border/50 bg-card space-y-5 p-5 sm:p-7 relative isolate overflow-hidden rounded-2xl">
+      <div className="absolute top-[-50px] right-[-50px] w-[300px] h-[300px] rounded-full bg-violet-500/10 blur-[100px] pointer-events-none -z-10" />
+      <header className="space-y-2">
+        <p className="kicker text-violet-400">ИИ-проверка</p>
+        <h3 className="text-xl font-bold text-foreground">Отправить практическую работу на ревью</h3>
+        <p className="text-sm text-foreground/70">
+          Вставьте ваш ответ на задание и ИИ проверит его на соответствие требованиям.
+        </p>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-[220px_1fr]">
+      <div className="grid gap-4 sm:grid-cols-[220px_1fr]">
         <select
           value={exerciseType}
           onChange={(event) => setExerciseType(event.target.value as ExerciseType)}
-          className="select-base"
+          className="select-base bg-card/60 backdrop-blur-sm border-border-subtle focus:border-violet-500/50 focus:ring-violet-500/20"
         >
           {exerciseOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -89,40 +93,52 @@ export function AIExerciseReview({ moduleTitle, trackTitle }: AIExerciseReviewPr
           type="button"
           onClick={runReview}
           disabled={isLoading || submission.trim().length < 20}
-          className="btn-primary inline-flex items-center justify-center gap-2 disabled:opacity-60"
+          className="btn-accent gap-2 disabled:opacity-60"
         >
-          <Sparkles className="h-4 w-4" />
-          {isLoading ? "Проверяю..." : "Проверить с ИИ"}
+          <Sparkles className="h-5 w-5" />
+          {isLoading ? "Оцениваю..." : "Получить подробную оценку"}
         </button>
       </div>
 
       <textarea
         value={submission}
         onChange={(event) => setSubmission(event.target.value)}
-        className="textarea-base min-h-[140px]"
-        placeholder="Вставьте вашу практическую работу сюда..."
+        className="textarea-base min-h-[140px] bg-card/60 backdrop-blur-sm border-border-subtle focus:border-violet-500/50 focus:ring-violet-500/20"
+        placeholder="Вставьте вашу практическую работу сюда (отформатируйте текст для лучшего понимания)..."
       />
 
       {result && (
-        <article className="content-card p-4">
-          <p className="text-sm font-semibold text-foreground">Оценка: {result.score}/100</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-3 text-xs">
-            <p className="data-pill px-2 py-1">
-              Точность: {result.accuracy}%
-            </p>
-            <p className="data-pill px-2 py-1">
-              Полнота: {result.completeness}%
-            </p>
-            <p className="data-pill px-2 py-1">
-              Логика: {result.logic}%
-            </p>
+        <article className="surface-subtle border border-violet-500/30 bg-card/50 backdrop-blur-md space-y-4 p-5 rounded-2xl relative isolate overflow-hidden mt-6">
+          <div className="absolute top-[-50px] left-[-50px] w-[200px] h-[200px] rounded-full bg-violet-500/10 blur-[80px] pointer-events-none -z-10" />
+          <p className="text-lg font-bold text-foreground">Общая оценка: <span className="text-violet-400">{result.score}/100</span></p>
+          <div className="grid gap-4 sm:grid-cols-3 text-xs">
+            <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/10 backdrop-blur-md p-3 text-center shadow-[0_0_15px_rgba(99,102,241,0.1)]">
+              <p className="text-indigo-300 uppercase tracking-widest font-semibold mb-1">Точность</p>
+              <p className="text-xl font-bold text-indigo-100">{result.accuracy}%</p>
+            </div>
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md p-3 text-center shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+              <p className="text-emerald-300 uppercase tracking-widest font-semibold mb-1">Полнота</p>
+              <p className="text-xl font-bold text-emerald-100">{result.completeness}%</p>
+            </div>
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 backdrop-blur-md p-3 text-center shadow-[0_0_15px_rgba(245,158,11,0.1)]">
+              <p className="text-amber-300 uppercase tracking-widest font-semibold mb-1">Логика</p>
+              <p className="text-xl font-bold text-amber-100">{result.logic}%</p>
+            </div>
           </div>
-          <ul className="mt-3 list-disc space-y-1 pl-4 text-xs text-muted-foreground">
-            {result.feedback.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-          <p className="mt-3 text-xs text-sky-700 dark:text-sky-300">{result.nextSteps.join(" ")}</p>
+          
+          <div className="mt-4 pt-4 border-t border-border/30">
+            <p className="text-sm font-semibold text-violet-300 mb-2">Обратная связь</p>
+            <ul className="list-disc space-y-1.5 pl-4 text-sm text-foreground/80">
+              {result.feedback.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          
+          <div className="mt-4 rounded-xl border border-violet-500/30 bg-violet-500/10 backdrop-blur-md p-4 text-sm text-violet-200">
+            <p className="font-semibold uppercase tracking-wide text-violet-400 mb-1">Следующие шаги</p>
+            <p>{result.nextSteps.join(" ")}</p>
+          </div>
         </article>
       )}
 

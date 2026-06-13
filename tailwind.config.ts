@@ -1,7 +1,8 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 const config: Config = {
-  darkMode: ["class"],
+  darkMode: ["selector", '[data-theme="dark"]'],
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -56,11 +57,47 @@ const config: Config = {
           da: "hsl(var(--track-da))",
         },
         border: "hsl(var(--border))",
+        "border-subtle": "hsl(var(--border-subtle))",
+        "border-strong": "hsl(var(--border-strong))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        /* Phase 6: semantic accent palette (supports opacity modifier) */
+        "accent-primary": {
+          DEFAULT: "hsl(var(--accent-primary) / <alpha-value>)",
+          fg: "hsl(var(--accent-primary-fg) / <alpha-value>)",
+        },
+        "accent-success": {
+          DEFAULT: "hsl(var(--accent-success) / <alpha-value>)",
+          fg: "hsl(var(--accent-success-fg) / <alpha-value>)",
+        },
+        "accent-warning": {
+          DEFAULT: "hsl(var(--accent-warning) / <alpha-value>)",
+          fg: "hsl(var(--accent-warning-fg) / <alpha-value>)",
+        },
+        "accent-danger": {
+          DEFAULT: "hsl(var(--accent-danger) / <alpha-value>)",
+          fg: "hsl(var(--accent-danger-fg) / <alpha-value>)",
+        },
+        "accent-info": {
+          DEFAULT: "hsl(var(--accent-info) / <alpha-value>)",
+          fg: "hsl(var(--accent-info-fg) / <alpha-value>)",
+        },
+        /* Phase 6: 2-level surface hierarchy */
+        "surface-raised": {
+          DEFAULT: "hsl(var(--surface-raised) / <alpha-value>)",
+          border: "hsl(var(--surface-raised-border) / <alpha-value>)",
+        },
+      },
+      fontSize: {
+        /* Phase 6: 5-size typography scale */
+        display: ["2.75rem", { lineHeight: "1.05", letterSpacing: "-0.02em", fontWeight: "800" }],
+        "heading-1": ["2rem", { lineHeight: "1.1", letterSpacing: "-0.015em", fontWeight: "700" }],
+        "heading-2": ["1.375rem", { lineHeight: "1.25", letterSpacing: "-0.01em", fontWeight: "600" }],
+        body: ["0.9375rem", { lineHeight: "1.6" }],
+        caption: ["0.75rem", { lineHeight: "1.4", letterSpacing: "0.02em" }],
       },
       fontFamily: {
-        sans: ["var(--font-manrope)", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
+        sans: ["var(--font-manrope, 'Segoe UI')", "Helvetica Neue", "Arial", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius-lg)",
@@ -68,7 +105,8 @@ const config: Config = {
         sm: "var(--radius-sm)",
         xl: "1.25rem",
         "2xl": "1.5rem",
-        "3xl": "1.7rem",
+        "3xl": "1.75rem",
+        "4xl": "2rem",
       },
       boxShadow: {
         soft: "0 14px 42px rgba(2, 6, 23, 0.36)",
@@ -83,9 +121,22 @@ const config: Config = {
       transitionTimingFunction: {
         smooth: "cubic-bezier(0.22, 1, 0.36, 1)",
       },
+      letterSpacing: {
+        kicker: "0.18em",
+      },
+      zIndex: {
+        base: "var(--z-base)",
+        raised: "var(--z-raised)",
+        sticky: "var(--z-sticky)",
+        overlay: "var(--z-overlay)",
+        drawer: "var(--z-drawer)",
+        modal: "var(--z-modal)",
+        toast: "var(--z-toast)",
+        tooltip: "var(--z-tooltip)",
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 };
 
 export default config;

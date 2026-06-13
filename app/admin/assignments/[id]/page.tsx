@@ -22,11 +22,12 @@ const STATUS_BADGE: Record<StudioContentStatus, string> = {
   ARCHIVED: "border-red-500/30 bg-red-500/10 text-red-400",
 };
 
-export default async function EditAssignmentPage({ params }: { params: { id: string } }) {
+export default async function EditAssignmentPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
   await requireAdminPermission("courses.write");
 
   const assignment = await prisma.assignment.findUnique({
-    where: { id: params.id },
+    where: { id: resolvedParams.id },
     include: {
       module: {
         select: {

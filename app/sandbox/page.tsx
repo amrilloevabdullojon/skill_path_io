@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Database } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Sandbox — SkillPath Academy",
+  title: "Sandbox",
   description: "Hands-on coding environments for practising SQL, scripting, and data analysis.",
 };
 
@@ -14,7 +14,7 @@ const SANDBOXES = [
     accent: "violet",
     title: "SQL Sandbox",
     description:
-      "Write and run SQL queries in an in-browser environment. Practice SELECT, JOIN, GROUP BY, subqueries, and more with pre-loaded sample datasets.",
+      "Пиши и запускай SQL-запросы прямо в браузере. Практикуй SELECT, JOIN, GROUP BY, подзапросы и многое другое с готовыми примерными наборами данных.",
     badge: "DA",
     tags: ["SELECT", "JOIN", "GROUP BY", "Subqueries"],
   },
@@ -32,10 +32,10 @@ export default function SandboxIndexPage() {
   return (
     <section className="page-shell">
       <header className="space-y-2">
-        <p className="kicker">Hands-on Practice</p>
+        <p className="kicker">Практика</p>
         <h1 className="section-title">Sandbox</h1>
         <p className="body-text max-w-xl text-sm text-muted-foreground">
-          Experiment in isolated environments — write code, run queries, and see results instantly.
+          Экспериментируй в изолированных средах — пиши код, выполняй запросы и сразу смотри результат.
         </p>
       </header>
 
@@ -75,7 +75,7 @@ export default function SandboxIndexPage() {
                 ))}
               </div>
               <span className="mt-auto text-sm font-medium text-sky-400">
-                Open sandbox →
+                Открыть sandbox →
               </span>
             </Link>
           );

@@ -27,6 +27,7 @@ export type QuizWrongAnswer = {
 
 export type QuizResult = {
   ok: boolean;
+  attemptId?: string;
   score: number;
   passed: boolean;
   passingScore: number;

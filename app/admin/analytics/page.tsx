@@ -1,5 +1,5 @@
 import { ProgressStatus, TrackCategory } from "@prisma/client";
-import { Award, BarChart3, BookOpen, CheckCircle2, Users2 } from "lucide-react";
+import { AlertTriangle, Award, BarChart3, BookOpen, CheckCircle2, TrendingDown, UserX, Users2 } from "lucide-react";
 
 import { StudioCourseAnalytics } from "@/components/admin/analytics/studio-course-analytics";
 import { StudioKpiCard } from "@/components/admin/studio-kpi-card";
@@ -7,10 +7,10 @@ import { requireAdminPermission } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
 type AnalyticsAdminPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     q?: string | string[];
     category?: string | string[];
-  };
+  }>;
 };
 
 function paramValue(value: string | string[] | undefined) {
@@ -20,11 +20,16 @@ function paramValue(value: string | string[] | undefined) {
   return value ?? "";
 }
 
+function aggregateCount(value: true | { _all?: number } | undefined) {
+  return typeof value === "object" && value !== null ? value._all ?? 0 : 0;
+}
+
 export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdminPageProps) {
   await requireAdminPermission("analytics.read");
 
-  const query = paramValue(searchParams?.q);
-  const categoryParam = paramValue(searchParams?.category);
+  const resolvedSearchParams = await searchParams;
+  const query = paramValue(resolvedSearchParams?.q);
+  const categoryParam = paramValue(resolvedSearchParams?.category);
   const categoryFilter = Object.values(TrackCategory).includes(categoryParam as TrackCategory)
     ? (categoryParam as TrackCategory)
     : "ALL";
@@ -36,11 +41,13 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
     quizzes,
     questions,
     certificates,
+    courseCertificates,
     completedProgress,
     inProgress,
     notStarted,
     trackRows,
     latestCertificates,
+    latestCourseCertificates,
     userGrowthRaw,
     completionRateRaw,
     missionSubmissionCount,
@@ -54,6 +61,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
       prisma.quiz.count(),
       prisma.question.count(),
       prisma.certificate.count(),
+      prisma.courseCertificate.count(),
       prisma.userProgress.count({ where: { status: ProgressStatus.COMPLETED } }),
       prisma.userProgress.count({ where: { status: ProgressStatus.IN_PROGRESS } }),
       prisma.userProgress.count({ where: { status: ProgressStatus.NOT_STARTED } }),
@@ -108,6 +116,25 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
           },
         },
       }),
+      prisma.courseCertificate.findMany({
+        take: 20,
+        orderBy: { issuedAt: "desc" },
+        select: {
+          id: true,
+          issuedAt: true,
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          course: {
+            select: {
+              title: true,
+            },
+          },
+        },
+      }),
       prisma.user.findMany({
         select: {
           createdAt: true,
@@ -149,6 +176,41 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
       }),
     ] as const);
 
+  const wrongQuestionGroups = await prisma.quizQuestionResult.groupBy({
+    by: ["questionId"],
+    where: { isCorrect: false },
+    _count: { _all: true },
+    orderBy: { _count: { questionId: "desc" } },
+    take: 10,
+  });
+  const wrongQuestionIds = wrongQuestionGroups.map((group) => group.questionId);
+  const [questionAttemptGroups, wrongQuestionDetails] = wrongQuestionIds.length > 0
+    ? await prisma.$transaction([
+        prisma.quizQuestionResult.groupBy({
+          by: ["questionId"],
+          where: { questionId: { in: wrongQuestionIds } },
+          _count: { _all: true },
+          orderBy: { questionId: "asc" },
+        }),
+        prisma.quizQuestionResult.findMany({
+          where: { questionId: { in: wrongQuestionIds } },
+          distinct: ["questionId"],
+          orderBy: { createdAt: "desc" },
+          select: {
+            questionId: true,
+            questionText: true,
+            attempt: {
+              select: {
+                trackTitle: true,
+                moduleTitle: true,
+                quizTitle: true,
+              },
+            },
+          },
+        }),
+      ])
+    : [[], []] as const;
+
   const growthByMonth = userGrowthRaw.reduce<Record<string, number>>((acc, item: { createdAt: Date }) => {
     const key = `${item.createdAt.getFullYear()}-${String(item.createdAt.getMonth() + 1).padStart(2, "0")}`;
     acc[key] = (acc[key] ?? 0) + 1;
@@ -180,6 +242,154 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
     : 0;
   const missionAvg = missionAverageScore._avg.score ? Math.round(missionAverageScore._avg.score) : 0;
   const popularTracks = [...completionRows].sort((a, b) => b.started - a.started).slice(0, 10);
+  const latestCertificateRows = [
+    ...latestCertificates.map((certificate) => ({
+      id: `track-${certificate.id}`,
+      issuedAt: certificate.issuedAt,
+      user: certificate.user,
+      title: certificate.track.title,
+      type: "Track",
+    })),
+    ...latestCourseCertificates.map((certificate) => ({
+      id: `course-${certificate.id}`,
+      issuedAt: certificate.issuedAt,
+      user: certificate.user,
+      title: certificate.course.title,
+      type: "Course",
+    })),
+  ]
+    .sort((a, b) => b.issuedAt.getTime() - a.issuedAt.getTime())
+    .slice(0, 20);
+  const totalAttemptsByQuestionId = new Map(
+    questionAttemptGroups.map((group) => [group.questionId, aggregateCount(group._count)]),
+  );
+  const detailsByQuestionId = new Map(
+    wrongQuestionDetails.map((item) => [item.questionId, item]),
+  );
+  const difficultQuestions = wrongQuestionGroups.map((group) => {
+    const wrongCount = aggregateCount(group._count);
+    const totalAttempts = totalAttemptsByQuestionId.get(group.questionId) ?? wrongCount;
+    const details = detailsByQuestionId.get(group.questionId);
+    return {
+      questionId: group.questionId,
+      wrongCount,
+      totalAttempts,
+      failRate: totalAttempts > 0 ? Math.round((wrongCount / totalAttempts) * 100) : 0,
+      questionText: details?.questionText ?? group.questionId,
+      trackTitle: details?.attempt.trackTitle ?? "Unknown track",
+      moduleTitle: details?.attempt.moduleTitle ?? "Unknown module",
+      quizTitle: details?.attempt.quizTitle ?? "Unknown quiz",
+    };
+  });
+  const [
+    moduleAttemptGroups,
+    moduleFailedGroups,
+    moduleAttemptDetails,
+    recentQuizAttempts,
+  ] = await prisma.$transaction([
+    prisma.quizAttempt.groupBy({
+      by: ["moduleId"],
+      _count: { _all: true },
+      _avg: { score: true },
+      orderBy: { moduleId: "asc" },
+    }),
+    prisma.quizAttempt.groupBy({
+      by: ["moduleId"],
+      where: { passed: false },
+      _count: { _all: true },
+      orderBy: { moduleId: "asc" },
+    }),
+    prisma.quizAttempt.findMany({
+      distinct: ["moduleId"],
+      orderBy: { submittedAt: "desc" },
+      select: {
+        moduleId: true,
+        moduleTitle: true,
+        trackSlug: true,
+        trackTitle: true,
+        quizTitle: true,
+      },
+    }),
+    prisma.quizAttempt.findMany({
+      orderBy: { submittedAt: "desc" },
+      take: 200,
+      select: {
+        id: true,
+        userId: true,
+        score: true,
+        passingScore: true,
+        passed: true,
+        submittedAt: true,
+        trackSlug: true,
+        trackTitle: true,
+        moduleId: true,
+        moduleTitle: true,
+        quizTitle: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    }),
+  ]);
+  const failedAttemptsByModuleId = new Map(
+    moduleFailedGroups.map((group) => [group.moduleId, aggregateCount(group._count)]),
+  );
+  const moduleDetailsById = new Map(
+    moduleAttemptDetails.map((item) => [item.moduleId, item]),
+  );
+  const weakModules = moduleAttemptGroups
+    .map((group) => {
+      const totalAttempts = aggregateCount(group._count);
+      const failedAttempts = failedAttemptsByModuleId.get(group.moduleId) ?? 0;
+      const details = moduleDetailsById.get(group.moduleId);
+
+      return {
+        moduleId: group.moduleId,
+        moduleTitle: details?.moduleTitle ?? group.moduleId,
+        trackTitle: details?.trackTitle ?? "Unknown track",
+        trackSlug: details?.trackSlug ?? "",
+        quizTitle: details?.quizTitle ?? "Unknown quiz",
+        attempts: totalAttempts,
+        failedAttempts,
+        averageScore: Math.round(group._avg?.score ?? 0),
+        failRate: totalAttempts > 0 ? Math.round((failedAttempts / totalAttempts) * 100) : 0,
+      };
+    })
+    .filter((item) => item.attempts > 0)
+    .sort((a, b) => a.averageScore - b.averageScore || b.failRate - a.failRate)
+    .slice(0, 8);
+  const seenLearnerModules = new Set<string>();
+  const learnersNeedingHelp = recentQuizAttempts
+    .flatMap((attempt) => {
+      const key = `${attempt.userId}:${attempt.moduleId}`;
+      if (seenLearnerModules.has(key)) {
+        return [];
+      }
+      seenLearnerModules.add(key);
+      if (attempt.passed) {
+        return [];
+      }
+
+      return [{
+        id: attempt.id,
+        userName: attempt.user.name,
+        email: attempt.user.email,
+        trackTitle: attempt.trackTitle,
+        trackSlug: attempt.trackSlug,
+        moduleId: attempt.moduleId,
+        moduleTitle: attempt.moduleTitle,
+        quizTitle: attempt.quizTitle,
+        score: attempt.score,
+        passingScore: attempt.passingScore,
+        gap: Math.max(attempt.passingScore - attempt.score, 0),
+        submittedAt: attempt.submittedAt,
+      }];
+    })
+    .sort((a, b) => b.gap - a.gap || b.submittedAt.getTime() - a.submittedAt.getTime())
+    .slice(0, 10);
 
   return (
     <section className="page-shell">
@@ -231,7 +441,7 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
         />
         <StudioKpiCard
           label="Certificates"
-          value={certificates}
+          value={certificates + courseCertificates}
           icon={<Award className="h-4 w-4" />}
           accent="rose"
         />
@@ -324,15 +534,20 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
               </tr>
             </thead>
             <tbody>
-              {latestCertificates.map((certificate) => (
+              {latestCertificateRows.map((certificate) => (
                 <tr key={certificate.id} className="table-row">
                   <td className="px-3 py-3 text-muted-foreground">{certificate.issuedAt.toLocaleString()}</td>
                   <td className="px-3 py-3">{certificate.user.name}</td>
                   <td className="px-3 py-3 text-muted-foreground">{certificate.user.email}</td>
-                  <td className="px-3 py-3">{certificate.track.title}</td>
+                  <td className="px-3 py-3">
+                    <span className="mr-2 rounded-md border border-border px-1.5 py-0.5 text-[10px] uppercase text-muted-foreground">
+                      {certificate.type}
+                    </span>
+                    {certificate.title}
+                  </td>
                 </tr>
               ))}
-              {latestCertificates.length === 0 && (
+              {latestCertificateRows.length === 0 && (
                 <tr>
                   <td className="px-3 py-6 text-center text-muted-foreground" colSpan={4}>
                     No certificates yet.
@@ -345,6 +560,188 @@ export default async function AnalyticsAdminPage({ searchParams }: AnalyticsAdmi
       </section>
 
       <StudioCourseAnalytics />
+
+      <section className="grid gap-4 xl:grid-cols-[1fr_1fr]">
+        <div className="surface-elevated space-y-4 p-5 text-foreground">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h3 className="inline-flex items-center gap-2 text-lg font-semibold">
+                <TrendingDown className="h-5 w-5 text-rose-500" />
+                Weak modules
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Modules sorted by lowest average quiz score.
+              </p>
+            </div>
+            <span className="rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground">
+              {weakModules.length} modules
+            </span>
+          </div>
+
+          {weakModules.length > 0 ? (
+            <div className="space-y-3">
+              {weakModules.map((item) => (
+                <article key={item.moduleId} className="rounded-2xl border border-border bg-card/65 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground">{item.trackTitle}</p>
+                      <h4 className="mt-1 line-clamp-2 text-sm font-semibold text-foreground">{item.moduleTitle}</h4>
+                      <p className="mt-1 text-xs text-muted-foreground">{item.quizTitle}</p>
+                    </div>
+                    <span className="shrink-0 rounded-full border border-rose-500/30 bg-rose-500/10 px-2.5 py-1 text-xs font-semibold text-rose-600 dark:text-rose-300">
+                      avg {item.averageScore}%
+                    </span>
+                  </div>
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
+                    <div className="h-full rounded-full bg-rose-500" style={{ width: `${Math.max(item.failRate, 6)}%` }} />
+                  </div>
+                  <div className="mt-3 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
+                    <p className="rounded-xl border border-border bg-background/50 px-3 py-2">
+                      Attempts: <span className="font-semibold text-foreground">{item.attempts}</span>
+                    </p>
+                    <p className="rounded-xl border border-border bg-background/50 px-3 py-2">
+                      Failed: <span className="font-semibold text-foreground">{item.failedAttempts}</span>
+                    </p>
+                    <p className="rounded-xl border border-border bg-background/50 px-3 py-2">
+                      Fail rate: <span className="font-semibold text-foreground">{item.failRate}%</span>
+                    </p>
+                  </div>
+                  {item.trackSlug ? (
+                    <a
+                      href={`/tracks/${item.trackSlug}/modules/${item.moduleId}`}
+                      className="mt-3 inline-flex text-xs font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-300"
+                    >
+                      Open module →
+                    </a>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-2xl border border-border bg-card/55 px-4 py-3 text-sm text-muted-foreground">
+              No module quiz history yet.
+            </p>
+          )}
+        </div>
+
+        <div className="surface-elevated space-y-4 p-5 text-foreground">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h3 className="inline-flex items-center gap-2 text-lg font-semibold">
+                <UserX className="h-5 w-5 text-amber-500" />
+                Learners needing help
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Latest failed quiz per learner and module.
+              </p>
+            </div>
+            <span className="rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground">
+              {learnersNeedingHelp.length} active
+            </span>
+          </div>
+
+          {learnersNeedingHelp.length > 0 ? (
+            <div className="space-y-3">
+              {learnersNeedingHelp.map((item) => (
+                <article key={item.id} className="rounded-2xl border border-border bg-card/65 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground">{item.userName}</p>
+                      <p className="truncate text-xs text-muted-foreground">{item.email}</p>
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        {item.trackTitle} · {item.moduleTitle}
+                      </p>
+                    </div>
+                    <span className="shrink-0 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-600 dark:text-amber-300">
+                      -{item.gap}%
+                    </span>
+                  </div>
+                  <div className="mt-3 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
+                    <p className="rounded-xl border border-border bg-background/50 px-3 py-2">
+                      Score: <span className="font-semibold text-foreground">{item.score}%</span>
+                    </p>
+                    <p className="rounded-xl border border-border bg-background/50 px-3 py-2">
+                      Need: <span className="font-semibold text-foreground">{item.passingScore}%</span>
+                    </p>
+                    <p className="rounded-xl border border-border bg-background/50 px-3 py-2">
+                      Last: <span className="font-semibold text-foreground">{item.submittedAt.toLocaleDateString()}</span>
+                    </p>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <a
+                      href={`/tracks/${item.trackSlug}/modules/${item.moduleId}`}
+                      className="btn-secondary px-3 py-2 text-xs"
+                    >
+                      Open module
+                    </a>
+                    <a href="/admin/users" className="btn-secondary px-3 py-2 text-xs">
+                      User list
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-2xl border border-border bg-card/55 px-4 py-3 text-sm text-muted-foreground">
+              No active failed quiz attempts yet.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section className="surface-elevated space-y-4 p-5 text-foreground">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h3 className="inline-flex items-center gap-2 text-lg font-semibold">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Most difficult quiz questions
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Based on saved question-level quiz attempts.
+            </p>
+          </div>
+          <span className="rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground">
+            {difficultQuestions.length} tracked
+          </span>
+        </div>
+
+        {difficultQuestions.length > 0 ? (
+          <div className="grid gap-3 lg:grid-cols-2">
+            {difficultQuestions.map((item) => (
+              <article key={item.questionId} className="rounded-2xl border border-border bg-card/65 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs text-muted-foreground">
+                      {item.trackTitle} · {item.moduleTitle}
+                    </p>
+                    <h4 className="mt-1 line-clamp-2 text-sm font-semibold text-foreground">
+                      {item.questionText}
+                    </h4>
+                  </div>
+                  <span className="shrink-0 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-600 dark:text-amber-300">
+                    {item.failRate}% fail
+                  </span>
+                </div>
+                <div className="mt-3 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
+                  <p className="rounded-xl border border-border bg-background/50 px-3 py-2">
+                    Wrong: <span className="font-semibold text-foreground">{item.wrongCount}</span>
+                  </p>
+                  <p className="rounded-xl border border-border bg-background/50 px-3 py-2">
+                    Attempts: <span className="font-semibold text-foreground">{item.totalAttempts}</span>
+                  </p>
+                  <p className="rounded-xl border border-border bg-background/50 px-3 py-2">
+                    Quiz: <span className="font-semibold text-foreground">{item.quizTitle}</span>
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="rounded-2xl border border-border bg-card/55 px-4 py-3 text-sm text-muted-foreground">
+            No quiz attempt history yet. This section will populate after students submit quizzes.
+          </p>
+        )}
+      </section>
 
       <section className="surface-elevated space-y-4 p-5 text-foreground">
         <h3 className="text-lg font-semibold">SaaS admin analytics</h3>

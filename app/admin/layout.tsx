@@ -27,7 +27,7 @@ export default async function AdminLayout({
             <div>
               <p className="kicker">Admin panel</p>
               <h1 className="text-xl font-semibold tracking-tight text-foreground">
-                SkillPath Academy Studio
+                Levio Studio
               </h1>
               <p className="text-xs text-muted-foreground">
                 {admin.email ?? "admin"} ·{" "}

@@ -25,13 +25,24 @@ export type LessonBlockType =
   | "important_concept"
   | "summary"
   | "quick_check"
-  | "mini_challenge";
+  | "mini_challenge"
+  | "lesson_panel";
 
 export type LessonQuickCheck = {
   question: string;
   options: string[];
   correctIndex: number;
   explanation: string;
+};
+
+export type LessonDecisionOption = {
+  id: string;
+  label: string;
+  action: string;
+  consequence: string;
+  artifactHint: string;
+  artifactField: "observation" | "risk" | "testIdea" | "evidence" | "decision";
+  tone: "growth" | "risk" | "mastery";
 };
 
 export type LessonBlock = {
@@ -51,6 +62,19 @@ export type LessonBlock = {
   media?: {
     url: string;
     alt?: string;
+  };
+  lesson?: {
+    order: number;
+    total: number;
+    title: string;
+    focus: string;
+    mission: string;
+    artifact: string;
+    checkpoint: string;
+    shiftPlan: string[];
+    doneCriteria: string[];
+    decisionPrompt: string;
+    decisionOptions: LessonDecisionOption[];
   };
   quickCheck?: LessonQuickCheck;
   challengePrompt?: string;
@@ -91,6 +115,84 @@ function commonMistakes(category: TrackCategory) {
     "Игнорирование null-значений и выбросов",
     "Презентация метрик без бизнес-контекста",
   ];
+}
+
+function missionBrief(category: TrackCategory, moduleTitle: string, locale: "en" | "ru") {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? `Вы junior QA на первом спринте. Команда дала вам небольшую фичу по теме "${moduleTitle}". Ваша цель - не выучить все термины сразу, а найти 3 риска, проверить 1 сценарий и понятно записать результат.`
+      : `You are a junior QA in your first sprint. The team gives you a small feature related to "${moduleTitle}". Your goal is not to memorize every term. Find 3 risks, test 1 scenario, and write down the result clearly.`;
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? `Вы junior BA на discovery-встрече. По теме "${moduleTitle}" нужно понять цель пользователя, задать 3 уточняющих вопроса и превратить ответ в проверяемое требование.`
+      : `You are a junior BA in a discovery session. For "${moduleTitle}", identify the user goal, ask 3 clarifying questions, and turn the answer into a testable requirement.`;
+  }
+  return locale === "ru"
+    ? `Вы junior data analyst. По теме "${moduleTitle}" нужно понять бизнес-вопрос, выбрать 1 метрику и объяснить вывод так, чтобы его понял неаналитик.`
+    : `You are a junior data analyst. For "${moduleTitle}", understand the business question, choose 1 metric, and explain the insight so a non-analyst can understand it.`;
+}
+
+function firstWin(category: TrackCategory, locale: "en" | "ru") {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? "Первый win: вы можете объяснить, что проверили, какой риск нашли и что команда должна сделать дальше."
+      : "First win: you can explain what you checked, what risk you found, and what the team should do next.";
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? "Первый win: вы превратили расплывчатую фразу стейкхолдера в понятное требование с acceptance criteria."
+      : "First win: you turned a vague stakeholder sentence into a clear requirement with acceptance criteria.";
+  }
+  return locale === "ru"
+    ? "Первый win: вы нашли простую закономерность в данных и связали её с бизнес-действием."
+    : "First win: you found a simple pattern in the data and connected it to a business action.";
+}
+
+function starterSteps(category: TrackCategory, locale: "en" | "ru") {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? [
+          "1. Прочитайте сценарий как пользователь, не как эксперт.",
+          "2. Найдите, где пользователь может ошибиться или застрять.",
+          "3. Проверьте один happy path и один плохой сценарий.",
+          "4. Запишите результат в формате: шаги -> ожидание -> факт -> риск.",
+        ]
+      : [
+          "1. Read the scenario like a user, not an expert.",
+          "2. Find where the user can fail or get stuck.",
+          "3. Check one happy path and one bad path.",
+          "4. Write the result as: steps -> expected -> actual -> risk.",
+        ];
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? [
+          "1. Назовите пользователя и его цель.",
+          "2. Найдите непонятные слова в требовании.",
+          "3. Задайте 3 вопроса стейкхолдеру.",
+          "4. Запишите критерии: когда задача считается готовой.",
+        ]
+      : [
+          "1. Name the user and their goal.",
+          "2. Find vague words in the requirement.",
+          "3. Ask 3 stakeholder questions.",
+          "4. Write the criteria for when the task is done.",
+        ];
+  }
+  return locale === "ru"
+    ? [
+        "1. Сформулируйте бизнес-вопрос простыми словами.",
+        "2. Выберите одну метрику, которая помогает ответить.",
+        "3. Проверьте данные на пропуски и странные значения.",
+        "4. Напишите вывод в формате: что увидел -> почему важно -> что сделать.",
+      ]
+    : [
+        "1. State the business question in plain language.",
+        "2. Pick one metric that helps answer it.",
+        "3. Check the data for missing and strange values.",
+        "4. Write the insight as: what I saw -> why it matters -> what to do.",
+      ];
 }
 
 function quickCheck(category: TrackCategory, locale: "en" | "ru"): LessonQuickCheck {
@@ -142,6 +244,312 @@ function quickCheck(category: TrackCategory, locale: "en" | "ru"): LessonQuickCh
   };
 }
 
+function lessonFocus(category: TrackCategory, lesson: LessonLike, locale: "en" | "ru") {
+  const title = lesson.title.toLowerCase();
+  if (category === TrackCategory.QA) {
+    if (title.includes("practice") || title.includes("практика")) {
+      return locale === "ru" ? "Собрать рабочий QA-артефакт" : "Build a practical QA artifact";
+    }
+    if (title.includes("api") || title.includes("postman") || title.includes("devtools")) {
+      return locale === "ru" ? "Разобрать поведение системы по evidence" : "Investigate system behavior with evidence";
+    }
+    if (title.includes("bug") || title.includes("release") || title.includes("релиз")) {
+      return locale === "ru" ? "Превратить находку в понятное решение для команды" : "Turn a finding into a clear team decision";
+    }
+    return locale === "ru" ? "Понять роль QA через реальный рабочий сценарий" : "Understand QA through a real workflow";
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru" ? "Превратить расплывчатую идею в проверяемое требование" : "Turn a vague idea into a testable requirement";
+  }
+  return locale === "ru" ? "Связать данные с бизнес-вопросом" : "Connect data to a business question";
+}
+
+function lessonMission(category: TrackCategory, lesson: LessonLike, locale: "en" | "ru") {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? `Вы на смене junior QA. За 15 минут разберите "${lesson.title}", найдите один риск и оформите результат так, чтобы разработчик или PM мог действовать.`
+      : `You are on a junior QA shift. Spend 15 minutes on "${lesson.title}", find one risk, and write the result so a developer or PM can act.`;
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? `Вы на discovery-сессии. После урока у вас должен быть один уточняющий вопрос и один проверяемый критерий.`
+      : `You are in a discovery session. After the lesson, you need one clarifying question and one testable criterion.`;
+  }
+  return locale === "ru"
+    ? `Вы готовите короткий аналитический вывод. После урока назовите метрику, риск в данных и одно действие.`
+    : `You are preparing a short analytical insight. After the lesson, name one metric, one data risk, and one action.`;
+}
+
+function lessonArtifact(category: TrackCategory, lesson: LessonLike, locale: "en" | "ru") {
+  const title = lesson.title.toLowerCase();
+  if (category === TrackCategory.QA) {
+    if (title.includes("practice") || title.includes("практика")) {
+      return locale === "ru" ? "Checklist, test case или короткий QA-report" : "Checklist, test case, or short QA report";
+    }
+    if (title.includes("devtools") || title.includes("postman") || title.includes("api")) {
+      return locale === "ru" ? "Investigation note с request/response evidence" : "Investigation note with request/response evidence";
+    }
+    if (title.includes("bug") || title.includes("release") || title.includes("релиз")) {
+      return locale === "ru" ? "Bug report или release recommendation" : "Bug report or release recommendation";
+    }
+    return locale === "ru" ? "QA intake note или risk list" : "QA intake note or risk list";
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru" ? "User story с acceptance criteria" : "User story with acceptance criteria";
+  }
+  return locale === "ru" ? "Короткий insight с метрикой и действием" : "Short insight with metric and action";
+}
+
+function lessonShiftPlan(category: TrackCategory, lesson: LessonLike, locale: "en" | "ru") {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? [
+          `Разберите кейс "${lesson.title}" как рабочую задачу, а не как теорию.`,
+          "Выпишите один риск, один вопрос команде и один ожидаемый результат.",
+          "Соберите мини-артефакт: заметку, checklist, finding или test case.",
+        ]
+      : [
+          `Treat "${lesson.title}" as a work task, not as theory.`,
+          "Write one risk, one team question, and one expected result.",
+          "Build a mini artifact: note, checklist, finding, or test case.",
+        ];
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? ["Найдите цель пользователя.", "Уберите расплывчатые слова.", "Запишите acceptance criteria."]
+      : ["Find the user goal.", "Remove vague wording.", "Write acceptance criteria."];
+  }
+  return locale === "ru"
+    ? ["Назовите бизнес-вопрос.", "Выберите метрику.", "Сформулируйте действие."]
+    : ["Name the business question.", "Pick the metric.", "State the action."];
+}
+
+function lessonDoneCriteria(category: TrackCategory, locale: "en" | "ru") {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? [
+          "Есть конкретный проверяемый сценарий.",
+          "Есть evidence: шаги, данные, screenshot, request или expected result.",
+          "Понятно, что делать дальше: retest, bug report, question или quiz.",
+        ]
+      : [
+          "There is a concrete testable scenario.",
+          "There is evidence: steps, data, screenshot, request, or expected result.",
+          "The next action is clear: retest, bug report, question, or quiz.",
+        ];
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? ["Требование можно проверить.", "Есть критерии приемки.", "Есть открытые вопросы."]
+      : ["The requirement is testable.", "Acceptance criteria exist.", "Open questions are captured."];
+  }
+  return locale === "ru"
+    ? ["Метрика названа.", "Риск данных отмечен.", "Вывод связан с действием."]
+    : ["Metric is named.", "Data risk is noted.", "Insight is tied to an action."];
+}
+
+function lessonDecisionPrompt(category: TrackCategory, lesson: LessonLike, locale: "en" | "ru") {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? `Вы получили задачу по "${lesson.title}". Что сделаете первым, чтобы не просто читать, а реально сдвинуть работу?`
+      : `You got a task about "${lesson.title}". What do you do first to move the work forward instead of just reading?`;
+  }
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? `Стейкхолдер принёс идею по "${lesson.title}". Какой первый ход сделает требование проверяемым?`
+      : `A stakeholder brings an idea about "${lesson.title}". Which first move makes the requirement testable?`;
+  }
+  return locale === "ru"
+    ? `Вам дали вопрос по "${lesson.title}". Какой первый ход превратит данные в понятный вывод?`
+    : `You got a question about "${lesson.title}". Which first move turns data into a clear insight?`;
+}
+
+function lessonDecisionOptions(category: TrackCategory, lesson: LessonLike, locale: "en" | "ru"): LessonDecisionOption[] {
+  if (category === TrackCategory.QA) {
+    return locale === "ru"
+      ? [
+          {
+            id: `${lesson.id}-map-risk`,
+            label: "Сначала найти риск",
+            action: "Вы читаете задачу глазами пользователя и отмечаете, где он может застрять, потерять данные или получить неверный результат.",
+            consequence: "Появляется фокус для проверки: команда видит не список терминов, а конкретный продуктовый риск.",
+            artifactHint: "Запишите в артефакт: риск, affected user, expected result.",
+            artifactField: "risk",
+            tone: "growth",
+          },
+          {
+            id: `${lesson.id}-run-check`,
+            label: "Сразу проверить сценарий",
+            action: "Вы берёте самый частый путь пользователя и проходите его до наблюдаемого результата.",
+            consequence: "Вы быстро получаете evidence, но можете пропустить важный edge case, если не сформулируете риск.",
+            artifactHint: "Запишите: steps, test data, expected/actual result.",
+            artifactField: "evidence",
+            tone: "mastery",
+          },
+          {
+            id: `${lesson.id}-ask-question`,
+            label: "Задать уточняющий вопрос",
+            action: "Вы фиксируете неизвестное: что считается успехом, какие ограничения есть, кто принимает результат.",
+            consequence: "Снижается риск тестировать не то, но работу нужно завершить конкретной проверкой.",
+            artifactHint: "Запишите: open question и как ответ повлияет на тест.",
+            artifactField: "decision",
+            tone: "risk",
+          },
+        ]
+      : [
+          {
+            id: `${lesson.id}-map-risk`,
+            label: "Find the risk first",
+            action: "You read the task like a user and mark where they can get stuck, lose data, or get a wrong result.",
+            consequence: "The work gets focus: the team sees a product risk instead of a list of terms.",
+            artifactHint: "Write down: risk, affected user, expected result.",
+            artifactField: "risk",
+            tone: "growth",
+          },
+          {
+            id: `${lesson.id}-run-check`,
+            label: "Run a scenario",
+            action: "You take the most common user path and follow it until an observable result.",
+            consequence: "You get evidence quickly, but can miss an edge case if the risk is not clear.",
+            artifactHint: "Write down: steps, test data, expected/actual result.",
+            artifactField: "evidence",
+            tone: "mastery",
+          },
+          {
+            id: `${lesson.id}-ask-question`,
+            label: "Ask one question",
+            action: "You capture what is unknown: success criteria, constraints, and who accepts the result.",
+            consequence: "You reduce the risk of testing the wrong thing, but still need to finish with a concrete check.",
+            artifactHint: "Write down: open question and how the answer changes the test.",
+            artifactField: "decision",
+            tone: "risk",
+          },
+        ];
+  }
+
+  if (category === TrackCategory.BA) {
+    return locale === "ru"
+      ? [
+          {
+            id: `${lesson.id}-user-goal`,
+            label: "Назвать пользователя и цель",
+            action: "Вы отделяете реальную цель пользователя от желаемого UI или готового решения.",
+            consequence: "Требование становится проще проверить и обсудить с командой.",
+            artifactHint: "Запишите: As a..., I want..., so that...",
+            artifactField: "observation",
+            tone: "growth",
+          },
+          {
+            id: `${lesson.id}-criteria`,
+            label: "Сразу написать критерии",
+            action: "Вы превращаете идею в условия, при которых задача считается готовой.",
+            consequence: "Команда быстрее понимает границы, но может понадобиться уточнить бизнес-ценность.",
+            artifactHint: "Запишите 2-3 acceptance criteria.",
+            artifactField: "testIdea",
+            tone: "mastery",
+          },
+          {
+            id: `${lesson.id}-question`,
+            label: "Уточнить спорное слово",
+            action: "Вы находите расплывчатую формулировку и задаёте один точный вопрос.",
+            consequence: "Снижается двусмысленность, но после ответа нужно обновить user story.",
+            artifactHint: "Запишите: vague word -> question -> decision.",
+            artifactField: "decision",
+            tone: "risk",
+          },
+        ]
+      : [
+          {
+            id: `${lesson.id}-user-goal`,
+            label: "Name user and goal",
+            action: "You separate the real user goal from a desired UI or preselected solution.",
+            consequence: "The requirement becomes easier to test and discuss with the team.",
+            artifactHint: "Write: As a..., I want..., so that...",
+            artifactField: "observation",
+            tone: "growth",
+          },
+          {
+            id: `${lesson.id}-criteria`,
+            label: "Write criteria",
+            action: "You turn the idea into conditions for when the work is done.",
+            consequence: "The team sees boundaries faster, but business value may still need clarification.",
+            artifactHint: "Write 2-3 acceptance criteria.",
+            artifactField: "testIdea",
+            tone: "mastery",
+          },
+          {
+            id: `${lesson.id}-question`,
+            label: "Clarify one vague word",
+            action: "You find ambiguous wording and ask one precise question.",
+            consequence: "Ambiguity drops, but the user story must be updated after the answer.",
+            artifactHint: "Write: vague word -> question -> decision.",
+            artifactField: "decision",
+            tone: "risk",
+          },
+        ];
+  }
+
+  return locale === "ru"
+    ? [
+        {
+          id: `${lesson.id}-metric`,
+          label: "Выбрать метрику",
+          action: "Вы связываете бизнес-вопрос с одним измеримым показателем.",
+          consequence: "Анализ получает фокус, но важно проверить качество данных.",
+          artifactHint: "Запишите: question -> metric -> why it matters.",
+          artifactField: "observation",
+          tone: "growth",
+        },
+        {
+          id: `${lesson.id}-quality`,
+          label: "Проверить качество данных",
+          action: "Вы ищете пропуски, выбросы и странные значения до вывода.",
+          consequence: "Вы снижаете риск неверной рекомендации, но можете замедлить получение insight.",
+          artifactHint: "Запишите: data issue -> impact -> fix/check.",
+          artifactField: "risk",
+          tone: "risk",
+        },
+        {
+          id: `${lesson.id}-insight`,
+          label: "Сформулировать вывод",
+          action: "Вы пишете короткое объяснение: что увидел, почему важно, что сделать.",
+          consequence: "Появляется понятный результат для неаналитика, если метрика выбрана корректно.",
+          artifactHint: "Запишите: observation -> implication -> action.",
+          artifactField: "decision",
+          tone: "mastery",
+        },
+      ]
+    : [
+        {
+          id: `${lesson.id}-metric`,
+          label: "Pick a metric",
+          action: "You connect the business question to one measurable signal.",
+          consequence: "The analysis gets focus, but data quality still needs checking.",
+          artifactHint: "Write: question -> metric -> why it matters.",
+          artifactField: "observation",
+          tone: "growth",
+        },
+        {
+          id: `${lesson.id}-quality`,
+          label: "Check data quality",
+          action: "You look for missing values, outliers, and strange records before making a claim.",
+          consequence: "You reduce the risk of a wrong recommendation, but insight may take longer.",
+          artifactHint: "Write: data issue -> impact -> fix/check.",
+          artifactField: "risk",
+          tone: "risk",
+        },
+        {
+          id: `${lesson.id}-insight`,
+          label: "State the insight",
+          action: "You write a short explanation: what I saw, why it matters, what to do.",
+          consequence: "A non-analyst gets a usable result if the metric is sound.",
+          artifactHint: "Write: observation -> implication -> action.",
+          artifactField: "decision",
+          tone: "mastery",
+        },
+      ];
+}
+
 export function buildLessonBlocks(params: {
   category: TrackCategory;
   locale?: "en" | "ru";
@@ -181,9 +589,13 @@ export function buildLessonBlocks(params: {
     quickCheck: locale === "ru" ? "Быстрая проверка" : "Quick Check",
     miniChallenge: locale === "ru" ? "Мини-практика" : "Mini Challenge",
     summary: locale === "ru" ? "Итоги модуля" : "Module summary",
-    codePattern: locale === "ru" ? "Пример структуры" : "Structure example",
+    missionBrief: locale === "ru" ? "Миссия на 10 минут" : "10-minute mission",
+    firstWin: locale === "ru" ? "Первый быстрый результат" : "First quick win",
+    starterSteps: locale === "ru" ? "Пошаговый план для новичка" : "Beginner step-by-step plan",
+    notNeededYet: locale === "ru" ? "Что пока не нужно знать" : "What you do not need yet",
   };
-  const lessonBlocks = [...lessons]
+  const sortedLessons = [...lessons].sort((a, b) => a.order - b.order);
+  const lessonBlocks = sortedLessons
     .sort((a, b) => a.order - b.order)
     .flatMap((lesson, index): LessonBlock[] => ([
       // Visual separator between lessons (not before the first one)
@@ -192,16 +604,25 @@ export function buildLessonBlocks(params: {
         type: "divider" as const,
       }] : []),
       {
-        id: makeId("lesson-heading", index + 20),
-        type: "heading",
+        id: `lesson-panel-${lesson.id}`,
+        type: "lesson_panel",
         title: `${lesson.order}. ${lesson.title}`,
-        content: moduleDescription,
-      },
-      {
-        id: makeId("lesson-markdown", index + 40),
-        type: "markdown",
-        title: locale === "ru" ? "Содержание урока" : "Lesson content",
         content: lesson.body,
+        lesson: {
+          order: lesson.order,
+          total: sortedLessons.length,
+          title: lesson.title,
+          focus: lessonFocus(category, lesson, locale),
+          mission: lessonMission(category, lesson, locale),
+          artifact: lessonArtifact(category, lesson, locale),
+          checkpoint: locale === "ru"
+            ? "После чтения запишите 3 строки: что проверю, какой риск ищу, какой evidence приложу."
+            : "After reading, write 3 lines: what I check, what risk I look for, what evidence I attach.",
+          shiftPlan: lessonShiftPlan(category, lesson, locale),
+          doneCriteria: lessonDoneCriteria(category, locale),
+          decisionPrompt: lessonDecisionPrompt(category, lesson, locale),
+          decisionOptions: lessonDecisionOptions(category, lesson, locale),
+        },
       },
     ]));
 
@@ -219,21 +640,39 @@ export function buildLessonBlocks(params: {
       content: moduleOverview || moduleDescription,
     },
     {
-      id: makeId("markdown", 2),
+      id: makeId("mission-brief", 2),
+      type: "callout",
+      title: localized.missionBrief,
+      content: missionBrief(category, moduleTitle, locale),
+    },
+    {
+      id: makeId("first-win", 3),
+      type: "real_world_example",
+      title: localized.firstWin,
+      content: firstWin(category, locale),
+    },
+    {
+      id: makeId("starter-steps", 4),
+      type: "list",
+      title: localized.starterSteps,
+      items: starterSteps(category, locale),
+    },
+    {
+      id: makeId("markdown", 5),
       type: "markdown",
       title: localized.learningFocus,
       content: locale === "ru"
-        ? "### Подход\n- Понять идею\n- Разобрать сценарии\n- Подтвердить результат практикой"
-        : "### Approach\n- Understand the concept\n- Break down the scenarios\n- Confirm the result through practice",
+        ? "### Как проходить модуль\n- Не пытайтесь запомнить всё сразу\n- Делайте маленький артефакт после каждого урока\n- Если застряли, нажмите AI hint и попросите пример проще\n- В конце сравните свой ответ с квизом"
+        : "### How to move through this module\n- Do not try to memorize everything at once\n- Create one small artifact after each lesson\n- If you get stuck, use AI hint and ask for a simpler example\n- At the end, compare your answer with the quiz",
     },
     {
-      id: makeId("list", 3),
+      id: makeId("list", 6),
       type: "list",
       title: localized.whatYouWillLearn,
       items: listItems,
     },
     {
-      id: makeId("table", 4),
+      id: makeId("table", 7),
       type: "table",
       title: localized.conceptMap,
       table: {
@@ -254,21 +693,12 @@ export function buildLessonBlocks(params: {
       },
     },
     {
-      id: makeId("callout", 5),
+      id: makeId("callout", 8),
       type: "callout",
-      title: localized.importantConcept,
+      title: localized.notNeededYet,
       content: locale === "ru"
-        ? "Стройте воспроизводимый workflow: гипотеза -> действие -> проверка результата."
-        : "Build a reproducible workflow: hypothesis -> action -> validation.",
-    },
-    {
-      id: makeId("code", 6),
-      type: "code_block",
-      title: localized.codePattern,
-      code: {
-        language: "ts",
-        value: "const progress = completed / total;\nif (progress >= 1) unlockNextModule();",
-      },
+        ? "На этом этапе не нужно знать все инструменты, стандарты и исключения. Достаточно научиться видеть риск, задавать хороший вопрос и фиксировать результат понятно."
+        : "At this stage you do not need every tool, standard, and exception. It is enough to spot a risk, ask a good question, and document the result clearly.",
     },
     ...lessonBlocks,
     {
@@ -308,11 +738,11 @@ export function buildLessonBlocks(params: {
       type: "mini_challenge",
       title: localized.miniChallenge,
       challengePrompt: locale === "ru"
-        ? `Примените идею из модуля "${moduleTitle}" к реальной задаче и опишите короткий план действий.`
-        : `Apply the idea from "${moduleTitle}" to a realistic task and write a short action plan.`,
+        ? `Представьте, что вам дали маленькую задачу по теме "${moduleTitle}". Напишите 3 пункта: что проверите первым, какой риск ищете, как поймёте, что всё работает.`
+        : `Imagine you got a small task about "${moduleTitle}". Write 3 bullets: what you check first, what risk you look for, and how you know it works.`,
       challengeHint: locale === "ru"
-        ? "Используйте 3-5 пунктов: контекст, действие, ожидаемый результат."
-        : "Use 3-5 bullet points: context, action, expected result.",
+        ? "Держите ответ коротким. Формат: проверка -> риск -> ожидаемый результат."
+        : "Keep it short. Format: check -> risk -> expected result.",
     },
     {
       id: makeId("summary", 86),
@@ -320,8 +750,8 @@ export function buildLessonBlocks(params: {
       title: localized.summary,
       items: resourceItems,
       content: locale === "ru"
-        ? "У вас есть структурированный путь: понять концепт, пройти уроки, выполнить практику и закрепить материал проверкой."
-        : "You now have a structured path: understand the concept, work through the lessons, practice, and validate the result.",
+        ? "Главная цель модуля - не закрыть длинный текст, а сделать маленький рабочий артефакт: вопрос, проверку, баг-репорт, требование или вывод."
+        : "The main goal is not to finish a long text. It is to create one small work artifact: a question, check, bug report, requirement, or insight.",
     },
   ];
 

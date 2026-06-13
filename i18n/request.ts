@@ -8,12 +8,12 @@ function resolveLocale(raw: string | undefined): Locale {
   if (raw && (SUPPORTED_LOCALES as readonly string[]).includes(raw)) {
     return raw as Locale;
   }
-  return "en";
+  return "ru";
 }
 
 export default getRequestConfig(async () => {
   const cookieStore = await cookies();
-  const locale = resolveLocale(cookieStore.get("skillpath-locale")?.value);
+  const locale = resolveLocale(cookieStore.get("levio-locale")?.value);
 
   return {
     locale,

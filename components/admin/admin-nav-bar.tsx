@@ -13,24 +13,19 @@ const NAV_GROUPS: { label: string; hrefs: string[] }[] = [
     hrefs: [
       "/admin/dashboard",
       "/admin/courses",
+      "/admin/tracks",
       "/admin/modules",
       "/admin/lessons",
       "/admin/quizzes",
-      "/admin/assignments",
-      "/admin/simulations",
-      "/admin/cases",
-      "/admin/templates",
-      "/admin/media",
-      "/admin/tracks",
     ],
   },
   {
     label: "People",
-    hrefs: ["/admin/users", "/admin/permissions", "/admin/certificates"],
+    hrefs: ["/admin/users", "/admin/certificates"],
   },
   {
     label: "System",
-    hrefs: ["/admin/analytics", "/admin/audit-log", "/admin/settings"],
+    hrefs: ["/admin/analytics", "/admin/settings"],
   },
 ];
 

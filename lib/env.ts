@@ -90,6 +90,12 @@ export function validateEnv(): void {
   const demoOn =
     process.env.ENABLE_DEMO_MODE === "true" ||
     process.env.NEXT_PUBLIC_ENABLE_DEMO_MODE === "true";
+  if (demoOn && process.env.NODE_ENV === "production") {
+    throw new Error(
+      "DEMO MODE must be disabled in production. " +
+        "Set ENABLE_DEMO_MODE=false and NEXT_PUBLIC_ENABLE_DEMO_MODE=false.",
+    );
+  }
   if (demoOn) {
     console.warn(
       "[startup] DEMO MODE is ENABLED. This allows login without real credentials. " +

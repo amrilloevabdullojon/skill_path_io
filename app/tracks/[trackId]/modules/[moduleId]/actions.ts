@@ -5,8 +5,9 @@ import { getServerSession } from "next-auth";
 import { ProgressStatus } from "@prisma/client";
 
 import { authOptions } from "@/lib/auth";
+import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
+import { upsertRuntimeModuleProgress } from "@/lib/learning/progress";
 import { resolveLearningUser } from "@/lib/learning-user";
-import { prisma } from "@/lib/prisma";
 
 function toStringValue(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim() : "";
@@ -27,39 +28,19 @@ export async function markModuleAsCompleted(formData: FormData) {
     return;
   }
 
-  const moduleItem = await prisma.module.findFirst({
-    where: {
-      id: moduleId,
-      track: {
-        slug: trackSlug,
-      },
-    },
-    select: {
-      id: true,
-    },
-  });
+  const runtimeCourse = await resolveRuntimeCourseBySlug(trackSlug, { includeCourseEntities: true });
+  const moduleItem = runtimeCourse?.modules.find((moduleEntry) => moduleEntry.id === moduleId) ?? null;
 
-  if (!moduleItem) {
+  if (!runtimeCourse || !moduleItem) {
     return;
   }
 
-  await prisma.userProgress.upsert({
-    where: {
-      userId_moduleId: {
-        userId: user.id,
-        moduleId: moduleItem.id,
-      },
-    },
-    update: {
-      status: ProgressStatus.COMPLETED,
-      completedAt: new Date(),
-    },
-    create: {
-      userId: user.id,
-      moduleId: moduleItem.id,
-      status: ProgressStatus.COMPLETED,
-      completedAt: new Date(),
-    },
+  await upsertRuntimeModuleProgress({
+    userId: user.id,
+    moduleId: moduleItem.id,
+    source: runtimeCourse.source,
+    status: ProgressStatus.COMPLETED,
+    completedAt: new Date(),
   });
 
   revalidatePath(`/tracks/${trackSlug}`);

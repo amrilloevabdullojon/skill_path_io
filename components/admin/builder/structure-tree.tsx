@@ -47,7 +47,7 @@ function SortableModuleRow({ id, title, status, selected, onSelect }: SortableMo
       style={{ transform: CSS.Transform.toString(transform), transition }}
       onClick={onSelect}
       className={`flex w-full items-center justify-between gap-2 rounded-xl border px-2.5 py-2 text-left text-sm ${
-        selected ? "border-sky-400/50 bg-sky-500/10 text-sky-100" : "border-border bg-card/80 text-muted-foreground"
+        selected ? "border-indigo-400/50 bg-indigo-500/10 text-indigo-100" : "border-border bg-card/80 text-muted-foreground"
       }`}
     >
       <span className="inline-flex items-center gap-2">
@@ -110,7 +110,7 @@ export function StructureTree({
         onClick={() => onSelect({ type: "course", id: entity.course.id })}
         className={`w-full rounded-xl border px-3 py-2 text-left text-sm ${
           selected.type === "course"
-            ? "border-sky-400/50 bg-sky-500/10 text-sky-100"
+            ? "border-indigo-400/50 bg-indigo-500/10 text-indigo-100"
             : "border-border bg-card/80 text-muted-foreground"
         }`}
       >
@@ -185,27 +185,27 @@ export function StructureTree({
 
                       <div className="space-y-1 pl-2">
                         {lessons.map((item) => (
-                          <button key={item.id} type="button" onClick={() => onSelect({ type: "lesson", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "lesson" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
+                          <button key={item.id} type="button" onClick={() => onSelect({ type: "lesson", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "lesson" && selected.id === item.id ? "bg-indigo-500/15 text-indigo-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
                             Lesson: {item.title}
                           </button>
                         ))}
                         {quizzes.map((item) => (
-                          <button key={item.id} type="button" onClick={() => onSelect({ type: "quiz", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "quiz" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
+                          <button key={item.id} type="button" onClick={() => onSelect({ type: "quiz", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "quiz" && selected.id === item.id ? "bg-indigo-500/15 text-indigo-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
                             Quiz: {item.title}
                           </button>
                         ))}
                         {assignments.map((item) => (
-                          <button key={item.id} type="button" onClick={() => onSelect({ type: "assignment", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "assignment" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
+                          <button key={item.id} type="button" onClick={() => onSelect({ type: "assignment", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "assignment" && selected.id === item.id ? "bg-indigo-500/15 text-indigo-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
                             Assignment: {item.title}
                           </button>
                         ))}
                         {simulations.map((item) => (
-                          <button key={item.id} type="button" onClick={() => onSelect({ type: "simulation", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "simulation" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
+                          <button key={item.id} type="button" onClick={() => onSelect({ type: "simulation", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "simulation" && selected.id === item.id ? "bg-indigo-500/15 text-indigo-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
                             Simulation: {item.title}
                           </button>
                         ))}
                         {cases.map((item) => (
-                          <button key={item.id} type="button" onClick={() => onSelect({ type: "case", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "case" && selected.id === item.id ? "bg-sky-500/15 text-sky-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
+                          <button key={item.id} type="button" onClick={() => onSelect({ type: "case", id: item.id })} className={`w-full rounded-lg px-2 py-1 text-left text-xs ${selected.type === "case" && selected.id === item.id ? "bg-indigo-500/15 text-indigo-200" : "text-muted-foreground hover:bg-card hover:text-foreground"}`}>
                             Case: {item.title}
                           </button>
                         ))}

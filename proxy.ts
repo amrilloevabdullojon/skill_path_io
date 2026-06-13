@@ -8,18 +8,26 @@ import { getToken } from "next-auth/jwt";
 const PUBLIC_PREFIXES = [
   "/api/auth/",   // NextAuth own endpoints (signin, signout, callback, session, csrf)
   "/api/health",  // Health-check — must stay reachable without a session
+  "/api/public/", // Endpoints that intentionally accept anonymous callers
   "/login",
+  "/p/",          // Public portfolio pages (/p/[slug])
+  "/interview-preview",
+  "/skill-test",
   "/_next/",
   "/favicon.ico",
   "/sitemap.xml",
   "/robots.txt",
+  "/manifest.webmanifest",
 ];
 
+const PUBLIC_EXACT = new Set<string>(["/"]);
+
 function isPublic(pathname: string): boolean {
+  if (PUBLIC_EXACT.has(pathname)) return true;
   return PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Always allow public routes through without touching the token.

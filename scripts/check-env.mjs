@@ -106,11 +106,11 @@ function main() {
     console.log(`  ✓ ${msg}`);
   }
 
-  console.log(`\nSkillPath Academy — env check${prodMode ? " [production mode]" : ""}\n`);
+  console.log(`\nLevio — env check${prodMode ? " [production mode]" : ""}\n`);
 
   // ── Required for all modes ────────────────────────────────────────────────
 
-  const required = ["DATABASE_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET"];
+  const required = ["DATABASE_URL", "DIRECT_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET"];
 
   for (const key of required) {
     if (!env[key]) {
@@ -173,7 +173,10 @@ function main() {
     console.log("\n  [production checks]");
 
     if (demoOn) {
-      warn("DEMO MODE is enabled — disable for production (set ENABLE_DEMO_MODE=false)");
+      error(
+        "DEMO MODE must be disabled in production " +
+          "(set ENABLE_DEMO_MODE=false and NEXT_PUBLIC_ENABLE_DEMO_MODE=false)",
+      );
     }
 
     // Secret strength
@@ -194,10 +197,10 @@ function main() {
 
     // HTTPS required in production
     if (env.NEXTAUTH_URL && env.NEXTAUTH_URL.startsWith("http://")) {
-      warn("NEXTAUTH_URL uses http:// — HTTPS is strongly recommended in production");
+      error("NEXTAUTH_URL must use https:// in production");
     }
     if (env.NEXT_PUBLIC_APP_URL && env.NEXT_PUBLIC_APP_URL.startsWith("http://")) {
-      warn("NEXT_PUBLIC_APP_URL uses http:// — HTTPS is strongly recommended in production");
+      error("NEXT_PUBLIC_APP_URL must use https:// in production");
     }
   }
 

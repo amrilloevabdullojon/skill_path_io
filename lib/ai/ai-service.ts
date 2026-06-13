@@ -50,57 +50,81 @@ export function getClientIp(request: Request): string {
  * Named callAnthropic for backward compatibility with existing callers.
  */
 export async function callAnthropic(opts: AiCallOptions): Promise<AiResult> {
-  const { geminiApiKey, geminiModel } = getServerEnv();
-  if (!geminiApiKey) {
-    return { ok: false, status: 500, error: "AI service is not configured" };
+  const env = getServerEnv();
+  
+  // 1. Try Gemini first if key is present
+  if (env.geminiApiKey) {
+    const apiKey = env.geminiApiKey;
+    const model = env.geminiModel || "gemini-1.5-flash";
+    const maxTokens = opts.maxTokens ?? 2048;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+    const contents = opts.messages.map((m) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
+    }));
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents,
+          systemInstruction: { parts: [{ text: opts.systemPrompt }] },
+          generationConfig: { temperature: opts.temperature ?? 0.4, maxOutputTokens: maxTokens },
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts
+          ?.map((p: { text?: string }) => p.text?.trim() ?? "")
+          .filter(Boolean)
+          .join("\n\n") ?? "";
+        return { ok: true, data: text };
+      }
+      
+      // If error but it's auth/rate limit, might not want to fallback. 
+      // But let's just log and let it fallback to Anthropic.
+      console.warn(`Gemini API error: ${response.status}`);
+    } catch (err) {
+      console.warn(`Gemini fetch failed:`, err);
+    }
   }
 
-  const apiKey = geminiApiKey;
-  const model = geminiModel;
-  const maxTokens = opts.maxTokens ?? 2048;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  // 2. Fallback to Anthropic if Gemini fails/missing and Anthropic is configured
+  if (env.anthropicApiKey) {
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "x-api-key": env.anthropicApiKey,
+          "anthropic-version": "2023-06-01",
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          model: env.anthropicModel || "claude-3-haiku-20240307",
+          max_tokens: opts.maxTokens ?? 1024,
+          temperature: opts.temperature ?? 0.4,
+          system: opts.systemPrompt,
+          messages: opts.messages,
+        }),
+      });
 
-  // Map Anthropic-style messages to Gemini format ("assistant" → "model")
-  const contents = opts.messages.map((m) => ({
-    role: m.role === "assistant" ? "model" : "user",
-    parts: [{ text: m.content }],
-  }));
-
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents,
-        systemInstruction: { parts: [{ text: opts.systemPrompt }] },
-        generationConfig: { temperature: opts.temperature ?? 0.4, maxOutputTokens: maxTokens },
-      }),
-    });
-  } catch (err) {
-    const detail = err instanceof Error ? err.message : "Network error";
-    return { ok: false, status: 502, error: `AI request failed: ${detail}` };
+      if (response.ok) {
+        const data = await response.json();
+        return { ok: true, data: data.content?.[0]?.text ?? "" };
+      }
+      
+      const text = await response.text().catch(() => "");
+      return { ok: false, status: response.status, error: `Anthropic error ${response.status}: ${text.slice(0, 500)}` };
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : "Network error";
+      return { ok: false, status: 502, error: `Anthropic request failed: ${detail}` };
+    }
   }
 
-  if (!response.ok) {
-    const text = await response.text().catch(() => "");
-    return {
-      ok: false,
-      status: response.status >= 500 ? 502 : response.status,
-      error: `AI error ${response.status}: ${text.slice(0, 500)}`,
-    };
-  }
-
-  const data = (await response.json()) as {
-    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-  };
-
-  const text = data.candidates?.[0]?.content?.parts
-    ?.map((p) => p.text?.trim() ?? "")
-    .filter(Boolean)
-    .join("\n\n") ?? "";
-
-  return { ok: true, data: text };
+  return { ok: false, status: 500, error: "AI service is not accessible. Check network connection or API Keys in .env.local" };
 }
 
 // ─── Rate-limiting wrapper ───────────────────────────────────────────────────
@@ -149,7 +173,7 @@ export function buildMentorPrompt(params: {
   lessonText: string;
 }): string {
   return [
-    `You are an experienced mentor of SkillPath Academy.`,
+    `You are an experienced mentor of Levio.`,
     `The student is studying module '${params.moduleTitle}' in track '${params.trackTitle}'.`,
     `Reply in Russian language. Explain simply with examples. Share practical advice from real experience. Use emoji for clarity.`,
     `\nLesson context (up to 2000 chars):\n${params.lessonText || "Lesson context is missing."}`,
@@ -166,7 +190,7 @@ export function buildReviewPrompt(params: {
     params.type === "quiz" ? "quiz answer" : params.type === "mission" ? "mission submission" : "exercise solution";
 
   return [
-    `You are a strict but fair SkillPath Academy reviewer. Evaluate the student's ${typeLabel}.`,
+    `You are a strict but fair Levio reviewer. Evaluate the student's ${typeLabel}.`,
     `Topic: ${params.topic}`,
     params.criteria ? `Evaluation criteria: ${params.criteria}` : "",
     `Reply in Russian language. Be concise and constructive. Give a score from 0 to 100 and explain the main strengths and weaknesses.`,
