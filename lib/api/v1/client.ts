@@ -84,9 +84,15 @@ import {
   type ProgressResponse,
 } from "@/lib/contracts/progress";
 import {
+  PollReceiptsResultSchema,
   PushTokenResponseSchema,
   RegisterPushTokenSchema,
+  SendPushResultSchema,
+  SendPushSchema,
+  type PollReceiptsResult,
   type RegisterPushTokenInput,
+  type SendPushInput,
+  type SendPushResult,
 } from "@/lib/contracts/push";
 import {
   WeeklyReportResponseSchema,
@@ -403,6 +409,25 @@ export function createApiClient(options: ApiClientOptions = {}) {
           method: "GET",
           path: "/api/v1/reports/weekly",
           schema: WeeklyReportResponseSchema,
+          auth: true,
+        });
+      },
+    },
+    admin: {
+      sendPush(input: SendPushInput): Promise<SendPushResult> {
+        return request({
+          method: "POST",
+          path: "/api/v1/admin/push",
+          body: SendPushSchema.parse(input),
+          schema: SendPushResultSchema,
+          auth: true,
+        });
+      },
+      pollPushReceipts(): Promise<PollReceiptsResult> {
+        return request({
+          method: "POST",
+          path: "/api/v1/admin/push/receipts",
+          schema: PollReceiptsResultSchema,
           auth: true,
         });
       },

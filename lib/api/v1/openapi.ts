@@ -60,7 +60,13 @@ import {
 import { PlannerForecastRequestSchema, PlannerForecastSchema } from "@/lib/contracts/planner";
 import { CommandResponseSchema } from "@/lib/contracts/command";
 import { ProgressResponseSchema } from "@/lib/contracts/progress";
-import { PushTokenResponseSchema, RegisterPushTokenSchema } from "@/lib/contracts/push";
+import {
+  PollReceiptsResultSchema,
+  PushTokenResponseSchema,
+  RegisterPushTokenSchema,
+  SendPushResultSchema,
+  SendPushSchema,
+} from "@/lib/contracts/push";
 import { WeeklyReportResponseSchema } from "@/lib/contracts/reports";
 import { SubscriptionsResponseSchema } from "@/lib/contracts/subscriptions";
 import {
@@ -471,6 +477,34 @@ export function buildOpenApiDocument() {
     security: [{ [bearerAuth.name]: [] }],
     responses: {
       200: { description: "Usage summary", content: { "application/json": { schema: AiUsageResponseSchema } } },
+      401: errorResponse("Authentication required"),
+      403: errorResponse("Admin only"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/admin/push",
+    tags: ["admin"],
+    summary: "Send a push notification to one user's devices (admin only)",
+    security: [{ [bearerAuth.name]: [] }],
+    request: { body: { content: { "application/json": { schema: SendPushSchema } } } },
+    responses: {
+      200: { description: "Delivery result", content: { "application/json": { schema: SendPushResultSchema } } },
+      400: errorResponse("Validation error"),
+      401: errorResponse("Authentication required"),
+      403: errorResponse("Admin only"),
+    },
+  });
+
+  registry.registerPath({
+    method: "post",
+    path: "/api/v1/admin/push/receipts",
+    tags: ["admin"],
+    summary: "Reconcile pending Expo push receipts and prune dead tokens (admin only)",
+    security: [{ [bearerAuth.name]: [] }],
+    responses: {
+      200: { description: "Reconciliation result", content: { "application/json": { schema: PollReceiptsResultSchema } } },
       401: errorResponse("Authentication required"),
       403: errorResponse("Admin only"),
     },
