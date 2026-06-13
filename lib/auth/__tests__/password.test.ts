@@ -1,0 +1,22 @@
+// @vitest-environment node
+import { describe, expect, it } from "vitest";
+
+import { hashPassword, verifyPassword } from "@/lib/auth/password";
+
+describe("password hashing", () => {
+  it("hashes and verifies a correct password", async () => {
+    const hash = await hashPassword("correct horse battery");
+    expect(hash).not.toBe("correct horse battery");
+    expect(await verifyPassword("correct horse battery", hash)).toBe(true);
+  });
+
+  it("rejects an incorrect password", async () => {
+    const hash = await hashPassword("s3cret-password");
+    expect(await verifyPassword("wrong-password", hash)).toBe(false);
+  });
+
+  it("returns false for a missing hash", async () => {
+    expect(await verifyPassword("anything", null)).toBe(false);
+    expect(await verifyPassword("anything", undefined)).toBe(false);
+  });
+});

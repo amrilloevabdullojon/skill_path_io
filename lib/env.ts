@@ -118,6 +118,31 @@ export function validateEnv(): void {
           "Generate a strong secret with: openssl rand -base64 32",
       );
     }
+
+    // A dedicated API token secret is optional (falls back to NEXTAUTH_SECRET),
+    // but if set it must be strong too.
+    const tokenSecret = process.env.AUTH_TOKEN_SECRET ?? "";
+    if (tokenSecret && tokenSecret.length < 32) {
+      throw new Error(
+        "AUTH_TOKEN_SECRET must be at least 32 characters when set. " +
+          "Generate one with: openssl rand -base64 32",
+      );
+    }
+
+    // Upstash requires both URL and token, or neither.
+    const hasUpstashUrl = Boolean(process.env.UPSTASH_REDIS_REST_URL);
+    const hasUpstashToken = Boolean(process.env.UPSTASH_REDIS_REST_TOKEN);
+    if (hasUpstashUrl !== hasUpstashToken) {
+      throw new Error(
+        "Both UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN must be set together.",
+      );
+    }
+    if (!hasUpstashUrl) {
+      console.warn(
+        "[startup] No Upstash Redis configured — rate limiting is in-memory (single instance). " +
+          "Set UPSTASH_REDIS_REST_URL/TOKEN for multi-instance deployments.",
+      );
+    }
   }
 
   // Demo-mode conditional requirements.

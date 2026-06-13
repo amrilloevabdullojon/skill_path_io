@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 
 import { EntryExperience } from "@/components/auth/entry-experience";
+import { OAuthButtons } from "@/components/auth/oauth-buttons";
 import { authOptions } from "@/lib/auth";
 import { isDemoModeEnabled } from "@/lib/config/runtime-mode";
 
@@ -48,6 +49,9 @@ export default async function LoginPage() {
   return (
     <section className="page-shell">
       <EntryExperience mode="guest" enableDemoAccess={enableDemoAccess} />
+      <div className="mx-auto w-full max-w-sm">
+        <OAuthButtons />
+      </div>
     </section>
   );
 }

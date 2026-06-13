@@ -46,7 +46,7 @@ export async function handleMentorRequest(request: Request, body: { context?: Me
   }
 
   const ip = getClientIp(request);
-  const rateLimit = applyRateLimit({
+  const rateLimit = await applyRateLimit({
     key: `mentor:${ip}`,
     maxRequests: env.mentorRateLimitMaxRequests,
     windowMs: env.mentorRateLimitWindowMs,

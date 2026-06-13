@@ -1,7 +1,7 @@
 import { ShieldCheck, TrendingDown, TrendingUp } from "lucide-react";
 
 import { DashboardSection } from "@/components/dashboard/dashboard-section";
-import { SkillRadarChart } from "@/components/skill-radar/skill-radar";
+import { SkillRadarChart } from "@/components/radar/skill-radar-chart";
 import type { DashboardSkillRadar } from "@/lib/dashboard/data";
 
 type DashboardSkillRadarProps = {

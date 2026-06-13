@@ -129,7 +129,7 @@ export async function POST(request: Request) {
 
   const ip = getIp(request);
   const env = getServerEnv();
-  const rateLimit = applyRateLimit({
+  const rateLimit = await applyRateLimit({
     key: `admin-ai:${ip}`,
     maxRequests: env.adminAiRateLimitMaxRequests,
     windowMs: env.adminAiRateLimitWindowMs,

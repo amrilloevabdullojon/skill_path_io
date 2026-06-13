@@ -1,4 +1,5 @@
 import { handleMentorRequest } from "@/lib/ai";
+import { logAiUsage } from "@/lib/ai/usage-log";
 import {
   denyFeature,
   denyUsage,
@@ -31,6 +32,7 @@ export async function POST(request: Request) {
 
   if (response.status < 400) {
     recordMeterUsage(accessContext, "aiMentorRequests");
+    await logAiUsage("AI_MENTOR", accessContext.userId);
   }
 
   return response;

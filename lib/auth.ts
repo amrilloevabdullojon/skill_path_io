@@ -1,10 +1,33 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GithubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
+import { verifyCredentials } from "@/lib/auth/credentials";
 import { getLocalUserByEmail } from "@/lib/auth/local-users";
 import { isDemoModeEnabled } from "@/lib/config/runtime-mode";
 import { prisma } from "@/lib/prisma";
 import type { AppRoleEnum } from "@/types/next-auth";
+
+// OAuth providers are enabled only when their credentials are configured, so
+// local/demo deployments work without them.
+const oauthProviders: NextAuthOptions["providers"] = [];
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  oauthProviders.push(
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+  );
+}
+if (process.env.GITHUB_ID && process.env.GITHUB_SECRET) {
+  oauthProviders.push(
+    GithubProvider({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
+    }),
+  );
+}
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -14,6 +37,7 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   providers: [
+    ...oauthProviders,
     CredentialsProvider({
       name: "Local Demo Access",
       credentials: {
@@ -21,32 +45,48 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!isDemoModeEnabled()) {
+        if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
-        // Guard: demo credentials require the expected demo password token.
-        // The local login panel always sends password: "local"; any other value
-        // (including missing/empty) must be rejected to prevent account enumeration.
-        if (credentials?.password !== "local") {
-          return null;
-        }
-
-        const user = getLocalUserByEmail(credentials?.email);
-        if (!user) {
+        // Unified verification: demo accounts (demo mode + "local" token) and
+        // real accounts (bcrypt password hash) are both handled here.
+        const identity = await verifyCredentials(credentials.email, credentials.password);
+        if (!identity) {
           return null;
         }
 
         return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
+          id: identity.id,
+          email: identity.email,
+          role: identity.role,
         };
       },
     }),
   ],
   callbacks: {
+    // On OAuth sign-in, upsert a real user (JWT strategy has no DB adapter).
+    // Email is provider-verified, so mark it verified. The jwt callback then
+    // syncs id/role from this row.
+    async signIn({ user, account }) {
+      if (account && account.provider !== "credentials" && user.email) {
+        try {
+          await prisma.user.upsert({
+            where: { email: user.email },
+            update: {},
+            create: {
+              email: user.email,
+              name: user.name ?? user.email,
+              role: "STUDENT",
+              emailVerified: new Date(),
+            },
+          });
+        } catch {
+          // Don't block sign-in on a DB hiccup; jwt callback falls back.
+        }
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       // First sign in
       if (user && "role" in user) {

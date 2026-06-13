@@ -35,7 +35,7 @@ export const POST = withErrorHandler(async (request: Request) => {
     throw Errors.forbidden("This endpoint requires a PRO subscription.");
   }
 
-  const rateLimit = checkRateLimit({
+  const rateLimit = await checkRateLimit({
     request,
     bucket: `ai-interview:${session.user.id}`,
     maxRequests: settings.aiRateLimit,

@@ -1,13 +1,28 @@
 # Levio
 
-Next.js 14 App Router learning and career platform with Prisma + PostgreSQL, SaaS feature gating, analytics, marketplace, and admin studio.
+Next.js 16 App Router learning and career platform with Prisma + PostgreSQL, SaaS feature gating, analytics, marketplace, and admin studio — plus a versioned API and a React Native (Expo) mobile client.
 
 ## Stack
-- Next.js 14 (App Router)
+- Next.js 16 (App Router)
 - Prisma 5 + PostgreSQL (Supabase-compatible)
-- NextAuth (credentials demo flow preserved)
+- NextAuth — real credential auth (bcrypt), email verification + password reset, Google/GitHub OAuth; plus stateless JWT tokens for the mobile/API clients
 - Recharts, Zustand, Framer Motion
-- Anthropic API (AI mentor)
+- AI mentor (Gemini, optional Anthropic)
+- Sentry (opt-in via `SENTRY_DSN`), Upstash Redis rate limiting (opt-in)
+
+## Architecture
+
+- **Versioned API** under `app/api/v1/*` — REST + Zod contracts (`lib/contracts/*`)
+  as the single source of truth, served with an OpenAPI 3.0 spec at
+  `/api/v1/openapi.json`. Both web and mobile consume the same typed client SDK
+  (`lib/api/v1/client.ts`). Auth via NextAuth cookie **or** Bearer token.
+- **Mobile app** in `apps/mobile/` (Expo, expo-router) shares the contracts +
+  SDK with the web app — no duplicated types. See `apps/mobile/README.md`.
+- Docs: `docs/PRODUCTION_READINESS.md`, `docs/ARCHITECTURE_AUDIT_REPORT.md`.
+
+## Testing
+- Unit/contract: `npm run test` (vitest).
+- E2E: `npm run test:e2e` (Playwright — run `npx playwright install` first; starts the dev server automatically).
 
 ## Local Setup
 1. Install dependencies:

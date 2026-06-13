@@ -141,14 +141,14 @@ export type RateLimitCheck =
   | { allowed: true; headers: Record<string, string> }
   | { allowed: false; headers: Record<string, string>; retryAfterMs: number };
 
-export function checkRateLimit({
+export async function checkRateLimit({
   request,
   bucket,
   maxRequests = 20,
   windowMs = 60_000,
-}: WithRateLimitOptions): RateLimitCheck {
+}: WithRateLimitOptions): Promise<RateLimitCheck> {
   const ip = getClientIp(request);
-  const result = applyRateLimit({ key: `${bucket}:${ip}`, maxRequests, windowMs });
+  const result = await applyRateLimit({ key: `${bucket}:${ip}`, maxRequests, windowMs });
 
   const headers: Record<string, string> = {
     "cache-control": "no-store",
