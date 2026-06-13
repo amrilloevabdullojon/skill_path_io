@@ -29,7 +29,7 @@ _Last updated: 2026-06-12 · branch `phase2/architecture-cleanup`_
 ## ✅ Handoff checklist (do these in your environment)
 
 1. **Merge PRs** — #1 first; GitHub auto-retargets #2 to `main`, then merge #2.
-2. **DB migrations** — apply Prisma migrations for `User.passwordHash`, `User.emailVerified`, and the `PushToken` model:
+2. **DB migrations** — apply Prisma migrations for `User.passwordHash`, `User.emailVerified`, the `PushToken` model, and the `PushReceipt` model (added for the push receipt poller):
    ```bash
    npx prisma migrate dev --name add_user_credentials_and_push   # dev
    npx prisma migrate deploy                                      # prod
@@ -40,7 +40,7 @@ _Last updated: 2026-06-12 · branch `phase2/architecture-cleanup`_
 
 ## Open follow-ups (additive — core is complete)
 
-- **Server-side push send** — `PushToken` model + `POST /api/v1/me/push-token` exist; the Expo push-send job is not wired. Needs a product decision on the trigger (in-app notifications are computed, not stored events). Helper to add: send to Expo push API for a user's tokens.
+- **Server-side push send** — ✅ delivery layer done: `sendPushToUser()` in `lib/notifications/push.ts` (Expo Push API, batching, sound/channelId defaults, ticket-level token pruning + `PushReceipt` storage), `pollPushReceipts()` for deferred `DeviceNotRegistered` cleanup, admin endpoints `POST /api/v1/admin/push` (rate-limited) and `POST /api/v1/admin/push/receipts`, SDK `client.admin.sendPush()/pollPushReceipts()`. **Still a product decision:** the *automated* trigger — when to call `sendPushToUser` (in-app notifications are computed, not stored events). **Ops:** schedule `POST /api/v1/admin/push/receipts` on a cron (~every 15–30 min) so dead tokens get pruned.
 - **Complete via UI** — no admin UI yet for `/api/v1/admin/ai-usage` (endpoint only).
 - **Mobile** — OAuth (expo-auth-session + redirect scheme), offline cache (react-query persistence), custom icon/splash art, reset/verify deep links.
 - **a11y audit** — advisory, do with a real screen reader / running app.

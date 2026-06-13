@@ -88,6 +88,18 @@ model PushToken {
   @@index([userId])
 }
 
+/// Expo push receipt awaiting async confirmation. Created when a send ticket is
+/// accepted; polled later via /getReceipts to detect deferred delivery errors
+/// (e.g. DeviceNotRegistered) and prune the dead `token`. Rows are deleted once
+/// their receipt has been resolved.
+model PushReceipt {
+  id        String   @id // the Expo receipt id
+  token     String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 model Track {
   id               String        @id @default(cuid())
   slug             String        @unique
