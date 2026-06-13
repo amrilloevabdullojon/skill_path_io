@@ -43,6 +43,8 @@ const CardTitle = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
+  // Wrapper component: heading content is always supplied by callers via children.
+  // eslint-disable-next-line jsx-a11y/heading-has-content
   <h3 ref={ref} className={cn("font-semibold leading-none tracking-tight text-card-foreground", className)} {...props} />
 ));
 CardTitle.displayName = "CardTitle";

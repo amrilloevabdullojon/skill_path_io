@@ -187,6 +187,9 @@ export function AppCommandPalette({ isAdmin }: AppCommandPaletteProps) {
         <div className="relative">
           <Search className="select-chevron pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" aria-hidden />
           <Input
+            // Command palette: focusing the search on open is the expected
+            // behavior (the modal is summoned explicitly by the user).
+            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
             value={query}
             onChange={(event) => updateQuery(event.target.value)}
