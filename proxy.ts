@@ -31,7 +31,13 @@ const PUBLIC_PREFIXES = [
   "/manifest.webmanifest",
 ];
 
-const PUBLIC_EXACT = new Set<string>(["/"]);
+const PUBLIC_EXACT = new Set<string>([
+  "/",
+  // Cron reconciliation endpoint — self-guarded in the handler (CRON_SECRET for
+  // GET schedulers; admin identity for POST). Whitelisted so an unauthenticated
+  // scheduler request reaches the handler instead of the proxy's blanket 401.
+  "/api/v1/admin/push/receipts",
+]);
 
 function isPublic(pathname: string): boolean {
   if (PUBLIC_EXACT.has(pathname)) return true;
