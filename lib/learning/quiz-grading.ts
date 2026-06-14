@@ -10,6 +10,7 @@ import {
 } from "@/lib/learning/progress";
 import { resolveRuntimeCourseBySlug } from "@/lib/learning/runtime-content";
 import { resolveLearningUser } from "@/lib/learning-user";
+import { notifyCertificateEarned, notifyModuleCompleted } from "@/lib/notifications/triggers";
 import { prisma } from "@/lib/prisma";
 import { applyTrackContentOverrides, normalizeLearningLocale } from "@/lib/tracks/content-overrides";
 
@@ -318,6 +319,9 @@ export async function gradeAndRecordQuizAttempt(params: {
       ? Math.max(existingProgress.score, score)
       : score;
 
+  // True only on the first transition to COMPLETED (not on a re-pass).
+  const moduleNewlyCompleted = passed && existingProgress?.status !== ProgressStatus.COMPLETED;
+
   if (passed) {
     await upsertRuntimeModuleProgress({
       userId: user.id,
@@ -358,6 +362,12 @@ export async function gradeAndRecordQuizAttempt(params: {
   const trackCompleted = trackModuleCount > 0 && completedModuleCount === trackModuleCount;
   let certificateIssued = false;
 
+  // Push on a newly completed module — but not the final one, where the
+  // certificate push (below) already notifies the learner.
+  if (moduleNewlyCompleted && !trackCompleted) {
+    await notifyModuleCompleted(user.id, moduleItem.title, overriddenTrack.slug);
+  }
+
   if (trackCompleted && overriddenTrack.source === "prisma-track") {
     const existingCertificate = await prisma.certificate.findUnique({
       where: { userId_trackId: { userId: user.id, trackId: overriddenTrack.id } },
@@ -375,6 +385,7 @@ export async function gradeAndRecordQuizAttempt(params: {
         data: { certificateUrl: `/api/certificates/${createdCertificate.id}/pdf` },
       });
 
+      await notifyCertificateEarned(user.id, overriddenTrack.title);
       certificateIssued = true;
     }
   }
@@ -402,6 +413,7 @@ export async function gradeAndRecordQuizAttempt(params: {
           data: { certificateUrl: `/api/course-certificates/${createdCertificate.id}/pdf` },
         });
 
+        await notifyCertificateEarned(user.id, overriddenTrack.title);
         certificateIssued = true;
       }
     }

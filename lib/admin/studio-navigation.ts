@@ -16,5 +16,6 @@ export const studioAdminLinks: StudioAdminLink[] = [
   { href: "/admin/users", label: "Users", permission: "users.manage" },
   { href: "/admin/certificates", label: "Certificates", permission: "certificates.manage" },
   { href: "/admin/analytics", label: "Analytics", permission: "analytics.read" },
+  { href: "/admin/ai-usage", label: "AI Usage", permission: "analytics.read" },
   { href: "/admin/settings", label: "Settings", permission: "settings.manage" },
 ];
