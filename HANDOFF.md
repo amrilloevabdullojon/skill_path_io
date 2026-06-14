@@ -29,10 +29,10 @@ _Last updated: 2026-06-12 · branch `phase2/architecture-cleanup`_
 ## ✅ Handoff checklist (do these in your environment)
 
 1. **Merge PRs** — #1 first; GitHub auto-retargets #2 to `main`, then merge #2.
-2. **DB migrations** — apply Prisma migrations for `User.passwordHash`, `User.emailVerified`, the `PushToken` model, and the `PushReceipt` model (added for the push receipt poller):
+2. **DB migrations** — the migration `prisma/migrations/20260614000000_add_user_credentials_and_push` is **committed** (adds `User.passwordHash`, `User.emailVerified`, the `PushToken` + `PushReceipt` tables). Hand-authored offline (no DB in the dev container), so apply it against a real DB — `migrate dev` validates it via a shadow DB, `migrate deploy` applies it in prod:
    ```bash
-   npx prisma migrate dev --name add_user_credentials_and_push   # dev
-   npx prisma migrate deploy                                      # prod
+   npx prisma migrate dev      # dev — validates + applies + regenerates client
+   npx prisma migrate deploy   # prod
    ```
 3. **Prod secrets (all opt-in, inert without)** — `RESEND_API_KEY`/`EMAIL_FROM`, `GOOGLE_*`/`GITHUB_*`, `UPSTASH_REDIS_REST_URL`/`TOKEN`, `SENTRY_DSN`/`NEXT_PUBLIC_SENTRY_DSN`, optionally `AUTH_TOKEN_SECRET`. See `.env.example` + `docs/PRODUCTION_READINESS.md`.
 4. **Mobile** — `cd apps/mobile && npm install && npx expo install …` (command in `apps/mobile/README.md`) → `npm test` (jest), `npm run ios`, `eas build`.
@@ -40,8 +40,8 @@ _Last updated: 2026-06-12 · branch `phase2/architecture-cleanup`_
 
 ## Open follow-ups (additive — core is complete)
 
-- **Server-side push send** — ✅ delivery layer done: `sendPushToUser()` in `lib/notifications/push.ts` (Expo Push API, batching, sound/channelId defaults, ticket-level token pruning + `PushReceipt` storage), `pollPushReceipts()` for deferred `DeviceNotRegistered` cleanup, admin endpoints `POST /api/v1/admin/push` (rate-limited) and `POST /api/v1/admin/push/receipts`, SDK `client.admin.sendPush()/pollPushReceipts()`. **Still a product decision:** the *automated* trigger — when to call `sendPushToUser` (in-app notifications are computed, not stored events). **Ops:** schedule `POST /api/v1/admin/push/receipts` on a cron (~every 15–30 min) so dead tokens get pruned.
-- **Complete via UI** — no admin UI yet for `/api/v1/admin/ai-usage` (endpoint only).
+- **Server-side push send** — ✅ delivery layer done: `sendPushToUser()` in `lib/notifications/push.ts` (Expo Push API, batching, sound/channelId defaults, ticket-level token pruning + `PushReceipt` storage), `pollPushReceipts()` for deferred `DeviceNotRegistered` cleanup, admin endpoints `POST /api/v1/admin/push` (rate-limited) and `POST /api/v1/admin/push/receipts`, SDK `client.admin.sendPush()/pollPushReceipts()`. Triggers wired: certificate earned + module completion (`lib/notifications/triggers.ts`). **Ops — done:** receipt reconciliation runs on a cron — `vercel.json` schedules `GET /api/v1/admin/push/receipts` every 30 min, authorized by `CRON_SECRET` (the route self-guards: GET=cron secret, POST=admin or secret; path whitelisted in `proxy.ts`). Set `CRON_SECRET` in prod to enable it. On non-Vercel hosts, point any scheduler at that GET with the bearer secret.
+- **AI usage UI** — ✅ `/admin/ai-usage` page over `buildAiUsageSummary()` (KPI cards + per-feature shares), gated by `analytics.read`, linked from the studio nav.
 - **Mobile** — OAuth (expo-auth-session + redirect scheme), offline cache (react-query persistence), custom icon/splash art, reset/verify deep links.
 - **a11y static audit — done & enforced.** `eslint-plugin-jsx-a11y` recommended set is enabled at **error** severity (`eslint.config.mjs`) and the codebase is swept clean (0 violations): associated every admin-form `<label>` via `htmlFor`/`id` (= the control's `name`), converted group-label misuses to `<span>`, and made the interview-preview play controls keyboard-accessible (avatar `<div role=button>` + `onKeyDown`; question text wrapped in a real `<button>`). Drag handle in `structure-tree` keeps an inline disable (dnd-kit supplies role/keyboard via spread props). **Still open (needs a running app + assistive tech):** dynamic checks — color contrast, focus order/keyboard flows, screen-reader semantics.
 - **AiUsageLog** now covers all AI routes; older `recordMeterUsage` (SaaS ledger) is separate — don't conflate.
