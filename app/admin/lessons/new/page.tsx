@@ -33,8 +33,8 @@ export default async function NewLessonPage() {
         <form action={handleCreate} className="space-y-5 max-w-2xl">
           {/* Module */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Module *</label>
-            <select name="moduleId" required className="select-base">
+            <label htmlFor="moduleId" className="text-sm font-medium text-foreground">Module *</label>
+            <select id="moduleId" name="moduleId" required className="select-base">
               <option value="">Select a module…</option>
               {modules.map((mod) => (
                 <option key={mod.id} value={mod.id}>
@@ -46,8 +46,8 @@ export default async function NewLessonPage() {
 
           {/* Title */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Title *</label>
-            <input
+            <label htmlFor="title" className="text-sm font-medium text-foreground">Title *</label>
+            <input id="title"
               name="title"
               required
               maxLength={200}
@@ -59,16 +59,16 @@ export default async function NewLessonPage() {
           {/* Type + Order row */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Type *</label>
-              <select name="type" defaultValue={LessonType.TEXT} required className="select-base">
+              <label htmlFor="type" className="text-sm font-medium text-foreground">Type *</label>
+              <select id="type" name="type" defaultValue={LessonType.TEXT} required className="select-base">
                 <option value={LessonType.TEXT}>TEXT</option>
                 <option value={LessonType.VIDEO}>VIDEO</option>
                 <option value={LessonType.TASK}>TASK</option>
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Order *</label>
-              <input
+              <label htmlFor="order" className="text-sm font-medium text-foreground">Order *</label>
+              <input id="order"
                 name="order"
                 type="number"
                 required
@@ -82,11 +82,11 @@ export default async function NewLessonPage() {
 
           {/* Body */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Body</label>
+            <label htmlFor="body" className="text-sm font-medium text-foreground">Body</label>
             <p className="text-xs text-muted-foreground">
               Lesson content (markdown or plain text).
             </p>
-            <textarea
+            <textarea id="body"
               name="body"
               rows={8}
               placeholder="Write lesson content here…"

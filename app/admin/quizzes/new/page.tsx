@@ -37,13 +37,13 @@ export default async function NewQuizPage() {
         <form action={handleCreate} className="max-w-lg space-y-5">
           {/* Module */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Module *</label>
+            <label htmlFor="moduleId" className="text-sm font-medium text-foreground">Module *</label>
             {modules.length === 0 ? (
               <p className="rounded-lg border border-amber-500/20 bg-amber-500/8 p-3 text-sm text-amber-400">
                 All modules already have quizzes. Delete an existing quiz to re-assign it.
               </p>
             ) : (
-              <select name="moduleId" required className="select-base">
+              <select id="moduleId" name="moduleId" required className="select-base">
                 <option value="">Select a module…</option>
                 {modules.map((mod) => (
                   <option key={mod.id} value={mod.id}>
@@ -56,8 +56,8 @@ export default async function NewQuizPage() {
 
           {/* Title */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Quiz title *</label>
-            <input
+            <label htmlFor="title" className="text-sm font-medium text-foreground">Quiz title *</label>
+            <input id="title"
               name="title"
               required
               maxLength={200}
@@ -68,8 +68,8 @@ export default async function NewQuizPage() {
 
           {/* Passing score */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Passing score % *</label>
-            <input
+            <label htmlFor="passingScore" className="text-sm font-medium text-foreground">Passing score % *</label>
+            <input id="passingScore"
               name="passingScore"
               type="number"
               required

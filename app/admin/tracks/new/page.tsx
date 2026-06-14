@@ -46,8 +46,9 @@ export default async function NewTrackPage({ searchParams }: NewTrackPageProps) 
         <form action={handleCreate} className="max-w-lg space-y-5">
           {/* Slug */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Slug *</label>
+            <label htmlFor="slug" className="text-sm font-medium text-foreground">Slug *</label>
             <input
+              id="slug"
               name="slug"
               required
               maxLength={60}
@@ -59,8 +60,9 @@ export default async function NewTrackPage({ searchParams }: NewTrackPageProps) 
 
           {/* Title */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Title *</label>
+            <label htmlFor="title" className="text-sm font-medium text-foreground">Title *</label>
             <input
+              id="title"
               name="title"
               required
               maxLength={200}
@@ -71,8 +73,9 @@ export default async function NewTrackPage({ searchParams }: NewTrackPageProps) 
 
           {/* Description */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Description *</label>
+            <label htmlFor="description" className="text-sm font-medium text-foreground">Description *</label>
             <textarea
+              id="description"
               name="description"
               required
               maxLength={500}
@@ -85,16 +88,17 @@ export default async function NewTrackPage({ searchParams }: NewTrackPageProps) 
           {/* Category + Icon row */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Category *</label>
-              <select name="category" required defaultValue={TrackCategory.QA} className="select-base">
+              <label htmlFor="category" className="text-sm font-medium text-foreground">Category *</label>
+              <select id="category" name="category" required defaultValue={TrackCategory.QA} className="select-base">
                 <option value={TrackCategory.QA}>QA</option>
                 <option value={TrackCategory.BA}>BA</option>
                 <option value={TrackCategory.DA}>DA</option>
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Icon</label>
+              <label htmlFor="icon" className="text-sm font-medium text-foreground">Icon</label>
               <input
+                id="icon"
                 name="icon"
                 maxLength={10}
                 placeholder="🎯"
@@ -107,8 +111,8 @@ export default async function NewTrackPage({ searchParams }: NewTrackPageProps) 
 
           {/* Status */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Status</label>
-            <select name="status" defaultValue={TrackStatus.DRAFT} className="select-base">
+            <label htmlFor="status" className="text-sm font-medium text-foreground">Status</label>
+            <select id="status" name="status" defaultValue={TrackStatus.DRAFT} className="select-base">
               <option value={TrackStatus.DRAFT}>Draft</option>
               <option value={TrackStatus.PUBLISHED}>Published</option>
               <option value={TrackStatus.ARCHIVED}>Archived</option>
@@ -117,7 +121,7 @@ export default async function NewTrackPage({ searchParams }: NewTrackPageProps) 
 
           {/* Color */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Color *</label>
+            <label htmlFor="color-hex" className="text-sm font-medium text-foreground">Color *</label>
             <div className="flex items-center gap-3">
               <input
                 type="color"
@@ -144,8 +148,9 @@ export default async function NewTrackPage({ searchParams }: NewTrackPageProps) 
 
           {/* Estimated Weeks */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Estimated Weeks</label>
+            <label htmlFor="estimatedWeeks" className="text-sm font-medium text-foreground">Estimated Weeks</label>
             <input
+              id="estimatedWeeks"
               name="estimatedWeeks"
               type="number"
               min={1}
@@ -158,8 +163,9 @@ export default async function NewTrackPage({ searchParams }: NewTrackPageProps) 
 
           {/* Skills */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Skills</label>
+            <label htmlFor="skills_raw" className="text-sm font-medium text-foreground">Skills</label>
             <textarea
+              id="skills_raw"
               name="skills_raw"
               rows={4}
               placeholder={"SQL\nPython\nData Analysis"}
@@ -170,8 +176,9 @@ export default async function NewTrackPage({ searchParams }: NewTrackPageProps) 
 
           {/* Learning Outcomes */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Learning Outcomes</label>
+            <label htmlFor="outcomes_raw" className="text-sm font-medium text-foreground">Learning Outcomes</label>
             <textarea
+              id="outcomes_raw"
               name="outcomes_raw"
               rows={4}
               placeholder={"Understand testing fundamentals\nWrite test cases\nUse bug tracking tools"}
@@ -182,8 +189,9 @@ export default async function NewTrackPage({ searchParams }: NewTrackPageProps) 
 
           {/* Career Impact */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Career Impact</label>
+            <label htmlFor="careerImpact" className="text-sm font-medium text-foreground">Career Impact</label>
             <textarea
+              id="careerImpact"
               name="careerImpact"
               rows={2}
               maxLength={500}

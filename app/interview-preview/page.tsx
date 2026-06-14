@@ -278,7 +278,19 @@ export default function InterviewPreviewPage() {
               <div className="p-6 sm:p-10 space-y-8">
                 {/* AI Avatar & Question */}
                 <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="relative cursor-pointer group" onClick={playQuestionAudio}>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Прослушать вопрос"
+                    className="relative cursor-pointer group"
+                    onClick={playQuestionAudio}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        playQuestionAudio();
+                      }
+                    }}
+                  >
                     <div className={`absolute inset-0 rounded-full bg-indigo-500/20 blur-xl transition-all duration-500 ${isPlayingAudio ? "animate-pulse scale-150 bg-indigo-400/40" : ""}`} />
                     <div className="h-20 w-20 relative bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center ring-4 ring-slate-900 shadow-2xl group-hover:scale-105 transition-transform">
                       {isPlayingAudio ? (
@@ -296,8 +308,14 @@ export default function InterviewPreviewPage() {
                     <p className="text-sm text-indigo-500 dark:text-indigo-400 font-bold uppercase tracking-widest mb-2 flex items-center justify-center gap-2">
                        ИИ-Интервьюер
                     </p>
-                    <h2 className="text-xl sm:text-2xl font-medium text-foreground leading-relaxed cursor-pointer hover:text-indigo-400 transition-colors" onClick={playQuestionAudio}>
-                      &laquo;{QUESTIONS[track]}&raquo;
+                    <h2 className="text-xl sm:text-2xl font-medium text-foreground leading-relaxed">
+                      <button
+                        type="button"
+                        onClick={playQuestionAudio}
+                        className="cursor-pointer hover:text-indigo-400 transition-colors"
+                      >
+                        &laquo;{QUESTIONS[track]}&raquo;
+                      </button>
                     </h2>
                   </div>
                 </div>

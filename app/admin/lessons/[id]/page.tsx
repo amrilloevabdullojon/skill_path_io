@@ -45,8 +45,8 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
 
             {/* Title */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Title *</label>
-              <input
+              <label htmlFor="title" className="text-sm font-medium text-foreground">Title *</label>
+              <input id="title"
                 name="title"
                 required
                 maxLength={200}
@@ -58,16 +58,16 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
             {/* Type + Order */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Type *</label>
-                <select name="type" defaultValue={lesson.type} required className="select-base">
+                <label htmlFor="type" className="text-sm font-medium text-foreground">Type *</label>
+                <select id="type" name="type" defaultValue={lesson.type} required className="select-base">
                   <option value={LessonType.TEXT}>TEXT</option>
                   <option value={LessonType.VIDEO}>VIDEO</option>
                   <option value={LessonType.TASK}>TASK</option>
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Order *</label>
-                <input
+                <label htmlFor="order" className="text-sm font-medium text-foreground">Order *</label>
+                <input id="order"
                   name="order"
                   type="number"
                   required
@@ -81,8 +81,8 @@ export default async function EditLessonPage({ params }: { params: Promise<{ id:
 
             {/* Body */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Body</label>
-              <textarea
+              <label htmlFor="body" className="text-sm font-medium text-foreground">Body</label>
+              <textarea id="body"
                 name="body"
                 rows={14}
                 defaultValue={lesson.body}

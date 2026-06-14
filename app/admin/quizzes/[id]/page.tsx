@@ -88,8 +88,8 @@ export default async function EditQuizPage({ params }: { params: Promise<{ id: s
               <input type="hidden" name="quizId" value={quiz.id} />
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Title *</label>
-                <input
+                <label htmlFor="title" className="text-sm font-medium text-foreground">Title *</label>
+                <input id="title"
                   name="title"
                   required
                   maxLength={200}
@@ -99,8 +99,8 @@ export default async function EditQuizPage({ params }: { params: Promise<{ id: s
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Passing score %</label>
-                <input
+                <label htmlFor="passingScore" className="text-sm font-medium text-foreground">Passing score %</label>
+                <input id="passingScore"
                   name="passingScore"
                   type="number"
                   required

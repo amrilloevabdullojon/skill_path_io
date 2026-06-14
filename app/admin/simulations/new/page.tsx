@@ -44,8 +44,8 @@ export default async function NewSimulationPage() {
         <form action={handleCreate} className="max-w-2xl space-y-5">
           {/* Module */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Module *</label>
-            <select name="moduleId" required className="select-base">
+            <label htmlFor="moduleId" className="text-sm font-medium text-foreground">Module *</label>
+            <select id="moduleId" name="moduleId" required className="select-base">
               <option value="">Select a module…</option>
               {modules.map((mod) => (
                 <option key={mod.id} value={mod.id}>
@@ -57,8 +57,8 @@ export default async function NewSimulationPage() {
 
           {/* Title */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Title *</label>
-            <input
+            <label htmlFor="title" className="text-sm font-medium text-foreground">Title *</label>
+            <input id="title"
               name="title"
               required
               maxLength={200}
@@ -69,8 +69,8 @@ export default async function NewSimulationPage() {
 
           {/* Simulation type */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Simulation type *</label>
-            <select name="simulationType" required className="select-base">
+            <label htmlFor="simulationType" className="text-sm font-medium text-foreground">Simulation type *</label>
+            <select id="simulationType" name="simulationType" required className="select-base">
               {Object.values(StudioSimulationType).map((t) => (
                 <option key={t} value={t}>
                   {t}
@@ -81,8 +81,8 @@ export default async function NewSimulationPage() {
 
           {/* Scenario */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Scenario *</label>
-            <textarea
+            <label htmlFor="scenario" className="text-sm font-medium text-foreground">Scenario *</label>
+            <textarea id="scenario"
               name="scenario"
               required
               rows={6}
@@ -93,8 +93,8 @@ export default async function NewSimulationPage() {
 
           {/* Difficulty */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Difficulty</label>
-            <select name="difficulty" defaultValue="MEDIUM" className="select-base">
+            <label htmlFor="difficulty" className="text-sm font-medium text-foreground">Difficulty</label>
+            <select id="difficulty" name="difficulty" defaultValue="MEDIUM" className="select-base">
               <option value="EASY">EASY</option>
               <option value="MEDIUM">MEDIUM</option>
               <option value="HARD">HARD</option>
@@ -104,8 +104,8 @@ export default async function NewSimulationPage() {
           {/* Estimated time + XP reward */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Estimated time (min)</label>
-              <input
+              <label htmlFor="estimatedTime" className="text-sm font-medium text-foreground">Estimated time (min)</label>
+              <input id="estimatedTime"
                 name="estimatedTime"
                 type="number"
                 min={0}
@@ -114,8 +114,8 @@ export default async function NewSimulationPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">XP reward</label>
-              <input
+              <label htmlFor="xpReward" className="text-sm font-medium text-foreground">XP reward</label>
+              <input id="xpReward"
                 name="xpReward"
                 type="number"
                 min={0}

@@ -63,8 +63,8 @@ export default async function EditSimulationPage({ params }: { params: Promise<{
 
             {/* Title */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Title *</label>
-              <input
+              <label htmlFor="title" className="text-sm font-medium text-foreground">Title *</label>
+              <input id="title"
                 name="title"
                 required
                 maxLength={200}
@@ -76,8 +76,8 @@ export default async function EditSimulationPage({ params }: { params: Promise<{
             {/* Type + Difficulty */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Simulation type *</label>
-                <select
+                <label htmlFor="simulationType" className="text-sm font-medium text-foreground">Simulation type *</label>
+                <select id="simulationType"
                   name="simulationType"
                   required
                   defaultValue={simulation.simulationType}
@@ -91,8 +91,8 @@ export default async function EditSimulationPage({ params }: { params: Promise<{
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Difficulty</label>
-                <select
+                <label htmlFor="difficulty" className="text-sm font-medium text-foreground">Difficulty</label>
+                <select id="difficulty"
                   name="difficulty"
                   defaultValue={simulation.difficulty}
                   className="select-base"
@@ -106,8 +106,8 @@ export default async function EditSimulationPage({ params }: { params: Promise<{
 
             {/* Status */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Status</label>
-              <select
+              <label htmlFor="status" className="text-sm font-medium text-foreground">Status</label>
+              <select id="status"
                 name="status"
                 defaultValue={simulation.status}
                 className="select-base"
@@ -122,8 +122,8 @@ export default async function EditSimulationPage({ params }: { params: Promise<{
 
             {/* Scenario */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Scenario *</label>
-              <textarea
+              <label htmlFor="scenario" className="text-sm font-medium text-foreground">Scenario *</label>
+              <textarea id="scenario"
                 name="scenario"
                 required
                 rows={6}
@@ -136,8 +136,8 @@ export default async function EditSimulationPage({ params }: { params: Promise<{
             {/* Estimated time + XP reward */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Estimated time (min)</label>
-                <input
+                <label htmlFor="estimatedTime" className="text-sm font-medium text-foreground">Estimated time (min)</label>
+                <input id="estimatedTime"
                   name="estimatedTime"
                   type="number"
                   min={0}
@@ -146,8 +146,8 @@ export default async function EditSimulationPage({ params }: { params: Promise<{
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">XP reward</label>
-                <input
+                <label htmlFor="xpReward" className="text-sm font-medium text-foreground">XP reward</label>
+                <input id="xpReward"
                   name="xpReward"
                   type="number"
                   min={0}

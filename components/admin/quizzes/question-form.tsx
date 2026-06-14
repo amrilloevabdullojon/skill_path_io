@@ -99,10 +99,10 @@ export function QuestionForm({ quizId }: { quizId: string }) {
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
       {/* Question text */}
       <div className="space-y-1.5">
-        <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        <label htmlFor="text" className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Текст вопроса *
         </label>
-        <textarea
+        <textarea id="text"
           name="text"
           required
           rows={3}
@@ -113,9 +113,9 @@ export function QuestionForm({ quizId }: { quizId: string }) {
 
       {/* Type */}
       <div className="space-y-1.5">
-        <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        <span className="block text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Тип ответа
-        </label>
+        </span>
         <div className="flex gap-2">
           {[QuestionType.SINGLE, QuestionType.MULTI].map((t) => (
             <button
@@ -139,9 +139,9 @@ export function QuestionForm({ quizId }: { quizId: string }) {
 
       {/* Options */}
       <div className="space-y-1.5">
-        <label className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        <span className="block text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Варианты — нажмите букву, чтобы отметить правильный ответ
-        </label>
+        </span>
         <div className="space-y-2">
           {options.map((opt, i) => (
             <div key={opt.id} className="flex items-center gap-2">

@@ -44,8 +44,8 @@ export default async function NewAssignmentPage() {
         <form action={handleCreate} className="max-w-2xl space-y-5">
           {/* Module */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Module *</label>
-            <select name="moduleId" required className="select-base">
+            <label htmlFor="moduleId" className="text-sm font-medium text-foreground">Module *</label>
+            <select id="moduleId" name="moduleId" required className="select-base">
               <option value="">Select a module…</option>
               {modules.map((mod) => (
                 <option key={mod.id} value={mod.id}>
@@ -57,8 +57,8 @@ export default async function NewAssignmentPage() {
 
           {/* Title */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Title *</label>
-            <input
+            <label htmlFor="title" className="text-sm font-medium text-foreground">Title *</label>
+            <input id="title"
               name="title"
               required
               maxLength={200}
@@ -69,8 +69,8 @@ export default async function NewAssignmentPage() {
 
           {/* Assignment type */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Assignment type *</label>
-            <select name="assignmentType" required className="select-base">
+            <label htmlFor="assignmentType" className="text-sm font-medium text-foreground">Assignment type *</label>
+            <select id="assignmentType" name="assignmentType" required className="select-base">
               {Object.values(StudioAssignmentType).map((t) => (
                 <option key={t} value={t}>
                   {t}
@@ -81,8 +81,8 @@ export default async function NewAssignmentPage() {
 
           {/* Instructions */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Instructions *</label>
-            <textarea
+            <label htmlFor="instructions" className="text-sm font-medium text-foreground">Instructions *</label>
+            <textarea id="instructions"
               name="instructions"
               required
               rows={6}
@@ -94,8 +94,8 @@ export default async function NewAssignmentPage() {
           {/* Max score + Estimated time */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Max score</label>
-              <input
+              <label htmlFor="maxScore" className="text-sm font-medium text-foreground">Max score</label>
+              <input id="maxScore"
                 name="maxScore"
                 type="number"
                 min={0}
@@ -105,8 +105,8 @@ export default async function NewAssignmentPage() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Estimated time (min)</label>
-              <input
+              <label htmlFor="estimatedTime" className="text-sm font-medium text-foreground">Estimated time (min)</label>
+              <input id="estimatedTime"
                 name="estimatedTime"
                 type="number"
                 min={0}

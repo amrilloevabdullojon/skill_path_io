@@ -30,8 +30,8 @@ export default async function NewPermissionPage() {
         <form action={handleCreate} className="max-w-lg space-y-5">
           {/* Email */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Email *</label>
-            <input
+            <label htmlFor="email" className="text-sm font-medium text-foreground">Email *</label>
+            <input id="email"
               name="email"
               type="email"
               required
@@ -44,8 +44,8 @@ export default async function NewPermissionPage() {
 
           {/* Role */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Role *</label>
-            <select name="role" required defaultValue={PermissionRoleType.COURSE_EDITOR} className="select-base">
+            <label htmlFor="role" className="text-sm font-medium text-foreground">Role *</label>
+            <select id="role" name="role" required defaultValue={PermissionRoleType.COURSE_EDITOR} className="select-base">
               <option value={PermissionRoleType.SUPER_ADMIN}>Super Admin</option>
               <option value={PermissionRoleType.CONTENT_ADMIN}>Content Admin</option>
               <option value={PermissionRoleType.COURSE_EDITOR}>Course Editor</option>

@@ -5,25 +5,16 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 const eslintConfig = [
   ...nextVitals,
   ...nextTypescript,
-  // Accessibility audit surface. eslint-config-next already enforces a few
-  // jsx-a11y rules as errors; this layer adds the *full* recommended set as
-  // warnings so the remaining issues stay visible (and regressions surface)
-  // without blocking CI. A static pass found 78: mostly unassociated <label>s
-  // in admin forms, a few keyboard-interaction gaps, and one false positive on
-  // the CardTitle wrapper — they need a visually-verified sweep to fix. The
-  // plugin is already registered by eslint-config-next, so we only set rules.
+  // Accessibility guardrail. The full jsx-a11y recommended set is enabled at its
+  // native severity (errors) on top of the subset eslint-config-next ships. The
+  // codebase was swept clean against it (associated every admin-form <label>,
+  // made the interview-preview controls keyboard-accessible), so this now blocks
+  // regressions in CI. Dynamic checks (contrast, keyboard flows, screen readers)
+  // still need a running app. The plugin is already registered by
+  // eslint-config-next, so we only set rules here.
   {
     files: ["app/**/*.{ts,tsx,jsx}", "components/**/*.{ts,tsx,jsx}"],
-    rules: Object.fromEntries(
-      Object.entries(jsxA11y.flatConfigs.recommended.rules)
-        // Keep only rules the recommended set actually enables, preserving any
-        // options, but downgrade the severity to "warn".
-        .map(([rule, value]) => {
-          const opts = Array.isArray(value) ? value.slice(1) : [];
-          const severity = Array.isArray(value) ? value[0] : value;
-          return [rule, severity === "off" || severity === 0 ? "off" : ["warn", ...opts]];
-        }),
-    ),
+    rules: jsxA11y.flatConfigs.recommended.rules,
   },
   {
     ignores: [

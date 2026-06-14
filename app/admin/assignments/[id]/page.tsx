@@ -57,8 +57,8 @@ export default async function EditAssignmentPage({ params }: { params: Promise<{
 
             {/* Title */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Title *</label>
-              <input
+              <label htmlFor="title" className="text-sm font-medium text-foreground">Title *</label>
+              <input id="title"
                 name="title"
                 required
                 maxLength={200}
@@ -70,8 +70,8 @@ export default async function EditAssignmentPage({ params }: { params: Promise<{
             {/* Type + Status */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Assignment type *</label>
-                <select
+                <label htmlFor="assignmentType" className="text-sm font-medium text-foreground">Assignment type *</label>
+                <select id="assignmentType"
                   name="assignmentType"
                   required
                   defaultValue={assignment.assignmentType}
@@ -85,8 +85,8 @@ export default async function EditAssignmentPage({ params }: { params: Promise<{
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Status</label>
-                <select
+                <label htmlFor="status" className="text-sm font-medium text-foreground">Status</label>
+                <select id="status"
                   name="status"
                   defaultValue={assignment.status}
                   className="select-base"
@@ -102,8 +102,8 @@ export default async function EditAssignmentPage({ params }: { params: Promise<{
 
             {/* Instructions */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Instructions *</label>
-              <textarea
+              <label htmlFor="instructions" className="text-sm font-medium text-foreground">Instructions *</label>
+              <textarea id="instructions"
                 name="instructions"
                 required
                 rows={6}
@@ -115,8 +115,8 @@ export default async function EditAssignmentPage({ params }: { params: Promise<{
 
             {/* Expected output */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Expected output</label>
-              <textarea
+              <label htmlFor="expectedOutput" className="text-sm font-medium text-foreground">Expected output</label>
+              <textarea id="expectedOutput"
                 name="expectedOutput"
                 rows={4}
                 defaultValue={assignment.expectedOutput}
@@ -128,8 +128,8 @@ export default async function EditAssignmentPage({ params }: { params: Promise<{
             {/* Max score + Estimated time */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Max score</label>
-                <input
+                <label htmlFor="maxScore" className="text-sm font-medium text-foreground">Max score</label>
+                <input id="maxScore"
                   name="maxScore"
                   type="number"
                   min={0}
@@ -139,8 +139,8 @@ export default async function EditAssignmentPage({ params }: { params: Promise<{
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Estimated time (min)</label>
-                <input
+                <label htmlFor="estimatedTime" className="text-sm font-medium text-foreground">Estimated time (min)</label>
+                <input id="estimatedTime"
                   name="estimatedTime"
                   type="number"
                   min={0}
