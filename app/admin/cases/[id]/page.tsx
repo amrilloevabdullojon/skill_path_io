@@ -60,8 +60,8 @@ export default async function EditCasePage({
 
             {/* Title */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Title *</label>
-              <input
+              <label htmlFor="title" className="text-sm font-medium text-foreground">Title *</label>
+              <input id="title"
                 name="title"
                 required
                 maxLength={300}
@@ -72,8 +72,8 @@ export default async function EditCasePage({
 
             {/* Summary */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Summary</label>
-              <textarea
+              <label htmlFor="summary" className="text-sm font-medium text-foreground">Summary</label>
+              <textarea id="summary"
                 name="summary"
                 rows={2}
                 maxLength={500}
@@ -84,10 +84,10 @@ export default async function EditCasePage({
 
             {/* Problem Statement */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">
+              <label htmlFor="problemStatement" className="text-sm font-medium text-foreground">
                 Problem Statement *
               </label>
-              <textarea
+              <textarea id="problemStatement"
                 name="problemStatement"
                 rows={5}
                 required
@@ -98,10 +98,10 @@ export default async function EditCasePage({
 
             {/* Expected Approach */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">
+              <label htmlFor="expectedApproach" className="text-sm font-medium text-foreground">
                 Expected Approach
               </label>
-              <textarea
+              <textarea id="expectedApproach"
                 name="expectedApproach"
                 rows={4}
                 defaultValue={caseStudy.expectedApproach}
@@ -111,8 +111,8 @@ export default async function EditCasePage({
 
             {/* Outcome */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Outcome</label>
-              <textarea
+              <label htmlFor="outcome" className="text-sm font-medium text-foreground">Outcome</label>
+              <textarea id="outcome"
                 name="outcome"
                 rows={3}
                 defaultValue={caseStudy.outcome}
@@ -123,8 +123,8 @@ export default async function EditCasePage({
             {/* Difficulty + Status */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Difficulty</label>
-                <select
+                <label htmlFor="difficulty" className="text-sm font-medium text-foreground">Difficulty</label>
+                <select id="difficulty"
                   name="difficulty"
                   defaultValue={caseStudy.difficulty}
                   className="select-base"
@@ -135,8 +135,8 @@ export default async function EditCasePage({
                 </select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-foreground">Status</label>
-                <select
+                <label htmlFor="status" className="text-sm font-medium text-foreground">Status</label>
+                <select id="status"
                   name="status"
                   defaultValue={caseStudy.status}
                   className="select-base"

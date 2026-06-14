@@ -42,13 +42,13 @@ export default async function NewCasePage() {
         <form action={handleCreate} className="max-w-2xl space-y-5">
           {/* Module */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Module *</label>
+            <label htmlFor="moduleId" className="text-sm font-medium text-foreground">Module *</label>
             {modules.length === 0 ? (
               <p className="rounded-lg border border-amber-500/20 bg-amber-500/8 p-3 text-sm text-amber-400">
                 No modules found. Create a module first before adding a case study.
               </p>
             ) : (
-              <select name="moduleId" required className="select-base">
+              <select id="moduleId" name="moduleId" required className="select-base">
                 <option value="">Select a module…</option>
                 {modules.map((mod) => (
                   <option key={mod.id} value={mod.id}>
@@ -61,8 +61,8 @@ export default async function NewCasePage() {
 
           {/* Title */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Title *</label>
-            <input
+            <label htmlFor="title" className="text-sm font-medium text-foreground">Title *</label>
+            <input id="title"
               name="title"
               required
               maxLength={300}
@@ -73,8 +73,8 @@ export default async function NewCasePage() {
 
           {/* Summary */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Summary</label>
-            <textarea
+            <label htmlFor="summary" className="text-sm font-medium text-foreground">Summary</label>
+            <textarea id="summary"
               name="summary"
               rows={2}
               maxLength={500}
@@ -85,10 +85,10 @@ export default async function NewCasePage() {
 
           {/* Problem Statement */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">
+            <label htmlFor="problemStatement" className="text-sm font-medium text-foreground">
               Problem Statement *
             </label>
-            <textarea
+            <textarea id="problemStatement"
               name="problemStatement"
               rows={5}
               required
@@ -99,8 +99,8 @@ export default async function NewCasePage() {
 
           {/* Difficulty */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Difficulty</label>
-            <select name="difficulty" defaultValue="MEDIUM" className="select-base">
+            <label htmlFor="difficulty" className="text-sm font-medium text-foreground">Difficulty</label>
+            <select id="difficulty" name="difficulty" defaultValue="MEDIUM" className="select-base">
               <option value="EASY">Easy</option>
               <option value="MEDIUM">Medium</option>
               <option value="HARD">Hard</option>

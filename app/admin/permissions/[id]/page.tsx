@@ -42,7 +42,7 @@ export default async function EditPermissionPage({
 
           {/* Email (read-only) */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Email</label>
+            <span className="block text-sm font-medium text-foreground">Email</span>
             <p className="input-base cursor-default font-mono text-muted-foreground select-all">
               {role.email}
             </p>

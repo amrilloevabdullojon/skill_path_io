@@ -1,9 +1,21 @@
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTypescript from "eslint-config-next/typescript";
+import jsxA11y from "eslint-plugin-jsx-a11y";
 
 const eslintConfig = [
   ...nextVitals,
   ...nextTypescript,
+  // Accessibility guardrail. The full jsx-a11y recommended set is enabled at its
+  // native severity (errors) on top of the subset eslint-config-next ships. The
+  // codebase was swept clean against it (associated every admin-form <label>,
+  // made the interview-preview controls keyboard-accessible), so this now blocks
+  // regressions in CI. Dynamic checks (contrast, keyboard flows, screen readers)
+  // still need a running app. The plugin is already registered by
+  // eslint-config-next, so we only set rules here.
+  {
+    files: ["app/**/*.{ts,tsx,jsx}", "components/**/*.{ts,tsx,jsx}"],
+    rules: jsxA11y.flatConfigs.recommended.rules,
+  },
   {
     ignores: [
       ".next/**",

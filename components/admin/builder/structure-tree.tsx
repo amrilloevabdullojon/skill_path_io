@@ -51,6 +51,10 @@ function SortableModuleRow({ id, title, status, selected, onSelect }: SortableMo
       }`}
     >
       <span className="inline-flex items-center gap-2">
+        {/* Drag handle: dnd-kit's {...attributes} supplies role/tabIndex and
+            {...listeners} supplies keyboard drag handlers — both invisible to
+            the linter because they're spread. */}
+        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
         <span
           {...attributes}
           {...listeners}
