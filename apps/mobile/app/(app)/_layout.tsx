@@ -2,10 +2,12 @@ import { Redirect, Stack } from "expo-router";
 import { useEffect } from "react";
 
 import { useAuth } from "~/auth";
-import { registerForPushNotifications } from "~/push";
+import { registerForPushNotifications, useNotificationNavigation } from "~/push";
 
 export default function AppLayout() {
   const { status } = useAuth();
+
+  useNotificationNavigation();
 
   useEffect(() => {
     if (status === "authenticated") {
